@@ -34,11 +34,42 @@ filters:
     - " things to "
 
 consolidation:
-  # Headline-similarity threshold for clustering (Day 2). Higher = stricter.
-  similarity_threshold: 0.85
+  # Backend for similarity computation. Options: embeddings | tfidf.
+  #   - embeddings: persistent vector representations, "living vector space"
+  #     (recommended default; same vectors power personalisation, drift
+  #     detection, cross-time relevance later).
+  #   - tfidf: re-fits per run; cheaper deps, but representations don't
+  #     persist. Useful in PyTorch-constrained environments.
+  method: embeddings
+
+  # Cosine-similarity threshold for clustering. The right value differs by
+  # backend because the two methods produce different similarity distributions:
+  #   - embeddings (BGE-base): same-event duplicates ~0.85-0.93; different
+  #     framings of same event ~0.65-0.75; unrelated topics ~0.30-0.45.
+  #     0.78 captures duplicates while preserving framing diversity.
+  #   - tfidf: same-event duplicates ~0.22-0.25; different framings ~0.13-0.15;
+  #     unrelated ~0.00. 0.20 captures duplicates while preserving framing.
+  # Re-tune against your real data once you've ingested a week's worth and run
+  # the compare_consolidation script.
+  similarity_threshold: 0.78
+
   # No single publication may contribute more than this many pieces to the
   # consolidated pool (anti-source-dominance).
   max_per_publication: 3
+
+# Embedding backend (used by Stage 1.5 and later by personalisation).
+embedding:
+  # Options: local | openai
+  #   - local: sentence-transformers on user's machine. Free. No API key.
+  #     Requires `pip install sentence-transformers` (~2GB with PyTorch).
+  #     First run downloads model (~110MB for bge-base-en-v1.5).
+  #   - openai: OpenAI embeddings API. ~$0.50/month at Aarva's volume.
+  #     Requires OPENAI_API_KEY env var and `pip install openai`.
+  provider: local
+  # Model identifier. For 'local': any sentence-transformers / HuggingFace
+  # model. For 'openai': 'text-embedding-3-small' or 'text-embedding-3-large'.
+  # Leave null to use the default for the provider.
+  model: BAAI/bge-base-en-v1.5
 
 assembly:
   slots:

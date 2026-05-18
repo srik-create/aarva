@@ -28,7 +28,9 @@ CREATE TABLE IF NOT EXISTS articles (
     excerpt         TEXT,
     status          TEXT NOT NULL DEFAULT 'ingested'
         CHECK (status IN ('ingested', 'filtered_out', 'scored', 'in_basket',
-                          'in_edition', 'extraction_failed'))
+                          'in_edition', 'extraction_failed')),
+    embedding       BLOB,      -- float32 numpy bytes, L2-normalised
+    embedding_model TEXT       -- name of the model used (for invalidation on swap)
 );
 CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
 CREATE INDEX IF NOT EXISTS idx_articles_publication ON articles(publication_id);
@@ -249,6 +251,40 @@ class Database:
                 "SELECT status, COUNT(*) AS n FROM articles GROUP BY status"
             ).fetchall()
             return {row["status"]: int(row["n"]) for row in rows}
+
+    # ------------------------------------------------------------------
+    # Embeddings
+    # ------------------------------------------------------------------
+
+    def set_article_embedding(
+        self,
+        article_id: int,
+        embedding_bytes: bytes,
+        embedding_model: str,
+    ) -> None:
+        with self.connect() as conn:
+            conn.execute(
+                "UPDATE articles SET embedding = ?, embedding_model = ? WHERE id = ?",
+                (embedding_bytes, embedding_model, article_id),
+            )
+
+    def get_articles_needing_embedding(
+        self,
+        embedding_model: str,
+        status_in: tuple[str, ...] = ("ingested",),
+    ) -> list[sqlite3.Row]:
+        """Articles that don't yet have an embedding from the configured model."""
+        placeholders = ",".join("?" * len(status_in))
+        with self.connect() as conn:
+            return conn.execute(
+                f"""
+                SELECT id, title, COALESCE(excerpt, '') AS excerpt
+                  FROM articles
+                 WHERE status IN ({placeholders})
+                   AND (embedding IS NULL OR embedding_model != ?)
+                """,
+                (*status_in, embedding_model),
+            ).fetchall()
 
     # ------------------------------------------------------------------
     # Pipeline runs
