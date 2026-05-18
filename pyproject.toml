@@ -15,9 +15,17 @@ dependencies = [
     "click>=8.1",
     "httpx>=0.27",
     "python-dateutil>=2.8",
+    "scikit-learn>=1.4",
+    "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
+embeddings = [
+    "sentence-transformers>=3.0",
+]
+openai_embeddings = [
+    "openai>=1.0",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",

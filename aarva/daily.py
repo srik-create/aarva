@@ -22,7 +22,7 @@ import click
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
-from aarva.stages import stage_1_ingest
+from aarva.stages import stage_1_ingest, stage_1_5_consolidate, stage_2_filter
 
 
 def _setup_logging(verbose: bool) -> None:
@@ -50,6 +50,7 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
 
     publication_filter = set(pubs) if pubs else None
 
+    # Stage 1 — Ingestion
     if stage is None or stage == 1:
         log.info("Stage 1 — Ingestion starting")
         run_id = db.start_run("stage_1_ingest")
@@ -71,7 +72,42 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 1 failed")
             sys.exit(1)
 
-    if stage is not None and stage != 1:
+    # Stage 1.5 — Consolidation
+    if stage is None or stage == 15:
+        log.info("Stage 1.5 — Consolidation starting")
+        run_id = db.start_run("stage_1_5_consolidate")
+        try:
+            cstats = stage_1_5_consolidate.consolidate(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 1.5 done — %d candidates, %d clusters (%d singletons), "
+                "%d survivors, %d filtered out",
+                cstats.candidates, cstats.clusters_formed, cstats.singletons,
+                cstats.survivors, cstats.filtered_out,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 1.5 failed")
+            sys.exit(1)
+
+    # Stage 2 — Hard filters
+    if stage is None or stage == 2:
+        log.info("Stage 2 — Hard filters starting")
+        run_id = db.start_run("stage_2_filter")
+        try:
+            fstats = stage_2_filter.filter_hard(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 2 done — %d candidates, %d below word floor, %d listicles, %d survivors",
+                fstats.candidates, fstats.failed_word_floor,
+                fstats.failed_listicle, fstats.survivors,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 2 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)
