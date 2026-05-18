@@ -1,0 +1,169 @@
+# Aarva publication allowlist — v0.1
+#
+# Each entry is a publication. Fields:
+#   name             — display name
+#   rss_url          — RSS / Atom feed URL
+#   homepage         — pub homepage (for reference)
+#   tier             — A through H per kickoff doc §2
+#   enabled          — true / false. Toggling is a one-line change.
+#   licence_status   — informal note: open | cc_licensed | metered | paywalled | republishable
+#   notes            — anything worth remembering
+#
+# v0.1 ingests Tier A/B/C/E/D where feeds are open and full text is fetchable.
+# Tier F (heterodox bench), G (paywalled crumbs), and H (smart escape) are
+# deferred to v0.2 — they need extra handling (extra tonal scrutiny / paywall
+# fishing / different ingestion patterns).
+#
+# RSS URLs verified against typical publisher feed conventions; some may need
+# adjustment as we run real ingestion. The on/off switch is the `enabled` flag.
+
+publications:
+
+  # ─── Tier A — Long-form essays & ideas ─────────────────────────────────────
+  - name: Aeon
+    rss_url: https://aeon.co/feed.rss
+    homepage: https://aeon.co
+    tier: A
+    enabled: true
+    licence_status: cc_licensed
+    notes: CC-licensed, the exemplar long-form essay source
+
+  - name: Psyche
+    rss_url: https://psyche.co/feed
+    homepage: https://psyche.co
+    tier: A
+    enabled: true
+    licence_status: cc_licensed
+    notes: Aeon's sister publication, psychology-focused
+
+  - name: Noema
+    rss_url: https://www.noemamag.com/feed/
+    homepage: https://www.noemamag.com
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Berggruen Institute, big-think essays
+
+  - name: Asterisk
+    rss_url: https://asteriskmag.com/feed
+    homepage: https://asteriskmag.com
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Methodologically curious essays
+
+  - name: Works in Progress
+    rss_url: https://worksinprogress.co/feed
+    homepage: https://worksinprogress.co
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Progress studies essays
+
+  # ─── Tier B — Behind the news ──────────────────────────────────────────────
+  - name: ProPublica
+    rss_url: https://www.propublica.org/feeds/propublica/main
+    homepage: https://www.propublica.org
+    tier: B
+    enabled: true
+    licence_status: republishable
+    notes: Investigative; explicit Creative Commons republishing licence
+
+  - name: The Marshall Project
+    rss_url: https://www.themarshallproject.org/rss/recent
+    homepage: https://www.themarshallproject.org
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Criminal justice reporting
+
+  - name: Lawfare
+    rss_url: https://www.lawfaremedia.org/feed
+    homepage: https://www.lawfaremedia.org
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Law and national security analysis
+
+  - name: Just Security
+    rss_url: https://www.justsecurity.org/feed/
+    homepage: https://www.justsecurity.org
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: NYU-affiliated law/security analysis
+
+  - name: War on the Rocks
+    rss_url: https://warontherocks.com/feed/
+    homepage: https://warontherocks.com
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Defence and foreign policy
+
+  # ─── Tier C — News analysis & opinion ──────────────────────────────────────
+  - name: The Bulwark
+    rss_url: https://www.thebulwark.com/feed
+    homepage: https://www.thebulwark.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Conservative-anti-Trumpist; mostly free posts
+
+  - name: Marginal Revolution
+    rss_url: https://marginalrevolution.com/feed
+    homepage: https://marginalrevolution.com
+    tier: C
+    enabled: true
+    licence_status: open
+    notes: Tyler Cowen and Alex Tabarrok
+
+  - name: Astral Codex Ten
+    rss_url: https://www.astralcodexten.com/feed
+    homepage: https://www.astralcodexten.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Scott Alexander's Substack; open posts only
+
+  # ─── Tier D — International ────────────────────────────────────────────────
+  - name: Rest of World
+    rss_url: https://restofworld.org/feed/
+    homepage: https://restofworld.org
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: Tech-and-society outside the West
+
+  # ─── Tier E — Specialist / vertical ────────────────────────────────────────
+  - name: Quanta Magazine
+    rss_url: https://api.quantamagazine.org/feed/
+    homepage: https://www.quantamagazine.org
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Science, math, computer science
+
+  - name: The Conversation
+    rss_url: https://theconversation.com/us/articles.atom
+    homepage: https://theconversation.com
+    tier: E
+    enabled: true
+    licence_status: cc_licensed
+    notes: Academic syndication, CC-licensed
+
+  - name: Knowable Magazine
+    rss_url: https://knowablemagazine.org/feed
+    homepage: https://knowablemagazine.org
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Annual Reviews-affiliated academic synthesis
+
+  - name: Smithsonian Magazine
+    rss_url: https://www.smithsonianmag.com/rss/latest_articles/
+    homepage: https://www.smithsonianmag.com
+    tier: E
+    enabled: true
+    licence_status: metered
+    notes: Open longform, history-leaning

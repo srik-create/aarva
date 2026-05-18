@@ -1,0 +1,83 @@
+# Aarva pipeline configuration — v0.1
+#
+# All tunable parameters of the pipeline live here so changes don't need code.
+
+paths:
+  db: aarva/data/aarva.db
+  audio_dir: aarva/output/audio
+  web_dir: aarva/output/web
+  rss_feed: aarva/output/feed.xml
+
+ingestion:
+  # How many entries to consider per feed per run. RSS feeds typically return
+  # ~10-30 items; we cap to avoid runaway extraction on misbehaving feeds.
+  max_entries_per_feed: 30
+  # How many days back to ingest. RSS feeds often include older items; we
+  # cap to recent-ish content for v0.1.
+  lookback_days: 7
+  # Per-request timeout when fetching feeds and article pages.
+  http_timeout_seconds: 30
+  # User agent for HTTP requests.
+  user_agent: "Aarva/0.1 (research; +aarva.app)"
+
+filters:
+  # Stage 2 word-count floor. From kickoff §2.
+  word_floor: 600
+  # Listicle-style headlines we drop at Stage 2.
+  listicle_keywords:
+    - "top 10"
+    - "top ten"
+    - "best of"
+    - " ways to "
+    - " reasons "
+    - " things you "
+    - " things to "
+
+consolidation:
+  # Headline-similarity threshold for clustering (Day 2). Higher = stricter.
+  similarity_threshold: 0.85
+  # No single publication may contribute more than this many pieces to the
+  # consolidated pool (anti-source-dominance).
+  max_per_publication: 3
+
+assembly:
+  slots:
+    deep_feature: 1
+    lens_card_future: 1
+    lens_card_humans: 1
+    lens_card_behind: 1
+    curiosity: 1
+    smart_escape: 1
+  length_distribution:
+    short: 0.30   # <= 8 minutes
+    medium: 0.50  # 8-15 minutes
+    long: 0.20    # > 15 minutes
+  trending_cap: 0.50
+
+scoring:
+  # Stage 4 hard-gate thresholds. From Q5.
+  rigour_min: 0.5
+  posture_min: 0.5
+  # Ranking score weights. From Q5.
+  rigour_weight: 0.45
+  posture_weight: 0.45
+  self_implication_weight: 0.10
+  # Prompt version pin (matches a key in prompts.yaml).
+  prompt_version: v1
+
+llm:
+  # Default provider. Options: claude_code, anthropic_api.
+  provider: claude_code
+  # Timeout for a single LLM call.
+  timeout_seconds: 120
+  # Sampling temperature. Low for classification, slightly higher for hooks.
+  temperature_classify: 0.1
+  temperature_generate: 0.6
+
+tts:
+  # Default provider. Options: piper, f5_tts, elevenlabs, openai_tts.
+  provider: piper
+  # Voice id (provider-specific). We'll pin one after auditioning a few in Day 6.
+  voice_id: null
+  # Speaking rate adjustment (1.0 = default).
+  speed: 1.0
