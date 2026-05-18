@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — AI-narrated journalism, beautifully read</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f3ede2;
+    --cream-deep: #ebe2d3;
+    --paper: #faf6ee;
+    --ink: #18130d;
+    --ink-soft: #3a3128;
+    --muted: #8a7e6c;
+    --rule: #d9cfbd;
+    --accent: #c8421f;
+    --accent-deep: #a8341a;
+    --gold: #b08842;
+    --teal: #1a4a3a;
+    --plum: #4a2a4a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: #2a241c;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 16px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(200,66,31,0.08), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(176,136,66,0.08), transparent 50%);
+  }
+
+  .intro {
+    max-width: 920px;
+    color: #e8dec9;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+  }
+  .intro h1 {
+    font-weight: 300;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
+  .intro p {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    color: #b8ad96;
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .frames {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .phone {
+    width: 380px;
+    height: 780px;
+    background: var(--paper);
+    border-radius: 44px;
+    box-shadow:
+      0 0 0 8px #1a1410,
+      0 0 0 10px #2a241c,
+      0 40px 80px rgba(0,0,0,0.5),
+      0 20px 40px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .status .right { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+  .status svg { display: block; }
+
+  .notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 28px;
+    background: #1a1410;
+    border-radius: 18px;
+    z-index: 100;
+  }
+
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ===== Header ===== */
+  .header { padding: 8px 24px 16px; }
+  .brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
+  .brand::after { content: '.'; color: var(--accent); }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c8421f, #b08842);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Fraunces', serif;
+  }
+  .date-row {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .date-row .vol { font-family: 'Fraunces', serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--ink-soft); }
+
+  .greeting {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 400;
+    margin-top: 22px;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .greeting em { color: var(--accent); font-style: italic; font-weight: 500; }
+  .question-line {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .greeting-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* ===== Featured story ===== */
+  .featured {
+    margin: 0 24px 28px;
+    background: linear-gradient(160deg, #1f1a14 0%, #2d251a 100%);
+    border-radius: 18px;
+    padding: 22px 22px 20px;
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .featured::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 90% 0%, rgba(200,66,31,0.35), transparent 60%),
+      radial-gradient(circle at 0% 100%, rgba(176,136,66,0.2), transparent 50%);
+    pointer-events: none;
+  }
+  .featured-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #d9b676;
+    margin-bottom: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .featured-tag::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: #d9b676;
+  }
+  .featured-question {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #d9b676;
+    margin-bottom: 8px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .featured h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .featured-meta {
+    font-size: 11px;
+    color: #b8ad96;
+    margin-bottom: 18px;
+    position: relative;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+  .featured-meta strong { color: var(--paper); font-style: normal; font-family: 'Inter Tight', sans-serif; font-weight: 500; }
+  .featured-pillar {
+    display: inline-block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--paper);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+    font-family: 'Inter Tight', sans-serif;
+    font-style: normal;
+  }
+  .play-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+  }
+  .play-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    cursor: pointer;
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .play-btn:hover { transform: scale(1.05); }
+  .play-btn svg { margin-left: 2px; }
+  .duration {
+    font-size: 12px;
+    color: #d9c8a8;
+    letter-spacing: 0.05em;
+  }
+  .duration .dot { color: var(--accent); margin: 0 6px; }
+  .ai-voice {
+    margin-left: auto;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #d9b676;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ai-voice::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #d9b676;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ===== Three lenses bar ===== */
+  .lenses-section {
+    padding: 4px 0 28px;
+    background: linear-gradient(180deg, transparent, rgba(200,66,31,0.04));
+  }
+  .lenses-intro {
+    padding: 0 24px;
+    margin-bottom: 14px;
+  }
+  .lenses-eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .lenses-title {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .lenses-title em { font-style: italic; color: var(--accent); }
+
+  .lens-cards {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 24px;
+    scrollbar-width: none;
+  }
+  .lens-cards::-webkit-scrollbar { display: none; }
+  .lens-card {
+    flex: 0 0 200px;
+    aspect-ratio: 4 / 5;
+    border-radius: 14px;
+    padding: 14px;
+    color: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .lens-card.future { background: linear-gradient(155deg, #1a4a3a, #0f2a1f); }
+  .lens-card.humans { background: linear-gradient(155deg, #c8421f, #6a1d0a); }
+  .lens-card.behind { background: linear-gradient(155deg, #4a2a4a, #28162a); }
+  .lens-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 28px;
+    opacity: 0.5;
+    line-height: 1;
+  }
+  .lens-card-content {
+    z-index: 2;
+  }
+  .lens-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .lens-name em { font-style: italic; }
+  .lens-tagline {
+    font-size: 10px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+  .lens-count {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.55);
+    margin-top: 12px;
+  }
+
+  /* ===== Section headers ===== */
+  .section-header {
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .section-title em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .section-more {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* ===== Article list ===== */
+  .articles { padding: 0 24px; }
+  .article {
+    display: flex;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: flex-start;
+  }
+  .article:last-child { border-bottom: none; }
+  .article-num {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--muted);
+    width: 22px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .article-body { flex: 1; min-width: 0; }
+  .article-tags {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .article-publisher {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .pillar-tag {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .article h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .article-question {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .article-meta {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .article-meta .sep { color: var(--rule); }
+  .mini-play {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mini-play:hover { background: var(--ink); color: var(--paper); }
+  .mini-play svg { margin-left: 1px; }
+
+  /* ===== Tab bar ===== */
+  .tabbar {
+    height: 76px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--rule);
+    background: rgba(250, 246, 238, 0.95);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 16px 14px;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+  }
+  .tab.active { color: var(--accent); }
+  .tab svg { width: 22px; height: 22px; }
+
+  /* ===== DISCOVER VIEW ===== */
+  .discover-screen { padding-bottom: 30px; }
+  .discover-header {
+    padding: 12px 24px 24px;
+  }
+  .discover-title {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .discover-title em { font-style: italic; color: var(--accent); }
+  .discover-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+  .lens-section {
+    border-top: 1px solid var(--rule);
+    padding: 22px 24px 24px;
+  }
+  .lens-section.future { background: linear-gradient(180deg, rgba(26,74,58,0.04), transparent); }
+  .lens-section.humans { background: linear-gradient(180deg, rgba(200,66,31,0.04), transparent); }
+  .lens-section.behind { background: linear-gradient(180deg, rgba(74,42,74,0.04), transparent); }
+  .lens-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+  .lens-section-head .num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .lens-section.future .num { color: var(--teal); }
+  .lens-section.humans .num { color: var(--accent); }
+  .lens-section.behind .num { color: var(--plum); }
+  .lens-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .lens-section-title em { font-style: italic; }
+  .lens-section-desc {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .lens-cta {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .lens-stories {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin: 0 -24px;
+    padding: 0 24px 4px;
+    scrollbar-width: none;
+  }
+  .lens-stories::-webkit-scrollbar { display: none; }
+  .story-card {
+    flex: 0 0 220px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .story-card .pub {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .story-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+  .story-card .duration-line {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: auto;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .story-card .play-mini {
+    width: 22px;
+    height: 22px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== EDITORIAL PROMISE ===== */
+  .promise-screen {
+    padding: 0 0 24px;
+    background:
+      linear-gradient(180deg, var(--paper) 0%, var(--cream-deep) 100%);
+    min-height: 100%;
+  }
+  .promise-hero {
+    padding: 24px 28px 30px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .promise-hero::before {
+    content: '"';
+    position: absolute;
+    top: -40px;
+    right: -10px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 240px;
+    color: var(--accent);
+    opacity: 0.06;
+    line-height: 1;
+  }
+  .promise-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .promise-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin-bottom: 14px;
+  }
+  .promise-title em { font-style: italic; color: var(--accent); font-weight: 500; }
+  .promise-lede {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .promise-section {
+    padding: 22px 28px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .promise-h {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    margin-bottom: 4px;
+  }
+  .promise-h em { font-style: italic; color: var(--accent); }
+  .promise-sub {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .promise-body {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .promise-body p + p { margin-top: 8px; }
+  .voice-list {
+    list-style: none;
+    margin-top: 10px;
+  }
+  .voice-list li {
+    font-size: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .voice-list li:last-child { border-bottom: 1px solid var(--rule); }
+  .voice-list .we {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .voice-list .not {
+    color: var(--muted);
+    text-decoration: line-through;
+    font-size: 11px;
+  }
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .pillar-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .pillar-card .name {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+  .pillar-card .desc {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  /* Frame labels */
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .label {
+    color: #b8ad96;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .label strong {
+    color: #e8dec9;
+    font-style: normal;
+    font-weight: 400;
+    font-family: 'Inter Tight', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 10px;
+    margin-right: 8px;
+    padding: 3px 8px;
+    border: 1px solid #b8ad96;
+    border-radius: 3px;
+  }
+
+  @media (max-width: 1280px) {
+    .frames { gap: 20px; }
+    .phone { width: 340px; height: 700px; }
+    .greeting { font-size: 26px; }
+    .featured h2 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Aarva<span style="color:var(--accent)">.</span> &nbsp;<span style="opacity:0.5">—</span>&nbsp; The world as your classroom.</h1>
+  <p>Now reflecting the editorial guidelines · three lenses, five pillars, a clear voice</p>
+</div>
+
+<div class="frames">
+
+  <!-- ============ SCREEN 1: TODAY (revised) ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status">
+        <span>9:41</span>
+        <span class="right">
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><path d="M1 9h2V5H1v4zm4 0h2V3H5v6zm4 0h2V1H9v8zm4 0h2V-1h-2v10z"/></svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="3" width="9" height="4" rx="1"/><rect x="11" y="4" width="1.5" height="2" fill="currentColor"/><rect x="2" y="4" width="6" height="2" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="screen">
+        <div class="header">
+          <div class="brand-row">
+            <div class="brand">Aarva</div>
+            <div class="avatar">M</div>
+          </div>
+          <div class="date-row">
+            <span>Wed · 29 Apr 2026</span>
+            <span class="vol">Vol. IV</span>
+          </div>
+          <h1 class="greeting">Good morning, <em>Maya</em>.</h1>
+          <p class="question-line">A few questions worth sitting with today —</p>
+          <p class="greeting-sub">7 stories · 48 min · Three lenses</p>
+        </div>
+
+        <div class="featured">
+          <div class="featured-tag">Editor's Pick</div>
+          <p class="featured-question">If a city could grow most of its own food, would it still be a city?</p>
+          <h2>The quiet revolution rewriting how cities feed themselves</h2>
+          <div class="featured-meta">
+            <span class="featured-pillar">Feature</span>
+            <strong>The Atlantic</strong> · 14 min · Sarah Zhang
+          </div>
+          <div class="play-row">
+            <div class="play-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M2 1l11 6-11 6V1z"/></svg>
+            </div>
+            <div class="duration">14:22<span class="dot">·</span>Future Gazing</div>
+            <div class="ai-voice">Eleanor</div>
+          </div>
+        </div>
+
+        <!-- Three lenses -->
+        <div class="lenses-section">
+          <div class="lenses-intro">
+            <div class="lenses-eyebrow">Today's edition</div>
+            <div class="lenses-title">Three <em>lenses</em> on the world</div>
+          </div>
+          <div class="lens-cards">
+            <div class="lens-card future">
+              <div class="lens-num">01</div>
+              <div class="lens-card-content">
+                <div class="lens-name">Future <em>Gazing</em></div>
+                <div class="lens-tagline">Where might the world be heading?</div>
+                <div class="lens-count">3 stories · 18 min</div>
+              </div>
+            </div>
+            <div class="lens-card humans">
+              <div class="lens-num">02</div>
+              <div class="lens-card-content">
+                <div class="lens-name">Humans &amp; <em>Humanity</em></div>
+                <div class="lens-tagline">The wonders of the human mind</div>
+                <div class="lens-count">2 stories · 16 min</div>
+              </div>
+            </div>
+            <div class="lens-card behind">
+              <div class="lens-num">03</div>
+              <div class="lens-card-content">
+                <div class="lens-name">Behind the <em>News</em></div>
+                <div class="lens-tagline">The bigger picture behind the headlines</div>
+                <div class="lens-count">2 stories · 14 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">For <em>your morning</em></div>
+          <div class="section-more">See all</div>
+        </div>
+
+        <div class="articles">
+          <div class="article">
+            <div class="article-num">01</div>
+            <div class="article-body">
+              <div class="article-tags">
+                <div class="article-publisher">Aeon</div>
+                <div class="pillar-tag">Ideas</div>
+              </div>
+              <h3>How Daoism shatters our illusions of time and being</h3>
+              <p class="article-question">What if the present moment is the only thing that's actually real?</p>
+              <div class="article-meta"><span>11 min</span><span class="sep">·</span><span>Humans &amp; Humanity</span></div>
+            </div>
+            <div class="mini-play"><svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor"><path d="M1 0l8 4.5L1 9V0z"/></svg></div>
+          </div>
+
+          <div class="article">
+            <div class="article-num">02</div>
+            <div class="article-body">
+              <div class="article-tags">
+                <div class="article-publisher">The Economist</div>
+                <div class="pillar-tag">News &amp; Analysis</div>
+              </div>
+              <h3>What rare-earth diplomacy reveals about a fragmenting world order</h3>
+              <p class="article-question">Who actually controls the supply chains of the future?</p>
+              <div class="article-meta"><span>9 min</span><span class="sep">·</span><span>Behind the News</span></div>
+            </div>
+            <div class="mini-play"><svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor"><path d="M1 0l8 4.5L1 9V0z"/></svg></div>
+          </div>
+
+          <div class="article">
+            <div class="article-num">03</div>
+            <div class="article-body">
+              <div class="article-tags">
+                <div class="article-publisher">Wired</div>
+                <div class="pillar-tag">Feature</div>
+              </div>
+              <h3>Inside the Dutch lab teaching AI to forget</h3>
+              <p class="article-question">If a machine can remember everything, should it?</p>
+              <div class="article-meta"><span>11 min</span><span class="sep">·</span><span>Future Gazing</span></div>
+            </div>
+            <div class="mini-play"><svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor"><path d="M1 0l8 4.5L1 9V0z"/></svg></div>
+          </div>
+
+          <div class="article">
+            <div class="article-num">04</div>
+            <div class="article-body">
+              <div class="article-tags">
+                <div class="article-publisher">The New Yorker</div>
+                <div class="pillar-tag">Feature</div>
+              </div>
+              <h3>The painter who spent forty years on a single landscape</h3>
+              <p class="article-question">What does it mean to give your life to one thing?</p>
+              <div class="article-meta"><span>22 min</span><span class="sep">·</span><span>Humans &amp; Humanity</span></div>
+            </div>
+            <div class="mini-play"><svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor"><path d="M1 0l8 4.5L1 9V0z"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Today
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+          Discover
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4v16l7-4 7 4V4z"/></svg>
+          Library
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          You
+        </div>
+      </div>
+    </div>
+    <div class="label"><strong>01</strong>Today</div>
+  </div>
+
+  <!-- ============ SCREEN 2: DISCOVER (new — three lenses) ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status">
+        <span>9:43</span>
+        <span class="right">
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><path d="M1 9h2V5H1v4zm4 0h2V3H5v6zm4 0h2V1H9v8zm4 0h2V-1h-2v10z"/></svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="3" width="9" height="4" rx="1"/><rect x="11" y="4" width="1.5" height="2" fill="currentColor"/><rect x="2" y="4" width="6" height="2" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="screen">
+        <div class="discover-screen">
+          <div class="discover-header">
+            <h1 class="discover-title">The world as your <em>classroom</em></h1>
+            <p class="discover-sub">Three lenses to look through. No right answers — just better questions.</p>
+          </div>
+
+          <!-- LENS 1: Future Gazing -->
+          <div class="lens-section future">
+            <div class="lens-section-head">
+              <div class="num">01</div>
+              <div style="flex:1;">
+                <div class="lens-section-title">Future <em>Gazing</em></div>
+                <div class="lens-section-desc">"If aliens exist, here's how we'll find them."<br>Stories about what's coming next.</div>
+              </div>
+              <div class="lens-cta">All →</div>
+            </div>
+            <div class="lens-stories">
+              <div class="story-card">
+                <div class="pub">MIT Tech Review</div>
+                <h4>The race to teach sign language to computers</h4>
+                <div class="duration-line"><span>9 min · Feature</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">Aeon</div>
+                <h4>Extraterrestrial engineering: building beyond Earth</h4>
+                <div class="duration-line"><span>16 min · Ideas</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">Wired</div>
+                <h4>The rules of the tech game are changing</h4>
+                <div class="duration-line"><span>12 min · Analysis</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LENS 2: Humans & Humanity -->
+          <div class="lens-section humans">
+            <div class="lens-section-head">
+              <div class="num">02</div>
+              <div style="flex:1;">
+                <div class="lens-section-title">Humans &amp; <em>Humanity</em></div>
+                <div class="lens-section-desc">"What if you could describe your dreams while dreaming?"<br>The mind, the heart, the strange business of being alive.</div>
+              </div>
+              <div class="lens-cta">All →</div>
+            </div>
+            <div class="lens-stories">
+              <div class="story-card">
+                <div class="pub">The New Yorker</div>
+                <h4>Meet Carl Hart: parent, professor, and heroin user</h4>
+                <div class="duration-line"><span>28 min · Profile</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">Aeon</div>
+                <h4>Why natural beauty nourishes our spiritual selves</h4>
+                <div class="duration-line"><span>14 min · Ideas</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">The Atlantic</div>
+                <h4>The scars of solitary confinement</h4>
+                <div class="duration-line"><span>19 min · Feature</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LENS 3: Behind the News -->
+          <div class="lens-section behind">
+            <div class="lens-section-head">
+              <div class="num">03</div>
+              <div style="flex:1;">
+                <div class="lens-section-title">Behind the <em>News</em></div>
+                <div class="lens-section-desc">"A brief global history of the war on cannabis."<br>Context for the headlines you've already seen.</div>
+              </div>
+              <div class="lens-cta">All →</div>
+            </div>
+            <div class="lens-stories">
+              <div class="story-card">
+                <div class="pub">Foreign Policy</div>
+                <h4>The brutal third act of Vladimir Putin</h4>
+                <div class="duration-line"><span>17 min · Analysis</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">The Guardian</div>
+                <h4>Hong Kong's historic businesses face an uncertain future</h4>
+                <div class="duration-line"><span>11 min · Feature</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+              <div class="story-card">
+                <div class="pub">FT</div>
+                <h4>Why leave the EU, when you can shape it instead?</h4>
+                <div class="duration-line"><span>8 min · Opinion</span><div class="play-mini"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><path d="M1 0l6 3.5L1 7V0z"/></svg></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Today
+        </div>
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+          Discover
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4v16l7-4 7 4V4z"/></svg>
+          Library
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          You
+        </div>
+      </div>
+    </div>
+    <div class="label"><strong>02</strong>Discover · Three Lenses</div>
+  </div>
+
+  <!-- ============ SCREEN 3: EDITORIAL PROMISE ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status">
+        <span>9:46</span>
+        <span class="right">
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><path d="M1 9h2V5H1v4zm4 0h2V3H5v6zm4 0h2V1H9v8zm4 0h2V-1h-2v10z"/></svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="3" width="9" height="4" rx="1"/><rect x="11" y="4" width="1.5" height="2" fill="currentColor"/><rect x="2" y="4" width="6" height="2" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="screen">
+        <div class="promise-screen">
+          <div class="promise-hero">
+            <div class="promise-eyebrow">Our editorial promise</div>
+            <h1 class="promise-title">We're building <em>bridges</em>, not echo chambers.</h1>
+            <p class="promise-lede">We don't claim to know the answers. We use questions to examine values, principles, and beliefs — and let you learn through your own discovery.</p>
+          </div>
+
+          <div class="promise-section">
+            <div class="promise-h">The world as our <em>classroom</em></div>
+            <div class="promise-sub">What we believe</div>
+            <div class="promise-body">
+              <p>Today, journalism is associated with news. We see it as a framework to tell excellent stories — and as a gateway to lifelong learning.</p>
+              <p>When the best journalism meets specialised insights from leading academics and thinkers, concepts come alive. We grow, not just as readers, but as people.</p>
+            </div>
+          </div>
+
+          <div class="promise-section">
+            <div class="promise-h">How we <em>sound</em></div>
+            <div class="promise-sub">Our voice in four lines</div>
+            <ul class="voice-list">
+              <li><span class="we">Personal</span><span style="color:var(--muted); font-size:11px;">where others are</span><span class="not">standoffish</span></li>
+              <li><span class="we">Curious</span><span style="color:var(--muted); font-size:11px;">where others play</span><span class="not">devil's advocate</span></li>
+              <li><span class="we">A participant</span><span style="color:var(--muted); font-size:11px;">where others are</span><span class="not">an authority</span></li>
+              <li><span class="we">Playful</span><span style="color:var(--muted); font-size:11px;">where others are</span><span class="not">heavy</span></li>
+            </ul>
+          </div>
+
+          <div class="promise-section">
+            <div class="promise-h">Five <em>building blocks</em></div>
+            <div class="promise-sub">What we publish</div>
+            <div class="pillars-grid">
+              <div class="pillar-card">
+                <div class="name">News &amp; Analysis</div>
+                <div class="desc">Expert reporting with the context to make sense of it.</div>
+              </div>
+              <div class="pillar-card">
+                <div class="name">Features</div>
+                <div class="desc">Long stories that earn their length.</div>
+              </div>
+              <div class="pillar-card">
+                <div class="name">Opinion</div>
+                <div class="desc">Insights from leading thinkers — Harari, Harford, and more.</div>
+              </div>
+              <div class="pillar-card">
+                <div class="name">Conversations</div>
+                <div class="desc">Interviews and panels — sometimes in their own voice.</div>
+              </div>
+              <div class="pillar-card" style="grid-column: span 2;">
+                <div class="name">Ideas</div>
+                <div class="desc">Big questions from science, philosophy, and beyond — the kind that shift how you see the world.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="promise-section" style="border-bottom: none;">
+            <div class="promise-h">Designed for <em>your</em> experience</div>
+            <div class="promise-sub">No expiry dates</div>
+            <div class="promise-body">
+              <p>Stories have been given a shelf-life. But like a good book, the right one can be picked up at any moment. We curate so you can return — and discover.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Today
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+          Discover
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4v16l7-4 7 4V4z"/></svg>
+          Library
+        </div>
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          You
+        </div>
+      </div>
+    </div>
+    <div class="label"><strong>03</strong>Editorial Promise</div>
+  </div>
+
+</div>
+
+</body>
+</html>

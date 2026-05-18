@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Package managers
+.uv/
+uv.lock
+Pipfile.lock
+poetry.lock
+
+# Aarva runtime state (do not commit)
+aarva/data/
+aarva/output/audio/
+aarva/output/web/
+aarva/output/feed.xml
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Secrets (never commit)
+.env
+.env.local
+*.secret
+credentials.json
+*_api_key*
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Temp / build artefacts
+*.log
+tmp/
+temp/
+.cache/
+~$*
