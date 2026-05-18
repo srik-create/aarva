@@ -22,7 +22,9 @@ import click
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
-from aarva.stages import stage_1_ingest, stage_1_5_consolidate, stage_2_filter
+from aarva.stages import (
+    stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
+)
 
 
 def _setup_logging(verbose: bool) -> None:
@@ -107,7 +109,23 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 2 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2):
+    # Stage 4+5+6 — Combined LLM scoring
+    if stage is None or stage in (4, 456):
+        log.info("Stage 4+5+6 — Combined LLM scoring starting")
+        run_id = db.start_run("stage_4_5_6_score")
+        try:
+            sstats = stage_4_5_6_score.score_all(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 4+5+6 done — %d candidates, %d scored (%d PASS, %d FAIL), %d errors",
+                sstats.candidates, sstats.scored, sstats.passed, sstats.failed, sstats.errors,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 4+5+6 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2, 4, 456):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)

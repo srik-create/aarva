@@ -1,0 +1,203 @@
+# Aarva LLM prompts — versioned.
+#
+# Each prompt has a version string (referenced from pipeline.yaml's
+# scoring.prompt_version). Multiple versions can coexist so we can run
+# A/B comparisons and roll back without losing the previous text.
+#
+# Variables wrapped in {{ ... }} are substituted at runtime:
+#   {{ article_body }}    — the full text of the article being scored
+#   {{ publication }}     — the source publication's name
+#   {{ published_date }}  — article publication date (YYYY-MM-DD)
+#   {{ topic_recency }}   — 0.0-1.0 recency-sensitivity from Stage 5
+#   {{ briefing_topics }} — top wire-branch topics today (for Stage 8b
+#                            current-event bridging)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 4+5+6 — Combined tonal + classification + fingerprint scoring
+# ─────────────────────────────────────────────────────────────────────────────
+# Combined because they all need to read the full article and produce
+# structured outputs. Single LLM call per article = ~3x cheaper than
+# separate calls, with no quality loss observed in calibration.
+#
+# Calibration learnings from v1 baked in:
+#   1. Posture requires depth, not just access (slot 3 disagreement)
+#   2. Provocation is allowed; vagueness is not (slots 10, 22)
+#   3. Per-piece, no author halo; derivative summaries scored on own substance (slot 6)
+
+stage_4_5_6:
+
+  v1:
+    description: |
+      Combined tonal scoring (Stage 4) + classification (Stage 5) +
+      narrative fingerprint (Stage 6). Single LLM call. Calibrated
+      against the v1 hand-labelled 32-piece set with the four
+      disagreement patterns folded in.
+
+    system: |
+      You are an editorial judge for Aarva, an audio-journalism app.
+      Apply yourself with the rigour of an editor of a publication like
+      the New Yorker or the Financial Times.
+
+    user: |
+      Score the article below on three sub-dimensions of editorial
+      substance (Stage 4), classify it on four categorisation axes
+      (Stage 5), and tag its narrative fingerprint along six dimensions
+      (Stage 6). Return a single JSON object.
+
+      Aarva's editorial commitment is rigour-and-honesty: welcome
+      controversial views and sharp arguments built with care; reject
+      lazy claims and dismissive framings even when tonally measured.
+
+      ════════════════════════════════════════════════════════════════
+      STAGE 4 — TONAL ANALYSIS
+      ════════════════════════════════════════════════════════════════
+
+      Sub-dimension 1 — RIGOUR (0.0 to 1.0):
+      Are the article's claims earned? Specifically:
+        - Are claims supported by specific evidence (named data, sources,
+          cases, primary documents)?
+        - Are generalisations bounded with appropriate qualifiers, or
+          sweeping?
+        - Does reasoning chain through, or skip steps?
+        - Are counter-arguments engaged or just dismissed?
+        - Are key terms defined when not common ground?
+
+      IMPORTANT: Rigour is about substance, not register. A sharply
+      opinionated piece with provocative claims is rigorous if those
+      claims are anchored to specific evidence and engage real
+      counter-arguments. A measured-toned piece that gestures at "both
+      sides" without specifics fails on rigour. Anger is fine.
+      Vagueness is not.
+
+      Sub-dimension 2 — POSTURE TOWARD SUBJECT (0.0 to 1.0):
+      How does the writer treat the people, groups, or viewpoints they
+      describe? Look for:
+        - Are opposing views stated accurately and understood from inside?
+        - Is dehumanising language used?
+        - Does the writer attempt to inhabit the subject's perspective?
+        - Does the writer probe past stated reasons to underlying
+          motivations and lived experience?
+
+      IMPORTANT: Letting subjects speak is necessary but NOT sufficient
+      for high posture. A reported piece can quote its subjects
+      extensively and still fail on posture if the journalist doesn't
+      push past stated reasons. High posture requires depth of
+      understanding, not just access.
+
+      Sub-dimension 3 — SELF-IMPLICATION (0.0 to 1.0):
+      Does the writer apply the same critical lens to their own
+      side/position? Bonus, not gate.
+
+      VERDICT and RANKING:
+      Hard gate: PASS if rigour >= 0.5 AND posture >= 0.5; otherwise FAIL.
+      Ranking: 0.45 * rigour + 0.45 * posture + 0.10 * self_implication.
+
+      ════════════════════════════════════════════════════════════════
+      STAGE 5 — CLASSIFICATION
+      ════════════════════════════════════════════════════════════════
+
+      Lens (one of, or 'unclassified' if no clear fit):
+        - future_gazing: the future possibilities of our world
+        - humans_and_humanity: the wonders of the human mind and experience
+        - behind_the_news: the bigger picture behind headlines
+
+      Pillar (one of):
+        - news_analysis, features, opinion, conversations, ideas
+
+      JTBD primary (one of), and optional secondary:
+        - keep_up_to_date: main happenings + deeper understanding
+        - keep_ahead: emerging trends worth knowing
+        - curiosity: something interesting
+        - smart_escape: entertaining/easy-but-constructive
+
+      Topic recency sensitivity (0.0 to 1.0):
+      How quickly does this piece's subject become stale? HIGH (0.7-1.0)
+      for current politics, sports, breaking tech, current science
+      findings, ongoing wars. MEDIUM (0.3-0.7) for industry analyses,
+      profiles of current figures, cultural commentary. LOW (0.0-0.3)
+      for philosophy, history, deep science (mechanisms), profiles of
+      historical figures, durable cultural criticism, personal essays.
+
+      ════════════════════════════════════════════════════════════════
+      STAGE 6 — NARRATIVE FINGERPRINT
+      ════════════════════════════════════════════════════════════════
+
+      Structural form (one of):
+        investigation, profile, essay, explainer, narrative_reportage,
+        dialogue, polemic, archive_anthology
+
+      Method of inquiry (one of):
+        first_person_investigation, scholarly_analysis, narrative_reporting,
+        philosophical_reasoning, data_driven, interview_dialogue,
+        lived_experience, archival
+
+      Voice register — primary (and optional secondary):
+        authoritative, intimate, analytical, playful, lyrical,
+        journalistic_detached, polemic, conversational
+
+      Temporal lens (distribution, sums to 1.0):
+        historical, present, speculative, timeless
+
+      Cognitive density (1-7 ordinal): how much new conceptual material
+      per unit length. NOT a quality score.
+
+      Emotional register (distribution, sums to 1.0):
+        contemplative, melancholy, joyful, awed, anxious, angry,
+        hopeful, comforting
+
+      ════════════════════════════════════════════════════════════════
+      CRITICAL RULES
+      ════════════════════════════════════════════════════════════════
+
+      1. Score each piece on its own merits. Do NOT adjust based on the
+         author's reputation, other work, or the publication's general
+         standing. Aarva judges each piece independently.
+      2. If the piece is a recap or summary of another piece, score it
+         on what it itself contains, not what the original referenced
+         contains.
+      3. Register is not substance. Polite vagueness fails. Sharp
+         specificity passes.
+
+      ════════════════════════════════════════════════════════════════
+      OUTPUT FORMAT (return JSON only, no preamble, no trailing text)
+      ════════════════════════════════════════════════════════════════
+
+      {
+        "rigour": <0.0-1.0>,
+        "rigour_rationale": "<1-2 sentences>",
+        "posture": <0.0-1.0>,
+        "posture_rationale": "<1-2 sentences>",
+        "self_implication": <0.0-1.0>,
+        "self_implication_rationale": "<1-2 sentences>",
+        "verdict": "PASS" | "FAIL",
+        "ranking_score": <computed: 0.45*rigour + 0.45*posture + 0.10*self_implication>,
+
+        "lens": "future_gazing" | "humans_and_humanity" | "behind_the_news" | "unclassified",
+        "lens_rationale": "<1 sentence>",
+        "pillar": "news_analysis" | "features" | "opinion" | "conversations" | "ideas",
+        "jtbd_primary": "keep_up_to_date" | "keep_ahead" | "curiosity" | "smart_escape",
+        "jtbd_secondary": <same options, or null>,
+        "topic_recency_sensitivity": <0.0-1.0>,
+        "topic_recency_rationale": "<1 sentence>",
+
+        "structural_form": "<one of 8>",
+        "method_of_inquiry": "<one of 8>",
+        "voice_register": {"primary": "<one of 8>", "secondary": "<one of 8 or null>"},
+        "temporal_lens": {"historical": <p>, "present": <p>, "speculative": <p>, "timeless": <p>},
+        "cognitive_density": <1-7>,
+        "emotional_register": {"contemplative": <p>, "melancholy": <p>, "joyful": <p>, "awed": <p>, "anxious": <p>, "angry": <p>, "hopeful": <p>, "comforting": <p>}
+      }
+
+      Both distributions (temporal_lens, emotional_register) must sum to
+      exactly 1.0. Small floating-point error is acceptable.
+
+      ════════════════════════════════════════════════════════════════
+      ARTICLE METADATA:
+      ════════════════════════════════════════════════════════════════
+      Publication: {{ publication }}
+      Published: {{ published_date }}
+
+      ════════════════════════════════════════════════════════════════
+      ARTICLE TEXT:
+      ════════════════════════════════════════════════════════════════
+      {{ article_body }}
