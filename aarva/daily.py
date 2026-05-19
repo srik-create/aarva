@@ -24,7 +24,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
-    stage_7_assemble,
+    stage_7_assemble, stage_8_hook_context,
 )
 
 
@@ -147,7 +147,25 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 7 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2, 4, 456, 7):
+    # Stage 8 — Hook + why-now contextualisation
+    if stage is None or stage == 8:
+        log.info("Stage 8 — Hook + why-now contextualisation starting")
+        run_id = db.start_run("stage_8_hook_context")
+        try:
+            s8stats = stage_8_hook_context.generate_for_edition(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 8 done — %d pieces, %d hooks, %d contexts, %d skipped, %d errors",
+                s8stats.pieces_total, s8stats.hooks_generated,
+                s8stats.contexts_generated, s8stats.skipped_already_done,
+                s8stats.errors,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 8 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)
