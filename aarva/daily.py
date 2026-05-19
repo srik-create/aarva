@@ -24,7 +24,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
-    stage_7_assemble, stage_8_hook_context,
+    stage_7_assemble, stage_8_hook_context, stage_9_tts,
 )
 
 
@@ -165,7 +165,25 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 8 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8):
+    # Stage 9 — TTS audio synthesis
+    if stage is None or stage == 9:
+        log.info("Stage 9 — TTS audio synthesis starting")
+        run_id = db.start_run("stage_9_tts")
+        try:
+            s9stats = stage_9_tts.generate_for_edition(config, db)
+            db.finish_run(run_id, status="success")
+            total_min = s9stats.total_audio_seconds / 60.0
+            log.info(
+                "Stage 9 done — %d pieces, %d audio generated (%.1f min), %d errors",
+                s9stats.pieces_total, s9stats.audio_generated,
+                total_min, s9stats.errors,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 9 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8, 9):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)

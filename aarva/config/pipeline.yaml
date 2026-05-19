@@ -106,9 +106,24 @@ llm:
   temperature_generate: 0.6
 
 tts:
-  # Default provider. Options: piper, f5_tts, elevenlabs, openai_tts.
+  # Provider. Options: piper (local, free), elevenlabs (cloud, paid),
+  # openai_tts (cloud, cheap), f5_tts (local, higher quality).
+  # v0.1 default: piper.
   provider: piper
-  # Voice id (provider-specific). We'll pin one after auditioning a few in Day 6.
-  voice_id: null
-  # Speaking rate adjustment (1.0 = default).
+
+  # Path to the Piper voice model (.onnx file). The .onnx.json sidecar must
+  # live alongside it. Tildes are expanded.
+  # v0.1 default: en_GB-northern_english_male-medium (warm-British register
+  # to fit the magazine aesthetic).
+  model_path: ~/.piper-voices/en_GB-northern_english_male-medium.onnx
+
+  # Override the piper binary location if it isn't on PATH.
+  # Leave null to use whatever `piper` resolves to.
+  binary: null
+
+  # Speaking rate (1.0 = default). >1 speaks faster, <1 slower.
   speed: 1.0
+
+  # Hard cap on a single synthesis run (seconds). Long articles take a few
+  # minutes; this is a safety net against runaway processes.
+  timeout_seconds: 600
