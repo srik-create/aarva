@@ -24,6 +24,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
+    stage_7_assemble,
 )
 
 
@@ -125,7 +126,28 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 4+5+6 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2, 4, 456):
+    # Stage 7 — Edition assembly
+    if stage is None or stage == 7:
+        log.info("Stage 7 — Edition assembly starting")
+        run_id = db.start_run("stage_7_assemble")
+        try:
+            astats = stage_7_assemble.assemble_edition(config, db)
+            db.finish_run(run_id, status="success")
+            if astats.edition_id is not None:
+                log.info(
+                    "Stage 7 done — edition #%d, %d slots filled, %d skipped (%s)",
+                    astats.edition_id, astats.slots_filled,
+                    len(astats.slots_skipped),
+                    ", ".join(astats.slots_skipped) if astats.slots_skipped else "none",
+                )
+            else:
+                log.warning("Stage 7 done — no edition built (insufficient candidates)")
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 7 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2, 4, 456, 7):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)
