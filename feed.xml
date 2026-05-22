@@ -8,7 +8,7 @@
     <link>https://srik-create.github.io/aarva</link>
     <description>AI-narrated journalism. The world as your classroom.</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 22 May 2026 21:19:43 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 22 May 2026 21:57:00 +0000</lastBuildDate>
     <itunes:author>Aarva</itunes:author>
     <itunes:owner>
       <itunes:name>Aarva</itunes:name>
@@ -16,7 +16,8 @@
     </itunes:owner>
     <itunes:category text="News"><itunes:category text="News Commentary"/></itunes:category>
     <itunes:explicit>false</itunes:explicit>
-    
+    <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+    <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://srik-create.github.io/aarva</link></image>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>He Was Fired for Sexually Harassing Students. California Allowed Him to Keep Teaching Anyway.</title>
