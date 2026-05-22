@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Tuesday, 19 May 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="edition-date">2026-05-19</div>
+      <div class="edition-meta">4 pieces · Tuesday, 19 May 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">When a state knows a teacher was fired for harassing students, why does it keep that information from the next school that hires him?</p>
+        <h2 class="title">He Was Fired for Sexually Harassing Students. California Allowed Him to Keep Teaching Anyway.</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Mollie Simon</span>
+        </p>
+        <p class="contextualisation">California has one of the most opaque teacher disciplinary systems in the country — and this investigation makes visible exactly what that opacity costs. The central puzzle here isn&#x27;t about one teacher&#x27;s behavior; it&#x27;s about how a credentialing system designed to protect students can instead shield the information that would let schools make informed decisions. What&#x27;s the actual gap between &quot;not convicted of a crime&quot; and &quot;fit to teach&quot;? That&#x27;s the question this piece keeps pressing on.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-05-19/article_0017.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>25 min</span>
+          <span class='sep'>·</span><span>narrated by female</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/california-fired-teacher-sexual-harassment' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">Why are babies still dying from something a single injection at birth could prevent?</p>
+        <h2 class="title">Tiny Footprints, a Blue Blanket: What I Can’t Forget About the Babies Who Died of Vitamin K Deficiency</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Duaa Eldeib</span>
+        </p>
+        <p class="contextualisation">The vitamin K shot is one of the most uncontroversial interventions in newborn medicine — sixty years of standard practice, Nobel Prize-backed science, a single injection at birth. Refusal rates still jumped 77 percent between 2017 and 2024. What&#x27;s worth sitting with isn&#x27;t the medical question, which doctors consider settled, but the cultural one: how vaccine skepticism migrated into something that isn&#x27;t a vaccine, and what that costs — rendered here through autopsy records, which turn out to carry more humanity than you&#x27;d expect.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-05-19/article_0009.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by female</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/vitamin-k-baby-autopsy-reports' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">When your ID, your lawsuit, and a viral video aren&#x27;t enough to prove you&#x27;re American, what is?</p>
+        <h2 class="title">Why Have Immigration Agents Detained This American Citizen Three Times?</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Nicole Foy</span>
+        </p>
+        <p class="contextualisation">The question at the center of this piece isn&#x27;t really whether immigration enforcement makes mistakes — of course it does. It&#x27;s what happens when those mistakes are documented on video, go viral, reach Congress, and still keep happening. And what it means when the officials responsible say, on the record, that they haven&#x27;t happened at all. There&#x27;s something clarifying about following one person through a system that has decided, repeatedly, that his citizenship is not sufficient proof of his citizenship.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-05-19/article_0010.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>7 min</span>
+          <span class='sep'>·</span><span>narrated by female</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/immigration-leo-garcia-venegas-arrests-detentions-citizens-ice-dhs' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">When the government admits it probably got the wrong people, who answers for what it did to them?</p>
+        <h2 class="title">Immigrants Detained in Chicago Military-Style Raid Seek Millions in Damages</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Mariam Elba</span>
+        </p>
+        <p class="contextualisation">The September raid on a Chicago apartment complex got saturating coverage — the Black Hawk helicopter, the flash grenades, the TV crew embedded with agents. What this piece follows is the quieter aftermath: the administrative claims filed this week by 17 people detained that night, seeking millions in damages and the more elusive thing that comes before damages, which is an official acknowledgment that something went wrong. The Federal Tort Claims Act is one of the only legal levers available to people harmed by federal agents. Whether it bends is still an open question.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-05-19/article_0015.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>11 min</span>
+          <span class='sep'>·</span><span>narrated by male</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/chicago-immigration-raid-ice-dhs-fbi-federal-tort-claims' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Aarva — the world as your classroom.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
