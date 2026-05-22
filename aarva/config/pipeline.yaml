@@ -106,24 +106,56 @@ llm:
   temperature_generate: 0.6
 
 tts:
-  # Provider. Options: piper (local, free), elevenlabs (cloud, paid),
-  # openai_tts (cloud, cheap), f5_tts (local, higher quality).
-  # v0.1 default: piper.
-  provider: piper
+  # Provider. v0.1 ships kokoro (lightweight ONNX, designed for long-form
+  # narration, runs well on MacBook Air's 8GB profile). Alternatives:
+  # chatterbox (higher quality voice-cloning but hangs on MBA MPS),
+  # macos_say (Apple's built-in `say`), piper (lower-quality fallback).
+  provider: kokoro
 
-  # Path to the Piper voice model (.onnx file). The .onnx.json sidecar must
-  # live alongside it. Tildes are expanded.
-  # v0.1 default: en_GB-northern_english_male-medium (warm-British register
-  # to fit the magazine aesthetic).
-  model_path: ~/.piper-voices/en_GB-northern_english_male-medium.onnx
+  # Kokoro model + voices files (downloaded from
+  # github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0)
+  model_path: aarva/models/kokoro-v1.0.onnx
+  voices_path: aarva/models/voices-v1.0.bin
 
-  # Override the piper binary location if it isn't on PATH.
-  # Leave null to use whatever `piper` resolves to.
-  binary: null
+  # Map Aarva-level voice IDs to Kokoro preset voice names.
+  # af_bella:  American, warm, the most-recommended long-form Kokoro voice
+  #            (Grade A in 2026 community rankings).
+  # bm_george: British, authoritative, "velvet-smooth tone for professional
+  #            narration." Picked after auditioning vs am_michael —
+  #            felt closer to Aarva's editorial register. Earlier candidate
+  #            bm_daniel was too flat with poor sentence transitions.
+  # Easy to swap by editing these strings.
+  voice_map:
+    female: af_bella
+    male:   bm_george
 
-  # Speaking rate (1.0 = default). >1 speaks faster, <1 slower.
+  voice_default: female
+  voice_alternate: male
+
+  # Voice-selection rule for Stage 9.
+  #   alternate_with_gender_match: gender-matched for first-person articles,
+  #     alternating between voice_default and voice_alternate otherwise.
+  #   alternate: pure alternation by position (no LLM call required).
+  #   single: always voice_default (no per-piece selection).
+  voice_selection_rule: alternate_with_gender_match
+
+  # Kokoro-specific controls.
+  lang: en-us
   speed: 1.0
+  max_chunk_chars: 1500   # Kokoro handles longer chunks comfortably
 
-  # Hard cap on a single synthesis run (seconds). Long articles take a few
-  # minutes; this is a safety net against runaway processes.
+  # Hard cap on a single synthesis run (seconds).
   timeout_seconds: 600
+
+  # — Chatterbox fallback (used when provider: chatterbox) —
+  # device: mps
+  # voices: {female: aarva/voices/female_ref.wav, male: aarva/voices/male_ref.wav}
+  # exaggeration: 0.5
+  # cfg_weight: 0.5
+
+  # — macOS say fallback (used when provider: macos_say) —
+  # voice_default: Serena (Premium)
+  # voice_alternate: Jamie (Premium)
+
+  # — Piper fallback (used when provider: piper) —
+  # model_path: ~/.piper-voices/en_GB-northern_english_male-medium.onnx

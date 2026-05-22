@@ -1,20 +1,36 @@
 """Stage 9 — Audio synthesis.
 
-For every piece in today's edition, build the full narration text
+For every piece in today's edition, pick a narrator voice (per the
+configured selection rule), build the full narration text
 (hook + contextualisation + article body), synthesize via the configured
 TTSClient, save the WAV file, and update edition_pieces with the audio
-URL and duration.
+URL, duration, and narrator voice.
 
-Idempotent: pieces that already have audio_url skip re-synthesis.
+Voice-selection rules (configured in pipeline.yaml under tts.voice_selection_rule):
+
+  alternate_with_gender_match (default for v0.1):
+    For each piece, a small LLM call detects whether the article is
+    first-person AND the author's gender is identifiable. If yes,
+    match the voice (Serena for female, Jamie for male). Otherwise
+    alternate between voice_default and voice_alternate by slot
+    position to vary narration across the edition.
+
+  alternate:
+    Pure alternation by position. No LLM call. Cheapest.
+
+  single:
+    Always use voice_default. No per-piece selection.
 """
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Optional
 
+from aarva.clients.llm import LLMClient, build_llm_client
 from aarva.clients.tts import TTSClient, build_tts_client
 from aarva.config import PipelineConfig
 from aarva.db import Database
@@ -32,20 +48,7 @@ class Stage9Stats:
 
 
 def _compose_narration(piece: dict) -> str:
-    """Combine the editorial wrapper + article body into one narration string.
-
-    Layout (blank lines render as natural pauses in Piper):
-
-        {hook}                  ← the editor's italic question
-
-        {contextualisation}     ← the 60-100 word why-now paragraph
-
-        {article body}          ← the article itself
-
-    For pieces missing a hook or context (e.g., Stage 8 hadn't run on them
-    yet), those segments are simply omitted — the article body still gets
-    narrated.
-    """
+    """Combine hook + context + article body; blank lines render as pauses."""
     parts: list[str] = []
     if piece.get("hook"):
         parts.append(str(piece["hook"]).strip())
@@ -56,12 +59,8 @@ def _compose_narration(piece: dict) -> str:
     return "\n\n".join(p for p in parts if p)
 
 
-def _audio_filename(article_id: int) -> str:
-    return f"article_{article_id:04d}.wav"
-
-
 def _audio_path(audio_dir: Path, edition_date: date, article_id: int) -> Path:
-    return audio_dir / edition_date.isoformat() / _audio_filename(article_id)
+    return audio_dir / edition_date.isoformat() / f"article_{article_id:04d}.wav"
 
 
 def _load_edition_pieces(
@@ -69,24 +68,20 @@ def _load_edition_pieces(
     edition_id: int,
     include_done: bool = False,
 ) -> tuple[date, list[dict]]:
-    """Return (edition_date, pieces). Pieces with audio_url filled are
-    skipped unless include_done=True.
-    """
     where = "" if include_done else " AND (ep.audio_url IS NULL OR ep.audio_url = '')"
     with db.connect() as conn:
         edition = conn.execute(
-            "SELECT id, edition_date FROM editions WHERE id = ?",
-            (edition_id,),
+            "SELECT id, edition_date FROM editions WHERE id = ?", (edition_id,),
         ).fetchone()
         if not edition:
             raise RuntimeError(f"Edition {edition_id} not found.")
         edition_date = date.fromisoformat(str(edition["edition_date"]))
 
         rows = conn.execute(f"""
-            SELECT ep.edition_id, ep.article_id, ep.slot,
+            SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
                    ep.hook, ep.contextualisation,
                    ep.audio_url AS existing_audio_url,
-                   a.title, a.full_text
+                   a.title, a.full_text, a.byline
               FROM edition_pieces ep
               JOIN articles a ON a.id = ep.article_id
              WHERE ep.edition_id = ?
@@ -102,13 +97,14 @@ def _save_audio(
     article_id: int,
     audio_url: str,
     duration_seconds: int,
+    narrator_voice: str,
 ) -> None:
     with db.connect() as conn:
         conn.execute(
             "UPDATE edition_pieces "
-            "SET audio_url = ?, duration_seconds = ? "
+            "SET audio_url = ?, duration_seconds = ?, narrator_voice = ? "
             "WHERE edition_id = ? AND article_id = ?",
-            (audio_url, duration_seconds, edition_id, article_id),
+            (audio_url, duration_seconds, narrator_voice, edition_id, article_id),
         )
 
 
@@ -120,6 +116,88 @@ def _get_latest_edition_id(db: Database) -> Optional[int]:
     return int(row["id"]) if row else None
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Voice selection
+# ─────────────────────────────────────────────────────────────────────────────
+
+_NARRATOR_PROMPT = """\
+Read this article. Reply with EXACTLY ONE WORD:
+
+- MALE: if the article is written in first-person AND the author is clearly male (the byline name is conventionally male or the text explicitly says so)
+- FEMALE: if the article is written in first-person AND the author is clearly female (the byline name is conventionally female or the text explicitly says so)
+- NEUTRAL: in all other cases (third-person reporting, ambiguous byline, multi-author, or no clear first-person voice)
+
+When unsure, return NEUTRAL.
+
+Byline: {byline}
+Article (first 2500 chars):
+{excerpt}
+
+Reply with one word: MALE, FEMALE, or NEUTRAL."""
+
+
+def _detect_narrator_gender(piece: dict, llm: LLMClient) -> str:
+    """Returns 'male', 'female', or 'neutral'."""
+    excerpt = (piece.get("full_text") or "")[:2500]
+    byline = piece.get("byline") or "Unknown"
+    prompt = _NARRATOR_PROMPT.format(excerpt=excerpt, byline=byline)
+    try:
+        response = llm.complete(prompt, expect_json=False, temperature=0.0)
+        text = str(response).strip().upper()
+        # The model sometimes returns "FEMALE" inside a longer sentence;
+        # match on word boundaries and prefer the most specific token.
+        if re.search(r"\bFEMALE\b", text):
+            return "female"
+        if re.search(r"\bMALE\b", text):
+            return "male"
+        return "neutral"
+    except Exception as e:
+        logger.warning("Narrator detection failed (%s); defaulting to neutral", e)
+        return "neutral"
+
+
+def _pick_voice(
+    piece: dict,
+    voice_default: str,
+    voice_alternate: str,
+    rule: str,
+    llm: Optional[LLMClient],
+) -> tuple[str, str]:
+    """Returns (voice_id, reason) for logging."""
+    position = int(piece.get("position") or 0)
+
+    if rule == "single":
+        return voice_default, "single-voice rule"
+
+    if rule == "alternate":
+        if position % 2 == 0:
+            return voice_default, f"alternation (position {position}, even)"
+        return voice_alternate, f"alternation (position {position}, odd)"
+
+    # alternate_with_gender_match (default)
+    if llm is None:
+        # Fallback: just alternate
+        return (
+            (voice_default, f"alternation (position {position}, even); no LLM")
+            if position % 2 == 0
+            else (voice_alternate, f"alternation (position {position}, odd); no LLM")
+        )
+
+    hint = _detect_narrator_gender(piece, llm)
+    if hint == "female":
+        return voice_default, "first-person female narrator detected"
+    if hint == "male":
+        return voice_alternate, "first-person male narrator detected"
+    # NEUTRAL → alternate by position
+    if position % 2 == 0:
+        return voice_default, f"third-person/neutral, alternation (position {position}, even)"
+    return voice_alternate, f"third-person/neutral, alternation (position {position}, odd)"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Public entry point
+# ─────────────────────────────────────────────────────────────────────────────
+
 def generate_for_edition(
     config: PipelineConfig,
     db: Database,
@@ -127,7 +205,6 @@ def generate_for_edition(
     edition_id: Optional[int] = None,
     include_done: bool = False,
 ) -> Stage9Stats:
-    """Run Stage 9 against the configured edition (default: latest)."""
     stats = Stage9Stats()
 
     if edition_id is None:
@@ -137,18 +214,27 @@ def generate_for_edition(
             return stats
         logger.info("Stage 9: using latest edition #%d", edition_id)
 
-    edition_date, pieces = _load_edition_pieces(db, edition_id,
-                                                 include_done=include_done)
+    edition_date, pieces = _load_edition_pieces(
+        db, edition_id, include_done=include_done
+    )
     stats.pieces_total = len(pieces)
     if not pieces:
         logger.info("Stage 9: no pieces in edition #%d need audio", edition_id)
         return stats
 
     tts = build_tts_client(config.tts)
+    voice_default = config.tts.get("voice_default") or tts.default_voice_id
+    voice_alternate = config.tts.get("voice_alternate") or voice_default
+    rule = config.tts.get("voice_selection_rule", "alternate_with_gender_match")
+
+    llm: Optional[LLMClient] = None
+    if rule == "alternate_with_gender_match":
+        llm = build_llm_client(config.llm)
+
     audio_dir = config.audio_dir
     logger.info(
-        "Stage 9: synthesizing %d pieces with voice=%s",
-        len(pieces), tts.voice_id,
+        "Stage 9: synthesizing %d pieces  |  voice rule=%s  |  default=%s  alternate=%s",
+        len(pieces), rule, voice_default, voice_alternate,
     )
 
     for piece in pieces:
@@ -163,24 +249,27 @@ def generate_for_edition(
             stats.errors += 1
             continue
 
+        voice_id, reason = _pick_voice(
+            piece, voice_default, voice_alternate, rule, llm
+        )
+
         out_path = _audio_path(audio_dir, edition_date, article_id)
         char_count = len(narration)
-        approx_minutes = char_count / 1000.0   # ~1000 chars per spoken minute, very rough
+        approx_minutes = char_count / 1000.0
 
         logger.info(
             "  [%s] article %d (%d chars, est ~%.1f min) — %s",
             slot, article_id, char_count, approx_minutes, title_preview,
         )
+        logger.info("      voice: %s  (%s)", voice_id, reason)
 
         try:
-            result = tts.synthesize(narration, out_path)
+            result = tts.synthesize(narration, out_path, voice_id=voice_id)
         except Exception as e:
             stats.errors += 1
             logger.warning("      synthesis failed: %s", e)
             continue
 
-        # Store the audio path relative to project root for portability.
-        # The web/RSS renderers will join with a public URL base later.
         try:
             rel_path = result.output_path.relative_to(audio_dir.parent.parent)
         except ValueError:
@@ -191,6 +280,7 @@ def generate_for_edition(
             db, edition_id, article_id,
             audio_url=audio_url,
             duration_seconds=int(round(result.duration_seconds)),
+            narrator_voice=result.voice_id,
         )
 
         stats.audio_generated += 1
