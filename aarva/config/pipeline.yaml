@@ -8,6 +8,29 @@ paths:
   web_dir: aarva/output/web
   rss_feed: aarva/output/feed.xml
 
+output:
+  # Public URL where the rendered HTML pages, RSS feed, and audio files will
+  # be hosted. Used to construct absolute URLs in the RSS feed so podcast
+  # apps can fetch the audio.
+  #
+  # For v0.1 testing you can use file:// to view locally, but a real podcast
+  # app subscription needs a real public URL. Easy free options:
+  #   - GitHub Pages:    https://<your-gh-user>.github.io/aarva
+  #   - Cloudflare Pages: https://aarva.pages.dev
+  #   - Your domain:     https://aarva.example.com
+  #
+  # Update this once you've picked a host. Until then, the local-file
+  # output still works for inspecting the web page in a browser.
+  public_url_base: file://
+
+  # Podcast channel metadata (shown in podcast apps when listeners subscribe).
+  feed_title: Aarva
+  feed_description: "AI-narrated journalism. The world as your classroom."
+  feed_author: Aarva
+  feed_email: aarva@example.com
+  feed_link: https://example.com/aarva
+  feed_image: ""
+
 ingestion:
   # How many entries to consider per feed per run. RSS feeds typically return
   # ~10-30 items; we cap to avoid runaway extraction on misbehaving feeds.

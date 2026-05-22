@@ -22,6 +22,7 @@ import click
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
+from aarva.output import web_renderer, rss_feed
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_9_tts,
@@ -183,7 +184,35 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 9 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8, 9):
+    # Stage 10 — Publish (HTML + RSS)
+    if stage is None or stage == 10:
+        log.info("Stage 10 — Publish (HTML + RSS) starting")
+        run_id = db.start_run("stage_10_publish")
+        try:
+            # Render the most recent edition's HTML
+            with db.connect() as conn:
+                latest = conn.execute(
+                    "SELECT id FROM editions ORDER BY edition_date DESC, id DESC LIMIT 1"
+                ).fetchone()
+            if latest:
+                ws = web_renderer.render_edition_html(config, db, int(latest["id"]))
+                log.info("Stage 10 web — edition #%d rendered to %s (%d pieces)",
+                         ws.edition_id, ws.html_path, ws.pieces_rendered)
+            else:
+                log.warning("Stage 10 web — no editions in DB; skipping HTML")
+
+            # Always regenerate the unified RSS feed across all editions
+            fs = rss_feed.generate_feed(config, db)
+            log.info("Stage 10 RSS — %d items written to %s",
+                     fs.items_written, fs.feed_path)
+
+            db.finish_run(run_id, status="success")
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 10 failed")
+            sys.exit(1)
+
+    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8, 9, 10):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)
