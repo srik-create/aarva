@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS edition_pieces (
     contextualisation   TEXT,
     audio_url           TEXT,
     duration_seconds    INTEGER,
+    narrator_voice      TEXT,
     PRIMARY KEY (edition_id, article_id)
 );
 
@@ -145,6 +146,16 @@ class Database:
     def _init_schema(self) -> None:
         with self._connect() as conn:
             conn.executescript(SCHEMA_SQL)
+            # Idempotent column-add migrations for DBs created before a
+            # column existed. SQLite raises OperationalError when the
+            # column already exists; we swallow that.
+            for migration in (
+                "ALTER TABLE edition_pieces ADD COLUMN narrator_voice TEXT",
+            ):
+                try:
+                    conn.execute(migration)
+                except sqlite3.OperationalError:
+                    pass
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:
