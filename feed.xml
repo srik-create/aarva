@@ -8,7 +8,7 @@
     <link>https://srik-create.github.io/aarva</link>
     <description>AI-narrated journalism. The world as your classroom.</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 22 May 2026 21:57:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 23 May 2026 16:49:05 +0000</lastBuildDate>
     <itunes:author>Aarva</itunes:author>
     <itunes:owner>
       <itunes:name>Aarva</itunes:name>
@@ -19,6 +19,72 @@
     <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
     <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://srik-create.github.io/aarva</link></image>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Rights require money</title>
+      <description><![CDATA[<em>If a city’s public transit system is broken, is it really a failure of engineering or a failure of justice?</em><br/><br/>We often talk about human rights as if they exist in a vacuum of laws and courts, but this piece argues that rights are fundamentally tied to the unglamorous, often invisible machinery of global finance. By tracing the journey of a Nairobi commuter, it reveals how the gap between our high-minded ideals and the reality on the ground is actually a structural choice. It’s a compelling look at why we need to stop treating fiscal policy and human dignity as separate conversations if we ever want to build a more equitable world.<br/><br/>Read at source: <a href="https://aeon.co/essays/to-fund-human-rights-we-need-a-global-fair-tax-convention">Aeon</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-5</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0005.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>23:18</itunes:duration>
+      <itunes:author>Attiya Waris</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>To Memorialize the Fallen, Renew the Pursuit of Peace</title>
+      <description><![CDATA[<em>If we are to truly honor the fallen, does our definition of sacrifice require a shift from waging war to building peace?</em><br/><br/>Memorial Day began as a quiet, deliberate act of national healing, a way to stitch together a country torn apart by conflict. But as we mark the occasion today, it feels like we’ve traded that focus on repair for a cycle of perpetual escalation, both in our neighborhoods and on the global stage. This piece asks us to look past the rhetoric of strength and consider what it would actually take to prioritize peace as a strategic, necessary investment. It is a sobering, practical invitation to rethink how we define security for ourselves and our future.<br/><br/>Read at source: <a href="https://www.justsecurity.org/139596/memorializing-the-fallen-pursuit-of-peace/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=memorializing-the-fallen-pursuit-of-peace">Just Security</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-49</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0049.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>11:20</itunes:duration>
+      <itunes:author>Peter J. Quaranto</itunes:author>
+      <itunes:subtitle>Just Security</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Being small</title>
+      <description><![CDATA[<em>How do you stop living out the unresolved childhood of the person who raised you?</em><br/><br/>We all carry the internal grammar of our childhoods, those quiet scripts about power and worth that we wrote when we were small and someone else was very big. This essay explores why we don&#x27;t truly recover from being children, but rather grow into the structures we built to survive our earliest relationships. It’s a profound look at how we project our unresolved ghosts onto others—and how we might eventually learn to become the kind of big people who can hold space for our own vulnerabilities without needing to dominate anyone else.<br/><br/>Read at source: <a href="https://aeon.co/essays/the-power-imbalance-between-parent-and-child-leaves-a-trace">Aeon</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-19</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0019.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>28:03</itunes:duration>
+      <itunes:author>Tom Wooldridge</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Make immigration boring</title>
+      <description><![CDATA[<em>What if we stopped treating immigration as a moral battleground and started treating it like a policy puzzle?</em><br/><br/>The migration debate often feels like a permanent state of emergency, split between two tribes shouting past each other about whether the phenomenon is a grand moral imperative or an existential threat. This piece cuts through that noise by arguing that we are asking the wrong questions entirely. By moving away from the binary of good versus bad, it explores the unglamorous, technical trade-offs that actually define how nations function. It is a compelling reminder that the best way to lower the temperature on such a volatile topic might be to make it significantly more boring.<br/><br/>Read at source: <a href="https://aeon.co/essays/more-migration-or-less-migration-the-answer-is-boring">Aeon</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-20</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0020.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>18:39</itunes:duration>
+      <itunes:author>Alan Manning</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Gen Z but two centuries ago</title>
+      <description><![CDATA[<em>If we stopped treating our anxiety as a personal failing, could we finally see it as a symptom of the world we live in?</em><br/><br/>When we feel overwhelmed by the state of the world, we are often told to look inward—to meditate, optimize our routines, or simply manage our stress better. But looking back at the nineteenth-century French concept of le mal du siècle, we find a different perspective: the idea that our collective malaise might be a rational response to our environment, not a personal failure. This piece explores how a generation two hundred years ago grappled with their own sense of historical displacement, offering us a vital framework for understanding our current anxieties as something shared, structural, and profoundly human.<br/><br/>Read at source: <a href="https://aeon.co/essays/young-people-now-and-the-mal-du-siecle-of-19th-century-france">Aeon</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-3</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0003.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>19:45</itunes:duration>
+      <itunes:author>Emily Herring</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Mathematics is out there</title>
+      <description><![CDATA[<em>If the laws of mathematics were waiting to be found, did we discover them or simply invent the tools to see them?</em><br/><br/>Is mathematics something we invent to describe the world, or is it the hidden substrate of reality itself, waiting for us to uncover it? Sergiu Klainerman, who spent a career probing the stability of black holes and the fabric of spacetime, argues that the most profound mathematical truths exist independently of us. This piece is a beautiful meditation on that question, tracing how a young mathematician found refuge from a restrictive regime in the only discipline that couldn&#x27;t be bent by propaganda. It is a thoughtful look at why math feels less like a language and more like a map to a territory we are only just beginning to explore.<br/><br/>Read at source: <a href="https://aeon.co/essays/for-sergiu-klainerman-maths-is-a-fact-to-be-divined">Aeon</a>]]></description>
+      <pubDate>Sat, 23 May 2026 15:57:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-2-2</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-23/article_0002.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>27:17</itunes:duration>
+      <itunes:author>Steve Nadis</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>He Was Fired for Sexually Harassing Students. California Allowed Him to Keep Teaching Anyway.</title>
       <description><![CDATA[<em>When a state knows a teacher was fired for harassing students, why does it keep that information from the next school that hires him?</em><br/><br/>California has one of the most opaque teacher disciplinary systems in the country — and this investigation makes visible exactly what that opacity costs. The central puzzle here isn&#x27;t about one teacher&#x27;s behavior; it&#x27;s about how a credentialing system designed to protect students can instead shield the information that would let schools make informed decisions. What&#x27;s the actual gap between &quot;not convicted of a crime&quot; and &quot;fit to teach&quot;? That&#x27;s the question this piece keeps pressing on.<br/><br/>Read at source: <a href="https://www.propublica.org/article/california-fired-teacher-sexual-harassment">ProPublica</a>]]></description>
