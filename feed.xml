@@ -8,7 +8,7 @@
     <link>https://srik-create.github.io/aarva</link>
     <description>AI-narrated journalism. The world as your classroom.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 23 May 2026 16:49:05 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 24 May 2026 09:12:27 +0000</lastBuildDate>
     <itunes:author>Aarva</itunes:author>
     <itunes:owner>
       <itunes:name>Aarva</itunes:name>
@@ -19,6 +19,61 @@
     <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
     <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://srik-create.github.io/aarva</link></image>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Beneath our human shallows</title>
+      <description><![CDATA[<em>If we are truly the architects of a new geological age, why do we feel so small when we look beneath our own feet?</em><br/><br/>We tend to talk about the Anthropocene as if we are the planet’s main characters, but this piece offers a much-needed reality check. By looking at how our surface activities—from draining seas to pumping oil—actually ripple down into the Earth’s mantle, we’re forced to confront a paradox: we are powerful enough to leave a geological scar, yet remain entirely peripheral to the grand, slow-motion cycles of the deep Earth. It’s a humbling, perspective-shifting read that suggests the way forward isn’t more hubris, but a deeper recognition of the forces that truly sustain our world.<br/><br/>Read at source: <a href="https://aeon.co/essays/how-does-the-deep-earth-see-humanity">Aeon</a>]]></description>
+      <pubDate>Sun, 24 May 2026 08:36:07 +0000</pubDate>
+      <guid isPermaLink="false">aarva-3-7</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-24/article_0007.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>21:13</itunes:duration>
+      <itunes:author>James Dinneen</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>New Paradigms Won&#x27;t Save You</title>
+      <description><![CDATA[<em>If we need a breakthrough to reach artificial intelligence, why should we assume it will take any longer than our current path?</em><br/><br/>There is a persistent comfort in believing that because our current AI models hit a ceiling, we are decades away from anything truly transformative. It is a way of outsourcing our anxiety to a future paradigm shift. But by applying Lindy’s Law to the history of technical breakthroughs, this piece makes a disquieting case: even if we require an entirely new architecture to reach AGI, we might be much closer to that threshold than we think. It is worth sitting with the possibility that the next leap is already hiding in plain sight.<br/><br/>Read at source: <a href="https://www.astralcodexten.com/p/new-paradigms-wont-save-you">Astral Codex Ten</a>]]></description>
+      <pubDate>Sun, 24 May 2026 08:36:07 +0000</pubDate>
+      <guid isPermaLink="false">aarva-3-108</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-24/article_0108.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>05:40</itunes:duration>
+      <itunes:author>Scott Alexander</itunes:author>
+      <itunes:subtitle>Astral Codex Ten</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Two Researchers Are Rebuilding Mathematics From the Ground Up</title>
+      <description><![CDATA[<em>What happens to the shape of mathematics when you decide to rebuild its foundation from dust?</em><br/><br/>Mathematics is often imagined as a fixed, immutable landscape, but as this piece illustrates, the very foundations we build upon are sometimes better suited for a renovation. Peter Scholze and Dustin Clausen are currently attempting to replace the century-old bedrock of topological spaces with something more flexible: condensed sets. It is a fascinating look at how changing the language of a field can suddenly make the impossible seem intuitive. Whether you are a math enthusiast or just enjoy watching brilliant minds tinker with the architecture of reality, this is a beautiful reminder that even the most established truths are open to being reimagined.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/two-researchers-are-rebuilding-mathematics-from-the-ground-up-20260520/">Quanta Magazine</a>]]></description>
+      <pubDate>Sun, 24 May 2026 08:36:07 +0000</pubDate>
+      <guid isPermaLink="false">aarva-3-119</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-24/article_0119.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>28:52</itunes:duration>
+      <itunes:author>Konstantin Kakaes</itunes:author>
+      <itunes:subtitle>Quanta Magazine</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>To Understand AI, Think Like A Dragonfly</title>
+      <description><![CDATA[<em>If we look at artificial intelligence through a dozen different lenses at once, what finally comes into focus?</em><br/><br/>Depending on who you ask, artificial intelligence is either our greatest engine of prosperity or the end of our cognitive independence. We tend to pick a side and dig in, but as Anthea Roberts argues, that narrowness is exactly what makes this technology so difficult to govern. Instead of searching for the single true narrative, she suggests we adopt dragonfly thinking—integrating nine competing perspectives to see the full, multifaceted reality of this hyperobject. It is a vital framework for anyone trying to make sense of a world that is shifting beneath our feet.<br/><br/>Read at source: <a href="https://www.noemamag.com/to-understand-ai-think-like-a-dragonfly">Noema</a>]]></description>
+      <pubDate>Sun, 24 May 2026 08:36:07 +0000</pubDate>
+      <guid isPermaLink="false">aarva-3-27</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-24/article_0027.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>25:57</itunes:duration>
+      <itunes:author>Anthea Roberts</itunes:author>
+      <itunes:subtitle>Noema</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>What we see when we look into the eyes of a bird</title>
+      <description><![CDATA[<em>If we stopped trying to turn animals into humans, what could we actually learn from them?</em><br/><br/>We spend so much of our lives moving through the world assuming we are the only ones observing it. But what if we shifted our perspective to consider that we are being watched right back by beings whose entire existence is shaped by a different kind of intelligence? This piece explores the profound, often quiet ways animals communicate and the radical act of trying to understand them on their own terms. It is a beautiful meditation on empathy, curiosity, and the surprising, stubborn persistence of care in a world that often feels designed for competition.<br/><br/>Read at source: <a href="https://www.vox.com/future-perfect/489307/ray-nayler-palaces-crow-profile">Vox</a>]]></description>
+      <pubDate>Sun, 24 May 2026 08:36:07 +0000</pubDate>
+      <guid isPermaLink="false">aarva-3-204</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-24/article_0204.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>15:34</itunes:duration>
+      <itunes:author>Jacob Brogan</itunes:author>
+      <itunes:subtitle>Vox</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Rights require money</title>
       <description><![CDATA[<em>If a city’s public transit system is broken, is it really a failure of engineering or a failure of justice?</em><br/><br/>We often talk about human rights as if they exist in a vacuum of laws and courts, but this piece argues that rights are fundamentally tied to the unglamorous, often invisible machinery of global finance. By tracing the journey of a Nairobi commuter, it reveals how the gap between our high-minded ideals and the reality on the ground is actually a structural choice. It’s a compelling look at why we need to stop treating fiscal policy and human dignity as separate conversations if we ever want to build a more equitable world.<br/><br/>Read at source: <a href="https://aeon.co/essays/to-fund-human-rights-we-need-a-global-fair-tax-convention">Aeon</a>]]></description>
