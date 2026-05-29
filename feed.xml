@@ -8,7 +8,7 @@
     <link>https://srik-create.github.io/aarva</link>
     <description>AI-narrated journalism. The world as your classroom.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 26 May 2026 14:43:29 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 15:51:13 +0000</lastBuildDate>
     <itunes:author>Aarva</itunes:author>
     <itunes:owner>
       <itunes:name>Aarva</itunes:name>
@@ -19,6 +19,72 @@
     <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
     <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://srik-create.github.io/aarva</link></image>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Can ecosystems malfunction?</title>
+      <description><![CDATA[<em>How did we start thinking of ecosystems as having jobs they can fail at?</em><br/><br/>This essay asks us to really consider what we mean when we say an ecosystem is &quot;malfunctioning&quot; or &quot;failing.&quot; Are we truly describing an objective biological state, or are we, perhaps unconsciously, projecting our own human values and desired outcomes onto nature? It’s a fascinating look at the language we use to frame environmental crises, inviting us to untangle that conceptual knot and think more clearly about our responsibilities to the natural world.<br/><br/>A critical examination of the concept of ecosystem malfunction argues that natural systems lack intrinsic goals or purposes. The essay traces how the idea of ecological function emerged from applying biological and engineering metaphors, often implicitly embedding anthropocentric values. It advocates for an ecology that explicitly acknowledges human values and responsibilities in environmental discourse.<br/><br/>Read at source: <a href="https://aeon.co/essays/why-we-need-to-think-again-about-ecosystem-failure">Aeon</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-394</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0394.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>39:34</itunes:duration>
+      <itunes:author>John Drake</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Leading in the Dark: How Submarine Commanders Think Under Uncertainty</title>
+      <description><![CDATA[<em>Can the silence of the deep ocean teach us how to lead in a noisy, uncertain world?</em><br/><br/>This piece takes us deep into the silent, opaque world of submarine command, where the fog of war isn&#x27;t an exception, but the constant state. What&#x27;s truly compelling is how it unpacks the mental disciplines forged in such extreme uncertainty. It&#x27;s less about tactical maneuvers and more about the profound human challenge of making high-stakes decisions when information is always incomplete and the consequences are irreversible. The piece asks: what does it mean to lead when you&#x27;re always &quot;leading in the dark,&quot; and why are these hard-won lessons suddenly critical for navigating uncertainty in our own increasingly complex world?<br/><br/>Submarine command under conditions of structural uncertainty is examined, detailing the cognitive habits required to build a tactical picture from incomplete data and make critical choices. Drawing on the author&#x27;s 14 years of experience, the piece argues these unique disciplines are increasingly vital for other military domains facing information-degraded environments.<br/><br/>Read at source: <a href="https://warontherocks.com/leading-in-the-dark-how-submarine-commanders-think-under-uncertainty/">War on the Rocks</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-570</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0570.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>14:29</itunes:duration>
+      <itunes:author>Paulo Frade</itunes:author>
+      <itunes:subtitle>War on the Rocks</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Should you feel guilty for killing the bugs in your house?</title>
+      <description><![CDATA[<em>How do we balance our reverence for all life with the need to clear a space of pests?</em><br/><br/>Ever swatted a fly or sprayed an ant and felt a tiny twinge of guilt? It&#x27;s a surprisingly common dilemma, especially as science hints that insects might actually feel pain. This piece dives into that uncomfortable space, exploring how we navigate our own comfort and safety against the potential moral weight of the tiny creatures sharing our homes. It&#x27;s not about finding a simple &#x27;yes&#x27; or &#x27;no&#x27; answer, but rather a thoughtful framework for understanding our conflicting values and making peace with the messy reality of coexistence.<br/><br/>The moral dilemma of killing household insects is examined through the lens of value pluralism, considering scientific evidence for insect sentience. The piece draws on philosophical pragmatism and Indigenous wisdom to propose a pragmatic approach to pest control that acknowledges competing moral weights and advocates for harm reduction over guilt.<br/><br/>Read at source: <a href="https://www.vox.com/the-highlight/486714/do-insects-feel-pain-killing-bugs-ethics">Vox</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-454</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0454.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>11:03</itunes:duration>
+      <itunes:author>Sigal Samuel</itunes:author>
+      <itunes:subtitle>Vox</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Weaponization of GLOMAG: How Rivals Co-opt U.S. Sanctions to Target Business and Political Opponents</title>
+      <description><![CDATA[<em>When does a tool designed for global justice become a lever for personal vendettas?</em><br/><br/>We often imagine U.S. sanctions as a clear-cut instrument for justice, targeting bad actors globally. But this piece asks a really interesting, and slightly unsettling, question: what if those powerful tools, designed to protect human rights and combat corruption, are actually being weaponized by the very rivals they’re meant to confront? It explores how the architecture of laws like Global Magnitsky sanctions, despite their good intentions, has become susceptible to manipulation, allowing adversaries to exploit them to neutralize opponents and settle scores. It challenges us to think about the unforeseen vulnerabilities in our systems of accountability.<br/><br/>U.S. Global Magnitsky and Section 7031(c) sanctions, designed to combat corruption and human rights abuses, are being co-opted by rivals to target business and political opponents. This analysis details the structural vulnerabilities in the designation process, documents patterns of manipulation across various regions, and proposes reforms to strengthen the frameworks&#x27; credibility.<br/><br/>Read at source: <a href="https://www.justsecurity.org/138443/weaponization-glomag-sanctions/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=weaponization-glomag-sanctions">Just Security</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-552</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0552.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>17:10</itunes:duration>
+      <itunes:author>Peter Kucik</itunes:author>
+      <itunes:subtitle>Just Security</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Scientists used a method from ecology to identify whether icy moons could hold conditions for life</title>
+      <description><![CDATA[<em>If life organizes chemistry in unique ways, how do we read those patterns from distant moons?</em><br/><br/>We’re always dreaming of finding life beyond Earth, but how do you even begin to look when you can’t get past miles of ice? This piece explores a truly clever approach: using a method from ecology to identify life’s subtle fingerprints on distant moons. It’s less about finding specific molecules, and more about recognizing the *patterns* they form. What if life’s unique organizational style, rather than just its raw ingredients, is the real clue we should be looking for?<br/><br/>Scientists developed a method, adapted from ecological diversity theory, to evaluate whether icy moons could host life. It analyzes statistical patterns in the types and proportions of molecules, like amino acids and fatty acids, to distinguish biological from nonbiological origins. This approach offers a practical biosignature for future spacecraft missions.<br/><br/>Read at source: <a href="https://theconversation.com/scientists-used-a-method-from-ecology-to-identify-whether-icy-moons-could-hold-conditions-for-life-283855">The Conversation</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-618</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0618.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>08:13</itunes:duration>
+      <itunes:author>Gideon Yoffe, Postdoctoral Fellow in Planetary Science, Weizmann Institute of Science</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Meet One of the Most Prolific Artists From Prison Music’s Golden Age</title>
+      <description><![CDATA[<em>When does a musician&#x27;s entire life story pour into songs made in prison?</em><br/><br/>This piece introduces us to Morgan White, a name you probably don&#x27;t know, but whose music echoed through Texas prisons for decades. It&#x27;s a fascinating dive into the &quot;golden age&quot; of prison music, but more than that, it asks us to consider the powerful human impulse to create, even in the most restrictive environments. What does it mean to find your voice, your art, when your freedom is taken away? And how do those experiences shape the choices you make when you finally get it back? It&#x27;s a story that resonates far beyond the prison walls.<br/><br/>Morgan White&#x27;s decades-long career as a musician in Texas prisons is chronicled, detailing his prolific output on numerous albums between 1964 and 1982. Based on an interview with White, now 86, the piece explores his experiences with harsh prison conditions, the role of music in his life, and his post-release decision to avoid the professional music industry.<br/><br/>Read at source: <a href="https://www.themarshallproject.org/2026/05/24/morgan-white-texas-prison-redemption-songs">The Marshall Project</a>]]></description>
+      <pubDate>Fri, 29 May 2026 15:00:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-5-400</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-05-29/article_0400.mp3" length="0" type="audio/mpeg"/>
+      <itunes:duration>06:24</itunes:duration>
+      <itunes:author>Maurice Chammah</itunes:author>
+      <itunes:subtitle>The Marshall Project</itunes:subtitle>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Planning for America’s Democratic Renewal Must Start Now: Lessons from Poland</title>
       <description><![CDATA[<em>How do you rebuild a democracy without bending the rules yourself?</em><br/><br/>You know how we often talk about what happens *after* a challenging political era? This piece dives right into that thorny question, looking at Poland&#x27;s recent experience. They successfully voted out an illiberal government, but then faced the incredibly difficult task of rebuilding democratic institutions without compromising the very rule of law they were trying to restore. It’s a fascinating, urgent look at the practical dilemmas of democratic renewal, and what America might learn about planning ahead for its own future.<br/><br/>Read at source: <a href="https://www.justsecurity.org/139687/americas-democratic-renewal-poland-lessons/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=americas-democratic-renewal-poland-lessons">Just Security</a>]]></description>
