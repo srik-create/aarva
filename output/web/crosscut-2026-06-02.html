@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 02 June 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-06-02</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 02 June 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · blind spots of belonging</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-06-02/crosscut_0011.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>8 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>There&#x27;s a real puzzle in how societies define belonging, often revealing profound blind spots. What&#x27;s striking is how dominant frameworks, intended to provide structure and rights, can inadvertently create categories of exclusion, denying full personhood or fundamental protections. One piece illuminates this through a national lens, examining how Taiwan’s democratic legal and political structures leave stateless populations without basic rights, as explored by Dolma Tsering and Kristina Kironska in The Diplomat. Another takes a vastly different scale, with Morgan Barry’s conversation with Amber Husain in Public Books, revealing how cultural and clinical narratives around eating disorders diminish individual agency and obscure the broader human and political dimensions of suffering. Together, these pieces reveal how varied systems can subtly marginalize.</p>
+        <article class='piece'>
+<p class='hook'>Dolma Tsering and Kristina Kironska examine how a democratic state&#x27;s legal and political structures can exclude stateless populations from basic rights, using Taiwan as a case study. The piece unpacks the often-overlooked reality of tens of thousands living without legal protections. As you listen, notice how the authors meticulously trace specific legal mechanisms, particularly Taiwan&#x27;s labor migration policies, as direct contributors to the emergence of a significant stateless population, including children born without legal standing.</p>
+<h2 class='title'>Taiwan’s Democratic Blind Spot: Statelessness and Legal Exclusion</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Dolma Tsering and Kristina Kironska</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/05/taiwans-democratic-blind-spot-statelessness-and-legal-exclusion/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Dolma Tsering and Kristina Kironska illuminate how a nation lauded for its democratic resilience can, through its very legal architecture, create a blind spot that renders tens of thousands stateless, effectively denying them fundamental human rights and full personhood. The piece reveals how a dominant narrative of national success can obscure profound internal exclusions, making the &quot;right to have rights&quot; inaccessible to those within its borders.
+
+Turning to Morgan Barry’s conversation with Amber Husain, a similar dynamic of obscured personhood emerges, though in a vastly different context. Where Tsering and Kironska expose the legal mechanisms of exclusion, Barry and Husain critique the cultural and clinical narratives that diminish the agency and complex motivations of those suffering from eating disorders. Husain’s observation that even feminist interpretations can fail to see beyond self-image or patriarchal pressure, echoing a &quot;failure of feminism,&quot; resonates with the &quot;democratic blind spot&quot; that overlooks statelessness. What surfaces from this pairing is an understanding of how deeply ingrained systems, whether legal or cultural, can inadvertently narrow the scope of human experience, reducing individuals to categories that deny their full humanity or political agency.</p>
+        <article class='piece'>
+
+<h2 class='title'>Eating Disorders Are More Than a Feminist Issue: A Conversation with Amber Husain</h2>
+<p class='byline'><span class='publication'>Public Books</span><span class='sep'>·</span><span>Morgan Barry</span></p>
+<p class='source'><a href='https://www.publicbooks.org/eating-disorders-are-more-than-a-feminist-issue-a-conversation-with-amber-husain/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers from these two distinct explorations is a profound awareness of how deeply embedded frameworks—be they legal, medical, or cultural—can shape the very definition of belonging and personhood. They reveal how easily systems, often intended for order or care, can inadvertently create categories of exclusion, diminishing fundamental rights or individual agency. The challenge, then, becomes recognizing these often-invisible boundaries. The question these pieces leave behind is: How can one consistently interrogate the foundational assumptions of any system to ensure it truly serves all within its reach, rather than inadvertently marginalizing some?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

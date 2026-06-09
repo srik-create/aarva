@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 03 June 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-06-03</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 03 June 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · new paradigms progress</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-06-03/crosscut_0013.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>9 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>The idea of a &#x27;new paradigm&#x27; often holds a powerful, almost irresistible appeal, promising a clean break from the past and a swift path to progress. Yet, a closer look reveals that what appears revolutionary often stands on deep foundations, or even risks neglecting crucial elements. What&#x27;s striking is how this pattern plays out across vastly different domains. Scott Alexander, writing in Astral Codex Ten, delves into the technical evolution of AI, questioning whether the pursuit of Artificial General Intelligence truly demands a complete paradigm shift, or if continuity is more essential. Parallel to this, Yusuf Serunkuma, in Africa Is a Country, critiques the push for STEM education as a &#x27;new paradigm&#x27; for development in Africa, arguing that overlooking the humanities can undermine holistic societal advancement. Together, these pieces invite a thoughtful reconsideration of what true progress entails.</p>
+        <article class='piece'>
+<p class='hook'>Scott Alexander, in his piece New Paradigms Won&#x27;t Save You, analyzes the technical evolution of AI to question how much of a &#x27;new paradigm&#x27; is truly needed for AGI, challenging assumptions about technological discontinuity. As the piece unfolds, notice how he applies Lindy&#x27;s Law to the history of AI breakthroughs, suggesting that even if a significant new paradigm is required, it could emerge within a few years, rather than an indefinite future. This reframes the urgency of AGI development.</p>
+<h2 class='title'>New Paradigms Won&#x27;t Save You</h2>
+<p class='byline'><span class='publication'>Astral Codex Ten</span><span class='sep'>·</span><span>Scott Alexander</span></p>
+<p class='source'><a href='https://www.astralcodexten.com/p/new-paradigms-wont-save-you' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>What jumps out from Scott Alexander&#x27;s argument is the way it dismantles the comforting notion of a distant, radically discontinuous technological leap. The piece suggests that even significant advances, like AGI, might emerge from evolutionary steps within existing frameworks, challenging the assumption that a &quot;new paradigm&quot; necessarily implies a complete break from the past or a long delay. It frames the wait for a truly novel breakthrough as a potential misdirection, urging a re-evaluation of how close and continuous future progress might actually be.
+
+Read alongside Alexander, Yusuf Serunkuma’s critique of educational policy in Africa takes on a complementary resonance. Where Alexander questions the *necessity* of radical discontinuity in technological progress, Serunkuma argues against its *desirability* in societal development. The push for STEM education as a standalone &quot;new paradigm&quot; for African progress, Serunkuma observes, risks severing the &quot;branches&quot; of technical skill from the &quot;roots&quot; of humanities and historical understanding. This isn&#x27;t merely an academic debate; it points to the specific argument that technical expertise, divorced from its political and social context, is inherently incomplete and potentially misdirected. Both pieces, in their distinct domains, reveal a shared skepticism towards the simplistic allure of a &quot;new paradigm&quot; as a panacea, instead highlighting the persistent, often overlooked, importance of continuity and foundational knowledge.</p>
+        <article class='piece'>
+
+<h2 class='title'>Branches without roots</h2>
+<p class='byline'><span class='publication'>Africa Is a Country</span><span class='sep'>·</span><span>Yusuf Serunkuma</span></p>
+<p class='source'><a href='https://africasacountry.com/2026/05/branches-without-roots' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after these discussions is a sense that the path forward, whether in technology or society, is rarely a clean break. The allure of a &#x27;new paradigm&#x27; can obscure the enduring value of what already exists, or the slow, iterative work that truly builds. Progress, it seems, often thrives not on radical discontinuity, but on a deeper engagement with continuity and foundational understanding. The question these two pieces leave behind is this: when faced with the promise of a revolutionary shift, how does one discern true innovation from a mere rebranding of the essential?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

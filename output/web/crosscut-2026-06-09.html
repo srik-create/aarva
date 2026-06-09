@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 09 June 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-06-09</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 09 June 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · ingenuity simple tech</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-06-09/crosscut_0017.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>8 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>It’s easy to assume that effective solutions demand the latest technology or the highest price tag. Yet a different kind of wisdom emerges when considering ingenuity. David B. Roberts, in War on the Rocks, critiques modern military procurement, arguing that massive defense budgets for systems like the F-35 often prove less effective against current drone attacks than simpler, more appropriate technologies. What’s striking is how this echoes across time: a piece from Smithsonian Magazine unveils the 600-year-old practices of ancient Chinese physicians, who expertly extracted anesthetics from poisonous plants to perform complex surgeries. These two accounts, separated by centuries and distinct domains, both reveal that true power often comes from prioritizing simplicity and sustainability over sheer complexity or cost.</p>
+        <article class='piece'>
+<p class='hook'>David B. Roberts, in his piece for War on the Rocks, examines the logic behind modern military procurement. He argues that expensive, high-tech defense systems often prove less effective and unsustainable against today&#x27;s threats than simpler, older technologies. Notice how the article opens by contrasting the success of a Cold War-era German anti-aircraft gun in Ukraine with the rapid depletion of advanced missile defenses. This initial example immediately frames a core question about strategic sustainability.</p>
+<h2 class='title'>Fences Not F-35s: Drone Attacks and the Illogic of Gulf Procurement</h2>
+<p class='byline'><span class='publication'>War on the Rocks</span><span class='sep'>·</span><span>David B. Roberts</span></p>
+<p class='source'><a href='https://warontherocks.com/fences-not-f-35s-drone-attacks-and-the-illogic-of-gulf-procurement/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>David B. Roberts points out the illusion of security offered by cutting-edge, expensive defense systems, showing how they often fail to meet the actual, persistent threats. The effectiveness of a 1976 anti-aircraft gun against modern drones, or the rapid depletion of advanced missile interceptors, casts doubt on the wisdom of sheer technological escalation. What surfaces from this critique is a profound argument for solutions rooted in practical realities and sustainability, rather than just technical prowess.
+
+Turning to the Ming dynasty, the picture shifts from military strategy to medical innovation, yet the underlying current of ingenuity remains striking. Here, the challenge wasn&#x27;t about countering advanced weaponry, but about alleviating surgical pain with deeply limited resources. The discovery of aconitine on 600-year-old instruments reveals a different kind of sophisticated problem-solving: how to transform a potent poison into a safe, effective anesthetic. The doctors of that era couldn&#x27;t just buy a ready-made solution; they had to understand, extract, and carefully mitigate the dangers of their natural environment. Both pieces, in their own way, illustrate how true ingenuity often means working *with* constraints rather than trying to overpower them with sheer, unsustainable complexity.</p>
+        <article class='piece'>
+
+<h2 class='title'>These 600-Year-Old Chinese Surgical Instruments Are Coated in an Early Local Anesthetic—Carefully Extracted From a Poisonous Plant</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/smart-news/these-600-year-old-chinese-surgical-instruments-are-coated-in-an-early-local-anestheticcarefully-extracted-from-a-poisonous-plant-180988865/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers from these two stories is a quiet challenge to our assumptions. Whether in ancient operating rooms or modern battlefields, the most effective answers often aren&#x27;t the most elaborate or costly. Instead, they emerge from a deep understanding of limits, a willingness to work with what&#x27;s available, and a focus on practical, adaptable tools. It suggests a different kind of progress, one built on cleverness and resourcefulness rather than sheer scale. What might change if we consistently prioritized simple, sustainable ingenuity over brute-force complexity in addressing our biggest challenges?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
