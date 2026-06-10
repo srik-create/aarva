@@ -11,7 +11,7 @@
     <itunes:summary>The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI. A daily edition of rigorous long-form pieces, plus a Crosscut episode each day pairing two articles on the same topic from different angles.</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Wed, 10 Jun 2026 13:38:54 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 14:53:45 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -54,6 +54,167 @@ The Atlantic: The Defiance of Marjane Satrapi</itunes:summary>
       <itunes:duration>31:45</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · political integrity complexity</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Flickering Enlightenment</title>
+      <itunes:title>Flickering Enlightenment</itunes:title>
+      <link>https://aeon.co/essays/lets-save-the-enlightenment-baby-from-its-muddied-bathwater</link>
+      <description><![CDATA[<em>How do we rescue the Enlightenment&#x27;s enduring wisdom from its own contradictions?</em><br/><br/>I&#x27;ve been wrestling with the idea of the Enlightenment lately, especially with how it&#x27;s being pulled apart from all sides. This essay, published just a couple of weeks ago in Aeon, dives straight into that tension. It asks whether we can — or even should — rescue its core values from the historical critiques of the Left and the populist attacks of the Right. Rather than simply defending or dismissing it, the writer thoughtfully explores what parts of this complex, sometimes contradictory project might still offer us a path forward in our increasingly polarized and &#x27;de-enlightened&#x27; world.<br/><br/>The essay re-evaluates the Enlightenment&#x27;s legacy, considering contemporary critiques from both the Left, which links it to racism, and the populist Right, which targets its associated institutions. Through historical context and expert interviews, it argues for a nuanced defense of core Enlightenment values like reason, tolerance, and critical inquiry, separating them from problematic historical applications to address current challenges.<br/><br/>Read at source: <a href="https://aeon.co/essays/lets-save-the-enlightenment-baby-from-its-muddied-bathwater">Aeon</a>]]></description>
+      <content:encoded><![CDATA[<em>How do we rescue the Enlightenment&#x27;s enduring wisdom from its own contradictions?</em><br/><br/>I&#x27;ve been wrestling with the idea of the Enlightenment lately, especially with how it&#x27;s being pulled apart from all sides. This essay, published just a couple of weeks ago in Aeon, dives straight into that tension. It asks whether we can — or even should — rescue its core values from the historical critiques of the Left and the populist attacks of the Right. Rather than simply defending or dismissing it, the writer thoughtfully explores what parts of this complex, sometimes contradictory project might still offer us a path forward in our increasingly polarized and &#x27;de-enlightened&#x27; world.<br/><br/>The essay re-evaluates the Enlightenment&#x27;s legacy, considering contemporary critiques from both the Left, which links it to racism, and the populist Right, which targets its associated institutions. Through historical context and expert interviews, it argues for a nuanced defense of core Enlightenment values like reason, tolerance, and critical inquiry, separating them from problematic historical applications to address current challenges.<br/><br/>Read at source: <a href="https://aeon.co/essays/lets-save-the-enlightenment-baby-from-its-muddied-bathwater">Aeon</a>]]></content:encoded>
+      <itunes:summary>How do we rescue the Enlightenment&#x27;s enduring wisdom from its own contradictions?
+
+I&#x27;ve been wrestling with the idea of the Enlightenment lately, especially with how it&#x27;s being pulled apart from all sides. This essay, published just a couple of weeks ago in Aeon, dives straight into that tension. It asks whether we can — or even should — rescue its core values from the historical critiques of the Left and the populist attacks of the Right. Rather than simply defending or dismissing it, the writer thoughtfully explores what parts of this complex, sometimes contradictory project might still offer us a path forward in our increasingly polarized and &#x27;de-enlightened&#x27; world.
+
+The essay re-evaluates the Enlightenment&#x27;s legacy, considering contemporary critiques from both the Left, which links it to racism, and the populist Right, which targets its associated institutions. Through historical context and expert interviews, it argues for a nuanced defense of core Enlightenment values like reason, tolerance, and critical inquiry, separating them from problematic historical applications to address current challenges.
+
+Read at source: Aeon</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-534</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_0534.mp3" length="13623405" type="audio/mpeg"/>
+      <itunes:duration>28:23</itunes:duration>
+      <itunes:author>Eliane Glaser</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>A Market Bubble Led by AI</title>
+      <itunes:title>A Market Bubble Led by AI</itunes:title>
+      <link>https://prospect.org/2026/06/09/market-bubble-led-by-ai/</link>
+      <description><![CDATA[<em>How much of our economy is now built on the promise of AI, rather than its profits?</em><br/><br/>In a piece just out yesterday, *The American Prospect* dives into the recent stock market jitters, asking a crucial question: are we seeing an AI bubble forming, much like the dot-com frenzy of 2000? It unpacks the astronomical valuations of AI companies, the massive capital expenditures required for data centers, and the growing public resistance to their environmental footprint. This piece isn&#x27;t just about market numbers; it’s a sharp look at whether the current AI hype can truly justify the financial reality, and what happens if it can&#x27;t.<br/><br/>A critical analysis of the current stock market suggests an AI-driven bubble, drawing parallels to the dot-com era. The piece explores the financial challenges of AI companies, public backlash against data centers, and the role of federal deficits in inflating market valuations and suppressing real wages.<br/><br/>Read at source: <a href="https://prospect.org/2026/06/09/market-bubble-led-by-ai/">The American Prospect</a>]]></description>
+      <content:encoded><![CDATA[<em>How much of our economy is now built on the promise of AI, rather than its profits?</em><br/><br/>In a piece just out yesterday, *The American Prospect* dives into the recent stock market jitters, asking a crucial question: are we seeing an AI bubble forming, much like the dot-com frenzy of 2000? It unpacks the astronomical valuations of AI companies, the massive capital expenditures required for data centers, and the growing public resistance to their environmental footprint. This piece isn&#x27;t just about market numbers; it’s a sharp look at whether the current AI hype can truly justify the financial reality, and what happens if it can&#x27;t.<br/><br/>A critical analysis of the current stock market suggests an AI-driven bubble, drawing parallels to the dot-com era. The piece explores the financial challenges of AI companies, public backlash against data centers, and the role of federal deficits in inflating market valuations and suppressing real wages.<br/><br/>Read at source: <a href="https://prospect.org/2026/06/09/market-bubble-led-by-ai/">The American Prospect</a>]]></content:encoded>
+      <itunes:summary>How much of our economy is now built on the promise of AI, rather than its profits?
+
+In a piece just out yesterday, *The American Prospect* dives into the recent stock market jitters, asking a crucial question: are we seeing an AI bubble forming, much like the dot-com frenzy of 2000? It unpacks the astronomical valuations of AI companies, the massive capital expenditures required for data centers, and the growing public resistance to their environmental footprint. This piece isn&#x27;t just about market numbers; it’s a sharp look at whether the current AI hype can truly justify the financial reality, and what happens if it can&#x27;t.
+
+A critical analysis of the current stock market suggests an AI-driven bubble, drawing parallels to the dot-com era. The piece explores the financial challenges of AI companies, public backlash against data centers, and the role of federal deficits in inflating market valuations and suppressing real wages.
+
+Read at source: The American Prospect</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-1722</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_1722.mp3" length="5477229" type="audio/mpeg"/>
+      <itunes:duration>11:25</itunes:duration>
+      <itunes:author>Robert Kuttner</itunes:author>
+      <itunes:subtitle>The American Prospect</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>We’re All One Crisis Away From Taking Unlicensed Research Peptides</title>
+      <itunes:title>We’re All One Crisis Away From Taking Unlicensed Research Peptides</itunes:title>
+      <link>https://asteriskmag.com/issues/14/we-re-all-one-crisis-away-from-taking-unlicensed-research-peptides</link>
+      <description><![CDATA[<em>When doctors have no answers, what happens when you become your own experiment?</em><br/><br/>This piece, published just last week, dives into a fascinating and often-judged world: people who, failed by mainstream medicine, take their health into their own hands. The author, Elizabeth Van Nostrand, shares her own journey through chronic illness, showing why deferring to the medical establishment isn&#x27;t always safe or sufficient. She asks us to reconsider the &quot;daredevils or lunatics&quot; label, suggesting that for many, the greater risk lies in *not* trying to find a cure outside the system. It’s a compelling look at agency, frustration, and the very personal calculus of risk.<br/><br/>This piece investigates the phenomenon of &quot;health hacking,&quot; where individuals pursue self-treatment and gray market solutions when conventional medical care proves insufficient. It draws on the author&#x27;s personal experience and interviews with diabetics, trans women, and GLP-1 users to detail how these individuals manage their own health outcomes.<br/><br/>Read at source: <a href="https://asteriskmag.com/issues/14/we-re-all-one-crisis-away-from-taking-unlicensed-research-peptides">Asterisk</a>]]></description>
+      <content:encoded><![CDATA[<em>When doctors have no answers, what happens when you become your own experiment?</em><br/><br/>This piece, published just last week, dives into a fascinating and often-judged world: people who, failed by mainstream medicine, take their health into their own hands. The author, Elizabeth Van Nostrand, shares her own journey through chronic illness, showing why deferring to the medical establishment isn&#x27;t always safe or sufficient. She asks us to reconsider the &quot;daredevils or lunatics&quot; label, suggesting that for many, the greater risk lies in *not* trying to find a cure outside the system. It’s a compelling look at agency, frustration, and the very personal calculus of risk.<br/><br/>This piece investigates the phenomenon of &quot;health hacking,&quot; where individuals pursue self-treatment and gray market solutions when conventional medical care proves insufficient. It draws on the author&#x27;s personal experience and interviews with diabetics, trans women, and GLP-1 users to detail how these individuals manage their own health outcomes.<br/><br/>Read at source: <a href="https://asteriskmag.com/issues/14/we-re-all-one-crisis-away-from-taking-unlicensed-research-peptides">Asterisk</a>]]></content:encoded>
+      <itunes:summary>When doctors have no answers, what happens when you become your own experiment?
+
+This piece, published just last week, dives into a fascinating and often-judged world: people who, failed by mainstream medicine, take their health into their own hands. The author, Elizabeth Van Nostrand, shares her own journey through chronic illness, showing why deferring to the medical establishment isn&#x27;t always safe or sufficient. She asks us to reconsider the &quot;daredevils or lunatics&quot; label, suggesting that for many, the greater risk lies in *not* trying to find a cure outside the system. It’s a compelling look at agency, frustration, and the very personal calculus of risk.
+
+This piece investigates the phenomenon of &quot;health hacking,&quot; where individuals pursue self-treatment and gray market solutions when conventional medical care proves insufficient. It draws on the author&#x27;s personal experience and interviews with diabetics, trans women, and GLP-1 users to detail how these individuals manage their own health outcomes.
+
+Read at source: Asterisk</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-1114</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_1114.mp3" length="11141613" type="audio/mpeg"/>
+      <itunes:duration>23:13</itunes:duration>
+      <itunes:author>Asterisk</itunes:author>
+      <itunes:subtitle>Asterisk</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>In Defense of Difficult Reading</title>
+      <itunes:title>In Defense of Difficult Reading</itunes:title>
+      <link>https://theamericanscholar.org/in-defense-of-difficult-reading/</link>
+      <description><![CDATA[<em>Why commit to books that ask so much of your attention?</em><br/><br/>This piece from the American Scholar, published just last week, dives into a question many of us wrestle with: why bother with &quot;difficult&quot; books? Naomi Kanakia&#x27;s new book isn&#x27;t about curriculum wars, but a gentle, yet firm, appeal to the &quot;common reader&quot; to engage with the Great Books. It&#x27;s a thoughtful exploration of why committing to challenging, often older, texts can cultivate a deeper understanding of ourselves and the world, even if it feels like hard work. She even takes on the progressive critiques, making a surprisingly compelling case for their enduring relevance.<br/><br/>A review of Naomi Kanakia&#x27;s book, which offers a defense of reading classic literature for the lay reader. The book argues that &quot;Great Books&quot; cultivate sustained attention and offer collective wisdom, while directly engaging common progressive critiques of such texts. It ultimately advocates for preserving the capacity for patient, challenging reading in contemporary life.<br/><br/>Read at source: <a href="https://theamericanscholar.org/in-defense-of-difficult-reading/">American Scholar</a>]]></description>
+      <content:encoded><![CDATA[<em>Why commit to books that ask so much of your attention?</em><br/><br/>This piece from the American Scholar, published just last week, dives into a question many of us wrestle with: why bother with &quot;difficult&quot; books? Naomi Kanakia&#x27;s new book isn&#x27;t about curriculum wars, but a gentle, yet firm, appeal to the &quot;common reader&quot; to engage with the Great Books. It&#x27;s a thoughtful exploration of why committing to challenging, often older, texts can cultivate a deeper understanding of ourselves and the world, even if it feels like hard work. She even takes on the progressive critiques, making a surprisingly compelling case for their enduring relevance.<br/><br/>A review of Naomi Kanakia&#x27;s book, which offers a defense of reading classic literature for the lay reader. The book argues that &quot;Great Books&quot; cultivate sustained attention and offer collective wisdom, while directly engaging common progressive critiques of such texts. It ultimately advocates for preserving the capacity for patient, challenging reading in contemporary life.<br/><br/>Read at source: <a href="https://theamericanscholar.org/in-defense-of-difficult-reading/">American Scholar</a>]]></content:encoded>
+      <itunes:summary>Why commit to books that ask so much of your attention?
+
+This piece from the American Scholar, published just last week, dives into a question many of us wrestle with: why bother with &quot;difficult&quot; books? Naomi Kanakia&#x27;s new book isn&#x27;t about curriculum wars, but a gentle, yet firm, appeal to the &quot;common reader&quot; to engage with the Great Books. It&#x27;s a thoughtful exploration of why committing to challenging, often older, texts can cultivate a deeper understanding of ourselves and the world, even if it feels like hard work. She even takes on the progressive critiques, making a surprisingly compelling case for their enduring relevance.
+
+A review of Naomi Kanakia&#x27;s book, which offers a defense of reading classic literature for the lay reader. The book argues that &quot;Great Books&quot; cultivate sustained attention and offer collective wisdom, while directly engaging common progressive critiques of such texts. It ultimately advocates for preserving the capacity for patient, challenging reading in contemporary life.
+
+Read at source: American Scholar</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-1926</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_1926.mp3" length="3257709" type="audio/mpeg"/>
+      <itunes:duration>06:47</itunes:duration>
+      <itunes:author>Todd Shy</itunes:author>
+      <itunes:subtitle>American Scholar</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Key Chemistry Question Answered, No Quantum Computer Required</title>
+      <itunes:title>Key Chemistry Question Answered, No Quantum Computer Required</itunes:title>
+      <link>https://www.quantamagazine.org/key-chemistry-question-answered-no-quantum-computer-required-20260529/</link>
+      <description><![CDATA[<em>If a chemical puzzle, once a quantum target, is solved classically, what does that reveal?</em><br/><br/>This piece, published last week, lands right in the middle of a fascinating debate about the future of scientific discovery. For years, the incredibly complex chemistry behind life-sustaining enzymes like nitrogenase has been held up as a problem only solvable by future quantum computers. But what if we don&#x27;t have to wait? One chemist, Garnet Chan, and his team just made a breakthrough using purely classical methods, pushing back on the idea that these problems are out of reach until quantum hardware arrives.<br/><br/>Researchers have successfully determined the ground-state energy of FeMo-co, the active site of the enzyme nitrogenase, using purely classical computational methods. This milestone challenges the assumption that quantum computers are required to understand such complex entangled chemical systems, contributing to the ongoing debate about the comparative advantages of classical and quantum computing in chemistry.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/key-chemistry-question-answered-no-quantum-computer-required-20260529/">Quanta Magazine</a>]]></description>
+      <content:encoded><![CDATA[<em>If a chemical puzzle, once a quantum target, is solved classically, what does that reveal?</em><br/><br/>This piece, published last week, lands right in the middle of a fascinating debate about the future of scientific discovery. For years, the incredibly complex chemistry behind life-sustaining enzymes like nitrogenase has been held up as a problem only solvable by future quantum computers. But what if we don&#x27;t have to wait? One chemist, Garnet Chan, and his team just made a breakthrough using purely classical methods, pushing back on the idea that these problems are out of reach until quantum hardware arrives.<br/><br/>Researchers have successfully determined the ground-state energy of FeMo-co, the active site of the enzyme nitrogenase, using purely classical computational methods. This milestone challenges the assumption that quantum computers are required to understand such complex entangled chemical systems, contributing to the ongoing debate about the comparative advantages of classical and quantum computing in chemistry.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/key-chemistry-question-answered-no-quantum-computer-required-20260529/">Quanta Magazine</a>]]></content:encoded>
+      <itunes:summary>If a chemical puzzle, once a quantum target, is solved classically, what does that reveal?
+
+This piece, published last week, lands right in the middle of a fascinating debate about the future of scientific discovery. For years, the incredibly complex chemistry behind life-sustaining enzymes like nitrogenase has been held up as a problem only solvable by future quantum computers. But what if we don&#x27;t have to wait? One chemist, Garnet Chan, and his team just made a breakthrough using purely classical methods, pushing back on the idea that these problems are out of reach until quantum hardware arrives.
+
+Researchers have successfully determined the ground-state energy of FeMo-co, the active site of the enzyme nitrogenase, using purely classical computational methods. This milestone challenges the assumption that quantum computers are required to understand such complex entangled chemical systems, contributing to the ongoing debate about the comparative advantages of classical and quantum computing in chemistry.
+
+Read at source: Quanta Magazine</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-856</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_0856.mp3" length="6870957" type="audio/mpeg"/>
+      <itunes:duration>14:19</itunes:duration>
+      <itunes:author>Kevin Hartnett</itunes:author>
+      <itunes:subtitle>Quanta Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Actually, the SAT Was Necessary After All</title>
+      <itunes:title>Actually, the SAT Was Necessary After All</itunes:title>
+      <link>https://www.theatlantic.com/ideas/2026/06/standardized-testing-math-gaps/687481/?utm_source=feed</link>
+      <description><![CDATA[<em>What happens when efforts to open university doors make learning harder inside?</em><br/><br/>This piece, published just yesterday in The Atlantic, unpacks a fascinating tension playing out within the University of California system. Faculty are in open revolt, arguing that the absence of standardized tests is leading to students in &#x27;freefall&#x27; in basic math, even in calculus classes. It asks us to consider the difficult trade-offs selective universities face: how do you balance the noble pursuit of equity with the practical demands of academic readiness, especially when the stakes are so high for STEM education? It’s a thorny question, and one many institutions are wrestling with right now.<br/><br/>University of California faculty are openly challenging the system&#x27;s test-blind admissions policy, citing a decline in basic math fluency among incoming STEM students. The piece details professors&#x27; observations, the faculty&#x27;s call for reinstating standardized tests, and examines the broader debate over their role in balancing academic excellence with equity, contrasting UC&#x27;s stance with other elite universities.<br/><br/>Read at source: <a href="https://www.theatlantic.com/ideas/2026/06/standardized-testing-math-gaps/687481/?utm_source=feed">The Atlantic</a>]]></description>
+      <content:encoded><![CDATA[<em>What happens when efforts to open university doors make learning harder inside?</em><br/><br/>This piece, published just yesterday in The Atlantic, unpacks a fascinating tension playing out within the University of California system. Faculty are in open revolt, arguing that the absence of standardized tests is leading to students in &#x27;freefall&#x27; in basic math, even in calculus classes. It asks us to consider the difficult trade-offs selective universities face: how do you balance the noble pursuit of equity with the practical demands of academic readiness, especially when the stakes are so high for STEM education? It’s a thorny question, and one many institutions are wrestling with right now.<br/><br/>University of California faculty are openly challenging the system&#x27;s test-blind admissions policy, citing a decline in basic math fluency among incoming STEM students. The piece details professors&#x27; observations, the faculty&#x27;s call for reinstating standardized tests, and examines the broader debate over their role in balancing academic excellence with equity, contrasting UC&#x27;s stance with other elite universities.<br/><br/>Read at source: <a href="https://www.theatlantic.com/ideas/2026/06/standardized-testing-math-gaps/687481/?utm_source=feed">The Atlantic</a>]]></content:encoded>
+      <itunes:summary>What happens when efforts to open university doors make learning harder inside?
+
+This piece, published just yesterday in The Atlantic, unpacks a fascinating tension playing out within the University of California system. Faculty are in open revolt, arguing that the absence of standardized tests is leading to students in &#x27;freefall&#x27; in basic math, even in calculus classes. It asks us to consider the difficult trade-offs selective universities face: how do you balance the noble pursuit of equity with the practical demands of academic readiness, especially when the stakes are so high for STEM education? It’s a thorny question, and one many institutions are wrestling with right now.
+
+University of California faculty are openly challenging the system&#x27;s test-blind admissions policy, citing a decline in basic math fluency among incoming STEM students. The piece details professors&#x27; observations, the faculty&#x27;s call for reinstating standardized tests, and examines the broader debate over their role in balancing academic excellence with equity, contrasting UC&#x27;s stance with other elite universities.
+
+Read at source: The Atlantic</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-1879</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_1879.mp3" length="6428973" type="audio/mpeg"/>
+      <itunes:duration>13:24</itunes:duration>
+      <itunes:author>Idrees Kahloon</itunes:author>
+      <itunes:subtitle>The Atlantic</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Opinion: Why STAT is sticking with ‘health care’ as two words</title>
+      <itunes:title>Opinion: Why STAT is sticking with ‘health care’ as two words</itunes:title>
+      <link>https://www.statnews.com/2026/06/09/health-care-vs-healthcare-ap-style-stat/?utm_campaign=rss</link>
+      <description><![CDATA[<em>How can a tiny stylistic choice reveal such profound differences in perspective?</em><br/><br/>Isn&#x27;t it funny how a single space can spark such a spirited debate? The Associated Press recently made the shift to &#x27;healthcare&#x27; as one word, and it’s sent ripples through newsrooms. This piece, published just yesterday, shares why STAT News is sticking with &#x27;health care&#x27; as two words. It’s more than a style guide decision; it&#x27;s a thoughtful exploration of how language shapes our perception of an entire industry, its values, and whether we&#x27;re talking about a system or the act of caring for people.<br/><br/>An editorial decision to maintain &quot;health care&quot; as two words, despite the AP Stylebook&#x27;s recent shift to &quot;healthcare,&quot; is explained. The piece details the rationale behind this choice, emphasizing distinct concepts and a patient-focused approach over industry usage. It also presents a collection of reader arguments both for and against the one-word and two-word spellings.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/09/health-care-vs-healthcare-ap-style-stat/?utm_campaign=rss">STAT News</a>]]></description>
+      <content:encoded><![CDATA[<em>How can a tiny stylistic choice reveal such profound differences in perspective?</em><br/><br/>Isn&#x27;t it funny how a single space can spark such a spirited debate? The Associated Press recently made the shift to &#x27;healthcare&#x27; as one word, and it’s sent ripples through newsrooms. This piece, published just yesterday, shares why STAT News is sticking with &#x27;health care&#x27; as two words. It’s more than a style guide decision; it&#x27;s a thoughtful exploration of how language shapes our perception of an entire industry, its values, and whether we&#x27;re talking about a system or the act of caring for people.<br/><br/>An editorial decision to maintain &quot;health care&quot; as two words, despite the AP Stylebook&#x27;s recent shift to &quot;healthcare,&quot; is explained. The piece details the rationale behind this choice, emphasizing distinct concepts and a patient-focused approach over industry usage. It also presents a collection of reader arguments both for and against the one-word and two-word spellings.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/09/health-care-vs-healthcare-ap-style-stat/?utm_campaign=rss">STAT News</a>]]></content:encoded>
+      <itunes:summary>How can a tiny stylistic choice reveal such profound differences in perspective?
+
+Isn&#x27;t it funny how a single space can spark such a spirited debate? The Associated Press recently made the shift to &#x27;healthcare&#x27; as one word, and it’s sent ripples through newsrooms. This piece, published just yesterday, shares why STAT News is sticking with &#x27;health care&#x27; as two words. It’s more than a style guide decision; it&#x27;s a thoughtful exploration of how language shapes our perception of an entire industry, its values, and whether we&#x27;re talking about a system or the act of caring for people.
+
+An editorial decision to maintain &quot;health care&quot; as two words, despite the AP Stylebook&#x27;s recent shift to &quot;healthcare,&quot; is explained. The piece details the rationale behind this choice, emphasizing distinct concepts and a patient-focused approach over industry usage. It also presents a collection of reader arguments both for and against the one-word and two-word spellings.
+
+Read at source: STAT News</itunes:summary>
+      <pubDate>Wed, 10 Jun 2026 13:01:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-20-1980</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-10/article_1980.mp3" length="3846765" type="audio/mpeg"/>
+      <itunes:duration>08:01</itunes:duration>
+      <itunes:author>Sarah Mupo</itunes:author>
+      <itunes:subtitle>STAT News</itunes:subtitle>
       <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
       <itunes:episodeType>full</itunes:episodeType>
       <itunes:explicit>false</itunes:explicit>
