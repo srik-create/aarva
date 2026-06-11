@@ -356,6 +356,18 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             if cc_count:
                 log.info("Stage 10 web — %d crosscut page(s) rendered", cc_count)
 
+            # 2c. Compose latest.html as the unified "today" view:
+            # latest daily + today's crosscut (if any) + today's bonus
+            # episodes (if any). Runs AFTER the dated daily + crosscut
+            # files are written so it can re-use the same rendering.
+            try:
+                ls = web_renderer.render_latest_html(config, db)
+                if ls.html_path:
+                    log.info("Stage 10 web — latest.html rendered (%d total pieces)",
+                             ls.pieces_rendered)
+            except Exception as e:
+                log.warning("Stage 10 web — latest.html render failed: %s", e)
+
             # 3. Always regenerate the unified RSS feed across all editions
             fs = rss_feed.generate_feed(config, db)
             log.info("Stage 10 RSS — %d items written to %s",
