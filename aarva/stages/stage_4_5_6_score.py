@@ -44,18 +44,7 @@ class ScoringStats:
 PROMPTS_PATH = Path(__file__).parent.parent / "config" / "prompts.yaml"
 
 
-def _load_prompts() -> dict:
-    with PROMPTS_PATH.open() as f:
-        return yaml.safe_load(f)
-
-
-def _render_prompt(template: str, **kwargs) -> str:
-    """Very-light templating: {{ var }} substitution. No control flow."""
-    out = template
-    for k, v in kwargs.items():
-        out = out.replace("{{ " + k + " }}", str(v))
-        out = out.replace("{{" + k + "}}", str(v))
-    return out
+from aarva.prompts import load_prompts as _load_prompts, render as _render_prompt
 
 
 def _build_user_prompt(
@@ -124,11 +113,16 @@ def score_all(
     db: Database,
     *,
     article_filter_ids: Optional[set[int]] = None,
+    llm: Optional[LLMClient] = None,
 ) -> ScoringStats:
     """Run Stage 4+5+6 on all articles with status='ingested'.
 
     article_filter_ids: if provided, only score articles with these IDs.
     Useful for the calibration loop.
+
+    llm: pass an existing client to avoid rebuilding (and to preserve
+    rate-limiter state across calls). If None, builds one from
+    config.llm — the CLI orchestrator path.
     """
     prompts = _load_prompts()
     prompt_version = config.scoring.get("prompt_version", "v1")
@@ -138,7 +132,8 @@ def score_all(
             f"Stage 4+5+6 prompt version '{prompt_version}' not in prompts.yaml"
         )
 
-    llm = build_llm_client(config.llm)
+    if llm is None:
+        llm = build_llm_client(config.llm)
     logger.info("Stage 4+5+6 starting with LLM=%s, prompt=%s",
                 llm.name, prompt_version)
 
@@ -164,21 +159,29 @@ def score_all(
     stats = ScoringStats(candidates=len(candidates))
     pass_min_rigour = float(config.scoring.get("rigour_min", 0.5))
     pass_min_posture = float(config.scoring.get("posture_min", 0.5))
+    # Concurrency: LLM calls are network-bound (~5–10s each). Running
+    # them sequentially means a 200-article run takes 20–30 minutes
+    # wall-clock; parallelising drops that to a few minutes, capped by
+    # the Gemini RPM limit (the client's internal _RateLimiter is
+    # thread-safe and throttles globally). SQLite's single-writer lock
+    # serialises the persists; that's milliseconds and not the
+    # bottleneck.
+    max_workers = int(config.scoring.get("concurrent_workers", 8))
 
-    for article in candidates:
+    import concurrent.futures
+    import threading
+    stats_lock = threading.Lock()
+
+    def _score_one(article: dict) -> None:
+        """Worker: score one article, persist, update stats. Logs
+        errors but does not raise — exceptions become stats.errors."""
         article_id = article["id"]
         try:
             prompt = _build_user_prompt(prompt_config, article)
-            # Prepend the system component as part of the user prompt — both
-            # Claude Code and Anthropic API will treat the combined text the
-            # same way. (The API can take a separate system parameter but
-            # we keep the call shape uniform.)
             full_prompt = prompt_config.get("system", "") + "\n\n" + prompt
             response = llm.complete(full_prompt, expect_json=True)
             assert isinstance(response, dict)
 
-            # Re-derive verdict locally to enforce the gate consistently with
-            # config (in case the LLM disagrees with its own returned verdict).
             rigour = float(response.get("rigour") or 0)
             posture = float(response.get("posture") or 0)
             self_imp = float(response.get("self_implication") or 0)
@@ -193,8 +196,6 @@ def score_all(
             )
 
             _persist_score(db, article_id, response, prompt_version)
-            stats.scored += 1
-
             new_status = "scored" if verdict == "PASS" else "filtered_out"
             with db.connect() as conn:
                 conn.execute(
@@ -202,10 +203,12 @@ def score_all(
                     (new_status, article_id),
                 )
 
-            if verdict == "PASS":
-                stats.passed += 1
-            else:
-                stats.failed += 1
+            with stats_lock:
+                stats.scored += 1
+                if verdict == "PASS":
+                    stats.passed += 1
+                else:
+                    stats.failed += 1
 
             logger.info(
                 "Article %d: %s (rigour=%.2f, posture=%.2f, self=%.2f, rank=%.2f) — %s",
@@ -216,12 +219,21 @@ def score_all(
             )
 
         except Exception as e:
-            stats.errors += 1
-            logger.warning("Scoring failed for article %d: %s",
-                           article_id, e)
+            with stats_lock:
+                stats.errors += 1
+            logger.warning("Scoring failed for article %d: %s", article_id, e)
+
+    if candidates:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=max_workers, thread_name_prefix="stage456",
+        ) as ex:
+            # Submit all and wait — we don't need the results here,
+            # _score_one writes to the DB and stats directly.
+            list(ex.map(_score_one, candidates))
 
     logger.info(
-        "Stage 4+5+6 done — %d scored (%d PASS, %d FAIL), %d errors",
-        stats.scored, stats.passed, stats.failed, stats.errors,
+        "Stage 4+5+6 done — %d scored (%d PASS, %d FAIL), %d errors  "
+        "(workers=%d)",
+        stats.scored, stats.passed, stats.failed, stats.errors, max_workers,
     )
     return stats
