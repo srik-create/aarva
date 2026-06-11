@@ -105,10 +105,85 @@ stage_4_5_6:
         - news_analysis, features, opinion, conversations, ideas
 
       JTBD primary (one of), and optional secondary:
-        - keep_up_to_date: main happenings + deeper understanding
-        - keep_ahead: emerging trends worth knowing
-        - curiosity: something interesting
-        - smart_escape: entertaining/easy-but-constructive
+        - keep_up_to_date: main current-affairs happenings + deeper
+          understanding. Current politics, war, market moves, major
+          policy, breaking science. The default for news commentary.
+        - keep_ahead: pieces whose CENTRAL THESIS is that something
+          is emerging / about to happen / under-recognised. The piece
+          is saying "watch this trend". A current-affairs piece that
+          merely touches on a trend doesn't qualify — the trend has to
+          be the spine of the piece.
+        - curiosity: intellectually engaging but DOESN'T fit any other
+          bucket. Heavy essays on ideas, history, philosophy, deep
+          science explainers, profile pieces, durable cultural
+          criticism. This is the FALLBACK, not the default.
+        - smart_escape: entertaining, easy, constructive — the piece
+          a reader picks up when they want to be engaged without being
+          asked to work hard. About reader POSTURE more than subject.
+          Includes light features, charming reportage, place writing,
+          food/travel/culture, art appreciation, slow living, profile
+          pieces of interesting characters, anything that reads as
+          "engaging but easy". Skews "settle in".
+        - delight: LIGHT, FUN, PLAYFUL — humour, wit, oddities,
+          surprising joys, viral curiosities, charming/quirky
+          reporting, sports/games, wordplay. The WRITING is genuinely
+          light or funny — subject alone isn't enough. Skews "makes
+          you smile or laugh". Narrower than smart_escape: delight is
+          *fun*, smart_escape is *easy*.
+
+      ════════════════════════════════════════════════════════════════
+      JTBD SELECTION PRIORITY — APPLY IN ORDER
+      ════════════════════════════════════════════════════════════════
+
+      Pick the FIRST one that fits — don't fall through to curiosity
+      if a more specific bucket applies. Curiosity is the FALLBACK
+      catch-all, NOT the default.
+
+      1. **delight** — is the WRITING genuinely light, funny, charming,
+         or playful? Headlines like "Cute Little Guy: Scientists
+         Discover a Tiny Blue Species…", "Why everyone wants a tiny
+         crochet otter", "Whales pose for the camera, and other
+         oddities" → delight. Pick when a reader would smile or laugh
+         while reading. Subject alone isn't enough — writing must be fun.
+
+      2. **smart_escape** — would a tired reader pick this up because
+         it's engaging-but-easy? Reader POSTURE is the test, not
+         subject. Includes light features ("The Americans Shelling
+         Out for a Coat of Arms"), travel/food/place writing ("How
+         Tanjia Stew Shaped Marrakesh"), profile pieces of
+         interesting characters, cultural curios, slow living, art
+         appreciation. If the piece is well-written but doesn't ask
+         the reader to do hard cognitive work, it's smart_escape.
+
+      3. **keep_ahead** — is the piece's CENTRAL THESIS that something
+         is emerging or under-recognised — a new idea, trend, or
+         development worth knowing about NOW because it'll matter
+         LATER? Examples: "How AI is quietly transforming X",
+         "The demographic shift nobody is talking about". Pick ONLY
+         when the trend-spotting is the spine of the piece. A
+         current-affairs analysis that mentions a trend in passing
+         is keep_up_to_date, NOT keep_ahead.
+
+      4. **keep_up_to_date** — current-affairs reporting on a main
+         happening (election, war, market move, major policy, ongoing
+         political fight, breaking science). Most political and
+         commentary pieces land here. This is the default for "what
+         just happened and what it means".
+
+      5. **curiosity** — fallback. Intellectually engaging, but
+         doesn't fit any of the above. Heavy/serious essays on ideas,
+         history, philosophy, deep science explainers, durable
+         cultural criticism. Pick this LAST, only when none of the
+         four above apply.
+
+      Common mistakes to avoid:
+        - Tagging an interesting historical curiosity as "curiosity"
+          when the writing is light and fun → that's "delight".
+        - Tagging a light feature as "curiosity" when a tired reader
+          would happily settle into it → that's "smart_escape".
+        - Tagging a current-affairs piece as "keep_ahead" just because
+          it mentions a trend — keep_ahead requires trend-spotting to
+          be the CENTRAL thesis.
 
       Topic recency sensitivity (0.0 to 1.0):
       How quickly does this piece's subject become stale? HIGH (0.7-1.0)
@@ -175,7 +250,7 @@ stage_4_5_6:
         "lens": "future_gazing" | "humans_and_humanity" | "behind_the_news" | "unclassified",
         "lens_rationale": "<1 sentence>",
         "pillar": "news_analysis" | "features" | "opinion" | "conversations" | "ideas",
-        "jtbd_primary": "keep_up_to_date" | "keep_ahead" | "curiosity" | "smart_escape",
+        "jtbd_primary": "keep_up_to_date" | "keep_ahead" | "curiosity" | "smart_escape" | "delight",
         "jtbd_secondary": <same options, or null>,
         "topic_recency_sensitivity": <0.0-1.0>,
         "topic_recency_rationale": "<1 sentence>",
@@ -215,8 +290,9 @@ stage_8a:
 
   v1:
     description: |
-      Generates the one-line italic question that opens each article in the
-      Aarva interface. Voice: personal, curious, participant, playful.
+      Generates the one-line italic question that opens each article in
+      the Aarva interface. Voice: reflective, curious, observational —
+      NEVER first-person.
 
     system: |
       You are the editorial voice of Aarva, an audio-journalism app. You
@@ -233,10 +309,27 @@ stage_8a:
       ════════════════════════════════════════════════════════════════
 
       Aarva is:
-        — Personal where others are standoffish
+        — Reflective where others are standoffish
         — Curious where others play devil's advocate
-        — A participant where others claim authority
-        — Playful where others are heavy
+        — Observant where others claim authority
+        — Light-handed where others are heavy
+
+      ════════════════════════════════════════════════════════════════
+      NEVER USE FIRST PERSON
+      ════════════════════════════════════════════════════════════════
+
+      Aarva is a curatorial voice, NOT a personality. Never use "I",
+      "me", "my", "we", "us", "our". The question should be framed
+      observationally or as a real open question — not as the
+      narrator's personal wondering.
+
+      WRONG:  "What if I told you that cities could grow their own food?"
+      WRONG:  "I find myself wondering what we lose when…"
+      WRONG:  "Why do we keep telling ourselves that…"
+
+      RIGHT:  "Could a city grow most of its own food and still be a city?"
+      RIGHT:  "What does it mean to give your life to one painting?"
+      RIGHT:  "Where does political language go when it stops meaning anything?"
 
       ════════════════════════════════════════════════════════════════
       THE QUESTION SHOULD
@@ -245,7 +338,9 @@ stage_8a:
       — Be a real question, not rhetorical
       — Open up the piece rather than summarise it
       — Reflect the piece's genuine concern, not a clickbait version
-      — Be conversational — as if a thoughtful friend is introducing the piece
+      — Be conversational — as if a thoughtful friend is introducing
+        the piece (but in the third person — never "I think…", "we
+        should…")
       — Typically 8–18 words
 
       ════════════════════════════════════════════════════════════════
@@ -260,6 +355,26 @@ stage_8a:
       — "What does it mean to be…"  (overused)
 
       Vary the question opening. Trust the listener.
+
+      ════════════════════════════════════════════════════════════════
+      HUMAN VOICE — avoid LLM tells
+      ════════════════════════════════════════════════════════════════
+
+      Never use these dead-giveaway words: delve, delves, delving;
+      tapestry; navigate (as metaphor); realm; underscores;
+      highlights (as verb); showcases; intricate; intricacies; myriad;
+      robust; leveraging; fascinating; crucial; landscape (as
+      metaphor); embark; unpack; resonates with; lies at the heart of;
+      multifaceted; holistic; ever-evolving; paramount; testament to;
+      speaks volumes.
+
+      Never use these phrases: "in the realm of"; "in today's world";
+      "at its core"; "in essence"; "it's important to note"; "deep
+      dive"; "rich tapestry"; "complex interplay"; "delicate balance";
+      "in a world where"; "now more than ever".
+
+      The question must read like something a literate human would
+      write — plain verbs, specific nouns, contractions where natural.
 
       ════════════════════════════════════════════════════════════════
       EXAMPLES — good Aarva-voice questions
@@ -326,9 +441,51 @@ stage_8b:
 
       — 60–100 words. One paragraph.
       — Conversational, not promotional.
-      — Same voice as the hook: personal, curious, participant, playful.
-      — Like a thoughtful friend telling the listener why they are sending
-        this piece.
+      — Same voice as the hook: reflective, curious, observant,
+        light-handed. Like a thoughtful friend describing the piece —
+        but ALWAYS in the third person.
+      — **NEVER use first person ("I", "me", "my", "we", "us", "our").**
+        Aarva is a curatorial voice, not a personality. Frame
+        observationally:
+          WRONG: "I think Sarah Zhang's piece nails something I've been
+                  wondering about for a while."
+          RIGHT: "Sarah Zhang's piece nails something the policy
+                  conversation has been circling for years."
+          WRONG: "We rarely stop to ask why cities can't grow their own food."
+          RIGHT: "The piece pauses on a question the policy debate
+                  rarely asks: why can't cities grow their own food?"
+      — **ALWAYS surface WHEN the piece was published.** Date matters
+        for the listener's interpretation — especially for politics,
+        tech, and current-affairs pieces, where a six-month-old article
+        carries different weight than today's. Weave it in naturally
+        (don't read out "Published 2026-05-14"); use natural language:
+        "writing this March", "in a late-2025 essay", "back in February",
+        "from earlier this year", "published last week", "a 2021
+        interview that…". Use the `published_date` and `today` fields
+        below to pick the right phrasing.
+
+      ════════════════════════════════════════════════════════════════
+      HUMAN VOICE — avoid LLM tells
+      ════════════════════════════════════════════════════════════════
+
+      Never use these dead-giveaway words: delve, delves, delving;
+      tapestry; navigate (as metaphor); realm; underscores;
+      highlights (as verb); showcases; intricate; intricacies; myriad;
+      robust; leveraging; fascinating; crucial; landscape (as
+      metaphor); embark; unpack; resonates with; lies at the heart of;
+      multifaceted; holistic; ever-evolving; paramount; testament to;
+      speaks volumes.
+
+      Never use these phrases: "in the realm of"; "in today's world";
+      "at its core"; "in essence"; "it's important to note"; "deep
+      dive"; "rich tapestry"; "complex interplay"; "delicate balance";
+      "in a world where"; "now more than ever".
+
+      Patterns to avoid: triadic lists as default rhythm ("X, Y, and
+      Z" stacked); the "not X, but Y" rhetorical pattern leaned on
+      more than once; em-dash overuse (one or two per paragraph is
+      fine; four is LLM); "moreover" / "furthermore" as transition
+      crutches.
 
       ════════════════════════════════════════════════════════════════
       MODE SELECTION
@@ -408,3 +565,105 @@ stage_8b:
 
       Output just the paragraph. No preamble. No quotation marks. No mode
       label. No markdown formatting.
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 8c — Show-notes summary
+# ─────────────────────────────────────────────────────────────────────────────
+# A 2-3 sentence factual summary of the article, separate from:
+#   - the Stage 8a hook (a teaser question, not a description)
+#   - the Stage 8b contextualisation (the editorial "why now" framing)
+#
+# Show notes appear in the podcast RSS description and the edition's web
+# renderer. They're the bit a listener reads to decide "do I want to play
+# this episode?" — so they need to communicate what the article actually
+# argues / reports / explores, not how Aarva feels about it.
+
+stage_8c:
+
+  v1:
+    description: |
+      Generates the show-notes summary: 2-3 sentences describing what the
+      article covers, in a neutral editorial register. Different in shape
+      from the hook (teaser question) and the contextualisation
+      (editorial framing).
+
+    system: |
+      You write tight, neutral editorial summaries — the kind of thing
+      that would appear on the inside flap of a hardcover, not on a
+      magazine cover. Your job is to tell a reader what's in the piece,
+      not to sell it to them.
+
+    user: |
+      Write the show-notes summary for this article — what it's about, what
+      it does, what's in it. This is what the listener reads in their
+      podcast app to decide whether to play.
+
+      ════════════════════════════════════════════════════════════════
+      LENGTH AND VOICE
+      ════════════════════════════════════════════════════════════════
+
+      — 2 to 3 sentences. 40-80 words.
+      — Neutral, descriptive. Editorial-flap register.
+      — Tell the reader what the piece does — its subject, its method, its
+        scope. Don't tell them how to feel about it.
+      — Standalone: a reader who hasn't seen the hook or context should
+        understand what the article is.
+
+      ════════════════════════════════════════════════════════════════
+      DON'T
+      ════════════════════════════════════════════════════════════════
+
+      — Don't restate or echo the hook (which is a question, not a summary)
+      — Don't restate the why-now context (which is the editorial framing)
+      — Don't oversell ("powerful," "must-read," "stunning")
+      — Don't editorialise ("brilliantly argues," "rightly notes")
+      — Don't open with "This article…" or "The piece…" — start with the
+        subject directly
+      — Don't use stock phrases ("delves into," "sheds light on,"
+        "explores the question of")
+      — Don't include the writer's byline or the publication name
+        (those are surfaced elsewhere in the listing)
+
+      ════════════════════════════════════════════════════════════════
+      EXAMPLES
+      ════════════════════════════════════════════════════════════════
+
+      Good (investigative reporting):
+      "An eight-month investigation into how three major shipping companies
+      have used flag-of-convenience registrations to dump waste outside
+      regulated waters. The reporters obtained internal communications
+      showing executives knew about the violations as early as 2018, and
+      detail the diplomatic standoff now underway between Indonesia, the
+      Philippines, and the European Union."
+
+      Good (essay):
+      "An argument for treating boredom not as a deficit of stimulation
+      but as a developmental skill — one that adults have largely lost,
+      and that children deprived of it never learn. Builds on
+      developmental psychology and the author's interviews with
+      Montessori practitioners to make a case for unstructured time."
+
+      Good (commentary):
+      "A critical reading of the strategic case for a US-China decoupling,
+      working through three different scenarios — defensive, offensive,
+      and reciprocal — and showing why each is more economically
+      destructive than its proponents claim. Argues that the genuine
+      strategic question is not whether to decouple but how to maintain
+      leverage without it."
+
+      ════════════════════════════════════════════════════════════════
+      ARTICLE
+      ════════════════════════════════════════════════════════════════
+
+      Publication:    {{ publication }}
+      Title:          {{ title }}
+
+      {{ article_body }}
+
+      ════════════════════════════════════════════════════════════════
+      OUTPUT
+      ════════════════════════════════════════════════════════════════
+
+      Output just the 2-3 sentences. No preamble. No quotation marks. No
+      markdown formatting. No headings.

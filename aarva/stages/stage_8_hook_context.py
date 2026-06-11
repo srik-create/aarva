@@ -1,25 +1,25 @@
-"""Stage 8 — Editor's hook (8a) and why-now contextualisation (8b).
+"""Stage 8 — Editor's hook (8a), why-now context (8b), and show-notes (8c).
 
-For each piece in today's edition, two LLM calls:
+For each piece in today's edition, three LLM calls:
   8a — one-line italic question (Aarva voice, ~8-18 words)
   8b — 60-100 word "why this is worth your time right now" paragraph
+  8c — 40-80 word neutral show-notes summary (what the article is about)
 
-These are the most editorially-visible LLM outputs in the system. If the
-hook reads as generic AI prose, the editorial promise dies on first
-contact. The prompts in `prompts.yaml` are heavy on negative examples
-("don't write 'have you ever wondered...'") to push the model away from
-clichés.
+The 8a hook and 8b context are the editorial wrapper around the piece —
+voice-y, opinionated, designed to make the listener want to play the
+audio. The 8c show-notes is the practical description that appears in
+the RSS feed and the podcast app's episode list — neutral, factual,
+designed to help a listener decide what to play.
 
-We split into two LLM calls rather than one combined call because:
-  - The two outputs need different lengths and tones
-  - The hook deserves the model's full attention (highest-stakes single
-    piece of Aarva's voice)
-  - Cost is trivial (~12 calls per daily edition)
+We keep all three as separate LLM calls because:
+  - Each output has a different tone and length budget
+  - The hook deserves the model's full attention (highest-stakes piece
+    of Aarva's voice in the entire app)
+  - Cost is trivial (~18 calls per daily edition)
 
-Idempotency: pieces that already have a hook + contextualisation skip
-re-generation. Run again to fill in pieces that errored on a previous
-pass. To force re-generation, NULL out the columns or pass --rebuild
-(deferred for now).
+Idempotency: pieces that already have a hook + context + show_notes skip
+re-generation per field. Run again to fill in pieces that errored on a
+previous pass.
 """
 from __future__ import annotations
 
@@ -46,22 +46,12 @@ class Stage8Stats:
     pieces_total: int = 0
     hooks_generated: int = 0
     contexts_generated: int = 0
+    show_notes_generated: int = 0
     skipped_already_done: int = 0
     errors: int = 0
 
 
-def _load_prompts() -> dict:
-    with PROMPTS_PATH.open() as f:
-        return yaml.safe_load(f)
-
-
-def _render(template: str, **kwargs) -> str:
-    """Lightweight {{ var }} substitution. Same as Stage 4+5+6's renderer."""
-    out = template
-    for k, v in kwargs.items():
-        out = out.replace("{{ " + k + " }}", str(v))
-        out = out.replace("{{" + k + "}}", str(v))
-    return out
+from aarva.prompts import load_prompts as _load_prompts, render as _render
 
 
 def _clean_hook(raw: str) -> str:
@@ -89,6 +79,12 @@ def _clean_context(raw: str) -> str:
     return " ".join(parts)
 
 
+def _clean_show_notes(raw: str) -> str:
+    """Same shape as _clean_context — the output is paragraph-shaped,
+    just with different content."""
+    return _clean_context(raw)
+
+
 def _load_edition_pieces(
     db: Database,
     edition_id: int,
@@ -101,13 +97,15 @@ def _load_edition_pieces(
     """
     where = "" if include_complete else (
         " AND (ep.hook IS NULL OR ep.hook = '' "
-        "      OR ep.contextualisation IS NULL OR ep.contextualisation = '')"
+        "      OR ep.contextualisation IS NULL OR ep.contextualisation = '' "
+        "      OR ep.show_notes IS NULL OR ep.show_notes = '')"
     )
     with db.connect() as conn:
         rows = conn.execute(f"""
             SELECT ep.edition_id, ep.article_id, ep.slot,
                    ep.hook AS existing_hook,
                    ep.contextualisation AS existing_context,
+                   ep.show_notes AS existing_show_notes,
                    a.title, a.full_text, a.published_date,
                    p.name AS publication_name,
                    s.topic_recency_sensitivity
@@ -157,39 +155,70 @@ def _generate_context(
     return _clean_context(str(response))
 
 
+def _generate_show_notes(
+    llm: LLMClient,
+    prompt_config: dict,
+    piece: dict,
+) -> str:
+    """Generate the 2-3 sentence show-notes summary (Stage 8c)."""
+    rendered = _render(
+        prompt_config["user"],
+        publication=piece["publication_name"] or "Unknown",
+        title=piece["title"] or "",
+        article_body=piece["full_text"] or "",
+    )
+    full_prompt = prompt_config.get("system", "") + "\n\n" + rendered
+    # Lower temperature than the hook/context — show notes should be steady
+    # and factual, not voice-y.
+    response = llm.complete(full_prompt, expect_json=False, temperature=0.3)
+    return _clean_show_notes(str(response))
+
+
 def _save(
     db: Database,
     edition_id: int,
     article_id: int,
     hook: Optional[str],
     context: Optional[str],
+    show_notes: Optional[str],
 ) -> None:
-    """Update edition_pieces with whichever fields were generated."""
+    """Update edition_pieces with whichever fields were generated.
+
+    Builds the UPDATE statement dynamically — sending the columns
+    individually avoided weird interactions when one field failed but
+    others succeeded, but it grew unwieldy as we added show_notes.
+    Better to write one UPDATE per non-None field.
+    """
+    updates: list[tuple[str, str]] = []
+    if hook is not None:
+        updates.append(("hook", hook))
+    if context is not None:
+        updates.append(("contextualisation", context))
+    if show_notes is not None:
+        updates.append(("show_notes", show_notes))
+
+    if not updates:
+        return
+
+    set_clause = ", ".join(f"{col} = ?" for col, _ in updates)
+    values = [val for _, val in updates] + [edition_id, article_id]
     with db.connect() as conn:
-        if hook is not None and context is not None:
-            conn.execute(
-                "UPDATE edition_pieces SET hook = ?, contextualisation = ? "
-                "WHERE edition_id = ? AND article_id = ?",
-                (hook, context, edition_id, article_id),
-            )
-        elif hook is not None:
-            conn.execute(
-                "UPDATE edition_pieces SET hook = ? "
-                "WHERE edition_id = ? AND article_id = ?",
-                (hook, edition_id, article_id),
-            )
-        elif context is not None:
-            conn.execute(
-                "UPDATE edition_pieces SET contextualisation = ? "
-                "WHERE edition_id = ? AND article_id = ?",
-                (context, edition_id, article_id),
-            )
+        conn.execute(
+            f"UPDATE edition_pieces SET {set_clause} "
+            "WHERE edition_id = ? AND article_id = ?",
+            values,
+        )
 
 
 def _get_latest_edition_id(db: Database) -> Optional[int]:
+    """Latest DAILY edition. Crosscut episodes generate their own
+    intro/bridge/outro/passages via aarva.stages.stage_crosscut and
+    don't go through this Stage 8 path."""
     with db.connect() as conn:
         row = conn.execute(
-            "SELECT id FROM editions ORDER BY edition_date DESC, id DESC LIMIT 1"
+            "SELECT id FROM editions "
+            " WHERE edition_type = 'daily' "
+            " ORDER BY edition_date DESC, id DESC LIMIT 1"
         ).fetchone()
     return int(row["id"]) if row else None
 
@@ -200,11 +229,13 @@ def generate_for_edition(
     *,
     edition_id: Optional[int] = None,
     include_complete: bool = False,
+    llm: Optional[LLMClient] = None,
 ) -> Stage8Stats:
     """Run Stage 8 (8a + 8b) for every piece in the specified edition.
 
     edition_id: defaults to the latest edition (by date) in the DB.
     include_complete: re-generate even for pieces that already have hook+context.
+    llm: pass an existing client to avoid rebuilding (DI).
     """
     stats = Stage8Stats()
 
@@ -218,10 +249,15 @@ def generate_for_edition(
     prompts = _load_prompts()
     prompt_8a = prompts.get("stage_8a", {}).get("v1")
     prompt_8b = prompts.get("stage_8b", {}).get("v1")
-    if not (prompt_8a and prompt_8b):
-        raise RuntimeError("Stage 8: v1 prompts missing from prompts.yaml")
+    prompt_8c = prompts.get("stage_8c", {}).get("v1")
+    if not (prompt_8a and prompt_8b and prompt_8c):
+        raise RuntimeError(
+            "Stage 8: one or more v1 prompts missing from prompts.yaml "
+            "(stage_8a / stage_8b / stage_8c)"
+        )
 
-    llm = build_llm_client(config.llm)
+    if llm is None:
+        llm = build_llm_client(config.llm)
     pieces = _load_edition_pieces(db, edition_id, include_complete=include_complete)
     stats.pieces_total = len(pieces)
 
@@ -240,6 +276,7 @@ def generate_for_edition(
 
         new_hook: Optional[str] = None
         new_context: Optional[str] = None
+        new_show_notes: Optional[str] = None
 
         # 8a — Hook
         if include_complete or not piece.get("existing_hook"):
@@ -263,11 +300,25 @@ def generate_for_edition(
                 stats.errors += 1
                 logger.warning("      context generation failed: %s", e)
 
-        if new_hook is None and new_context is None:
+        # 8c — Show notes
+        if include_complete or not piece.get("existing_show_notes"):
+            try:
+                new_show_notes = _generate_show_notes(llm, prompt_8c, piece)
+                stats.show_notes_generated += 1
+                preview = (
+                    new_show_notes if len(new_show_notes) <= 80
+                    else new_show_notes[:77] + "..."
+                )
+                logger.info("      show notes: %s", preview)
+            except Exception as e:
+                stats.errors += 1
+                logger.warning("      show-notes generation failed: %s", e)
+
+        if new_hook is None and new_context is None and new_show_notes is None:
             stats.skipped_already_done += 1
             continue
 
-        _save(db, edition_id, article_id, new_hook, new_context)
+        _save(db, edition_id, article_id, new_hook, new_context, new_show_notes)
 
     logger.info(
         "Stage 8 done — %d pieces, %d hooks, %d contexts, %d skipped, %d errors",
