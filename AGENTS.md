@@ -158,12 +158,22 @@ Last updated: 2026-06-10
 
 ## Version control
 
-20. **Commit at the end of every logical task batch.** Don't leave
-    days of work uncommitted. After finishing a coherent change
-    (one feature, one refactor, one bugfix), stage the relevant
-    files, write a one-line subject + a few-line body, and commit.
-    Push to `origin` at natural pause points (end of a session, end
-    of a feature, before any risky migration).
+20. **Never commit or push without explicit user sign-off.** At the
+    end of a coherent change (one feature, one refactor, one bugfix):
+
+    a) Summarise the diff in chat — what changed, which files, why.
+    b) Propose the commit subject + body.
+    c) Wait for the user to say "commit" (or override the proposal).
+       Only then run `git add` + `git commit`.
+
+    Same applies to `git push`: never push without explicit sign-off,
+    even after a commit has been approved. The user wants a moment to
+    inspect / fix / amend before the change leaves the laptop.
+
+    Don't leave work uncommitted for long — propose commits at the
+    end of every logical task batch so the user can sign off promptly.
+    The principle: every commit boundary is a real checkpoint, not a
+    routine save.
 
 21. **One concept per commit.** Don't bundle a refactor with a bug
     fix with a new feature — even if they were done in the same
