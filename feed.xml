@@ -11,7 +11,7 @@
     <itunes:summary>The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI. A daily edition of rigorous long-form pieces, plus a Crosscut episode each day pairing two articles on the same topic from different angles.</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Thu, 11 Jun 2026 13:44:27 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jun 2026 14:16:29 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -27,6 +27,29 @@
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>By Ruskin Bond: A boy finds a purple stone that glows in the sunlight. But this is no ordinary stone</title>
+      <itunes:title>By Ruskin Bond: A boy finds a purple stone that glows in the sunlight. But this is no ordinary stone</itunes:title>
+      <link>https://scroll.in/article/1092823/by-ruskin-bond-a-boy-finds-a-purple-stone-that-glows-in-the-sunlight-but-this-is-no-ordinary-stone?utm_source=rss&amp;utm_medium=public</link>
+      <description><![CDATA[<em>What does it mean when a simple stone seems to glow with its own light?</em><br/><br/>Published just this week, Ruskin Bond’s story invites listeners into the quiet world of a summer holiday, where a boy’s discovery of a purple stone becomes more than a simple find. The piece gently considers how a child’s wonder can transform an ordinary object into something truly extraordinary, and how that unique perception can differ sharply from an adult&#x27;s. It’s an exploration of the subtle magic found in nature&#x27;s small gifts and the quiet mysteries they can hold.<br/><br/>A 12-year-old boy on summer holiday in Mussoorie discovers a unique, glowing purple stone in a mountain stream. He brings it home, where his grandmother reacts with surprise to its unusual appearance. The narrative describes the boy&#x27;s exploration and the stone&#x27;s mysterious qualities.<br/><br/>Read at source: <a href="https://scroll.in/article/1092823/by-ruskin-bond-a-boy-finds-a-purple-stone-that-glows-in-the-sunlight-but-this-is-no-ordinary-stone?utm_source=rss&amp;utm_medium=public">Scroll.in</a>]]></description>
+      <content:encoded><![CDATA[<em>What does it mean when a simple stone seems to glow with its own light?</em><br/><br/>Published just this week, Ruskin Bond’s story invites listeners into the quiet world of a summer holiday, where a boy’s discovery of a purple stone becomes more than a simple find. The piece gently considers how a child’s wonder can transform an ordinary object into something truly extraordinary, and how that unique perception can differ sharply from an adult&#x27;s. It’s an exploration of the subtle magic found in nature&#x27;s small gifts and the quiet mysteries they can hold.<br/><br/>A 12-year-old boy on summer holiday in Mussoorie discovers a unique, glowing purple stone in a mountain stream. He brings it home, where his grandmother reacts with surprise to its unusual appearance. The narrative describes the boy&#x27;s exploration and the stone&#x27;s mysterious qualities.<br/><br/>Read at source: <a href="https://scroll.in/article/1092823/by-ruskin-bond-a-boy-finds-a-purple-stone-that-glows-in-the-sunlight-but-this-is-no-ordinary-stone?utm_source=rss&amp;utm_medium=public">Scroll.in</a>]]></content:encoded>
+      <itunes:summary>What does it mean when a simple stone seems to glow with its own light?
+
+Published just this week, Ruskin Bond’s story invites listeners into the quiet world of a summer holiday, where a boy’s discovery of a purple stone becomes more than a simple find. The piece gently considers how a child’s wonder can transform an ordinary object into something truly extraordinary, and how that unique perception can differ sharply from an adult&#x27;s. It’s an exploration of the subtle magic found in nature&#x27;s small gifts and the quiet mysteries they can hold.
+
+A 12-year-old boy on summer holiday in Mussoorie discovers a unique, glowing purple stone in a mountain stream. He brings it home, where his grandmother reacts with surprise to its unusual appearance. The narrative describes the boy&#x27;s exploration and the stone&#x27;s mysterious qualities.
+
+Read at source: Scroll.in</itunes:summary>
+      <pubDate>Thu, 11 Jun 2026 13:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-24-1766</guid>
+      <enclosure url="https://srik-create.github.io/aarva/output/audio/2026-06-11/article_1766.mp3" length="2340717" type="audio/mpeg"/>
+      <itunes:duration>04:52</itunes:duration>
+      <itunes:author>Ruskin Bond</itunes:author>
+      <itunes:subtitle>Scroll.in</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>bonus</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: ai human systems</title>
       <itunes:title>Crosscut: ai human systems</itunes:title>
