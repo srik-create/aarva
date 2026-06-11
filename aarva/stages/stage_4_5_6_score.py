@@ -185,11 +185,25 @@ def score_all(
             rigour = float(response.get("rigour") or 0)
             posture = float(response.get("posture") or 0)
             self_imp = float(response.get("self_implication") or 0)
-            verdict = (
-                "PASS"
-                if rigour >= pass_min_rigour and posture >= pass_min_posture
-                else "FAIL"
-            )
+
+            # Piece-type override: anything other than 'article' is
+            # forced to FAIL regardless of rigour/posture. The LLM
+            # still produces all the metadata so we can audit later,
+            # but the article won't reach the candidate pool.
+            piece_type = (response.get("piece_type") or "article").strip().lower()
+            valid_types = {"article", "digest", "collection",
+                           "video_stub", "audio_stub", "other"}
+            if piece_type not in valid_types:
+                piece_type = "other"
+
+            if piece_type != "article":
+                verdict = "FAIL"
+            else:
+                verdict = (
+                    "PASS"
+                    if rigour >= pass_min_rigour and posture >= pass_min_posture
+                    else "FAIL"
+                )
             response["verdict"] = verdict
             response["ranking_score"] = round(
                 0.45 * rigour + 0.45 * posture + 0.10 * self_imp, 4
@@ -197,6 +211,13 @@ def score_all(
 
             _persist_score(db, article_id, response, prompt_version)
             new_status = "scored" if verdict == "PASS" else "filtered_out"
+
+            if piece_type != "article":
+                logger.info(
+                    "Article %d: filtered as %s — %s",
+                    article_id, piece_type,
+                    (article.get("title") or "")[:60],
+                )
             with db.connect() as conn:
                 conn.execute(
                     "UPDATE articles SET status = ? WHERE id = ?",
