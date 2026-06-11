@@ -234,10 +234,54 @@ stage_4_5_6:
          specificity passes.
 
       ════════════════════════════════════════════════════════════════
+      PIECE TYPE — IMPORTANT, FIRST THING TO CLASSIFY
+      ════════════════════════════════════════════════════════════════
+
+      Before scoring, classify what kind of page this actually is.
+      Aarva is for *individual long-form articles*, not for digests,
+      collections, or stub pages where the real content is in another
+      medium. Use `piece_type`:
+
+        - "article": individual long-form piece — essay, reportage,
+          investigation, profile, opinion, explainer, dialogue. The
+          full intellectual substance is in the text. PASSES through
+          to scoring.
+
+        - "digest": daily/weekly news round-up. Multiple stories
+          summarised on one page, often with linked headlines and a
+          curator's framing. Examples: "Early Edition: June 9",
+          "The Briefing", "Week in Review". Do NOT pass this.
+
+        - "collection": index/landing page listing multiple related
+          articles. The page itself is metadata about other pieces,
+          not a piece. Examples: "Collection: Coverage of X",
+          "Our 2026 reporting on Y". Do NOT pass this.
+
+        - "video_stub": the page is primarily a video — the visible
+          text is a description, a transcript header, or a few
+          paragraphs framing the video. The real content is on the
+          embedded player. Do NOT pass this.
+
+        - "audio_stub": same shape but for a podcast / audio
+          interview. The text is the episode description; the real
+          content is in the audio player. Do NOT pass this.
+
+        - "other": looks like none of the above and doesn't clearly
+          read as an individual long-form article. Do NOT pass this.
+
+      If piece_type != "article", still output the full JSON below,
+      but set verdict = "FAIL". Score everything else as you would —
+      the verdict will be overridden by downstream logic, but the
+      classification metadata is still useful.
+
+      ════════════════════════════════════════════════════════════════
       OUTPUT FORMAT (return JSON only, no preamble, no trailing text)
       ════════════════════════════════════════════════════════════════
 
       {
+        "piece_type": "article" | "digest" | "collection" | "video_stub" | "audio_stub" | "other",
+        "piece_type_rationale": "<1 sentence>",
+
         "rigour": <0.0-1.0>,
         "rigour_rationale": "<1-2 sentences>",
         "posture": <0.0-1.0>,
