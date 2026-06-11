@@ -1,0 +1,51 @@
+# Aarva v0.1 — runtime dependencies.
+#
+# Install on a fresh venv with:
+#   python3.12 -m venv .venv
+#   source .venv/bin/activate
+#   pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# Tested against Python 3.12 on macOS. We pin 3.12 in pyproject.toml +
+# the launchd wrapper for predictability. The previous Kokoro/onnxruntime
+# constraint that required 3.10+ was removed when Gemini TTS replaced
+# Kokoro; 3.10+ is still a safe floor.
+#
+# Pinning policy: lower bound to the version we know works, no upper
+# bound (so security patches and minor versions just flow). Revisit if
+# anything breaks after a major version bump.
+
+# ─── Ingestion ────────────────────────────────────────────────────────────
+feedparser>=6.0            # RSS/Atom feed parsing (Stage 1)
+httpx>=0.27                # HTTP client (RSS fetching + article extraction)
+trafilatura>=2.0           # Article-body extraction; v2 API for favor_recall / no_fallback
+python-dateutil>=2.8       # Lenient date parsing in RSS entries
+
+# ─── Stage 1.5 consolidation ──────────────────────────────────────────────
+numpy>=1.26                # Embedding vector math
+scikit-learn>=1.4          # TF-IDF fallback path; cosine_similarity
+sentence-transformers>=3.0 # Local embeddings via BGE-base (default backend)
+
+# ─── LLM clients (Stage 4+5+6, Stage 8a/b, Stage 9 narrator detection) ────
+# google-genai is the production default per project policy
+# (see aarva/clients/llm.py and pipeline.yaml).
+# anthropic is kept for debug/fallback only.
+google-genai>=1.0          # Gemini API (production LLM)
+anthropic>=0.40            # Anthropic API (fallback)
+
+# ─── Stage 9 TTS ──────────────────────────────────────────────────────────
+# Gemini TTS is the production path. It uses the same `google-genai`
+# package already pinned above for LLM calls — no extra dep needed.
+# Audio handling uses Python's stdlib `wave` module. Removed when
+# Gemini TTS landed: kokoro-onnx, onnxruntime.
+
+# ─── Config / utilities ───────────────────────────────────────────────────
+pyyaml>=6.0                # All config files
+click>=8.1                 # daily.py CLI
+
+# ─── Asset generation ────────────────────────────────────────────────────
+Pillow>=10.0               # scripts/generate_logo.py (podcast cover)
+
+# ─── Doc reading (audit + diagnostic scripts) ────────────────────────────
+python-docx>=1.0           # Reads docs/aarva_kickoff.docx in scripts that
+                           # cross-reference the kickoff against code state
