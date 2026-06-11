@@ -47,15 +47,120 @@ class Stage9Stats:
     total_audio_seconds: float = 0.0
 
 
+def _attribution_line(piece: dict) -> str:
+    """Build the spoken handoff between our intro and the article body.
+
+    Format: 'Written by <author> in <publication>, narrated for Aarva.'
+
+    Switched from 'read for Aarva' to 'narrated for Aarva' because
+    Kokoro's phonemizer can't reliably disambiguate the heteronym 'read'
+    (past 'red' vs present 'reed'). The default it chose was 'reed',
+    which is grammatically present-tense and felt wrong here. 'Narrated'
+    is unambiguous, has the same editorial register, and sidesteps the
+    pronunciation problem entirely.
+
+    Falls back gracefully when the byline is missing:
+      - byline absent     → 'Written in <publication>, narrated for Aarva.'
+      - publication absent → 'Narrated for Aarva.' (defensive; shouldn't
+        happen because edition_pieces always join through to publications,
+        but we don't want a crash if the column ever comes back NULL).
+
+    Tonal note: the leading capital 'W'/'N' helps Kokoro raise pitch
+    slightly at the start of the sentence, which makes the handoff feel
+    like a distinct beat from the contextualisation. The trailing period
+    gives a natural pause before the article body begins.
+    """
+    byline = (piece.get("byline") or "").strip()
+    publication = (piece.get("publication_name") or "").strip()
+
+    if byline and publication:
+        return f"Written by {byline} in {publication}, narrated for Aarva."
+    if publication:
+        return f"Written in {publication}, narrated for Aarva."
+    return "Narrated for Aarva."
+
+
+# ─── Text normalisation for TTS ──────────────────────────────────────────────
+#
+# Article bodies come through trafilatura's `txt` extractor which is *mostly*
+# plain text, but some publishers' HTML still produces output with stray
+# markdown / pseudo-markdown formatting markers that Kokoro reads literally.
+# The most common case observed in production: `*emphasis*` being read as
+# "asterisk emphasis asterisk" instead of just emphasising the word.
+#
+# Kokoro has no SSML support, so we can't *add* emphasis. Best we can do is
+# strip the markers and let the prosody fall where it falls.
+#
+# This is conservative — it strips markers when they look like inline
+# formatting but leaves literal asterisks alone in mathematical contexts
+# (e.g., "2*3=6" stays as-is because the asterisks aren't wrapping a
+# word). Same with hyphens, em-dashes, etc.
+
+_MD_EMPHASIS    = re.compile(r"(?<![*\w])\*([^*\s][^*]*?[^*\s]|[^*\s])\*(?![*\w])")
+_MD_BOLD        = re.compile(r"(?<!\*)\*\*([^*]+?)\*\*(?!\*)")
+_MD_ITAL_UNDER  = re.compile(r"(?<![_\w])_([^_\s][^_]*?[^_\s]|[^_\s])_(?![_\w])")
+_MD_BOLD_UNDER  = re.compile(r"(?<!_)__([^_]+?)__(?!_)")
+_MD_CODE_INLINE = re.compile(r"`([^`]+)`")
+_MD_LINK        = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+_MD_HEADER      = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+_MD_BLOCKQUOTE  = re.compile(r"^>\s?", re.MULTILINE)
+_MD_HRULE       = re.compile(r"^[-*_]{3,}\s*$", re.MULTILINE)
+_MD_LIST_BULLET = re.compile(r"^[\s]*[-*+]\s+", re.MULTILINE)
+
+
+def _normalize_for_tts(text: str) -> str:
+    """Strip inline formatting markers that Kokoro would otherwise pronounce.
+
+    Order matters: bold patterns must run BEFORE single-asterisk emphasis
+    (otherwise the inner pair eats the outer markers and we leave a stray
+    asterisk behind). Headers and block-level markers run last because they
+    consume leading whitespace.
+    """
+    if not text:
+        return text
+
+    # Block-level markdown first.
+    text = _MD_HRULE.sub("", text)
+    text = _MD_HEADER.sub("", text)
+    text = _MD_BLOCKQUOTE.sub("", text)
+    text = _MD_LIST_BULLET.sub("", text)
+
+    # Links → keep the visible text, drop the URL.
+    text = _MD_LINK.sub(r"\1", text)
+
+    # Inline emphasis / bold. Bold before italic so doubled markers go first.
+    text = _MD_BOLD.sub(r"\1", text)
+    text = _MD_BOLD_UNDER.sub(r"\1", text)
+    text = _MD_EMPHASIS.sub(r"\1", text)
+    text = _MD_ITAL_UNDER.sub(r"\1", text)
+
+    # Inline code → keep the word(s), drop the backticks.
+    text = _MD_CODE_INLINE.sub(r"\1", text)
+
+    return text
+
+
 def _compose_narration(piece: dict) -> str:
-    """Combine hook + context + article body; blank lines render as pauses."""
+    """Combine hook + context + attribution + article body.
+
+    Blank lines render as pauses in Kokoro. The attribution line sits as
+    its own paragraph between our intro and the article body so the
+    transition is sonically clear. All text is run through
+    _normalize_for_tts so that markdown emphasis markers aren't read
+    literally by Kokoro.
+    """
     parts: list[str] = []
     if piece.get("hook"):
-        parts.append(str(piece["hook"]).strip())
+        parts.append(_normalize_for_tts(str(piece["hook"]).strip()))
     if piece.get("contextualisation"):
-        parts.append(str(piece["contextualisation"]).strip())
+        parts.append(_normalize_for_tts(str(piece["contextualisation"]).strip()))
     if piece.get("full_text"):
-        parts.append(str(piece["full_text"]).strip())
+        # Attribution sits between the intro material and the body, so the
+        # listener gets a clear handoff before the article proper starts.
+        # Attribution is our own copy and doesn't need normalisation, but
+        # we run it through anyway for consistency.
+        parts.append(_normalize_for_tts(_attribution_line(piece)))
+        parts.append(_normalize_for_tts(str(piece["full_text"]).strip()))
     return "\n\n".join(p for p in parts if p)
 
 
@@ -81,9 +186,11 @@ def _load_edition_pieces(
             SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
                    ep.hook, ep.contextualisation,
                    ep.audio_url AS existing_audio_url,
-                   a.title, a.full_text, a.byline
+                   a.title, a.full_text, a.byline,
+                   p.name AS publication_name
               FROM edition_pieces ep
               JOIN articles a ON a.id = ep.article_id
+              JOIN publications p ON p.id = a.publication_id
              WHERE ep.edition_id = ?
                {where}
              ORDER BY ep.position
@@ -109,9 +216,14 @@ def _save_audio(
 
 
 def _get_latest_edition_id(db: Database) -> Optional[int]:
+    """Latest DAILY edition. Excludes crosscut episodes (which have
+    their own TTS path) so Stage 9 doesn't accidentally grab a crosscut
+    that was built after the daily edition row."""
     with db.connect() as conn:
         row = conn.execute(
-            "SELECT id FROM editions ORDER BY edition_date DESC, id DESC LIMIT 1"
+            "SELECT id FROM editions "
+            " WHERE edition_type = 'daily' "
+            " ORDER BY edition_date DESC, id DESC LIMIT 1"
         ).fetchone()
     return int(row["id"]) if row else None
 
@@ -156,42 +268,164 @@ def _detect_narrator_gender(piece: dict, llm: LLMClient) -> str:
         return "neutral"
 
 
-def _pick_voice(
-    piece: dict,
-    voice_default: str,
-    voice_alternate: str,
+def _normalise_voice_pool(value) -> list[str]:
+    """voice_map values can be a single string or a list. Always return a list."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value]
+    return list(value)
+
+
+def _gender_of_voice(voice_name: str,
+                     female_pool: list[str],
+                     male_pool: list[str]) -> str:
+    if voice_name in female_pool:
+        return "female"
+    if voice_name in male_pool:
+        return "male"
+    return "unknown"
+
+
+def _plan_voices_for_edition(
+    pieces: list[dict],
+    female_pool: list[str],
+    male_pool: list[str],
     rule: str,
     llm: Optional[LLMClient],
-) -> tuple[str, str]:
-    """Returns (voice_id, reason) for logging."""
-    position = int(piece.get("position") or 0)
+) -> dict[int, tuple[str, str]]:
+    """Pre-compute voice assignments for every piece in the edition.
 
+    Returns {article_id: (voice_name, reason)}.
+
+    Constraints, in priority order:
+
+      1. Each voice used at most once per edition (anti-duplication).
+      2. First-person pieces with detected gender MUST get a voice from
+         the matching gender pool (gender-match override). If the
+         matching pool is exhausted, we soft-relax and pick from the
+         other pool, logging a warning — this happens only when an
+         edition has more first-person pieces of one gender than we
+         have matching voices.
+      3. Neutral pieces alternate gender for natural variation (start
+         with female if no prior pieces; else flip from previous piece).
+      4. Within a gender pool, pick voices in the pool's listed order
+         (so the first time a gender appears, it uses the first voice
+         in the config — making the editorial intent visible).
+
+    The two-pass design (first pass assigns gendered pieces, second pass
+    fills neutral pieces) means gendered pieces never get a voice that
+    would have been better used for a later neutral piece.
+
+    Rules:
+      - "rotate_with_gender_match" (default for the new 6-voice setup):
+        full pre-planning with gender check + rotation.
+      - "alternate_with_gender_match" (legacy): falls into this same
+        planner — works identically when pools have only 1 voice each.
+      - "alternate": skips the LLM gender call, alternates F/M by position.
+      - "single": uses only the first voice in female_pool (or male_pool
+        if female empty), every piece.
+    """
+    plan: dict[int, tuple[str, str]] = {}
+    used: set[str] = set()
+
+    # ── single ────────────────────────────────────────────────────────────
     if rule == "single":
-        return voice_default, "single-voice rule"
+        only = (female_pool + male_pool)[:1]
+        if not only:
+            return {}
+        for piece in pieces:
+            plan[int(piece["article_id"])] = (only[0], "single-voice rule")
+        return plan
 
+    # ── alternate (no gender detection) ───────────────────────────────────
     if rule == "alternate":
-        if position % 2 == 0:
-            return voice_default, f"alternation (position {position}, even)"
-        return voice_alternate, f"alternation (position {position}, odd)"
+        for i, piece in enumerate(pieces):
+            pool = female_pool if i % 2 == 0 else male_pool
+            # Within pool, pick first unused; relax to any unused if exhausted
+            chosen = next((v for v in pool if v not in used), None)
+            if chosen is None:
+                chosen = next(
+                    (v for v in (female_pool + male_pool) if v not in used),
+                    (female_pool + male_pool)[0] if (female_pool + male_pool) else "",
+                )
+            plan[int(piece["article_id"])] = (
+                chosen, f"alternation (position {i})"
+            )
+            used.add(chosen)
+        return plan
 
-    # alternate_with_gender_match (default)
-    if llm is None:
-        # Fallback: just alternate
-        return (
-            (voice_default, f"alternation (position {position}, even); no LLM")
-            if position % 2 == 0
-            else (voice_alternate, f"alternation (position {position}, odd); no LLM")
-        )
+    # ── alternate_with_gender_match / rotate_with_gender_match ────────────
+    # Two passes: gendered pieces first, then neutral fill.
+    gender_hints: dict[int, str] = {}
+    for piece in pieces:
+        if llm is None:
+            gender_hints[int(piece["article_id"])] = "neutral"
+        else:
+            gender_hints[int(piece["article_id"])] = _detect_narrator_gender(
+                piece, llm,
+            )
 
-    hint = _detect_narrator_gender(piece, llm)
-    if hint == "female":
-        return voice_default, "first-person female narrator detected"
-    if hint == "male":
-        return voice_alternate, "first-person male narrator detected"
-    # NEUTRAL → alternate by position
-    if position % 2 == 0:
-        return voice_default, f"third-person/neutral, alternation (position {position}, even)"
-    return voice_alternate, f"third-person/neutral, alternation (position {position}, odd)"
+    # Pass 1: pieces with detected gender.
+    for piece in pieces:
+        aid = int(piece["article_id"])
+        hint = gender_hints[aid]
+        if hint not in ("female", "male"):
+            continue
+        primary = female_pool if hint == "female" else male_pool
+        secondary = male_pool if hint == "female" else female_pool
+        chosen = next((v for v in primary if v not in used), None)
+        if chosen is not None:
+            plan[aid] = (chosen, f"first-person {hint} → {chosen}")
+            used.add(chosen)
+        else:
+            # Gender pool exhausted; soft-relax to the other pool.
+            chosen = next((v for v in secondary if v not in used), None)
+            if chosen is not None:
+                plan[aid] = (chosen, f"first-person {hint}, but {hint} "
+                                     f"pool exhausted → {chosen}")
+                used.add(chosen)
+            else:
+                # All voices used — last resort, reuse the primary's first.
+                chosen = primary[0] if primary else (secondary[0] if secondary else "")
+                plan[aid] = (chosen, f"first-person {hint}, all voices used → "
+                                     f"{chosen} (reuse)")
+
+    # Pass 2: neutral pieces, alternating gender preference based on the
+    # gender of the previously-placed voice (so the edition has natural
+    # voice variation across slots).
+    def _prev_gender_at(i: int) -> str:
+        """Gender of voice at position i-1, if assigned, else 'female' (start with F)."""
+        if i == 0:
+            return "male"   # so the first neutral piece prefers female
+        prev_piece = pieces[i - 1]
+        prev_aid = int(prev_piece["article_id"])
+        if prev_aid in plan:
+            return _gender_of_voice(plan[prev_aid][0], female_pool, male_pool)
+        return "male"
+
+    for i, piece in enumerate(pieces):
+        aid = int(piece["article_id"])
+        if aid in plan:
+            continue   # gendered piece already placed
+        prev = _prev_gender_at(i)
+        # Flip from previous gender for variety.
+        primary = female_pool if prev == "male" else male_pool
+        secondary = male_pool if prev == "male" else female_pool
+        chosen = next((v for v in primary if v not in used), None)
+        if chosen is None:
+            chosen = next((v for v in secondary if v not in used), None)
+        if chosen is None:
+            # Everything used. With 6 voices and 6 slots this only happens
+            # if pools are very small. Reuse the first voice as a fallback.
+            all_voices = female_pool + male_pool
+            chosen = all_voices[0] if all_voices else ""
+            plan[aid] = (chosen, f"position {i}, all voices used → {chosen} (reuse)")
+        else:
+            plan[aid] = (chosen, f"position {i}, neutral → {chosen}")
+            used.add(chosen)
+
+    return plan
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -204,7 +438,15 @@ def generate_for_edition(
     *,
     edition_id: Optional[int] = None,
     include_done: bool = False,
+    tts: Optional[TTSClient] = None,
+    llm: Optional[LLMClient] = None,
 ) -> Stage9Stats:
+    """Generate audio for pieces in an edition.
+
+    tts: pass an existing TTS client to avoid rebuilding (DI).
+    llm: pass an existing LLM client. Only used when voice_selection_rule
+         is gender-aware; ignored otherwise.
+    """
     stats = Stage9Stats()
 
     if edition_id is None:
@@ -222,20 +464,45 @@ def generate_for_edition(
         logger.info("Stage 9: no pieces in edition #%d need audio", edition_id)
         return stats
 
-    tts = build_tts_client(config.tts)
-    voice_default = config.tts.get("voice_default") or tts.default_voice_id
-    voice_alternate = config.tts.get("voice_alternate") or voice_default
-    rule = config.tts.get("voice_selection_rule", "alternate_with_gender_match")
+    if tts is None:
+        tts = build_tts_client(config.tts)
+    rule = config.tts.get("voice_selection_rule", "rotate_with_gender_match")
 
-    llm: Optional[LLMClient] = None
-    if rule == "alternate_with_gender_match":
-        llm = build_llm_client(config.llm)
+    # Build the per-gender voice pools from voice_map. Each entry can be a
+    # single name (legacy) or a list (rotation mode). _normalise_voice_pool
+    # handles both.
+    voice_map_cfg = config.tts.get("voice_map") or {}
+    female_pool = _normalise_voice_pool(voice_map_cfg.get("female"))
+    male_pool = _normalise_voice_pool(voice_map_cfg.get("male"))
+
+    # Gender-aware rules need the LLM to detect first-person speaker gender.
+    # Build one lazily if the caller didn't supply one.
+    if rule in ("rotate_with_gender_match", "alternate_with_gender_match"):
+        if llm is None:
+            llm = build_llm_client(config.llm)
 
     audio_dir = config.audio_dir
     logger.info(
-        "Stage 9: synthesizing %d pieces  |  voice rule=%s  |  default=%s  alternate=%s",
-        len(pieces), rule, voice_default, voice_alternate,
+        "Stage 9: synthesizing %d pieces  |  rule=%s  |  "
+        "female pool=%s  |  male pool=%s",
+        len(pieces), rule, female_pool, male_pool,
     )
+
+    # Plan voice assignments for the entire edition up front. This lets
+    # the rotation logic see all pieces at once and avoid voice
+    # duplication / gender-pool exhaustion surprises mid-loop.
+    voice_plan = _plan_voices_for_edition(
+        pieces, female_pool, male_pool, rule, llm,
+    )
+
+    # Pretty-print the plan so it's auditable in the log.
+    logger.info("Stage 9 voice plan:")
+    for piece in pieces:
+        aid = int(piece["article_id"])
+        if aid in voice_plan:
+            v, reason = voice_plan[aid]
+            logger.info("  pos=%d [%s] article %d → %s  (%s)",
+                        piece.get("position", 0), piece["slot"], aid, v, reason)
 
     for piece in pieces:
         article_id = piece["article_id"]
@@ -249,9 +516,13 @@ def generate_for_edition(
             stats.errors += 1
             continue
 
-        voice_id, reason = _pick_voice(
-            piece, voice_default, voice_alternate, rule, llm
-        )
+        if int(article_id) not in voice_plan:
+            logger.warning("  [%s] article %d — no voice planned; skipping",
+                           slot, article_id)
+            stats.errors += 1
+            continue
+
+        voice_id, reason = voice_plan[int(article_id)]
 
         out_path = _audio_path(audio_dir, edition_date, article_id)
         char_count = len(narration)

@@ -163,7 +163,7 @@ CREATE TABLE editions (
 CREATE TABLE edition_pieces (
     edition_id INTEGER REFERENCES editions(id),
     article_id INTEGER REFERENCES articles(id),
-    slot TEXT,                      -- 'deep_feature' | 'lens_card_future' | 'lens_card_humans' | 'lens_card_behind' | 'curiosity' | 'smart_escape'
+    slot TEXT,                      -- 'deep_feature' | 'lens_card_future' | 'lens_card_humans' | 'lens_card_behind' | 'curiosity' | 'smart_escape' | 'delight'
     position INTEGER,
     hook TEXT,
     contextualisation TEXT,
@@ -360,12 +360,16 @@ assembly:
     lens_card_humans: 1
     lens_card_behind: 1
     curiosity: 1
-    smart_escape: 1
+    smart_escape: 2     # bumped — lineups skewed cerebral; gives reviewer two
+                        # light options to keep or drop
+    delight: 1          # post-v0.1 addition — see "Post-v0.1 changes" below
   length_distribution:
     short: 0.30
     medium: 0.50
     long: 0.20
   trending_cap: 0.50
+  max_per_publication_per_edition: 1
+  publication_cooldown_editions: 5    # see Post-v0.1 changes
 
 output:
   web_dir: output/web/
@@ -435,5 +439,311 @@ These are small enough not to block, but will get raised as we hit them:
 - Whether to commit the SQLite DB to git or keep it local (probably local, since it'll grow).
 - Whether to use uv, pip, or Poetry for Python dependencies (I'll default to uv unless you prefer otherwise).
 - Whether to wrap daily.py in a simple Flask app for ad-hoc preview, or keep it strictly CLI for v0.1 (I'd say strictly CLI).
+
+## Post-v0.1 changes (live)
+
+This section is the running log of behaviour that's shipped since the
+original v0.1 spec above was written. Read it as an addendum, not a
+replacement.
+
+### Crosscut episodes — a second daily episode type
+
+Beyond the daily edition, Aarva now publishes a **Crosscut**: a daily
+paired-listening episode that puts two rigorous articles on the same
+topic but with different angles back-to-back, stitched together by
+editorial intro / bridge / outro. Not a debate format — a "multiple
+angles" format. The original spec deferred pairings to v0.2; the
+pairing implementation we shipped is narrower than that (one pair per
+day, no UI) but it is a real second pipeline.
+
+Implementation summary:
+
+- New module `aarva/stages/stage_crosscut.py` with three phases:
+  pair detection, episode-script generation, and TTS composition.
+- New persistence: `crosscut_pair_candidates` table (one row per
+  detected pair, with topic_label, angle_a/b, connection_summary,
+  connection_score, divergence_score, selected_at, edition_id,
+  superseded_at).
+- New entry-point flags in `daily.py`:
+  - `--crosscut-detect [--require-fresh]` runs pair detection and
+    persists a ~10-pair longlist for review.
+  - `--crosscut-build` generates intro/bridges/outro from the
+    user-selected pair and persists an edition with edition_type='crosscut'.
+  - `--crosscut-tts` synthesises the three-voice episode (host
+    voice + one voice per article).
+- New review CLI: `python -m aarva.crosscut` shows the longlist and
+  takes a selection. Re-running `--crosscut-detect` regenerates fresh
+  pairs (no exact pair is re-shown; same articles may recur in new
+  pairings unless `--require-fresh` is set).
+- Editions table gained `edition_type` ('daily' | 'crosscut'),
+  `topic_label`, `intro_text`, `outro_text` columns and a composite
+  UNIQUE (edition_date, edition_type).
+- `edition_pieces` gained `bridge_text` for the cross-piece bridge.
+- Crosscut TTS uses **three distinct Gemini voices**: Sulafat (host /
+  intro / bridges / outro), Charon (article A), Vindemiatrix (article B).
+- Crosscut narration uses the **full article body**, not an extracted
+  excerpt — listeners hear the whole piece.
+- Publish path: Stage 10 audio conversion and RSS feed regeneration
+  both pick up crosscut episodes automatically. The RSS feed
+  interleaves daily and crosscut items by date; crosscut items render
+  as one item per episode (not one-per-piece) titled
+  "Crosscut: {topic}".
+
+Daily and crosscut share article pool and the rigour filter; crosscut
+applies a higher floor (`ranking_score ≥ 0.7`).
+
+### New JTBD: `delight`
+
+Added alongside the existing four (`keep_up_to_date`, `keep_ahead`,
+`curiosity`, `smart_escape`). `delight` is for genuinely light,
+playful, fun pieces — humour, oddities, surprising joys, wit, viral
+curiosities. Distinct from `smart_escape` (which is restorative /
+gentle / "settle in"). Stage 7 carries a `delight: 1` slot that
+renders as "A Bit of Delight" in the web output and sits at the end of
+the edition.
+
+### Cross-edition publication-rotation cooldown
+
+Stage 7 now applies a decaying penalty (-0.12, -0.08, -0.05, -0.03,
+-0.02) to the ranking score of any publication that appeared in one
+of the last 5 daily editions. This is the rotation force that
+prevents the "same 4-5 publications every day" pattern when a few
+pubs dominate the high-score tier of the candidate pool. Tunable via
+`assembly.publication_cooldown_editions` in `pipeline.yaml` (set to 0
+to disable).
+
+### Stage 1.5 cluster persistence
+
+The original spec stored Stage 1.5 cluster decisions only by marking
+duplicates `status='filtered_out'`. It never populated
+`event_clusters` or `article_clusters` — which meant Stage 7's
+within-edition cluster cap (`max_per_cluster_per_edition`) was a
+no-op. Stage 1.5 now persists multi-article clusters idempotently:
+re-runs delete old memberships for the articles being re-clustered
+and garbage-collect orphaned clusters before inserting fresh.
+
+### Gemini-first LLM and TTS
+
+The original spec named Claude Code (subprocess) as the default LLM
+backend. Current default is **Gemini API** (`gemini-2.5-flash`) for
+all non-coding LLM calls and for TTS. The `LLMClient` abstraction is
+still used; `GeminiAPIClient` is now the production path. Claude Code
+remains a swap-by-config option. TTS uses `GeminiTTSClient`.
+
+The TTS `style_prompt` carries an explicit **"narrate only in
+English"** instruction — Gemini TTS otherwise occasionally renders
+foreign names or quoted phrases in their native language.
+
+### Gemini token limits
+
+`GeminiAPIClient.DEFAULT_MAX_TOKENS` is **16384** (up from 4096) and
+the client now detects `finish_reason == MAX_TOKENS` and raises
+immediately rather than silently retrying on a partial JSON response.
+
+### Review workflow
+
+Daily edition review CLI (`python -m aarva.review`) supports
+`extra_slots` / `dropped_slots` / `slot_biases` overrides persisted on
+the editions row. Aliases: `feature`, `future`, `humans`, `behind`,
+`curiosity`, `escape`, `delight`. Plus filter aliases `+pub:NAME`
+(case-insensitive substring match on publication name) and
+`+topic:KEYWORD` (case-insensitive match against article title) for
+ad-hoc constrained slots.
+
+### Bonus episodes (user-picked ad-hoc publishes)
+
+A user can publish any article from the pool as a standalone bonus
+episode via `python -m aarva.publish_articles <id> [<id> ...]` or via
+the search CLI's `--publish` flag. Bonus episodes:
+
+- Live in `editions` with `edition_type='bonus'` and (for the web app)
+  `user_id` set to the publisher.
+- Get the full Aarva editorial treatment: Stage 8 generates hook +
+  context + show_notes; Stage 9 narrates the hook + context + article
+  body.
+- Tag as `itunes:episodeType="bonus"` in the RSS feed so Apple /
+  Spotify shelve them as side content alongside the daily series.
+- Mark the source article `status='in_edition'` so tomorrow's daily
+  selection won't double-pick it.
+
+The `editions` table's UNIQUE constraint became partial as a result:
+one `daily` + one `crosscut` per date are still enforced, but
+`bonus` rows are unconstrained (multiple per date allowed).
+
+### Search CLI
+
+`python -m aarva.search` supports lexical (substring on title +
+excerpt by default, also full-text with `--full-text`) and semantic
+(embedding cosine similarity, `--semantic`) search modes, plus
+structured filters (`--pub`, `--lens`, `--jtbd`, `--status`,
+`--since`, `--limit`, `--json`). The `--publish` flag forwards the
+top results into `aarva.publish_articles` after confirmation.
+
+### Article re-tagging utility
+
+`scripts/retag_jtbd.py` re-classifies the JTBD field on already-
+scored articles using the current prompt. Useful after a prompt
+update; sends each article's full text + fingerprint to Gemini and
+updates `article_scores.jtbd_primary` + `jtbd_secondary` in place.
+Has `--dry-run`, `--pub`, `--limit`, `--all` flags.
+
+## App-layer foundation (Phase A)
+
+The pipeline above operates without a notion of users. The web app
+layers per-user state on top — see new tables and modules below.
+
+### Schema additions
+
+```sql
+-- People consuming Aarva via the web app
+users (id, email UNIQUE, name, settings_json, created_at,
+       last_login_at, is_admin)
+
+-- Persistent login tokens (cookie value)
+user_sessions (token PK, user_id, created_at, expires_at,
+               revoked_at, user_agent, ip)
+
+-- Single-use, short-lived auth tokens (magic-link flow)
+magic_link_tokens (token PK, email, created_at, expires_at,
+                   consumed_at, ip)
+
+-- Per-user interactions with articles. Drives the dismiss-from-feed
+-- feature today; will drive per-user taste centroids in Phase B.
+user_actions (id, user_id, article_id,
+              action IN ('dismissed', 'liked', 'disliked',
+                         'listened', 'completed', 'shared'),
+              created_at, metadata_json)
+
+-- Durable background-job queue
+jobs (id, kind, payload_json,
+      status IN ('pending', 'running', 'completed',
+                 'failed', 'cancelled'),
+      created_at, started_at, finished_at,
+      result_json, error_message, user_id, progress)
+
+-- editions gained a nullable user_id column:
+--   NULL = global (daily, crosscut, shared bonus)
+--   set  = private to that user (their own ad-hoc bonus picks)
+```
+
+### Service layer (`aarva/services/`)
+
+The boundary between web routes and the rest of the system.
+Pure-Python functions taking a Database + arguments; return plain
+data; raise `aarva.exceptions.*` rather than printing or
+exiting.
+
+- **`services/users.py`** — magic-link request/verify, session
+  minting, session lookup. 20-min TTL on links, 30-day on sessions.
+- **`services/actions.py`** — record/list dismissals + likes/listens/
+  completes/shares with optional metadata.
+- **`services/feeds.py`** — `get_user_feed(user_id, since_days)`
+  returns the personalised feed: shared daily (minus dismissals) +
+  shared crosscut (minus crosscuts whose source articles are
+  dismissed) + the user's own bonus picks.
+- **`services/articles.py`** — `get_article`, `search_articles`.
+- **`services/editions.py`** — `list_editions`,
+  `publish_bonus_article` (enqueues a job, returns the Job row).
+- **`services/jobs.py`** — durable queue: `enqueue`, `run_once`,
+  `WorkerThread` (FastAPI starts this at boot). Handlers registered
+  via `register_handler(kind, fn)`. Atomic claim prevents
+  double-runs across workers.
+- **`services/queries.py`** — shared SQL queries used by the RSS
+  feed, web renderer, and feed service. Centralises the
+  edition_pieces+articles+publications JOIN patterns that were
+  previously duplicated.
+
+### Auth model
+
+Magic-link only (no passwords). Flow:
+1. Anon user submits email → `request_magic_link(email)` stores a
+   short-lived token; caller emails the link.
+2. User clicks → `verify_magic_link(token)` consumes the token,
+   creates/fetches the User, mints a session.
+3. Browser stores the session token as an HttpOnly cookie.
+   `get_user_for_session(token)` resolves it on each request.
+
+### Background-job pattern
+
+TTS takes minutes per piece. The synchronous pipeline path is fine
+for CLI invocation but blocks a web request unacceptably. The
+`jobs` table + `WorkerThread` model decouples request from work:
+
+1. Route receives e.g. `POST /api/publish_article/123`.
+2. Service `publish_bonus_article(user_id, article_id)` enqueues a
+   `publish_bonus_article` job and returns the Job id (HTTP 202).
+3. Frontend polls `GET /api/jobs/{id}` until status='completed' or
+   'failed'. Result includes the new edition_id.
+
+The worker thread is an in-process design (no Redis / Celery
+dependency). When you move to cloud, swap the worker for a
+Lambda + SQS trigger or a Celery worker — the `jobs` table stays.
+
+## Cross-cutting infrastructure changes
+
+### Exception hierarchy (`aarva.exceptions`)
+
+```
+AarvaError                       — base; catch this in web routes
+├── ConfigError                  — config missing / invalid / env var
+├── DatabaseError                — connection / query failure
+├── ExternalServiceError         — generic upstream failure
+│   ├── LLMError                 — Gemini / Claude API failure
+│   ├── TTSError                 — Gemini TTS or silence-retry exhaustion
+│   └── EmbeddingError           — model load / call failure
+├── PipelineError                — a stage failed during its run
+└── NotFoundError                — article / edition / user / job missing
+```
+
+Suggested HTTP mappings documented in the module's docstring.
+
+### Env-var overlay on config
+
+`load_pipeline_config()` reads `aarva/config/pipeline.yaml`, then
+applies environment variables as overrides. Recognised vars:
+`AARVA_DB_PATH`, `AARVA_AUDIO_DIR`, `AARVA_WEB_DIR`,
+`AARVA_RSS_FEED_PATH`, `AARVA_PUBLIC_URL_BASE`, `AARVA_FEED_EMAIL`,
+`AARVA_LLM_PROVIDER`, `AARVA_LLM_MODEL`, `AARVA_EMBEDDING_PROVIDER`,
+`AARVA_EMBEDDING_MODEL`, `AARVA_LOG_LEVEL`. Secrets via
+`AARVA_GEMINI_API_KEY`, `AARVA_OPENAI_API_KEY` (read directly by
+the clients, never written to YAML).
+
+### Explicit dependency injection for stages
+
+Every public stage entry point now accepts the LLM/TTS/Embedding
+clients as optional keyword arguments. CLI orchestrator (`daily.py`)
+doesn't pass them — backwards compat. Web routes / job handlers
+build clients once at app init and inject, preserving rate-limiter
+state across requests:
+
+```python
+stage_4_5_6_score.score_all(config, db, llm=shared_llm)
+stage_8_hook_context.generate_for_edition(config, db, llm=shared_llm)
+stage_9_tts.generate_for_edition(config, db, tts=shared_tts, llm=shared_llm)
+stage_1_5_consolidate.consolidate(config, db, embedding_client=shared_emb)
+stage_crosscut.detect_pair_candidates(config, db, llm=shared_llm)
+stage_crosscut.build_episode_script(config, db, llm=shared_llm)
+stage_crosscut.synthesize_crosscut_episode(config, db, tts=shared_tts)
+```
+
+### Shared utility modules
+
+- **`aarva/cli_utils.py`** — single home for ANSI color helpers
+  (BOLD/DIM/RED/GREEN/YELLOW/BLUE/CYAN). Previously duplicated
+  across 4-5 CLI modules.
+- **`aarva/prompts.py`** — single `load_prompts()` + `render()`
+  with LRU caching. Previously duplicated in two stages.
+
+### Standing rules for AI coding agents
+
+A new top-level `AGENTS.md` captures the principles for how Claude
+or any other coding agent should operate on this repo: brevity,
+pre-approval for material trade-offs, default to higher-signal
+inputs (full text, not excerpts) when judging, web-search for
+post-training reality (RSS URLs, API endpoints), no first-person
+voice in editorial copy, no LLM-tell vocabulary, etc. Agents
+re-read this file at the start of each session.
+
+End of post-v0.1 changes.
 
 End of architecture spec v1. Updates as we build.

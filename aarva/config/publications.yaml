@@ -53,12 +53,14 @@ publications:
     notes: Methodologically curious essays
 
   - name: Works in Progress
-    rss_url: https://worksinprogress.co/feed
-    homepage: https://worksinprogress.co
+    # Moved to Substack as worksinprogress.news; the magazine site
+    # worksinprogress.co no longer exposes its own feed (returned 404).
+    rss_url: https://www.worksinprogress.news/feed
+    homepage: https://www.worksinprogress.news
     tier: A
     enabled: true
-    licence_status: open
-    notes: Progress studies essays
+    licence_status: metered
+    notes: Progress studies essays; Stripe-published; on Substack
 
   # ─── Tier B — Behind the news ──────────────────────────────────────────────
   - name: ProPublica
@@ -78,12 +80,19 @@ publications:
     notes: Criminal justice reporting
 
   - name: Lawfare
+    # The /feed URL is correct (confirmed via Lawfare's own posts about
+    # their RSS), but the publisher actively bot-blocks our fetcher even
+    # with a Chrome UA — likely TLS fingerprinting via Cloudflare. To
+    # ingest Lawfare reliably we'd need a scraper-grade HTTP client
+    # (curl-impersonate or similar). Tracked as a v0.2 task.
+    # In the meantime Just Security + War on the Rocks + The Diplomat
+    # cover meaningfully overlapping ground.
     rss_url: https://www.lawfaremedia.org/feed
     homepage: https://www.lawfaremedia.org
     tier: B
-    enabled: true
+    enabled: false
     licence_status: open
-    notes: Law and national security analysis
+    notes: DISABLED — Cloudflare bot-block defeats Chrome UA
 
   - name: Just Security
     rss_url: https://www.justsecurity.org/feed/
@@ -153,7 +162,8 @@ publications:
     notes: Academic syndication, CC-licensed
 
   - name: Knowable Magazine
-    rss_url: https://knowablemagazine.org/feed
+    # Corrected: their feed path is /rss, not /feed.
+    rss_url: https://knowablemagazine.org/rss
     homepage: https://knowablemagazine.org
     tier: E
     enabled: true
@@ -167,3 +177,568 @@ publications:
     enabled: true
     licence_status: metered
     notes: Open longform, history-leaning
+
+  - name: Undark
+    rss_url: https://undark.org/feed/
+    homepage: https://undark.org
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Science-policy and science-and-society reporting
+
+  - name: Orion Magazine
+    rss_url: https://orionmagazine.org/feed/
+    homepage: https://orionmagazine.org
+    tier: E
+    enabled: true
+    licence_status: metered
+    notes: Nature, environment, place-based essays; smart-escape friendly
+
+  # ─── Tier A — additional long-form essays & ideas ──────────────────────────
+
+  - name: Public Books
+    rss_url: https://www.publicbooks.org/feed/
+    homepage: https://www.publicbooks.org
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Academic-oriented criticism + ideas
+
+  - name: The Hedgehog Review
+    # Corrected URL — they publish the web-features feed at
+    # /web-features/feed (the /rss endpoint returns 404). The print
+    # quarterly is separate; this is the blog-style web features stream.
+    rss_url: https://hedgehogreview.com/web-features/feed
+    homepage: https://hedgehogreview.com
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Institute for Advanced Studies in Culture; culture + ideas
+
+  - name: The Drift
+    rss_url: https://www.thedriftmag.com/rss/
+    homepage: https://www.thedriftmag.com
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Politics + culture criticism; younger-generation voices
+
+  # ─── Tier B — additional behind-the-news & investigative ───────────────────
+
+  - name: Politico Magazine
+    # Corrected — feeds live under rss.politico.com, not www.politico.com.
+    # The www subdomain has Cloudflare in front of it and returned 403
+    # to non-browser fetches.
+    rss_url: https://rss.politico.com/magazine.xml
+    homepage: https://www.politico.com/magazine
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Long-form political reporting (Magazine, not the daily Playbook)
+
+  - name: Reveal
+    rss_url: https://revealnews.org/feed/
+    homepage: https://revealnews.org
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Center for Investigative Reporting; pairs with ProPublica/Marshall
+
+  - name: The Diplomat
+    rss_url: https://thediplomat.com/feed/
+    homepage: https://thediplomat.com
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Asia-Pacific affairs, security, geopolitics
+
+  - name: Africa Is a Country
+    rss_url: https://africasacountry.com/feed
+    homepage: https://africasacountry.com
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: African intellectual platform; politics + culture
+
+  - name: Brookings Commentary
+    # Both the site-wide /feed/ and the research-specific
+    # /feeds/rss/research/ endpoints currently emit malformed XML
+    # (undefined entity reference). This is a publisher-side bug; not
+    # something we can work around without a custom XML fixer. Disabled
+    # until Brookings either fixes the feed or we add a sanitiser.
+    # In the meantime Carnegie Endowment + Just Security + War on the
+    # Rocks cover overlapping policy commentary.
+    rss_url: https://www.brookings.edu/feeds/rss/research/
+    homepage: https://www.brookings.edu
+    tier: B
+    enabled: false
+    licence_status: open
+    notes: DISABLED — publisher feed returns malformed XML
+
+  - name: Carnegie Endowment
+    rss_url: https://carnegieendowment.org/rss/solr/
+    homepage: https://carnegieendowment.org
+    tier: B
+    enabled: true
+    licence_status: open
+    notes: Foreign-policy think tank commentary
+
+  # ─── Tier C — additional news analysis & opinion ───────────────────────────
+
+  - name: Vox
+    rss_url: https://www.vox.com/rss/index.xml
+    homepage: https://www.vox.com
+    tier: C
+    enabled: true
+    licence_status: open
+    notes: Explainer journalism, daily cadence, mostly 800-2500 words
+
+  - name: Project Syndicate
+    rss_url: https://www.project-syndicate.org/rss
+    homepage: https://www.project-syndicate.org
+    tier: C
+    enabled: true
+    licence_status: open
+    notes: Daily op-eds from globally-recognised thinkers
+
+  - name: The American Prospect
+    # Corrected — the canonical feed they link in their own footer is
+    # /feed/?partner-feed=main-feed. The previous /api/rss/all.rss path
+    # was being rate-limited (429) consistently.
+    rss_url: https://prospect.org/feed/?partner-feed=main-feed
+    homepage: https://prospect.org
+    tier: C
+    enabled: true
+    licence_status: open
+    notes: Progressive policy analysis; long-form
+
+  - name: Slow Boring
+    rss_url: https://www.slowboring.com/feed
+    homepage: https://www.slowboring.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Matt Yglesias Substack; ~30% free posts daily
+
+  - name: Noahpinion
+    rss_url: https://www.noahpinion.blog/feed
+    homepage: https://www.noahpinion.blog
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Noah Smith Substack; economics + tech analysis
+
+  # ─── Tier D — additional international ─────────────────────────────────────
+
+  - name: Der Spiegel International
+    rss_url: https://www.spiegel.de/international/index.rss
+    homepage: https://www.spiegel.de/international
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: German publication, English edition, European affairs
+
+  - name: The Caravan
+    # 404 on /feed and /rss; The Caravan appears to have moved fully to
+    # subscriber-only access and dropped RSS. Disabled until they
+    # restore a feed, or we add a per-publication HTML-scrape backend.
+    # See Himal Southasian (added below) as an editorial alternative
+    # for South Asian long-form.
+    rss_url: https://caravanmagazine.in/feed
+    homepage: https://caravanmagazine.in
+    tier: D
+    enabled: false
+    licence_status: paywalled
+    notes: DISABLED — RSS removed; subscriber-only access now
+
+  - name: The Hindu
+    rss_url: https://www.thehindu.com/news/national/feeder/default.rss
+    homepage: https://www.thehindu.com
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: Indian daily, substantive reportage, long-form leanings
+
+  - name: Scroll.in
+    rss_url: https://feeds.feedburner.com/ScrollinArticles.rss
+    homepage: https://scroll.in
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: Indian independent daily; long-form leanings
+
+  - name: Himal Southasian
+    # Editorial replacement for The Caravan (which removed its RSS).
+    # Independent, non-nationalist South Asian regional magazine — covers
+    # politics, culture, history, economics across India, Pakistan,
+    # Bangladesh, Nepal, Sri Lanka, Bhutan. Long-form leaning. Free.
+    # WordPress site so /feed/ is the conventional endpoint; probe will
+    # confirm.
+    rss_url: https://www.himalmag.com/feed/
+    homepage: https://www.himalmag.com
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: South Asian long-form regional magazine; non-nationalist
+
+  # ─── UK / international general dailies & metered pubs ─────────────────────
+  # Some of these are partially paywalled. Stage 2's hard filters and the
+  # extractor naturally drop articles whose full text isn't retrievable
+  # (extraction_failed status). Free articles get through. Expect higher
+  # extraction_failed rates here than on tier A/B pubs.
+
+  - name: The Guardian (Long Read)
+    # The Guardian's "Long Read" series — feature-length essays and
+    # investigative deep dives. Free, high editorial quality, excellent
+    # match for Aarva's editorial bar.
+    rss_url: https://www.theguardian.com/news/series/the-long-read/rss
+    homepage: https://www.theguardian.com/news/series/the-long-read
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Free, long-form essays — premier match for Aarva's editorial style
+
+  - name: The Atlantic
+    # Long-form essays, ideas, culture, politics. Metered paywall —
+    # some pieces accessible, most require subscription. Articles that
+    # extract cleanly will go through; paywalled ones fail extraction
+    # and get filtered_out automatically.
+    rss_url: https://www.theatlantic.com/feed/all/
+    homepage: https://www.theatlantic.com
+    tier: B
+    enabled: true
+    licence_status: metered
+    notes: Metered paywall; free articles extract OK, paid ones fail naturally
+
+  - name: The Independent
+    # UK general news + some long-form. Largely free with ads;
+    # occasional paywall. News skews shorter than Aarva's preferred bar,
+    # but the long-form pieces (Indy long reads) are worth picking up.
+    rss_url: https://www.independent.co.uk/news/rss
+    homepage: https://www.independent.co.uk
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: UK daily; news + long reads. Word-floor filter drops the short pieces
+
+  - name: The Telegraph
+    # The Telegraph's /rss.xml endpoint returns 403 to any non-browser
+    # fetcher — Cloudflare bot-blocking on user-agent / TLS fingerprint
+    # (same pattern as Lawfare). The feed URL itself is correct; the
+    # publisher just won't serve it to our HTTP client. Would need
+    # curl-impersonate or similar to bypass. Tracked as a v0.2 task.
+    # In the meantime The Guardian + The Independent cover overlapping
+    # UK general-affairs ground.
+    rss_url: https://www.telegraph.co.uk/rss.xml
+    homepage: https://www.telegraph.co.uk
+    tier: D
+    enabled: false
+    licence_status: paywalled
+    notes: DISABLED — Cloudflare bot-block (403); needs scraper-grade client
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Originally-agreed pubs (per docs/v01_audit.md) that were missing from the
+  # allowlist. Added so the configured set matches the agreed kickoff tiers.
+  # Probe with `python scripts/probe_feeds.py` after edits; any feed that
+  # 404s or returns no entries should have its URL fixed (or be disabled).
+  #
+  # NOT included here (intentionally deferred):
+  #   - Inkstick                — needs heterodox-bench tonal filter (Tier F)
+  #   - Reuters Investigates    — needs wire-branch (Q28, v0.2)
+  #   - AP investigative        — needs wire-branch (Q28, v0.2)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ─── Tier A — additional long-form essays & ideas ──────────────────────────
+
+  - name: American Scholar
+    rss_url: https://theamericanscholar.org/feed/
+    homepage: https://theamericanscholar.org
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Phi Beta Kappa quarterly — essays, ideas, criticism
+
+  - name: Liberties
+    # Liberties is a quarterly print journal; web-side RSS coverage may
+    # be limited. Probe will tell us whether the feed yields anything.
+    rss_url: https://libertiesjournal.com/feed/
+    homepage: https://libertiesjournal.com
+    tier: A
+    enabled: true
+    licence_status: metered
+    notes: Quarterly literary-political journal; feed may be sparse
+
+  - name: Comment Magazine
+    rss_url: https://comment.org/feed/
+    homepage: https://comment.org
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Cardus-affiliated; essays on institutions, formation, culture
+
+  - name: Compact
+    rss_url: https://compactmag.com/feed
+    homepage: https://compactmag.com
+    tier: A
+    enabled: true
+    licence_status: metered
+    notes: Heterodox left-right political essays; partial paywall
+
+  # ─── Tier C — additional news analysis & opinion ───────────────────────────
+
+  - name: The UnPopulist
+    # Substack — conventional /feed endpoint.
+    rss_url: https://www.theunpopulist.net/feed
+    homepage: https://www.theunpopulist.net
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Pro-liberal-democracy commentary; mostly free posts
+
+  - name: Construction Physics
+    # Substack — conventional /feed endpoint.
+    rss_url: https://www.construction-physics.com/feed
+    homepage: https://www.construction-physics.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Brian Potter Substack — building, infrastructure, productivity
+
+  - name: The Honest Broker
+    # Ted Gioia's Substack — conventional /feed endpoint.
+    rss_url: https://www.honest-broker.com/feed
+    homepage: https://www.honest-broker.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Ted Gioia on culture, music, the creative economy
+
+  - name: Culture Study
+    # Anne Helen Petersen's Substack — uses the .substack.com domain.
+    rss_url: https://annehelen.substack.com/feed
+    homepage: https://annehelen.substack.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Anne Helen Petersen — work, culture, generational analysis
+
+  - name: Cafe Hayek
+    rss_url: https://cafehayek.com/feed
+    homepage: https://cafehayek.com
+    tier: C
+    enabled: true
+    licence_status: open
+    notes: Don Boudreaux + Russ Roberts — economics blog
+
+  # ─── Tier D — additional international ─────────────────────────────────────
+
+  - name: Le Monde diplomatique (English)
+    # Canonical English feed: /backend (the SPIP `?page=backend-en`
+    # variant was deprecated and 404s).
+    rss_url: https://mondediplo.com/backend
+    homepage: https://mondediplo.com/en/
+    tier: D
+    enabled: true
+    licence_status: metered
+    notes: Long-form political-economic analysis; some pieces metered
+
+  - name: Caixin Global
+    # Caixin's old /rss/news.xml endpoint 404s. Their Feedly-style
+    # gateway URL (gateway.caixin.com/api/data/global/feedlyRss.xml)
+    # responds 406 even with proper Accept negotiation, suggesting
+    # they're restricting access to authenticated Feedly clients
+    # specifically. Disabled until we either get an alternative URL
+    # or add a per-pub auth/header workaround.
+    rss_url: https://gateway.caixin.com/api/data/global/feedlyRss.xml
+    homepage: https://www.caixinglobal.com
+    tier: D
+    enabled: false
+    licence_status: metered
+    notes: DISABLED — no working public RSS endpoint found
+
+  - name: Mada Masr
+    rss_url: https://www.madamasr.com/en/feed/
+    homepage: https://www.madamasr.com/en/
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: Independent Egyptian journalism; English section
+
+  - name: Granta
+    rss_url: https://granta.com/feed/
+    homepage: https://granta.com
+    tier: D
+    enabled: true
+    licence_status: metered
+    notes: Literary magazine — essays, reportage, fiction
+
+  - name: Eurozine
+    rss_url: https://www.eurozine.com/feed/
+    homepage: https://www.eurozine.com
+    tier: D
+    enabled: true
+    licence_status: open
+    notes: Pan-European network of cultural journals — essays + translations
+
+  # ─── Tier E — additional specialist / vertical ─────────────────────────────
+
+  - name: STAT News
+    rss_url: https://www.statnews.com/feed/
+    homepage: https://www.statnews.com
+    tier: E
+    enabled: true
+    licence_status: metered
+    notes: Health, medicine, biotech reporting; selective long-form
+
+  - name: Tortoise
+    # Tortoise was acquired by / merged with The Observer in early 2025
+    # and no longer publishes a general article RSS — only podcast feeds
+    # via Acast (e.g., rss.acast.com/the-tortoise-podcast). Their
+    # written reporting now lives at observer.co.uk. Disabled here;
+    # The Observer is added separately below.
+    rss_url: https://www.tortoisemedia.com/feed/
+    homepage: https://www.tortoisemedia.com
+    tier: E
+    enabled: false
+    licence_status: metered
+    notes: DISABLED — acquired by The Observer; no general article RSS
+
+  - name: The Observer
+    # UK Sunday newspaper. Sold by Guardian Media Group to Tortoise
+    # Media in December 2024; transition completed April 2025. The new
+    # site at observer.co.uk does not currently expose a public RSS
+    # endpoint at /feed/, /rss, or any of the conventional paths — the
+    # new owners haven't published RSS yet (or have moved entirely
+    # away from it). The legacy Guardian path (theguardian.com/
+    # observer/rss) no longer carries new Observer content post-sale.
+    # Disabled here; re-enable when an RSS URL is published by the
+    # new owners.
+    rss_url: https://observer.co.uk/feed/
+    homepage: https://observer.co.uk
+    tier: B
+    enabled: false
+    licence_status: open
+    notes: DISABLED — new owners (Tortoise) have not published an RSS feed yet
+
+  - name: Hakai Magazine
+    # Hakai ceased new publication in late 2023, but the archive is up
+    # and the RSS still serves old pieces. Enable for the archive value;
+    # disable later if it provides no fresh material.
+    rss_url: https://hakaimagazine.com/feed/
+    homepage: https://hakaimagazine.com
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Coastal science + culture; ARCHIVE-ONLY since late 2023
+
+  - name: Emergence Magazine
+    rss_url: https://emergencemagazine.org/feed/
+    homepage: https://emergencemagazine.org
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Ecology, culture, spirituality; long-form essays + multimedia
+
+  # Note on two skipped Tier E entries:
+  #   - The Pudding (pudding.cool): primarily interactive data essays;
+  #     does not expose a conventional RSS feed. Skip for v0.1.
+  #   - Edge.org: annual question / conversations format; no reliable
+  #     RSS endpoint. Skip for v0.1.
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Delight-leaning publications — added so the new `delight` JTBD slot
+  # has a meaningful supply. These pubs are selected for *writing
+  # register* (genuinely playful / witty / charming prose), not just
+  # subject. Mix of humor essays, sports + culture with voice, oddities
+  # reporting, literary playfulness, and internet/media criticism.
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: McSweeney's Internet Tendency
+    # Humor essays + satirical lists + parody journalism. Short pieces,
+    # explicitly funny. The clearest "delight" match in the allowlist.
+    rss_url: https://www.mcsweeneys.net/rss
+    homepage: https://www.mcsweeneys.net
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Short-form humor — the delight slot's strongest source
+
+  - name: Defector
+    # Sports + culture + politics with irreverent, often hilarious voice.
+    # Founded by ex-Deadspin staff after the Deadspin implosion. Mostly
+    # subscription but a meaningful fraction of pieces are free. Expect
+    # higher extraction_failed rate than tier A pubs.
+    # Canonical feed is /feed (not /rss).
+    rss_url: https://defector.com/feed
+    homepage: https://defector.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Sports/culture journalism with humor; partial paywall
+
+  - name: Atlas Obscura
+    # Oddities, weird places, weird history, surprising-corners-of-the-
+    # world reporting. Bemused-curious tone. Charming-but-substantive.
+    # Canonical feed is /rss.xml (the /articles.rss path is not their feed).
+    rss_url: https://www.atlasobscura.com/rss.xml
+    homepage: https://www.atlasobscura.com
+    tier: E
+    enabled: true
+    licence_status: open
+    notes: Oddities + place writing; reliable delight + smart_escape source
+
+  - name: New Yorker Shouts & Murmurs
+    # The New Yorker's humor column. Short pieces, often laugh-out-loud.
+    # New Yorker has a paywall overall but Shouts pieces are mostly free.
+    rss_url: https://www.newyorker.com/feed/humor
+    homepage: https://www.newyorker.com/humor/shouts-murmurs
+    tier: A
+    enabled: true
+    licence_status: metered
+    notes: Literary humor column; free pieces extract OK
+
+  - name: Today in Tabs
+    # Rusty Foster's daily media/internet criticism. Sharp humor, very
+    # of-the-moment. Migrated from Substack (and briefly Ghost) to
+    # Beehiiv — the canonical feed lives on Beehiiv's RSS infrastructure,
+    # not on todayintabs.com itself.
+    rss_url: https://rss.beehiiv.com/feeds/ZRiesnGI0u.xml
+    homepage: https://www.todayintabs.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Media + internet criticism with wit; Substack mix
+
+  - name: Read Max
+    # Max Read's tech/culture criticism on Substack. Witty, often
+    # genuinely funny when the topic warrants it. Lives on Substack
+    # (maxread.substack.com) — readmax.com is not the canonical URL.
+    rss_url: https://maxread.substack.com/feed
+    homepage: https://maxread.substack.com
+    tier: C
+    enabled: true
+    licence_status: metered
+    notes: Tech/internet criticism with humor; Substack mix
+
+  - name: The Paris Review Daily
+    # The literary magazine's daily blog. Playful book essays, weird
+    # corners of literary history, charming author profiles. Free
+    # alongside the (paywalled) main magazine.
+    rss_url: https://www.theparisreview.org/blog/feed/
+    homepage: https://www.theparisreview.org/blog/
+    tier: A
+    enabled: true
+    licence_status: open
+    notes: Literary blog; playful book/writer essays
+
+  - name: Public Domain Review
+    # Essays on weird historical curiosities, public-domain archives,
+    # art oddities. Scholarly-but-light writing. Free + CC-licensed —
+    # one of the few pubs we can quote freely.
+    # Canonical feed is /rss.xml (not /feed/).
+    rss_url: https://publicdomainreview.org/rss.xml
+    homepage: https://publicdomainreview.org
+    tier: A
+    enabled: true
+    licence_status: cc_licensed
+    notes: Archive curiosities + art history; charming + CC-licensed

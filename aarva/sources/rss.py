@@ -19,6 +19,29 @@ from dateutil import parser as date_parser
 logger = logging.getLogger(__name__)
 
 
+# URL substrings that flag an entry as "not an article" — typically video pages,
+# podcast episodes, image galleries, etc. These are always going to fail
+# trafilatura extraction (there's no article text to extract), so we drop them
+# at the RSS layer instead of wasting an HTTP fetch + an extraction attempt.
+NON_ARTICLE_URL_SUBSTRINGS = (
+    "/videos/",
+    "/video/",
+    "/podcasts/",
+    "/podcast/",
+    "/gallery/",
+    "/galleries/",
+    "/photos/",
+    "/photo-",
+    "/interactive/",
+    "/multimedia/",
+)
+
+
+def _is_non_article_url(url: str) -> bool:
+    lower = url.lower()
+    return any(s in lower for s in NON_ARTICLE_URL_SUBSTRINGS)
+
+
 @dataclass(frozen=True)
 class FeedEntry:
     """A single article entry from an RSS / Atom feed.
@@ -75,8 +98,21 @@ def fetch_feed(
     than raising — one bad feed shouldn't break a pipeline run.
     """
     try:
+        # Send an explicit Accept header for RSS/Atom/XML in addition
+        # to the User-Agent. Some publishers (e.g., Caixin's gateway
+        # API) do strict content-negotiation and return 406 Not
+        # Acceptable when no Accept header is sent. Listing the
+        # specific MIME types with */* as the fallback is broadly
+        # compatible — any well-behaved RSS server matches one of them.
+        headers = {
+            "User-Agent": user_agent,
+            "Accept": (
+                "application/rss+xml, application/atom+xml, "
+                "application/xml;q=0.9, text/xml;q=0.9, */*;q=0.5"
+            ),
+        }
         with httpx.Client(timeout=timeout, follow_redirects=True,
-                          headers={"User-Agent": user_agent}) as client:
+                          headers=headers) as client:
             response = client.get(rss_url)
             response.raise_for_status()
             feed_text = response.text
@@ -96,6 +132,13 @@ def fetch_feed(
         url = raw_entry.get("link")
         title = raw_entry.get("title")
         if not url or not title:
+            continue
+
+        # Drop video / podcast / gallery entries — they have no article text
+        # for trafilatura to extract, so they'd just clog Stage 1 with
+        # extraction failures.
+        if _is_non_article_url(url):
+            logger.debug("Skipping non-article entry: %s", url)
             continue
 
         published_date = _parse_date(

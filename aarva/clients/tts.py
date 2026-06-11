@@ -1,14 +1,18 @@
 """TTS-client abstraction.
 
-Provider-agnostic interface. v0.1 ships:
-  - KokoroClient (Aarva's v0.1 default after extensive TTS shopping; local,
-    ONNX-based, designed for long-form narration, ~5-10 min per Aarva piece
-    on Apple Silicon, no PyTorch dependency required)
-  - ChatterboxClient (Resemble AI, local, voice-cloning — higher quality but
-    proved to hang on MacBook Air's MPS; kept as a swap-back option for
-    beefier hardware)
+Provider-agnostic interface. Current production path:
+  - GeminiTTSClient (★ default; same voices as NotebookLM Audio Overviews,
+    via Google's google-genai SDK + GEMINI_API_KEY)
+
+Fallback / legacy backends kept available behind the same interface:
+  - ChatterboxClient (Resemble AI local voice-cloning; works on beefier
+    hardware but hangs on the MacBook Air MPS path)
   - MacSayClient (Apple's `say` command — no-install fallback)
-  - PiperClient (kept for testing on non-Mac hosts)
+  - PiperClient (alternative local TTS for non-Mac hosts)
+
+Kokoro was the v0.1 default but was removed once Gemini TTS landed —
+quality was no longer competitive. The class lives on in git history if
+ever needed.
 
 ElevenLabs / OpenAI / F5-TTS implementations slot in behind the same
 TTSClient interface without touching stage code.
@@ -61,96 +65,248 @@ def _wav_duration(path: Path) -> tuple[float, int]:
         return (frames / float(rate), rate)
 
 
+def _has_long_silence(
+    pcm: bytes,
+    sample_rate: int,
+    sample_width: int,
+    threshold_amplitude: int,
+    max_silence_seconds: float,
+) -> bool:
+    """Scan PCM for any continuous run of near-zero samples longer than
+    `max_silence_seconds`. Used as a defensive sanity check after each
+    Gemini TTS chunk — Gemini occasionally produces stretches of
+    unprompted silence on longer outputs (Google's docs warn about
+    quality drift past a few minutes).
+
+    Implementation: we unpack the PCM in 64KB blocks and walk samples,
+    tracking the current run of "silent" (|sample| < threshold) samples.
+    If the run ever exceeds the per-second sample count × seconds
+    threshold, return True immediately.
+
+    Performance: O(n) over the PCM bytes; ~10ms for a 3-minute chunk on
+    Apple Silicon. Negligible vs the API call latency.
+    """
+    import struct
+
+    if not pcm:
+        return False
+    fmt_char = "h" if sample_width == 2 else "b"
+    max_silent_samples = int(sample_rate * max_silence_seconds)
+    bytes_per_block = 65536
+    # Ensure block size is a multiple of sample_width.
+    bytes_per_block -= bytes_per_block % sample_width
+    run = 0
+    for start in range(0, len(pcm), bytes_per_block):
+        block = pcm[start:start + bytes_per_block]
+        # Trim trailing partial sample if any (shouldn't happen with our
+        # aligned blocks, but safeguard against truncated PCM).
+        block = block[:len(block) - (len(block) % sample_width)]
+        n_samples = len(block) // sample_width
+        if n_samples == 0:
+            continue
+        samples = struct.unpack(f"<{n_samples}{fmt_char}", block)
+        for s in samples:
+            if abs(s) < threshold_amplitude:
+                run += 1
+                if run >= max_silent_samples:
+                    return True
+            else:
+                run = 0
+    return False
+
+
+
 # ─────────────────────────────────────────────────────────────────────────────
-# Kokoro backend (lightweight ONNX TTS; v0.1 default after extensive shopping)
+# Gemini TTS backend (Google native audio — same voices as NotebookLM)
 # ─────────────────────────────────────────────────────────────────────────────
 
-class KokoroClient(TTSClient):
-    """Kokoro TTS via kokoro-onnx.
+class GeminiTTSClient(TTSClient):
+    """Gemini TTS via the google-genai SDK.
 
-    Kokoro uses preset voices (not reference-clip cloning). The voice_map
-    constructor argument maps Aarva-level voice IDs ('female', 'male') to
-    Kokoro voice names ('af_bella', 'bm_daniel', etc.), so Stage 9's voice
-    selection logic stays the same as for other providers.
+    Same underlying voice models that power NotebookLM's Audio Overviews,
+    exposed through the Gemini API. The 30 prebuilt voices each carry a
+    named character (Sulafat=Warm, Charon=Informative, etc.); we map our
+    abstract Aarva-level voice IDs ('female', 'male', etc.) to Gemini's
+    voice names so Stage 9's selection logic is unchanged.
 
-    Kokoro is fast (~5-10 min per ~25K-char article on Apple Silicon) and
-    light (~80MB onnxruntime + ~330MB model files). Long articles are still
-    chunked at paragraph/sentence boundaries for stable inference and to
-    keep memory pressure manageable.
+    Cost (as of May 2026): ~$0.50/M input text tokens + $10/M output audio
+    tokens on Gemini 2.5/3.1 Flash TTS. Roughly $0.50-1/day for Aarva's
+    ~60 min/day volume.
 
-    The Kokoro model is loaded lazily on the first synthesize() call.
+    Caveats from Google's own docs:
+      - Quality drift on outputs longer than a few minutes. We chunk per
+        the kickoff's standard pattern (paragraph/sentence boundaries,
+        ≤max_chunk_chars per chunk) to keep each request short.
+      - Occasional 500 errors that need retry. We do up to N retries with
+        exponential backoff.
+      - Models are currently in Preview status — may change. Project policy
+        is to track changes via Google's docs and update model name as
+        needed.
+
+    The Gemini API returns raw 24kHz 16-bit mono PCM in the response. We
+    stitch chunks with a short silence between them and write a single WAV
+    file via the standard `wave` module — no extra audio library required.
     """
 
-    DEFAULT_MAX_CHUNK_CHARS = 1500
+    # Gemini's audio output spec is fixed.
+    GEMINI_SAMPLE_RATE = 24000        # 24 kHz mono PCM (per Google docs)
+    GEMINI_SAMPLE_WIDTH = 2           # 16-bit
+    GEMINI_CHANNELS = 1               # mono
+
+    DEFAULT_MODEL = "gemini-2.5-flash-preview-tts"
+    # Bumped from 1500 → 2500 (~1.5 min audio per chunk) after observing
+    # noticeable voice variation between chunks. Fewer chunks → fewer
+    # transitions where the listener notices Gemini's per-request tone
+    # drift. The chunker now *never* splits mid-sentence, so an
+    # individual long sentence may exceed this cap.
+    DEFAULT_MAX_CHUNK_CHARS = 2500
     INTER_CHUNK_PAUSE_MS = 250
-    DEFAULT_LANG = "en-us"
+    DEFAULT_RETRIES = 4               # 500s do happen; Google's docs warn
+
+    # Defensive silence detection. Google's docs warn that Gemini TTS can
+    # drift on longer outputs — in practice we've observed chunks where
+    # the model goes unprompted-silent for multi-second stretches mid-
+    # narration. After each chunk synthesis we scan the PCM for any
+    # continuous run of near-zero samples longer than this threshold;
+    # if found, the chunk is treated as a failed synthesis and retried.
+    # 4 seconds catches the failure mode without false-positiving on
+    # natural pauses (paragraph breaks, sentence ends, em-dash beats).
+    MAX_SILENCE_SECONDS = 4.0
+    SILENCE_AMPLITUDE_THRESHOLD = 200    # 16-bit samples; absolute value below = silent
+
+    # Curated voice catalog from the 30 prebuilt voices, selected for
+    # Aarva's editorial register. The full list is at
+    # https://ai.google.dev/gemini-api/docs/speech-generation
+    # Audition at https://aistudio.google.com/generate-speech.
+    KNOWN_GEMINI_VOICES = {
+        # Warm / steady — good for default narrator
+        "Sulafat":       "warm",
+        "Algieba":       "smooth",
+        "Despina":       "smooth",
+        "Vindemiatrix":  "gentle",
+        # Editorial / informative
+        "Charon":        "informative",
+        "Rasalgethi":    "informative",
+        "Gacrux":        "mature",
+        # Bright / forward
+        "Kore":          "firm",
+        "Zephyr":        "bright",
+        "Autonoe":       "bright",
+        # Lighter / playful (for smart-escape pieces)
+        "Leda":          "youthful",
+        "Aoede":         "breezy",
+        "Achird":        "friendly",
+    }
 
     def __init__(
         self,
-        model_path: str,
-        voices_path: str,
         voice_map: dict[str, str],
         default_voice: str = "female",
-        speed: float = 1.0,
-        lang: str = DEFAULT_LANG,
+        model: str | None = None,
         max_chunk_chars: int = DEFAULT_MAX_CHUNK_CHARS,
+        retries: int = DEFAULT_RETRIES,
+        style_prompt: str | None = None,
     ):
-        self.model_path = Path(model_path).expanduser()
-        self.voices_path = Path(voices_path).expanduser()
         self.voice_map = dict(voice_map)
         self._default = default_voice
-        self.speed = float(speed)
-        self.lang = lang
+        self.model = model or self.DEFAULT_MODEL
         self.max_chunk_chars = int(max_chunk_chars)
-        self._model = None
+        self.retries = int(retries)
+        # Optional style direction prepended to every chunk. Useful for
+        # consistent editorial tone — e.g., "Read in a calm, editorial
+        # register, like a thoughtful longform podcast host."
+        self.style_prompt = style_prompt
+        self._client = None
 
-        if not self.model_path.exists():
-            raise RuntimeError(
-                f"Kokoro model not found at {self.model_path}. "
-                f"Download with: curl -L -O https://github.com/thewh1teagle/"
-                f"kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
-            )
-        if not self.voices_path.exists():
-            raise RuntimeError(
-                f"Kokoro voices file not found at {self.voices_path}. "
-                f"Download with: curl -L -O https://github.com/thewh1teagle/"
-                f"kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
-            )
         if not self.voice_map:
-            raise RuntimeError("KokoroClient requires at least one voice mapping.")
+            raise RuntimeError("GeminiTTSClient requires at least one voice mapping.")
         if self._default not in self.voice_map:
             raise RuntimeError(
                 f"default_voice '{self._default}' not in voice_map "
                 f"({list(self.voice_map)})"
             )
+        # voice_map values may be either a single string or a list of strings
+        # (a "pool" used by Stage 9's rotation logic). Verify all entries.
+        for voice_id, mapped in self.voice_map.items():
+            names = mapped if isinstance(mapped, list) else [mapped]
+            for gemini_name in names:
+                if gemini_name not in self.KNOWN_GEMINI_VOICES:
+                    logger.warning(
+                        "GeminiTTS: voice '%s' (mapped to '%s') is not in "
+                        "the curated catalog. Letting it through — Gemini "
+                        "may accept it, but verify at "
+                        "https://aistudio.google.com/generate-speech.",
+                        voice_id, gemini_name,
+                    )
 
     def _load(self) -> None:
-        if self._model is not None:
+        if self._client is not None:
             return
         try:
-            from kokoro_onnx import Kokoro
+            from google import genai  # type: ignore
         except ImportError as e:
             raise RuntimeError(
-                "KokoroClient requires kokoro-onnx. Install with: "
-                "pip install kokoro-onnx soundfile"
+                "GeminiTTSClient requires google-genai. "
+                "Install with: pip install google-genai"
             ) from e
-        logger.info("Loading Kokoro model from %s (first call only)", self.model_path)
-        self._model = Kokoro(str(self.model_path), str(self.voices_path))
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "Neither GEMINI_API_KEY nor GOOGLE_API_KEY is set. "
+                "Get an API key from https://aistudio.google.com/apikey "
+                "and export it: export GEMINI_API_KEY=..."
+            )
+        self._client = genai.Client(api_key=api_key)
+        logger.info("GeminiTTS client ready — model=%s, voices=%s",
+                    self.model, list(self.voice_map.items()))
 
     def _chunk_text(self, text: str) -> list[str]:
-        """Split text into chunks ≤ max_chunk_chars, on paragraph then sentence boundaries."""
+        """Split text into chunks targeting ≤ max_chunk_chars each.
+
+        Strict rule: NEVER split mid-sentence. A single sentence longer
+        than max_chunk_chars becomes its own oversize chunk rather than
+        being chopped at a character offset — mid-sentence breaks produce
+        the most noticeable tone discontinuities in Gemini's output.
+
+        The algorithm:
+          1. Split text into paragraphs on blank lines.
+          2. Within each paragraph, greedily pack whole sentences into
+             a chunk until adding the next sentence would exceed the cap.
+          3. Emit the chunk; start the next chunk with the sentence that
+             didn't fit.
+          4. If a single sentence is longer than the cap on its own, it
+             gets its own chunk (and the cap is briefly exceeded).
+        """
         import re
 
         chunks: list[str] = []
         paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        # Match sentence boundaries — period/!?/etc. followed by whitespace.
+        # Lookbehind preserves the punctuation with the preceding sentence.
         sentence_split = re.compile(r"(?<=[.!?])\s+")
 
+        # Walk paragraph-by-paragraph, building chunks as we go. We pack
+        # whole paragraphs together when they fit, fall back to packing
+        # sentences when they don't.
+        current = ""
         for para in paragraphs:
-            if len(para) <= self.max_chunk_chars:
-                chunks.append(para)
+            # Case A: the whole paragraph fits into the current chunk
+            # alongside whatever's already there.
+            joined = (f"{current}\n\n{para}" if current else para)
+            if len(joined) <= self.max_chunk_chars:
+                current = joined
                 continue
+            # Flush current before splitting the paragraph at sentence
+            # boundaries.
+            if current:
+                chunks.append(current)
+                current = ""
+            # Case B: paragraph fits as its own chunk.
+            if len(para) <= self.max_chunk_chars:
+                current = para
+                continue
+            # Case C: paragraph is too big; split at sentence boundaries.
             sentences = sentence_split.split(para)
-            current = ""
             for sent in sentences:
                 if not current:
                     current = sent
@@ -159,13 +315,127 @@ class KokoroClient(TTSClient):
                 else:
                     chunks.append(current)
                     current = sent
-            if current:
-                if len(current) > self.max_chunk_chars:
-                    for i in range(0, len(current), self.max_chunk_chars):
-                        chunks.append(current[i:i + self.max_chunk_chars])
-                else:
-                    chunks.append(current)
+            # Note: if a single sentence is longer than max_chunk_chars
+            # it becomes its own oversize chunk — preferred over an
+            # arbitrary mid-sentence break that causes audible tone shifts.
+
+        if current:
+            chunks.append(current)
         return chunks
+
+    def _synthesize_chunk(self, text: str, gemini_voice: str) -> bytes:
+        """One LLM call for one chunk → raw PCM bytes.
+
+        Implements retry-with-backoff for the 500 errors Google's docs warn
+        are an expected (low-rate) failure mode. Returns the raw PCM that
+        gets written into the chunk-concat buffer.
+        """
+        import random
+        import time
+
+        from google.genai import types as genai_types  # type: ignore
+
+        # If a style prompt is configured, prepend it to the chunk. This
+        # is the natural-language steering Google's docs encourage — the
+        # model "knows not just what to say, but how to say it".
+        prompt = (
+            f"{self.style_prompt}\n\n{text}"
+            if self.style_prompt else text
+        )
+
+        config = genai_types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=genai_types.SpeechConfig(
+                voice_config=genai_types.VoiceConfig(
+                    prebuilt_voice_config=genai_types.PrebuiltVoiceConfig(
+                        voice_name=gemini_voice,
+                    )
+                )
+            ),
+        )
+
+        last_error: Exception | None = None
+        last_pcm: bytes | None = None    # kept so the last attempt can ship
+                                          # what it had even if silence was
+                                          # detected — better than nothing.
+        for attempt in range(self.retries + 1):
+            try:
+                response = self._client.models.generate_content(
+                    model=self.model,
+                    contents=prompt,
+                    config=config,
+                )
+                # The audio data lives at:
+                #   response.candidates[0].content.parts[0].inline_data.data
+                # Both the docs and the cookbook show this exact path.
+                pcm = None
+                parts = response.candidates[0].content.parts
+                for part in parts:
+                    if getattr(part, "inline_data", None) and part.inline_data.data:
+                        pcm = part.inline_data.data
+                        break
+
+                if pcm is None:
+                    # If we got here, the response was structured oddly —
+                    # text instead of audio is the documented "rare" failure
+                    # mode. Treat as a retryable error.
+                    raise RuntimeError(
+                        "Gemini TTS returned no audio data "
+                        "(possibly the rare text-instead-of-audio failure mode)."
+                    )
+
+                # Defensive silence detection — Gemini occasionally drifts
+                # into long stretches of unprompted silence inside a
+                # chunk. Catch that here and treat as a retryable error.
+                if _has_long_silence(
+                    pcm,
+                    sample_rate=self.GEMINI_SAMPLE_RATE,
+                    sample_width=self.GEMINI_SAMPLE_WIDTH,
+                    threshold_amplitude=self.SILENCE_AMPLITUDE_THRESHOLD,
+                    max_silence_seconds=self.MAX_SILENCE_SECONDS,
+                ):
+                    last_pcm = pcm
+                    if attempt < self.retries:
+                        logger.warning(
+                            "GeminiTTS chunk contains >%.1fs of unprompted "
+                            "silence — discarding and retrying "
+                            "(attempt %d/%d)",
+                            self.MAX_SILENCE_SECONDS,
+                            attempt + 1, self.retries + 1,
+                        )
+                        # Skip the normal retry-with-backoff (it's a server-
+                        # quality issue, not a network one); brief pause and
+                        # immediately re-request.
+                        time.sleep(1.0)
+                        continue
+                    # Out of retries — ship the last attempt anyway, so the
+                    # rest of the article isn't lost. Better partial than
+                    # nothing.
+                    logger.error(
+                        "GeminiTTS chunk still contained long silence on "
+                        "final attempt — shipping it anyway; the listener "
+                        "will hear a quiet stretch."
+                    )
+                    return pcm
+
+                return pcm
+            except Exception as e:
+                last_error = e
+                # Exponential backoff with jitter: 2, 5, 10, 20s.
+                backoffs = (2, 5, 10, 20, 40)
+                if attempt < self.retries:
+                    base = backoffs[min(attempt, len(backoffs) - 1)]
+                    delay = base * (1.0 + random.uniform(0, 0.3))
+                    logger.warning(
+                        "GeminiTTS chunk synth failed (attempt %d/%d): %s — "
+                        "sleeping %.1fs",
+                        attempt + 1, self.retries + 1, e, delay,
+                    )
+                    time.sleep(delay)
+
+        raise RuntimeError(
+            f"GeminiTTS failed after {self.retries + 1} attempts: {last_error}"
+        )
 
     def synthesize(
         self,
@@ -173,16 +443,39 @@ class KokoroClient(TTSClient):
         output_path: Path,
         voice_id: Optional[str] = None,
     ) -> SynthesisResult:
+        """Synthesize text to a single WAV file.
+
+        `voice_id` accepts two forms:
+          - An Aarva-level abstract ID ('female' / 'male') that's looked up
+            in `voice_map`. If the map value is a list, the first item is
+            used (rotation should happen at the caller level).
+          - A literal Gemini voice name ('Sulafat', 'Charon', etc.). Used
+            when Stage 9 has already planned a specific voice for this
+            piece via its own rotation logic.
+        """
         self._load()
-        import numpy as np
-        import soundfile as sf
 
         voice_alias = voice_id or self._default
-        if voice_alias not in self.voice_map:
-            raise ValueError(
-                f"Unknown voice_id '{voice_alias}'. Available: {list(self.voice_map)}"
+
+        # Resolve to a concrete Gemini voice name.
+        if voice_alias in self.voice_map:
+            mapped = self.voice_map[voice_alias]
+            gemini_voice = mapped[0] if isinstance(mapped, list) else mapped
+        elif voice_alias in self.KNOWN_GEMINI_VOICES:
+            # Caller passed a literal voice name (Stage 9 rotation mode).
+            gemini_voice = voice_alias
+        else:
+            # Last-ditch: assume the caller knows the Gemini voice name
+            # exists even if we don't have it in our curated catalog
+            # (Google may have added more voices since we last updated).
+            logger.warning(
+                "GeminiTTS voice_id '%s' not in voice_map or curated "
+                "catalog. Passing through to Gemini — verify at "
+                "https://aistudio.google.com/generate-speech.",
+                voice_alias,
             )
-        kokoro_voice = self.voice_map[voice_alias]
+            gemini_voice = voice_alias
+
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -191,34 +484,43 @@ class KokoroClient(TTSClient):
             raise RuntimeError("No text to synthesize after chunking")
 
         logger.info(
-            "Kokoro: synthesizing %d chunks via voice='%s' (kokoro_voice=%s)",
-            len(chunks), voice_alias, kokoro_voice,
+            "GeminiTTS: synthesizing %d chunks via voice='%s' "
+            "(gemini_voice=%s, model=%s)",
+            len(chunks), voice_alias, gemini_voice, self.model,
         )
 
-        segments = []
-        sample_rate: int | None = None
+        # Generate inter-chunk silence PCM bytes once. 24kHz × 16-bit ×
+        # mono × pause_ms/1000.
+        silence_samples = int(
+            self.GEMINI_SAMPLE_RATE * self.INTER_CHUNK_PAUSE_MS / 1000
+        )
+        silence_bytes = b"\x00\x00" * silence_samples  # 16-bit zeros
+
+        pcm_segments: list[bytes] = []
         for i, chunk in enumerate(chunks):
             try:
-                samples, sr = self._model.create(
-                    chunk, voice=kokoro_voice, speed=self.speed, lang=self.lang,
-                )
+                pcm = self._synthesize_chunk(chunk, gemini_voice)
             except Exception as e:
                 raise RuntimeError(
-                    f"Kokoro synthesis failed on chunk {i+1}/{len(chunks)}: {e}"
+                    f"GeminiTTS failed on chunk {i+1}/{len(chunks)}: {e}"
                 ) from e
-            if sample_rate is None:
-                sample_rate = int(sr)
-            segments.append(samples)
+            pcm_segments.append(pcm)
             if i < len(chunks) - 1:
-                # Inter-chunk silence for natural pauses.
-                pause_samples = int(sample_rate * self.INTER_CHUNK_PAUSE_MS / 1000)
-                segments.append(np.zeros(pause_samples, dtype=samples.dtype))
+                pcm_segments.append(silence_bytes)
+            logger.info(
+                "  GeminiTTS chunk %d/%d done (%d bytes)",
+                i + 1, len(chunks), len(pcm),
+            )
 
-        combined = np.concatenate(segments)
-        sf.write(str(output_path), combined, sample_rate)
+        combined = b"".join(pcm_segments)
+        with wave.open(str(output_path), "wb") as wf:
+            wf.setnchannels(self.GEMINI_CHANNELS)
+            wf.setsampwidth(self.GEMINI_SAMPLE_WIDTH)
+            wf.setframerate(self.GEMINI_SAMPLE_RATE)
+            wf.writeframes(combined)
 
         if not output_path.exists() or output_path.stat().st_size == 0:
-            raise RuntimeError(f"Kokoro produced no output for {output_path}")
+            raise RuntimeError(f"GeminiTTS produced no output for {output_path}")
 
         duration, sr_out = _wav_duration(output_path)
         return SynthesisResult(
@@ -617,30 +919,36 @@ def build_tts_client(config: dict) -> TTSClient:
           provider: piper
           model_path: ~/.piper-voices/en_GB-northern_english_male-medium.onnx
     """
-    provider = (config or {}).get("provider", "kokoro")
+    provider = (config or {}).get("provider", "gemini")
     speed = float((config or {}).get("speed", 1.0))
 
-    if provider == "kokoro":
-        model_path = (config or {}).get(
-            "model_path", "aarva/models/kokoro-v1.0.onnx",
-        )
-        voices_path = (config or {}).get(
-            "voices_path", "aarva/models/voices-v1.0.bin",
-        )
+    if provider == "gemini":
         voice_map = (config or {}).get("voice_map") or {}
         default = (config or {}).get("voice_default") or "female"
-        lang = (config or {}).get("lang", "en-us")
+        model = (config or {}).get("model")
         max_chunk = int((config or {}).get(
-            "max_chunk_chars", KokoroClient.DEFAULT_MAX_CHUNK_CHARS,
+            "max_chunk_chars", GeminiTTSClient.DEFAULT_MAX_CHUNK_CHARS,
         ))
-        return KokoroClient(
-            model_path=model_path,
-            voices_path=voices_path,
+        retries = int((config or {}).get(
+            "retries", GeminiTTSClient.DEFAULT_RETRIES,
+        ))
+        style_prompt = (config or {}).get("style_prompt")
+        return GeminiTTSClient(
             voice_map=voice_map,
             default_voice=default,
-            speed=speed,
-            lang=lang,
+            model=model,
             max_chunk_chars=max_chunk,
+            retries=retries,
+            style_prompt=style_prompt,
+        )
+
+    if provider == "kokoro":
+        raise ValueError(
+            "TTS provider 'kokoro' was removed when Gemini TTS became "
+            "production. Use provider: gemini in pipeline.yaml. If you "
+            "really need to restore Kokoro, the KokoroClient class is in "
+            "git history — search for the commit that introduced "
+            "GeminiTTSClient and revert the deletion."
         )
 
     if provider == "chatterbox":

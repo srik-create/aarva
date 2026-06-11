@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Aarva daily run — launchd schedule for the publish pipeline.
+
+  Install:
+      cp scripts/app.aarva.daily.plist ~/Library/LaunchAgents/
+      launchctl load ~/Library/LaunchAgents/app.aarva.daily.plist
+
+  Verify it's registered:
+      launchctl list | grep aarva
+
+  Trigger an immediate test run (bypasses the calendar interval):
+      launchctl start app.aarva.daily
+
+  Stop the schedule:
+      launchctl unload ~/Library/LaunchAgents/app.aarva.daily.plist
+
+  Logs:
+      tail -f ~/Library/Logs/aarva-daily.log
+
+  Wake-on-schedule (so the Mac runs even if asleep at 8am):
+      sudo pmset repeat wakeorpoweron MTWRFSU 07:55:00
+
+  Cancel wake schedule:
+      sudo pmset repeat cancel
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>app.aarva.daily</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/srikant/Documents/Claude/Projects/Curio v2/scripts/run_daily.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/srikant/Documents/Claude/Projects/Curio v2</string>
+
+    <!-- Fire every day at 08:00 local time. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- If the Mac was asleep / off at 08:00, run on next wake. -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/srikant/Library/Logs/aarva-daily.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/srikant/Library/Logs/aarva-daily.log</string>
+
+    <!-- Give the job a generous PATH; run_daily.sh also exports its own. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/srikant</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+    </dict>
+
+    <!-- Don't relaunch if it exits non-zero — we don't want a runaway loop. -->
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>

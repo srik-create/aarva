@@ -1,0 +1,185 @@
+"""Shared SQL queries used by both presentation modules (RSS feed,
+HTML renderer) and the personalised feed service.
+
+The same JOIN pattern (edition_pieces + articles + publications, or
+the two-piece crosscut shape) was repeated across three modules with
+subtly different WHERE clauses. This module centralises the joins
+and lets callers compose filters explicitly.
+
+All functions return plain dicts (sqlite3.Row → dict). Add new
+filters as keyword arguments rather than spawning new functions.
+"""
+from __future__ import annotations
+
+from datetime import date
+from typing import Any, Optional
+
+from aarva.db import Database
+
+
+def load_daily_pieces_with_audio(
+    db: Database,
+    *,
+    edition_id: Optional[int] = None,
+    since_date: Optional[date] = None,
+    user_id_filter: Optional[int] = None,
+    include_user_id_null: bool = True,
+    include_flagged: bool = False,
+) -> list[dict[str, Any]]:
+    """Pieces from daily editions whose audio has been generated.
+
+    edition_id           — single-edition mode (used by the HTML
+                           renderer's per-edition view).
+    since_date           — cutoff for batch listings (RSS feed, feed
+                           service).
+    user_id_filter       — restrict to this user's editions. With
+                           include_user_id_null=True, returns
+                           (user's editions OR shared globals).
+    include_user_id_null — whether to include global (user_id IS NULL)
+                           editions. Default True.
+    include_flagged      — include post-hoc flagged pieces. Default
+                           False (the RSS feed and web renderer both
+                           hide flagged content).
+    """
+    where: list[str] = ["e.edition_type = 'daily'"]
+    params: list[Any] = []
+
+    if edition_id is not None:
+        where.append("e.id = ?")
+        params.append(edition_id)
+    if since_date is not None:
+        where.append("e.edition_date >= ?")
+        params.append(since_date.isoformat())
+    if user_id_filter is not None:
+        if include_user_id_null:
+            where.append("(e.user_id = ? OR e.user_id IS NULL)")
+            params.append(user_id_filter)
+        else:
+            where.append("e.user_id = ?")
+            params.append(user_id_filter)
+    elif include_user_id_null:
+        where.append("e.user_id IS NULL")
+
+    where.append("ep.audio_url IS NOT NULL AND ep.audio_url != ''")
+    if not include_flagged:
+        where.append("ep.flagged_at IS NULL")
+
+    sql = f"""
+        SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
+               ep.hook, ep.contextualisation, ep.show_notes,
+               ep.audio_url, ep.duration_seconds, ep.narrator_voice,
+               a.title, a.byline, a.canonical_url,
+               p.name AS publication_name,
+               e.edition_date, e.published_date, e.edition_type,
+               e.user_id
+          FROM edition_pieces ep
+          JOIN editions e ON e.id = ep.edition_id
+          JOIN articles a ON a.id = ep.article_id
+          JOIN publications p ON p.id = a.publication_id
+         WHERE {' AND '.join(where)}
+         ORDER BY e.edition_date DESC, ep.position
+    """
+    with db.connect() as conn:
+        return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def load_bonus_pieces_with_audio(
+    db: Database,
+    *,
+    user_id: int,
+    since_date: Optional[date] = None,
+    include_flagged: bool = False,
+) -> list[dict[str, Any]]:
+    """Bonus episodes (edition_type='bonus') belonging to a specific
+    user. Used by the personalised feed service."""
+    where: list[str] = [
+        "e.edition_type = 'bonus'",
+        "e.user_id = ?",
+        "ep.audio_url IS NOT NULL AND ep.audio_url != ''",
+    ]
+    params: list[Any] = [user_id]
+    if since_date is not None:
+        where.append("e.edition_date >= ?")
+        params.append(since_date.isoformat())
+    if not include_flagged:
+        where.append("ep.flagged_at IS NULL")
+
+    sql = f"""
+        SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
+               ep.hook, ep.contextualisation, ep.show_notes,
+               ep.audio_url, ep.duration_seconds, ep.narrator_voice,
+               a.title, a.byline, a.canonical_url,
+               p.name AS publication_name,
+               e.edition_date, e.published_date, e.edition_type,
+               e.user_id
+          FROM edition_pieces ep
+          JOIN editions e ON e.id = ep.edition_id
+          JOIN articles a ON a.id = ep.article_id
+          JOIN publications p ON p.id = a.publication_id
+         WHERE {' AND '.join(where)}
+         ORDER BY e.edition_date DESC, ep.position
+    """
+    with db.connect() as conn:
+        return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def load_crosscut_episodes(
+    db: Database,
+    *,
+    edition_id: Optional[int] = None,
+    since_date: Optional[date] = None,
+    include_user_id_null: bool = True,
+    include_flagged: bool = False,
+) -> list[dict[str, Any]]:
+    """Crosscut episodes flattened into one row per edition with both
+    pieces' metadata joined in. Used by RSS feed, HTML renderer, and
+    personalised feed service.
+
+    Crosscut episodes are always global today (user_id IS NULL); the
+    parameter is kept for forward compatibility with eventual
+    per-user crosscut variants."""
+    where: list[str] = [
+        "e.edition_type = 'crosscut'",
+        "ep_a.audio_url IS NOT NULL AND ep_a.audio_url != ''",
+    ]
+    params: list[Any] = []
+    if edition_id is not None:
+        where.append("e.id = ?")
+        params.append(edition_id)
+    if since_date is not None:
+        where.append("e.edition_date >= ?")
+        params.append(since_date.isoformat())
+    if include_user_id_null:
+        where.append("e.user_id IS NULL")
+    if not include_flagged:
+        where.append("ep_a.flagged_at IS NULL")
+
+    sql = f"""
+        SELECT e.id AS edition_id, e.edition_date, e.published_date,
+               e.topic_label, e.intro_text, e.outro_text,
+               ep_a.audio_url, ep_a.duration_seconds,
+               ep_a.narrator_voice,
+               ep_a.article_id AS article_a_id,
+               ep_a.bridge_text AS bridge_a,
+               ep_b.article_id AS article_b_id,
+               a_a.title AS title_a, a_a.byline AS byline_a,
+               a_a.canonical_url AS url_a,
+               p_a.name AS pub_a,
+               ep_b.bridge_text AS bridge_between,
+               a_b.title AS title_b, a_b.byline AS byline_b,
+               a_b.canonical_url AS url_b,
+               p_b.name AS pub_b
+          FROM editions e
+          JOIN edition_pieces ep_a
+            ON ep_a.edition_id = e.id AND ep_a.position = 0
+          JOIN articles a_a ON a_a.id = ep_a.article_id
+          JOIN publications p_a ON p_a.id = a_a.publication_id
+          JOIN edition_pieces ep_b
+            ON ep_b.edition_id = e.id AND ep_b.position = 1
+          JOIN articles a_b ON a_b.id = ep_b.article_id
+          JOIN publications p_b ON p_b.id = a_b.publication_id
+         WHERE {' AND '.join(where)}
+         ORDER BY e.edition_date DESC, e.id DESC
+    """
+    with db.connect() as conn:
+        return [dict(r) for r in conn.execute(sql, params).fetchall()]

@@ -6,11 +6,14 @@ split this, but for v0.1 a single module keeps things easy to reason about.
 """
 from __future__ import annotations
 
+import logging
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Iterator, Optional
+
+logger = logging.getLogger(__name__)
 
 
 SCHEMA_SQL = """
@@ -89,13 +92,40 @@ CREATE TABLE IF NOT EXISTS article_scores (
 
 
 -- Editions (Day 4 onward).
+--
+-- edition_date is UNIQUE per (edition_date, edition_type) because we now
+-- support two episode types on the same day: a daily edition plus a
+-- daily crosscut episode. The UNIQUE constraint is enforced by an index
+-- below to allow both to coexist.
 CREATE TABLE IF NOT EXISTS editions (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    edition_date    DATE    UNIQUE NOT NULL,
+    edition_date    DATE    NOT NULL,
+    edition_type    TEXT    NOT NULL DEFAULT 'daily'
+        CHECK (edition_type IN ('daily', 'crosscut', 'bonus')),
     published_date  DATETIME DEFAULT CURRENT_TIMESTAMP,
     web_url         TEXT,
-    rss_episode_url TEXT
+    rss_episode_url TEXT,
+    -- Review-CLI overrides for daily editions (unused for crosscut).
+    extra_slots     TEXT DEFAULT '[]',
+    dropped_slots   TEXT DEFAULT '[]',
+    slot_biases     TEXT DEFAULT '{}',
+    -- Crosscut episode-level framing text (unused for daily editions).
+    -- intro_text:    ~100 words framing the topic + the two angles
+    -- outro_text:    ~80 words landing the takeaway / takeaway question
+    -- topic_label:   short editorial label for the topic (e.g., "AI safety")
+    --                used in episode title + on-screen badge
+    intro_text      TEXT,
+    outro_text      TEXT,
+    topic_label     TEXT,
+    -- Per-user bonus episodes (Phase A web app). NULL = global
+    -- (daily, crosscut, shared bonus). Set = private to that user
+    -- (their own ad-hoc picks via /api/v1/publish_article).
+    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL
 );
+-- NOTE: the composite UNIQUE index on (edition_date, edition_type) is
+-- created in _init_schema AFTER the ALTER TABLE migrations have added
+-- the edition_type column to legacy DBs. Putting it here would fail on
+-- DBs that pre-date edition_type.
 
 CREATE TABLE IF NOT EXISTS edition_pieces (
     edition_id          INTEGER REFERENCES editions(id) ON DELETE CASCADE,
@@ -104,11 +134,80 @@ CREATE TABLE IF NOT EXISTS edition_pieces (
     position            INTEGER,
     hook                TEXT,
     contextualisation   TEXT,
+    show_notes          TEXT,   -- 2-3 sentence factual summary; surfaced
+                                -- in RSS description and web renderer
     audio_url           TEXT,
     duration_seconds    INTEGER,
     narrator_voice      TEXT,
+    -- Review status: 'proposed' is the state right after Stage 7 picks the
+    -- piece; 'approved' means the user (or the auto-approve path when
+    -- review.enabled=false) has signed off and the piece can proceed to
+    -- Stage 8+. Rejected pieces are *deleted* from this table and a row is
+    -- added to edition_rejections so re-runs avoid re-picking them.
+    review_status       TEXT NOT NULL DEFAULT 'approved'
+        CHECK (review_status IN ('proposed', 'approved')),
+    -- Post-hoc flag-and-remove (Q6). When flagged_at is non-NULL, the
+    -- piece is filtered out of the RSS feed and the web renderer.
+    -- Soft-delete preserves audit history and supports unflag. Reason is
+    -- optional free text for now; later we may move to a controlled
+    -- vocabulary for pattern detection.
+    flagged_at          DATETIME,
+    flag_reason         TEXT,
+    -- Crosscut piece-level connective commentary. For a daily edition's
+    -- pieces this stays NULL. For a crosscut episode it holds the bridge
+    -- text that PRECEDES this piece in the audio. The first piece in a
+    -- crosscut has its bridge serve as the article-intro ("piece 1 angle");
+    -- the second piece's bridge_text is the cross-piece bridge that
+    -- connects 1 → 2. Stage 9 reads this column when composing crosscut
+    -- audio.
+    bridge_text         TEXT,
     PRIMARY KEY (edition_id, article_id)
 );
+
+-- Articles the user explicitly rejected for a specific edition during
+-- the cold-start review step. Stage 7 reads this on every re-run and
+-- excludes these from the candidate pool so the same piece never gets
+-- proposed twice in the same review session.
+CREATE TABLE IF NOT EXISTS edition_rejections (
+    edition_id          INTEGER NOT NULL REFERENCES editions(id) ON DELETE CASCADE,
+    article_id          INTEGER NOT NULL REFERENCES articles(id),
+    slot_at_rejection   TEXT,   -- which slot the piece was filling when rejected
+    rejected_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (edition_id, article_id)
+);
+
+
+-- Crosscut pair candidates (longlist).
+--
+-- The pair-detection stage proposes up to ~10 candidate pairs per day.
+-- The user reviews this longlist and picks ONE pair to build the
+-- crosscut episode from. Picked rows get linked to an edition_id once
+-- the episode is built; unpicked rows are kept for analytics / future
+-- restart but don't influence anything downstream.
+CREATE TABLE IF NOT EXISTS crosscut_pair_candidates (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    candidate_date       DATE NOT NULL,
+    article_a_id         INTEGER NOT NULL REFERENCES articles(id),
+    article_b_id         INTEGER NOT NULL REFERENCES articles(id),
+    topic_label          TEXT,           -- LLM-generated short topic name
+    angle_a_label        TEXT,           -- one-line angle of article A
+    angle_b_label        TEXT,           -- one-line angle of article B
+    connection_summary   TEXT,           -- LLM's one-sentence connection rationale
+    connection_score     REAL,           -- 0-10 LLM-rated quality
+    divergence_score     REAL,           -- structural divergence (axes that differ)
+    selected_at          DATETIME,       -- non-NULL once user picks this pair
+    edition_id           INTEGER REFERENCES editions(id),  -- linked once built
+    created_at           DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Soft-supersede column so seen-articles history persists across
+    -- intra-day re-runs of detect (the require-fresh filter depends
+    -- on this; without it, _clear_today_candidates would wipe the
+    -- signal every time it fires).
+    superseded_at        DATETIME
+);
+CREATE INDEX IF NOT EXISTS idx_crosscut_candidates_date
+    ON crosscut_pair_candidates(candidate_date);
+CREATE INDEX IF NOT EXISTS idx_crosscut_candidates_selected
+    ON crosscut_pair_candidates(selected_at);
 
 
 -- Pipeline run log: one row per invocation.
@@ -126,6 +225,116 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
     error_message                   TEXT,
     stage_invoked                   TEXT
 );
+
+
+-- ── App-layer tables (web app + per-user state) ─────────────────────────────
+--
+-- The pipeline above runs unaware of users (it produces a global daily +
+-- crosscut). The web app layers per-user state on top: each user has their
+-- own dismissals, bonus picks, listening history. The shared daily edition
+-- still exists; users see (shared minus their dismissals) plus (their own
+-- bonus picks).
+
+-- Users — the people consuming Aarva via the web app.
+-- Auth is magic-link by default: a short-lived token is emailed when the
+-- user requests login, and consumed on first click to mint a session.
+CREATE TABLE IF NOT EXISTS users (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    email           TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    name            TEXT,
+    settings_json   TEXT DEFAULT '{}',
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login_at   DATETIME,
+    is_admin        INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+
+-- Sessions — persistent login tokens (cookie value). One row per active
+-- session per device. Expire after `expires_at`; revoke by setting
+-- revoked_at.
+CREATE TABLE IF NOT EXISTS user_sessions (
+    token           TEXT PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at      DATETIME NOT NULL,
+    revoked_at      DATETIME,
+    user_agent      TEXT,
+    ip              TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON user_sessions(expires_at);
+
+
+-- Magic-link tokens — single-use, short-lived. Consumed on first click,
+-- which mints a row in user_sessions.
+CREATE TABLE IF NOT EXISTS magic_link_tokens (
+    token           TEXT PRIMARY KEY,
+    email           TEXT NOT NULL COLLATE NOCASE,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at      DATETIME NOT NULL,
+    consumed_at     DATETIME,
+    ip              TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_magic_links_email ON magic_link_tokens(email);
+CREATE INDEX IF NOT EXISTS idx_magic_links_expires ON magic_link_tokens(expires_at);
+
+
+-- User actions — every meaningful interaction a user has with an article.
+-- Drives the dismiss-from-feed feature today, and per-user taste centroids
+-- + collaborative signals in Phase B.
+--
+-- action values:
+--   'dismissed'  — user removed this article from their feed (won't appear
+--                  again; doesn't affect other users)
+--   'liked'      — explicit positive signal
+--   'disliked'   — explicit negative signal
+--   'listened'   — started playback
+--   'completed'  — finished playback (or >90% played)
+--   'shared'     — shared the article to someone
+CREATE TABLE IF NOT EXISTS user_actions (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    article_id      INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+    action          TEXT NOT NULL
+        CHECK (action IN ('dismissed', 'liked', 'disliked',
+                          'listened', 'completed', 'shared')),
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    metadata_json   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_user_actions_user ON user_actions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_actions_article ON user_actions(article_id);
+CREATE INDEX IF NOT EXISTS idx_user_actions_user_action
+    ON user_actions(user_id, action);
+
+
+-- Background jobs — durable queue for long-running operations (TTS,
+-- bonus-episode publish, retag passes). Polled by an in-process worker
+-- thread today; cleanly maps to Celery/SQS/Lambda when we move to cloud.
+--
+-- status:
+--   'pending'    — waiting to be picked up
+--   'running'    — claimed by a worker
+--   'completed'  — finished successfully (result_json populated)
+--   'failed'     — finished with error (error_message populated)
+--   'cancelled'  — operator cancelled before run
+CREATE TABLE IF NOT EXISTS jobs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind            TEXT NOT NULL,
+    payload_json    TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'running', 'completed',
+                          'failed', 'cancelled')),
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    started_at      DATETIME,
+    finished_at     DATETIME,
+    result_json     TEXT,
+    error_message   TEXT,
+    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    progress        TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_user ON jobs(user_id);
 """
 
 
@@ -146,16 +355,181 @@ class Database:
     def _init_schema(self) -> None:
         with self._connect() as conn:
             conn.executescript(SCHEMA_SQL)
-            # Idempotent column-add migrations for DBs created before a
-            # column existed. SQLite raises OperationalError when the
-            # column already exists; we swallow that.
-            for migration in (
+            # Column-add migrations for legacy DBs. All columns the
+            # historical migrations added are now in the base CREATE
+            # TABLE definitions above — these ALTERs only fire on
+            # pre-existing DBs that predate each column's introduction.
+            # Idempotent: SQLite raises OperationalError when the
+            # column already exists; we swallow it.
+            #
+            # New additions go here, not in SCHEMA_SQL, so existing
+            # production DBs upgrade cleanly. After a column has been
+            # in production for a few weeks across all instances,
+            # move the entry into SCHEMA_SQL and delete from this list.
+            _LEGACY_COLUMN_ADDS = (
                 "ALTER TABLE edition_pieces ADD COLUMN narrator_voice TEXT",
-            ):
+                "ALTER TABLE edition_pieces ADD COLUMN review_status TEXT "
+                "NOT NULL DEFAULT 'approved'",
+                "ALTER TABLE edition_pieces ADD COLUMN show_notes TEXT",
+                "ALTER TABLE edition_pieces ADD COLUMN flagged_at DATETIME",
+                "ALTER TABLE edition_pieces ADD COLUMN flag_reason TEXT",
+                "ALTER TABLE edition_pieces ADD COLUMN bridge_text TEXT",
+                "ALTER TABLE editions ADD COLUMN extra_slots TEXT",
+                "ALTER TABLE editions ADD COLUMN dropped_slots TEXT",
+                "ALTER TABLE editions ADD COLUMN slot_biases TEXT",
+                "ALTER TABLE editions ADD COLUMN edition_type TEXT "
+                "NOT NULL DEFAULT 'daily'",
+                "ALTER TABLE editions ADD COLUMN intro_text TEXT",
+                "ALTER TABLE editions ADD COLUMN outro_text TEXT",
+                "ALTER TABLE editions ADD COLUMN topic_label TEXT",
+                "ALTER TABLE crosscut_pair_candidates "
+                "ADD COLUMN superseded_at DATETIME",
+                "ALTER TABLE editions ADD COLUMN user_id INTEGER "
+                "REFERENCES users(id) ON DELETE SET NULL",
+            )
+            for migration in _LEGACY_COLUMN_ADDS:
                 try:
                     conn.execute(migration)
                 except sqlite3.OperationalError:
                     pass
+
+            # Compound migration: the original editions schema had
+            # `edition_date UNIQUE` at the column level. That blocks
+            # storing a daily edition and a crosscut episode for the
+            # same date. We rebuild the table without the column-level
+            # UNIQUE and add a composite UNIQUE index on
+            # (edition_date, edition_type) instead.
+            #
+            # SQLite doesn't support DROP CONSTRAINT, so this is a
+            # table-rebuild migration. We detect the old schema by
+            # checking whether the composite index exists.
+            self._migrate_editions_uniqueness(conn)
+
+            # Idempotent composite index. Created here (after migrations)
+            # rather than in SCHEMA_SQL so we don't try to reference the
+            # edition_type column before ALTER TABLE has added it on
+            # legacy DBs. On fresh installs this is a no-op.
+            #
+            # PARTIAL UNIQUE: enforce singleton-per-day only for
+            # 'daily' + 'crosscut' edition types. 'bonus' editions
+            # (user-picked ad-hoc articles) can have multiple rows
+            # per day and are intentionally not constrained.
+            try:
+                # Drop the old non-partial index if it exists (migration
+                # from a previous version that constrained all types).
+                conn.execute(
+                    "DROP INDEX IF EXISTS idx_editions_date_type"
+                )
+                conn.execute(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS "
+                    "idx_editions_date_type_singleton "
+                    "ON editions(edition_date, edition_type) "
+                    "WHERE edition_type IN ('daily', 'crosscut')"
+                )
+            except sqlite3.OperationalError as e:
+                logger.warning("Could not create composite editions index: %s", e)
+
+    def _migrate_editions_uniqueness(self, conn: sqlite3.Connection) -> None:
+        """Rebuild `editions` if it still has either:
+        (a) the old single-column UNIQUE constraint on `edition_date`, or
+        (b) a CHECK constraint that doesn't include 'bonus' as a valid
+            edition_type (added when ad-hoc bonus episodes shipped).
+
+        No-op once both are addressed."""
+        # Check current state of the editions table.
+        sql_row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='editions'"
+        ).fetchone()
+        if not sql_row:
+            return  # no table yet — fresh init will use SCHEMA_SQL
+        table_sql = sql_row[0] or ""
+
+        legacy_unique = ("edition_date    DATE    UNIQUE" in table_sql)
+        check_missing_bonus = (
+            "CHECK" in table_sql
+            and "bonus" not in table_sql
+        )
+
+        # Index marker tells us whether the UNIQUE part of the migration
+        # has already run. CHECK migration is gated separately.
+        row = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND "
+            "name IN ('idx_editions_date_type', "
+            "         'idx_editions_date_type_singleton')",
+        ).fetchone()
+        unique_already_migrated = bool(row)
+
+        if unique_already_migrated and not check_missing_bonus:
+            return    # already fully migrated
+        if not legacy_unique and not check_missing_bonus:
+            return    # nothing to do (fresh schema)
+
+        # Rebuild the editions table. Either: the legacy single-column
+        # UNIQUE constraint is present (first-time migration from
+        # pre-crosscut schema, no edition_type column), or the CHECK
+        # constraint lacks 'bonus' (added when ad-hoc bonus episodes
+        # shipped — edition_type column exists in this case).
+        #
+        # Introspect actual columns so the SELECT only references
+        # columns that exist in the old table.
+        existing_cols = {
+            row[1]
+            for row in conn.execute("PRAGMA table_info(editions)").fetchall()
+        }
+        has_edition_type = "edition_type" in existing_cols
+        has_intro = "intro_text" in existing_cols
+        has_outro = "outro_text" in existing_cols
+        has_topic = "topic_label" in existing_cols
+        edition_type_expr = (
+            "COALESCE(edition_type, 'daily')" if has_edition_type else "'daily'"
+        )
+        intro_expr = "intro_text" if has_intro else "NULL"
+        outro_expr = "outro_text" if has_outro else "NULL"
+        topic_expr = "topic_label" if has_topic else "NULL"
+
+        migration_sql = f"""
+            CREATE TABLE editions_new (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                edition_date    DATE NOT NULL,
+                edition_type    TEXT NOT NULL DEFAULT 'daily'
+                    CHECK (edition_type IN ('daily', 'crosscut', 'bonus')),
+                published_date  DATETIME DEFAULT CURRENT_TIMESTAMP,
+                web_url         TEXT,
+                rss_episode_url TEXT,
+                extra_slots     TEXT DEFAULT '[]',
+                dropped_slots   TEXT DEFAULT '[]',
+                slot_biases     TEXT DEFAULT '{{}}',
+                intro_text      TEXT,
+                outro_text      TEXT,
+                topic_label     TEXT
+            );
+            INSERT INTO editions_new
+                (id, edition_date, edition_type, published_date,
+                 web_url, rss_episode_url,
+                 extra_slots, dropped_slots, slot_biases,
+                 intro_text, outro_text, topic_label)
+            SELECT id, edition_date,
+                   {edition_type_expr},
+                   published_date,
+                   web_url, rss_episode_url,
+                   COALESCE(extra_slots, '[]'),
+                   COALESCE(dropped_slots, '[]'),
+                   COALESCE(slot_biases, '{{}}'),
+                   {intro_expr}, {outro_expr}, {topic_expr}
+              FROM editions;
+            DROP TABLE editions;
+            ALTER TABLE editions_new RENAME TO editions;
+            DROP INDEX IF EXISTS idx_editions_date_type;
+            CREATE UNIQUE INDEX idx_editions_date_type_singleton
+                ON editions(edition_date, edition_type)
+                WHERE edition_type IN ('daily', 'crosscut');
+        """
+
+        conn.execute("PRAGMA foreign_keys = OFF")
+        try:
+            conn.executescript(migration_sql)
+        finally:
+            conn.execute("PRAGMA foreign_keys = ON")
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:

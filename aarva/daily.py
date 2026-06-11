@@ -22,10 +22,10 @@ import click
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
-from aarva.output import web_renderer, rss_feed
+from aarva.output import web_renderer, rss_feed, audio_converter
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
-    stage_7_assemble, stage_8_hook_context, stage_9_tts,
+    stage_7_assemble, stage_8_hook_context, stage_9_tts, stage_crosscut,
 )
 
 
@@ -43,8 +43,27 @@ def _setup_logging(verbose: bool) -> None:
               help="Run only this stage number. Omit to run the full pipeline.")
 @click.option("--pub", "pubs", multiple=True,
               help="Limit ingestion to this publication name. Repeatable.")
+@click.option("--crosscut-detect", is_flag=True, default=False,
+              help="Run only the Crosscut pair-detection stage. Produces "
+                   "today's longlist of ~10 pair candidates for review via "
+                   "`python -m aarva.crosscut`. Other stages skipped.")
+@click.option("--require-fresh", is_flag=True, default=False,
+              help="With --crosscut-detect: require at least one article "
+                   "in each pair to be one that has NEVER appeared in any "
+                   "past longlist. Forces variety when the pool churns slowly.")
+@click.option("--crosscut-build", is_flag=True, default=False,
+              help="After a pair has been selected via `python -m aarva.crosscut`, "
+                   "this runs Phase 3 — generates intro/bridge/outro/key-"
+                   "passages via Gemini and creates a crosscut edition row "
+                   "for today. Other stages skipped.")
+@click.option("--crosscut-tts", is_flag=True, default=False,
+              help="Phase 4 — synthesize audio for the most recent built "
+                   "crosscut episode (intro+bridges+passages+outro into one "
+                   "WAV). Other stages skipped.")
 @click.option("-v", "--verbose", is_flag=True, help="Enable debug-level logging.")
-def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
+def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
+         require_fresh: bool, crosscut_build: bool, crosscut_tts: bool,
+         verbose: bool) -> None:
     """Run the Aarva daily-edition pipeline."""
     _setup_logging(verbose)
     log = logging.getLogger("aarva.daily")
@@ -53,6 +72,81 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
     db = Database(config.db_path)
 
     publication_filter = set(pubs) if pubs else None
+
+    # ── Crosscut: pair-detection-only path ────────────────────────────────
+    if crosscut_detect:
+        log.info("Crosscut pair detection starting%s",
+                 " (require-fresh)" if require_fresh else "")
+        run_id = db.start_run("stage_crosscut_detect")
+        try:
+            cstats = stage_crosscut.detect_pair_candidates(
+                config, db, require_fresh_article=require_fresh,
+            )
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Crosscut detect done — %d articles considered, "
+                "%d pre-scored pairs, %d evaluated, %d persisted "
+                "(%d skipped for topic recency)",
+                cstats.candidates_considered, cstats.pairs_pre_scored,
+                cstats.pairs_eval_called, cstats.pairs_persisted,
+                cstats.skipped_for_topic_recency,
+            )
+            log.info(
+                "Run `python -m aarva.crosscut` to review the longlist "
+                "and pick one pair."
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Crosscut pair detection failed")
+            sys.exit(1)
+        return
+
+    # ── Crosscut: TTS path ────────────────────────────────────────────────
+    if crosscut_tts:
+        log.info("Crosscut TTS starting")
+        run_id = db.start_run("stage_crosscut_tts")
+        try:
+            tstats = stage_crosscut.synthesize_crosscut_episode(config, db)
+            db.finish_run(run_id, status="success")
+            if tstats.edition_id is None:
+                log.warning("Crosscut TTS: no crosscut edition to synthesize.")
+            else:
+                total_min = tstats.total_audio_seconds / 60.0
+                log.info(
+                    "Crosscut TTS: edition #%d — %d sections, %.1f min total, "
+                    "%d errors. Audio at: %s",
+                    tstats.edition_id, tstats.sections_synthesized,
+                    total_min, tstats.errors, tstats.output_path,
+                )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Crosscut TTS failed")
+            sys.exit(1)
+        return
+
+    # ── Crosscut: script-build path ───────────────────────────────────────
+    if crosscut_build:
+        log.info("Crosscut script build starting")
+        run_id = db.start_run("stage_crosscut_build")
+        try:
+            bstats = stage_crosscut.build_episode_script(config, db)
+            db.finish_run(run_id, status="success")
+            if bstats.edition_id is None:
+                log.warning("Crosscut build: no edition produced "
+                            "(check logs for the reason).")
+            else:
+                log.info(
+                    "Crosscut build: edition #%d ready — intro=%s, "
+                    "bridges=%d, outro=%s, passages=%d.",
+                    bstats.edition_id, bstats.intro_generated,
+                    bstats.bridges_generated, bstats.outro_generated,
+                    bstats.key_passages_picked,
+                )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Crosscut script build failed")
+            sys.exit(1)
+        return
 
     # Stage 1 — Ingestion
     if stage is None or stage == 1:
@@ -148,6 +242,20 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 7 failed")
             sys.exit(1)
 
+        # Cold-start review: if review.enabled is true and we're running
+        # the full pipeline (stage is None), halt here. The user needs to
+        # approve pieces via `python -m aarva.review` before the LLM and
+        # TTS stages run on them.
+        review_cfg = config.raw.get("review") or {}
+        if stage is None and bool(review_cfg.get("enabled", False)):
+            log.info(
+                "Pipeline halting after Stage 7 — review.enabled=true. "
+                "Approve the edition with `python -m aarva.review`, then "
+                "run `bash scripts/finalize_edition.sh` (or re-invoke "
+                "`python -m aarva.daily --stage 8` and onwards)."
+            )
+            return
+
     # Stage 8 — Hook + why-now contextualisation
     if stage is None or stage == 8:
         log.info("Stage 8 — Hook + why-now contextualisation starting")
@@ -156,10 +264,11 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             s8stats = stage_8_hook_context.generate_for_edition(config, db)
             db.finish_run(run_id, status="success")
             log.info(
-                "Stage 8 done — %d pieces, %d hooks, %d contexts, %d skipped, %d errors",
+                "Stage 8 done — %d pieces, %d hooks, %d contexts, %d show notes, "
+                "%d skipped, %d errors",
                 s8stats.pieces_total, s8stats.hooks_generated,
-                s8stats.contexts_generated, s8stats.skipped_already_done,
-                s8stats.errors,
+                s8stats.contexts_generated, s8stats.show_notes_generated,
+                s8stats.skipped_already_done, s8stats.errors,
             )
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
@@ -184,15 +293,33 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             log.exception("Stage 9 failed")
             sys.exit(1)
 
-    # Stage 10 — Publish (HTML + RSS)
+    # Stage 10 — Publish (MP3 conversion + HTML + RSS)
     if stage is None or stage == 10:
-        log.info("Stage 10 — Publish (HTML + RSS) starting")
+        log.info("Stage 10 — Publish starting")
         run_id = db.start_run("stage_10_publish")
         try:
-            # Render the most recent edition's HTML
+            # 1. Convert any unconverted WAVs to MP3 (podcast apps need MP3)
+            try:
+                cs = audio_converter.convert_all_for_publish(config, db)
+                log.info(
+                    "Stage 10 audio — %d converted, %d already done, %d source-missing, %d errors",
+                    cs.converted, cs.skipped_already_done,
+                    cs.skipped_source_missing, cs.errors,
+                )
+            except RuntimeError as e:
+                log.warning("MP3 conversion skipped: %s", e)
+                log.warning(
+                    "  → Audio will remain as WAV. Podcast apps may reject WAV "
+                    "enclosures. Install ffmpeg (brew install ffmpeg) and re-run "
+                    "Stage 10 to convert."
+                )
+
+            # 2. Render the most recent DAILY edition's HTML.
             with db.connect() as conn:
                 latest = conn.execute(
-                    "SELECT id FROM editions ORDER BY edition_date DESC, id DESC LIMIT 1"
+                    "SELECT id FROM editions "
+                    " WHERE edition_type = 'daily' "
+                    " ORDER BY edition_date DESC, id DESC LIMIT 1"
                 ).fetchone()
             if latest:
                 ws = web_renderer.render_edition_html(config, db, int(latest["id"]))
@@ -201,7 +328,35 @@ def main(stage: Optional[int], pubs: tuple[str, ...], verbose: bool) -> None:
             else:
                 log.warning("Stage 10 web — no editions in DB; skipping HTML")
 
-            # Always regenerate the unified RSS feed across all editions
+            # 2b. Render ALL crosscut episodes' HTML pages. Per-episode
+            # HTML is what the RSS feed's <link> elements point at, so
+            # we need pages for every published crosscut, not just the
+            # latest. Idempotent — re-renders existing pages with any
+            # template changes.
+            with db.connect() as conn:
+                cc_rows = conn.execute("""
+                    SELECT e.id, e.edition_date
+                      FROM editions e
+                      JOIN edition_pieces ep ON ep.edition_id = e.id
+                     WHERE e.edition_type = 'crosscut'
+                       AND ep.audio_url IS NOT NULL AND ep.audio_url != ''
+                     GROUP BY e.id
+                     ORDER BY e.edition_date DESC, e.id DESC
+                """).fetchall()
+            cc_count = 0
+            for cc_row in cc_rows:
+                try:
+                    cs = web_renderer.render_crosscut_html(
+                        config, db, int(cc_row["id"]),
+                    )
+                    cc_count += 1
+                except Exception as e:
+                    log.warning("Stage 10 web — crosscut #%d render failed: %s",
+                                int(cc_row["id"]), e)
+            if cc_count:
+                log.info("Stage 10 web — %d crosscut page(s) rendered", cc_count)
+
+            # 3. Always regenerate the unified RSS feed across all editions
             fs = rss_feed.generate_feed(config, db)
             log.info("Stage 10 RSS — %d items written to %s",
                      fs.items_written, fs.feed_path)
