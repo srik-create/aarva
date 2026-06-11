@@ -35,6 +35,7 @@ SLOT_ORDER = [
     "lens_card_behind",
     "curiosity",
     "smart_escape",
+    "delight",
 ]
 
 SLOT_DISPLAY = {
@@ -44,6 +45,7 @@ SLOT_DISPLAY = {
     "lens_card_behind": "Behind the News",
     "curiosity": "For Your Curiosity",
     "smart_escape": "A Smart Escape",
+    "delight": "A Bit of Delight",
 }
 
 
@@ -65,6 +67,7 @@ def _load_edition_for_render(db: Database, edition_id: int) -> tuple[date, list[
         edition_date = date.fromisoformat(str(row["edition_date"]))
         rows = conn.execute("""
             SELECT ep.slot, ep.position, ep.hook, ep.contextualisation,
+                   ep.show_notes,
                    ep.audio_url, ep.duration_seconds, ep.narrator_voice,
                    a.id AS article_id, a.title, a.byline, a.canonical_url,
                    p.name AS publication_name,
@@ -74,6 +77,7 @@ def _load_edition_for_render(db: Database, edition_id: int) -> tuple[date, list[
               JOIN publications p ON p.id = a.publication_id
               LEFT JOIN article_scores s ON s.article_id = a.id
              WHERE ep.edition_id = ?
+               AND ep.flagged_at IS NULL    -- Q6 post-hoc flag-and-remove
              ORDER BY ep.position
         """, (edition_id,)).fetchall()
     return edition_date, [dict(r) for r in rows]
@@ -94,12 +98,13 @@ def _e(s: Optional[str]) -> str:
 def _piece_html(piece: dict, public_url_base: str) -> str:
     audio_rel = piece.get("audio_url") or ""
     audio_url = f"{public_url_base.rstrip('/')}/{audio_rel.lstrip('/')}" if audio_rel else ""
+    audio_mime = "audio/mpeg" if audio_rel.lower().endswith(".mp3") else "audio/wav"
     duration = _format_duration(piece.get("duration_seconds"))
     narrator = piece.get("narrator_voice") or ""
 
     audio_block = f"""
         <audio controls preload="metadata" class="audio">
-          <source src="{_e(audio_url)}" type="audio/wav" />
+          <source src="{_e(audio_url)}" type="{_e(audio_mime)}" />
           Your browser doesn't support the audio element.
         </audio>
         <div class="audio-meta">
@@ -108,6 +113,10 @@ def _piece_html(piece: dict, public_url_base: str) -> str:
         </div>
     """ if audio_url else "<div class='audio-missing'>Audio not available</div>"
 
+    show_notes_block = (
+        f"<p class='show-notes'>{_e(piece.get('show_notes'))}</p>"
+        if piece.get("show_notes") else ""
+    )
     return f"""
       <article class="piece">
         <p class="hook">{_e(piece.get("hook") or "")}</p>
@@ -117,6 +126,7 @@ def _piece_html(piece: dict, public_url_base: str) -> str:
           {("<span class='sep'>·</span><span>" + _e(piece.get("byline") or "") + "</span>") if piece.get("byline") else ""}
         </p>
         <p class="contextualisation">{_e(piece.get("contextualisation") or "")}</p>
+        {show_notes_block}
         {audio_block}
         {("<p class='source'><a href='" + _e(piece.get("canonical_url") or "") + "' target='_blank' rel='noopener'>Read at source →</a></p>") if piece.get("canonical_url") else ""}
       </article>
@@ -188,6 +198,149 @@ def render_edition_html(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Crosscut renderer
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _load_crosscut_for_render(db: Database, edition_id: int) -> Optional[dict]:
+    """Pull everything needed to render one crosscut episode page —
+    edition-level (topic, intro, outro, audio) + the two pieces (title,
+    byline, publication, source url, bridge text)."""
+    from aarva.services.queries import load_crosscut_episodes
+    rows = load_crosscut_episodes(db, edition_id=edition_id)
+    return rows[0] if rows else None
+
+
+def _crosscut_body_html(cc: dict, public_url_base: str) -> str:
+    """The body section for a crosscut episode page. Linear structure
+    mirrors the audio: topic → audio → intro → bridge_a → article A
+    → bridge_between → article B → outro."""
+    audio_rel = cc.get("audio_url") or ""
+    audio_url = (
+        f"{public_url_base.rstrip('/')}/{audio_rel.lstrip('/')}"
+        if audio_rel else ""
+    )
+    audio_mime = "audio/mpeg" if audio_rel.lower().endswith(".mp3") else "audio/wav"
+    duration = _format_duration(cc.get("duration_seconds"))
+    narrator = cc.get("narrator_voice") or ""
+
+    audio_block = f"""
+      <audio controls preload="metadata" class="audio">
+        <source src="{_e(audio_url)}" type="{_e(audio_mime)}" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        {("<span>" + _e(duration) + "</span>") if duration else ""}
+        {("<span class='sep'>·</span><span>narrated by " + _e(narrator) + "</span>") if narrator else ""}
+      </div>
+    """ if audio_url else "<div class='audio-missing'>Audio not available</div>"
+
+    def _article_card(title, byline, pub, url, bridge):
+        bridge_block = (
+            f"<p class='hook'>{_e(bridge)}</p>" if bridge else ""
+        )
+        source_link = (
+            f"<p class='source'><a href='{_e(url)}' target='_blank' "
+            f"rel='noopener'>Read at source →</a></p>" if url else ""
+        )
+        byline_block = (
+            f"<span class='sep'>·</span><span>{_e(byline)}</span>"
+            if byline else ""
+        )
+        return (
+            "<article class='piece'>\n"
+            + bridge_block + "\n"
+            + f"<h2 class='title'>{_e(title or 'Untitled')}</h2>\n"
+            + f"<p class='byline'><span class='publication'>{_e(pub or '')}</span>{byline_block}</p>\n"
+            + source_link + "\n"
+            + "</article>"
+        )
+
+    intro_block = (
+        f"<p class='contextualisation'>{_e(cc.get('intro_text') or '')}</p>"
+        if cc.get("intro_text") else ""
+    )
+    bridge_between_block = (
+        f"<p class='hook'>{_e(cc.get('bridge_between') or '')}</p>"
+        if cc.get("bridge_between") else ""
+    )
+    outro_block = (
+        f"<p class='contextualisation'>{_e(cc.get('outro_text') or '')}</p>"
+        if cc.get("outro_text") else ""
+    )
+
+    return f"""
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · {_e(cc.get('topic_label') or 'untitled')}</h3>
+        {audio_block}
+        {intro_block}
+        {_article_card(cc.get('title_a'), cc.get('byline_a'),
+                       cc.get('pub_a'), cc.get('url_a'), cc.get('bridge_a'))}
+        {bridge_between_block}
+        {_article_card(cc.get('title_b'), cc.get('byline_b'),
+                       cc.get('pub_b'), cc.get('url_b'), None)}
+        {outro_block}
+      </section>
+    """
+
+
+def render_crosscut_html(
+    config: PipelineConfig,
+    db: Database,
+    edition_id: int,
+) -> WebRenderStats:
+    """Render a crosscut episode to a self-contained HTML page.
+
+    Output: `aarva/output/web/crosscut-YYYY-MM-DD.html`. Same masthead /
+    footer as the daily edition page; body is one section showing the
+    linear editorial structure: topic → audio → intro → article A →
+    bridge between → article B → outro. The audio is the single
+    stitched MP3; the page is a way for browser visitors and podcast-
+    app deep links to see the editorial context."""
+    cc = _load_crosscut_for_render(db, edition_id)
+    if not cc:
+        raise RuntimeError(
+            f"Crosscut edition {edition_id} not found "
+            f"(or not edition_type='crosscut')."
+        )
+    edition_date = date.fromisoformat(str(cc["edition_date"]))
+    stats = WebRenderStats(edition_id=edition_id, edition_date=edition_date)
+
+    public_url_base = (config.raw.get("output", {}) or {}).get(
+        "public_url_base", "file:///"
+    )
+    body = _crosscut_body_html(cc, public_url_base)
+
+    page = _PAGE_TEMPLATE.format(
+        edition_date_iso=edition_date.isoformat(),
+        edition_date_display=f"Crosscut · {edition_date.strftime('%A, %d %B %Y')}",
+        body_sections=body,
+        piece_count=2,
+    )
+
+    out_dir = config.web_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"crosscut-{edition_date.isoformat()}.html"
+    out_path.write_text(page, encoding="utf-8")
+    stats.html_path = out_path
+    stats.pieces_rendered = 2
+
+    logger.info(
+        "Stage 10 web — crosscut #%d (%s) rendered to %s",
+        edition_id, edition_date, out_path,
+    )
+    return stats
+
+
+def crosscut_html_url_for(public_url_base: str, edition_date: date) -> str:
+    """Stable URL for a given crosscut edition's HTML page. Used by
+    rss_feed.py for the per-item <link> on crosscut episodes."""
+    return (
+        f"{public_url_base.rstrip('/')}/web/"
+        f"crosscut-{edition_date.isoformat()}.html"
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # HTML template (kept inline — single file deliverable, no Jinja dependency)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -202,6 +355,7 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
     --paper:     #f5efe0;  /* warm cream — has presence without competing */
     --ink:       #0a0a0a;
     --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
     --muted:     #6b6b6b;
     --rule:      #1a1a1a;
     --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
@@ -244,6 +398,15 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
   .brand::after {{
     content: '.';
     color: var(--accent);
+  }}
+  .brand-tagline {{
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
   }}
   .edition-date {{
     font-size: 12px;
@@ -319,7 +482,19 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
     font-size: 17px;
     line-height: 1.65;
     color: var(--ink-mid);
-    margin-bottom: 28px;
+    margin-bottom: 16px;
+  }}
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {{
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
   }}
 
   .audio {{
@@ -388,6 +563,7 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
   <div class="container">
     <header class="masthead">
       <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
       <div class="edition-date">{edition_date_iso}</div>
       <div class="edition-meta">{piece_count} pieces · {edition_date_display}</div>
     </header>
@@ -395,7 +571,7 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
     {body_sections}
 
     <footer>
-      <span class="tagline">Aarva — the world as your classroom.</span>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
       <span>v0.1</span>
     </footer>
   </div>
