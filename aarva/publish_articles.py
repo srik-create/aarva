@@ -87,9 +87,17 @@ def _create_bonus_edition_with_piece(
 
 def _validate_pick(article: Optional[dict], force: bool) -> tuple[bool, str]:
     """Decide whether to proceed with publishing this article.
-    Returns (ok, reason). Refuses by default if the article is missing,
-    has no full text, or has been in a past edition (idempotency).
-    --force overrides the in-edition check.
+
+    Refuses ONLY for technical impossibility (article missing, no
+    full_text to narrate, extraction failed upstream). Editorial-bar
+    rejections (verdict=FAIL, already in another edition) are NOT
+    enforced here — once the user explicitly picks an article, their
+    choice is paramount. Any editorial filtering should happen
+    upstream (search results, longlist composition), so that what's
+    shown to the user is already publishable.
+
+    --force is retained for symmetry but is now a no-op in practice;
+    we keep it so existing callers that pass it don't break.
     """
     if not article:
         return False, "article not found"
@@ -97,16 +105,6 @@ def _validate_pick(article: Optional[dict], force: bool) -> tuple[bool, str]:
         return False, "no full_text — can't narrate"
     if article.get("status") == "extraction_failed":
         return False, "extraction failed — no narratable content"
-    if article.get("status") == "in_edition" and not force:
-        return False, (
-            "already published in a past edition. Use --force to "
-            "re-publish (will overwrite the existing audio file)."
-        )
-    if article.get("verdict") == "FAIL":
-        return False, (
-            "scored as FAIL (below rigour/posture floor). "
-            "Editorial bar protection. Use --force to override."
-        )
     return True, "ok"
 
 
