@@ -317,6 +317,34 @@ def _is_429_or_quota(exc: Exception) -> bool:
     return "429" in s or "RESOURCE_EXHAUSTED" in s or "exceeded your current quota" in s
 
 
+def _is_permanent_client_error(exc: Exception) -> bool:
+    """Errors that won't recover by retrying inside this run.
+
+    Today we catch:
+      - 404 NOT_FOUND — bad model name (burned 6 retries on every call
+        when pipeline.yaml pointed at `gemini-3-flash` before we
+        discovered the preview SKU is `gemini-3-flash-preview`).
+      - 429 RESOURCE_EXHAUSTED with "monthly spending cap" / "billing
+        account" in the body — this is the paid-tier monthly spend
+        cutoff, not a per-minute rate limit. It won't recover until
+        the cap is raised at https://ai.studio/billing or the billing
+        cycle resets, so retrying with a 30s sleep is pure waste
+        (6 × 30s = 3 min burned per call).
+      - 400 INVALID_ARGUMENT could be added here if it shows up.
+
+    Note: regular 429 rate-limit responses (with a retryDelay field)
+    are NOT permanent and continue to flow through the 429 sleep
+    branch below.
+    """
+    s = str(exc)
+    if "404" in s or "NOT_FOUND" in s:
+        return True
+    # Spending-cap exhaustion: account-level, not per-minute.
+    if "spending cap" in s.lower() or "billing account" in s.lower():
+        return True
+    return False
+
+
 class GeminiAPIClient(LLMClient):
     """Google AI Studio Gemini API.
 
@@ -455,6 +483,13 @@ class GeminiAPIClient(LLMClient):
 
             except Exception as e:
                 last_error = e
+                # Permanent errors (bad model name, malformed request)
+                # won't recover by retrying — bail immediately so the
+                # operator sees the actionable error without burning the
+                # retry budget.
+                if _is_permanent_client_error(e):
+                    logger.error("Gemini permanent error — not retrying: %s", e)
+                    raise
                 # Decide how long to wait based on error type.
                 if _is_429_or_quota(e):
                     delay = _parse_gemini_retry_delay(e) or 30.0
