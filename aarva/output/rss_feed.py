@@ -41,23 +41,23 @@ class FeedStats:
 def _load_all_published_pieces(db: Database) -> list[dict]:
     """Daily + bonus pieces with audio. Crosscut episodes are loaded
     separately by _load_published_crosscuts so they emit ONE RSS item
-    per edition (two crosscut pieces share one audio file)."""
+    per edition (two crosscut pieces share one audio file).
+
+    The public feed.xml shows everything — global daily editions
+    plus all bonus episodes regardless of who published them. Per-
+    user filtering happens in the future per-user RSS endpoint
+    (`/feed/{user_token}.xml`), not here.
+    """
     from aarva.services.queries import (
         load_daily_pieces_with_audio,
         load_bonus_pieces_with_audio,
     )
-    # Daily globals + ALL users' bonus episodes (each user sees only
-    # their own bonus in the personalised feed; the unified RSS file
-    # is a debugging / public-feed view).
     daily = load_daily_pieces_with_audio(db)
-    # Loop bonus per user — small number of users today; can switch to
-    # a UNION query if this gets hot.
-    bonus: list[dict] = []
-    with db.connect() as conn:
-        user_ids = [int(r["id"]) for r in conn.execute(
-            "SELECT id FROM users").fetchall()]
-    for uid in user_ids:
-        bonus.extend(load_bonus_pieces_with_audio(db, user_id=uid))
+    # user_id=None → all bonus episodes regardless of attribution.
+    # Includes CLI-published bonuses (user_id IS NULL) and any
+    # future web-published bonuses (user_id set). For the public
+    # RSS feed we surface them all.
+    bonus = load_bonus_pieces_with_audio(db)
     return daily + bonus
 
 

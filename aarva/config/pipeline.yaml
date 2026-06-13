@@ -209,6 +209,14 @@ scoring:
   self_implication_weight: 0.10
   # Prompt version pin (matches a key in prompts.yaml).
   prompt_version: v1
+  # Stage 4+5+6 parallelism (ThreadPoolExecutor workers). Lowered from
+  # the historical default of 8 to 4 on 2026-06-12 to stay under the
+  # Gemini 3 Flash free-tier RPM ceiling of 10 — 8 workers bursting
+  # together triggered 429 backoffs that slowed the run more than the
+  # parallelism saved. 4 workers × ~3s/call ≈ 80 RPM peak, well inside
+  # the per-minute window once the sliding-window limiter spreads them.
+  # Bump back to 8 once billing is enabled (paid tier RPM is ~1000).
+  concurrent_workers: 4
 
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────
@@ -234,14 +242,27 @@ llm:
   #   anthropic_api — debug/fallback only. Direct Anthropic API,
   #                   pay-per-token. Requires ANTHROPIC_API_KEY env var.
   provider: gemini_api
-  # Model. Switched from gemini-3.1-flash-lite → gemini-2.5-flash on
-  # 2026-05-26 after moving to a new API key with paid-tier quota. The
-  # 2.5-flash tier gives noticeably better quality on the Stage 4 rigour /
-  # posture judgements (less round-number bias, more nuanced rationales).
-  # Free-tier 2.5-flash is ~20 RPD which is too low for Aarva's volume,
-  # so this only works with billing enabled (Tier 1+). If you switch back
-  # to the free tier, flip this to gemini-3.1-flash-lite (500 RPD free).
-  model: gemini-2.5-flash
+  # Model. Switched 2026-06-12 from gemini-2.5-flash → gemini-3-flash
+  # because the 2.5-flash free-tier quota was exhausted and billing is
+  # not enabled. Gemini 3 Flash free tier (June 2026) is 10 RPM / 250k
+  # TPM / 1500 RPD — comfortable headroom for Aarva's ~270 calls/day
+  # across all stages combined. Quality is at-parity or better than
+  # 2.5-flash for our Stage 4 rigour/posture judgements.
+  #
+  # If 3-flash ever becomes unavailable or you want to split work
+  # across model buckets, the model key can be overridden per-stage by
+  # passing an `llm=` client into the stage entry-points (each stage's
+  # signature already accepts it); the orchestrator would build N
+  # clients up front.
+  #
+  # Historical: gemini-3.1-flash-lite (500 RPD free) was the free-tier
+  # fallback before 3-flash launched.
+  #
+  # Model name carries the `-preview` suffix while Gemini 3 Flash is
+  # in preview. When it goes GA, drop the suffix. (Discovered via
+  # ModelService.ListModels — only `models/gemini-3-flash-preview`
+  # is exposed, not the bare `models/gemini-3-flash`.)
+  model: gemini-3-flash-preview
   #
   # Retries on transient errors. For Gemini, we observed:
   #   - 503 UNAVAILABLE: server overload, often in streaks. Needs >=3 retries.
@@ -252,15 +273,14 @@ llm:
   # Default is 5 for gemini_api, 1 for the Anthropic backends.
   # retries: 5
   #
-  # Requests-per-minute cap (gemini_api only). On paid Tier 1, the RPM
-  # for gemini-2.5-flash is ~1000. We default conservatively to 30 —
-  # plenty fast for Aarva's volume (~150-200 calls per day at 30 RPM =
-  # ~5-7 min of pure throughput) and well under the ceiling. Bump higher
-  # if you want speed; lower if you want to leave headroom for other
-  # tools sharing the same key. Check your personalised limit at
-  # https://aistudio.google.com/rate-limit. The cap is enforced via a
-  # sliding-window token bucket.
-  rpm: 30
+  # Requests-per-minute cap (gemini_api only). Set to 8 on 2026-06-12 to
+  # stay one below the Gemini 3 Flash free-tier ceiling of 10 RPM, so
+  # the client-side sliding-window limiter throttles us before Google's
+  # server does (avoiding 429s entirely on the happy path). On paid
+  # Tier 1, the RPM for gemini-3-flash is much higher (~1000); bump
+  # this to 60-120 once billing is enabled. Check your personalised
+  # limit at https://aistudio.google.com/rate-limit.
+  rpm: 8
   #
   # Timeout for a single LLM call.
   timeout_seconds: 120

@@ -86,18 +86,37 @@ def load_daily_pieces_with_audio(
 def load_bonus_pieces_with_audio(
     db: Database,
     *,
-    user_id: int,
+    user_id: Optional[int] = None,
+    include_global: bool = True,
     since_date: Optional[date] = None,
     include_flagged: bool = False,
 ) -> list[dict[str, Any]]:
-    """Bonus episodes (edition_type='bonus') belonging to a specific
-    user. Used by the personalised feed service."""
+    """Bonus episodes (edition_type='bonus') with audio attached.
+
+    user_id semantics:
+      - None (default): return ALL bonus episodes regardless of
+        user_id. Used by the public RSS feed (one feed.xml for
+        everyone) and by admin views.
+      - int: return that user's own bonus episodes. If
+        include_global=True (default), also include bonus episodes
+        with user_id IS NULL — the "shared" pool produced by the
+        CLI publish_articles flow before per-user attribution
+        existed, OR by an admin acting outside any user account.
+    """
     where: list[str] = [
         "e.edition_type = 'bonus'",
-        "e.user_id = ?",
         "ep.audio_url IS NOT NULL AND ep.audio_url != ''",
     ]
-    params: list[Any] = [user_id]
+    params: list[Any] = []
+    if user_id is not None:
+        if include_global:
+            where.append("(e.user_id = ? OR e.user_id IS NULL)")
+            params.append(user_id)
+        else:
+            where.append("e.user_id = ?")
+            params.append(user_id)
+    # When user_id is None, no user filter — return everything.
+
     if since_date is not None:
         where.append("e.edition_date >= ?")
         params.append(since_date.isoformat())

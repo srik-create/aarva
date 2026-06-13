@@ -186,13 +186,144 @@ def render_edition_html(
     stats.html_path = out_path
     stats.pieces_rendered = sum(len(ps) for ps in by_slot.values())
 
-    # Also write a stable "latest.html" pointing at the most recent edition.
-    latest = out_dir / "latest.html"
-    latest.write_text(page, encoding="utf-8")
+    # latest.html used to be a literal copy of this page. It's now
+    # produced by render_latest_html() which composes the daily
+    # alongside today's crosscut + bonus episodes, so the "today"
+    # landing surface stays in sync with the RSS feed.
 
     logger.info(
         "Stage 10 web — edition #%d (%s): %d pieces rendered to %s",
         edition_id, edition_date, stats.pieces_rendered, out_path,
+    )
+    return stats
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Latest-page renderer — "today" view combining daily + crosscut + bonus
+# ─────────────────────────────────────────────────────────────────────────────
+
+def render_latest_html(
+    config: PipelineConfig,
+    db: Database,
+) -> WebRenderStats:
+    """Produce latest.html as a unified 'today' page: the most recent
+    daily edition + today's crosscut episode (if any) + today's bonus
+    episodes (if any).
+
+    Each section reuses the same _piece_html / _crosscut_body_html
+    renderers as the dedicated dated pages, so the look stays
+    consistent. The dated archive pages (edition-YYYY-MM-DD.html and
+    crosscut-YYYY-MM-DD.html) remain pure single-edition views.
+    """
+    stats = WebRenderStats()
+    public_url_base = (config.raw.get("output", {}) or {}).get(
+        "public_url_base", "file:///"
+    )
+
+    # Find the latest daily edition.
+    with db.connect() as conn:
+        daily_row = conn.execute(
+            "SELECT id FROM editions WHERE edition_type = 'daily' "
+            "ORDER BY edition_date DESC, id DESC LIMIT 1"
+        ).fetchone()
+        if not daily_row:
+            logger.warning("Stage 10 web — no daily editions; "
+                           "latest.html not written")
+            return stats
+        daily_id = int(daily_row["id"])
+
+    edition_date, pieces = _load_edition_for_render(db, daily_id)
+    stats.edition_id = daily_id
+    stats.edition_date = edition_date
+
+    # ── Daily section ────────────────────────────────────────────────
+    by_slot: dict[str, list[dict]] = {slot: [] for slot in SLOT_ORDER}
+    for p in pieces:
+        slot = p.get("slot") or ""
+        if slot in by_slot:
+            by_slot[slot].append(p)
+        else:
+            by_slot.setdefault(slot, []).append(p)
+    daily_body = "\n".join(
+        _slot_section_html(slot, by_slot.get(slot, []), public_url_base)
+        for slot in SLOT_ORDER
+    )
+    daily_piece_count = sum(len(ps) for ps in by_slot.values())
+
+    # ── Crosscut section (today's, if any) ───────────────────────────
+    with db.connect() as conn:
+        cc_row = conn.execute(
+            "SELECT id FROM editions "
+            " WHERE edition_type = 'crosscut' "
+            "   AND edition_date = ? "
+            " ORDER BY id DESC LIMIT 1",
+            (edition_date.isoformat(),),
+        ).fetchone()
+    crosscut_body = ""
+    if cc_row:
+        cc = _load_crosscut_for_render(db, int(cc_row["id"]))
+        if cc:
+            crosscut_body = _crosscut_body_html(cc, public_url_base)
+
+    # ── Bonus section (today's, if any) ──────────────────────────────
+    with db.connect() as conn:
+        bonus_rows = conn.execute("""
+            SELECT ep.slot, ep.position, ep.hook, ep.contextualisation,
+                   ep.show_notes,
+                   ep.audio_url, ep.duration_seconds, ep.narrator_voice,
+                   a.id AS article_id, a.title, a.byline, a.canonical_url,
+                   p.name AS publication_name,
+                   s.lens, s.pillar, s.jtbd_primary
+              FROM edition_pieces ep
+              JOIN editions e ON e.id = ep.edition_id
+              JOIN articles a ON a.id = ep.article_id
+              JOIN publications p ON p.id = a.publication_id
+              LEFT JOIN article_scores s ON s.article_id = a.id
+             WHERE e.edition_type = 'bonus'
+               AND e.edition_date = ?
+               AND ep.flagged_at IS NULL
+               AND ep.audio_url IS NOT NULL AND ep.audio_url != ''
+             ORDER BY e.id ASC, ep.position
+        """, (edition_date.isoformat(),)).fetchall()
+    bonus_pieces = [dict(r) for r in bonus_rows]
+    bonus_body = ""
+    if bonus_pieces:
+        bonus_pieces_html = "\n".join(
+            _piece_html(p, public_url_base) for p in bonus_pieces
+        )
+        bonus_body = f"""
+          <section class="slot slot-bonus">
+            <h3 class="slot-title">Bonus Picks Today</h3>
+            {bonus_pieces_html}
+          </section>
+        """
+
+    # Compose the page. Order: daily → bonus → crosscut.
+    # (Bonus surfaces above crosscut because it's the most
+    # personally-curated layer today; crosscut is the editorial
+    # paired-listening capstone.)
+    body_sections = daily_body + bonus_body + crosscut_body
+    total_pieces = daily_piece_count + len(bonus_pieces) + (1 if crosscut_body else 0)
+
+    page = _PAGE_TEMPLATE.format(
+        edition_date_iso=edition_date.isoformat(),
+        edition_date_display=edition_date.strftime("%A, %d %B %Y"),
+        body_sections=body_sections,
+        piece_count=total_pieces,
+    )
+
+    out_dir = config.web_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+    latest_path = out_dir / "latest.html"
+    latest_path.write_text(page, encoding="utf-8")
+    stats.html_path = latest_path
+    stats.pieces_rendered = total_pieces
+
+    logger.info(
+        "Stage 10 web — latest.html composed: %d daily piece(s)%s%s",
+        daily_piece_count,
+        f", {len(bonus_pieces)} bonus" if bonus_pieces else "",
+        ", + crosscut" if crosscut_body else "",
     )
     return stats
 
