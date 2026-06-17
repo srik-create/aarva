@@ -209,13 +209,17 @@ scoring:
   self_implication_weight: 0.10
   # Prompt version pin (matches a key in prompts.yaml).
   prompt_version: v1
-  # Stage 4+5+6 parallelism (ThreadPoolExecutor workers). Lowered from
-  # the historical default of 8 to 4 on 2026-06-12 to stay under the
-  # Gemini 3 Flash free-tier RPM ceiling of 10 — 8 workers bursting
-  # together triggered 429 backoffs that slowed the run more than the
-  # parallelism saved. 4 workers × ~3s/call ≈ 80 RPM peak, well inside
-  # the per-minute window once the sliding-window limiter spreads them.
-  # Bump back to 8 once billing is enabled (paid tier RPM is ~1000).
+  # Stage 4+5+6 parallelism (ThreadPoolExecutor workers). Bumped back
+  # to 4 on 2026-06-13 alongside the move to Vertex AI / ADC auth.
+  # Vertex's per-project RPM ceiling is much higher than the weekend
+  # key's, so we no longer need to force strictly-serial scoring.
+  # With workers=4 and llm.rpm=30, the sliding-window limiter paces
+  # bursts within Vertex's quota without 429 round-trips.
+  #
+  # Historical: 1 (2026-06-13 weekend-key safety) → 4 (2026-06-12) →
+  # 8 (long-standing default). Don't push past 8 without checking
+  # whether the Stage 4-5-6 prompt's token count keeps us under the
+  # TPM ceiling.
   concurrent_workers: 4
 
 llm:
@@ -273,14 +277,35 @@ llm:
   # Default is 5 for gemini_api, 1 for the Anthropic backends.
   # retries: 5
   #
-  # Requests-per-minute cap (gemini_api only). Set to 8 on 2026-06-12 to
-  # stay one below the Gemini 3 Flash free-tier ceiling of 10 RPM, so
-  # the client-side sliding-window limiter throttles us before Google's
-  # server does (avoiding 429s entirely on the happy path). On paid
-  # Tier 1, the RPM for gemini-3-flash is much higher (~1000); bump
-  # this to 60-120 once billing is enabled. Check your personalised
-  # limit at https://aistudio.google.com/rate-limit.
-  rpm: 8
+  # Requests-per-minute cap (gemini_api only). Bumped 2026-06-13 to 30
+  # alongside the move to Vertex AI / ADC auth (project
+  # gen-lang-client-0889802137, location 'global'). The Vertex
+  # gen-lang-client paid-tier RPM ceiling is much higher than the
+  # weekend-key 'standard' tier we were on (which forced rpm: 4 with
+  # workers: 1). 30 RPM is conservative against Vertex's actual
+  # ceiling but plenty fast for Aarva's volume. Check the personalised
+  # limit at https://aistudio.google.com/rate-limit when needed.
+  rpm: 30
+  #
+  # ─── Vertex AI / ADC auth (new path) ──────────────────────────────────
+  # When auth_mode: adc, the client uses Application Default Credentials
+  # from ~/.config/gcloud/application_default_credentials.json (set up
+  # via the admin's setup_adc.sh bootstrap) and hits the Vertex AI
+  # endpoint (aiplatform.googleapis.com) under the named project. Billing
+  # and quotas are tracked at the project level, not per-key. Required
+  # by gibran.ai's data-governance policy as of 2026-06-13.
+  #
+  # When auth_mode: api_key, the client falls back to the older AI
+  # Studio Gemini API endpoint and reads an API key from
+  # AARVA_GEMINI_API_KEY / GEMINI_API_KEY / GOOGLE_API_KEY. Kept as a
+  # one-line fallback during the migration.
+  auth_mode: adc
+  gcp_project: gen-lang-client-0889802137
+  # 'global' is the multi-region Vertex endpoint. Empirically the only
+  # location for this project that serves Gemini 3 Flash Preview
+  # (europe-west2 + us-central1 only serve 2.5 Flash; 'eu' multi-region
+  # only serves 3.5 Flash). Verified via probe_vertex_regions.py.
+  gcp_location: global
   #
   # Timeout for a single LLM call.
   timeout_seconds: 120
@@ -354,11 +379,29 @@ tts:
   #   single: always the first voice in the female pool.
   voice_selection_rule: rotate_with_gender_match
 
-  # Gemini TTS model. Available options as of May 2026:
-  #   gemini-3.1-flash-tts-preview     (newest)
-  #   gemini-2.5-flash-preview-tts     (stable; our default)
-  #   gemini-2.5-pro-preview-tts       (highest quality, ~2x cost)
-  model: gemini-2.5-flash-preview-tts
+  # Gemini TTS model. Switched 2026-06-13 from
+  # gemini-2.5-flash-preview-tts → gemini-3.1-flash-tts-preview as part
+  # of the Vertex AI / ADC migration: the 2.5 TTS models persistently
+  # return 500 INTERNAL on the Vertex 'global' endpoint we use, while
+  # 3.1 TTS works cleanly and supports all six Aarva voices (Sulafat,
+  # Gacrux, Vindemiatrix, Charon, Algieba, Rasalgethi — verified
+  # empirically). 3.1 TTS is also newer (April 2026) and offers
+  # finer-grained expressive control via 200+ audio tags.
+  #
+  # Available options on Vertex 'global' for this project:
+  #   gemini-3.1-flash-tts-preview     (current default, works)
+  #   gemini-2.5-flash-preview-tts     (broken — 500 INTERNAL)
+  #   gemini-2.5-pro-preview-tts       (broken — 500 INTERNAL)
+  model: gemini-3.1-flash-tts-preview
+
+  # ─── Vertex AI / ADC auth (mirrors llm.auth_mode) ─────────────────────
+  # When auth_mode: adc, GeminiTTSClient uses Application Default
+  # Credentials and hits aiplatform.googleapis.com under the named
+  # project. Required by gibran.ai's data-governance policy as of
+  # 2026-06-13. Falls back to API-key path when auth_mode: api_key.
+  auth_mode: adc
+  gcp_project: gen-lang-client-0889802137
+  gcp_location: global
 
   # Optional natural-language style direction prepended to every chunk.
   # Lets us steer Gemini's voice toward Aarva's editorial register
