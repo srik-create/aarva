@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 17 June 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-06-17</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 17 June 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · football and national identity</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-06-17/crosscut_0026.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>19 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>It’s worth pausing on how a football jersey is rarely just polyester and ink; it’s a claim to history. Writing this week, Julia Gaffield looks at why FIFA blocked Haiti from wearing a kit featuring symbols of its 1804 revolution. It feels like a modern echo of a long-standing effort to quiet Haiti’s past. Also writing this week, Alasdair Howorth examines a different kind of national expression through Cabo Verde’s philosophy of morabeza. While one nation faces institutional silence, the other uses the pitch to gather a diaspora under a specific cultural code. There’s a tension here between what global governors allow a team to say and how a small island nation chooses to define itself.</p>
+        <article class='piece'>
+<p class='hook'>FIFA’s recent ban on a Haitian soccer jersey featuring the Battle of Vertières might look like a simple rules violation. But writing two days ago, Julia Gaffield, Professor of History, William &amp; Mary, suggests the move fits a much older pattern of global censorship. Notice how she links this modern bureaucratic veto to the historical smear campaigns against Jean-Jacques Dessalines, the leader who dared to declare Haiti’s independence.</p>
+<h2 class='title'>FIFA’s Haiti jersey ban echoes the long campaign to discredit and downplay the Haitian Revolution</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>Julia Gaffield, Professor of History, William &amp; Mary</span></p>
+<p class='source'><a href='https://theconversation.com/fifas-haiti-jersey-ban-echoes-the-long-campaign-to-discredit-and-downplay-the-haitian-revolution-285218' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Julia Gaffield illustrates how a global bureaucracy like FIFA can effectively erase a nation’s foundational memory by labeling its origin story &quot;political.&quot; The image of Jean-Jacques Dessalines and the Battle of Vertières is treated as a violation rather than a birth certificate, suggesting that for some, the price of entering the global arena is a mandatory historical amnesia. Turning to Alasdair Howorth’s account of Cabo Verde, the dynamic shifts from external policing to internal willpower. While Haiti is forced to scrub its symbols, Cabo Verde leans into its own cultural philosophy of morabeza. The interesting thing is that both pieces treat the football pitch as a site for processing the scars of slavery and colonial neglect. Read alongside Gaffield, the &quot;No Stress&quot; motto Howorth describes starts to look like more than a team-building exercise. It appears as a successful attempt to package a history of hardship—specifically the survival of Portuguese abandonment—into a performance of identity that the world actually accepts. Where Haiti’s revolutionary symbols are seen as a threat to the game’s neutrality, Cabo Verde’s philosophy is embraced as the secret to its success, revealing a lopsided boundary for which national stories are allowed to be told out loud.</p>
+        <article class='piece'>
+
+<h2 class='title'>No stress</h2>
+<p class='byline'><span class='publication'>Africa Is a Country</span><span class='sep'>·</span><span>Alasdair Howorth</span></p>
+<p class='source'><a href='https://africasacountry.com/2026/06/no-stress' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the friction between a nation’s private memory and its public uniform. While Haiti’s revolutionary symbols were scrubbed from the fabric by distant officials, Cabo Verde’s morabeza was carried in the players&#x27; quiet hospitality. One story was silenced by a rulebook; the other was sustained by a shared spirit. These moments suggest a match is rarely just about the score, but about the right to exist out loud. When a global stage demands a sanitized version of history, what parts of a people’s soul are left behind in the locker room?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
