@@ -153,7 +153,15 @@ class GeminiTTSClient(TTSClient):
     GEMINI_SAMPLE_WIDTH = 2           # 16-bit
     GEMINI_CHANNELS = 1               # mono
 
-    DEFAULT_MODEL = "gemini-2.5-flash-preview-tts"
+    # Switched 2026-06-13 from gemini-2.5-flash-preview-tts →
+    # gemini-3.1-flash-tts-preview as part of the Vertex AI / ADC
+    # migration: the 2.5 TTS models persistently return 500 INTERNAL on
+    # the Vertex 'global' endpoint, while 3.1 TTS works cleanly and
+    # supports all six voices in Aarva's voice_map (Sulafat, Gacrux,
+    # Vindemiatrix, Charon, Algieba, Rasalgethi — verified empirically
+    # via probe_vertex_tts_voices.py).
+    DEFAULT_MODEL = "gemini-3.1-flash-tts-preview"
+    DEFAULT_AUTH_MODE = "api_key"
     # Bumped from 1500 → 2500 (~1.5 min audio per chunk) after observing
     # noticeable voice variation between chunks. Fewer chunks → fewer
     # transitions where the listener notices Gemini's per-request tone
@@ -206,6 +214,10 @@ class GeminiTTSClient(TTSClient):
         max_chunk_chars: int = DEFAULT_MAX_CHUNK_CHARS,
         retries: int = DEFAULT_RETRIES,
         style_prompt: str | None = None,
+        *,
+        auth_mode: str | None = None,
+        gcp_project: str | None = None,
+        gcp_location: str | None = None,
     ):
         self.voice_map = dict(voice_map)
         self._default = default_voice
@@ -217,6 +229,25 @@ class GeminiTTSClient(TTSClient):
         # register, like a thoughtful longform podcast host."
         self.style_prompt = style_prompt
         self._client = None
+
+        # Auth: api_key (legacy) or adc (Vertex AI). Both supported via
+        # the same google-genai SDK; only the client constructor differs.
+        # Mirrors the dual-mode pattern in GeminiAPIClient.
+        self._auth_mode = (auth_mode or self.DEFAULT_AUTH_MODE).lower()
+        self._gcp_project = gcp_project
+        self._gcp_location = gcp_location
+
+        if self._auth_mode not in ("api_key", "adc"):
+            raise RuntimeError(
+                f"Unknown tts.auth_mode '{self._auth_mode}'. "
+                f"Expected 'api_key' or 'adc'."
+            )
+        if self._auth_mode == "adc":
+            if not self._gcp_project or not self._gcp_location:
+                raise RuntimeError(
+                    "tts.auth_mode='adc' requires both tts.gcp_project "
+                    "and tts.gcp_location in pipeline.yaml."
+                )
 
         if not self.voice_map:
             raise RuntimeError("GeminiTTSClient requires at least one voice mapping.")
@@ -249,12 +280,35 @@ class GeminiTTSClient(TTSClient):
                 "GeminiTTSClient requires google-genai. "
                 "Install with: pip install google-genai"
             ) from e
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+
+        if self._auth_mode == "adc":
+            # Vertex AI path — credentials picked up from
+            # ~/.config/gcloud/application_default_credentials.json.
+            self._client = genai.Client(
+                vertexai=True,
+                project=self._gcp_project,
+                location=self._gcp_location,
+            )
+            logger.info(
+                "GeminiTTS client ready (ADC/Vertex) — model=%s, "
+                "project=%s, location=%s, voices=%s",
+                self.model, self._gcp_project, self._gcp_location,
+                list(self.voice_map.items()),
+            )
+            return
+
+        # api_key path. Aarva-namespaced env var takes precedence.
+        api_key = (
+            os.environ.get("AARVA_GEMINI_API_KEY")
+            or os.environ.get("GEMINI_API_KEY")
+            or os.environ.get("GOOGLE_API_KEY")
+        )
         if not api_key:
             raise RuntimeError(
-                "Neither GEMINI_API_KEY nor GOOGLE_API_KEY is set. "
-                "Get an API key from https://aistudio.google.com/apikey "
-                "and export it: export GEMINI_API_KEY=..."
+                "No Gemini API key found. Set AARVA_GEMINI_API_KEY "
+                "(or GEMINI_API_KEY / GOOGLE_API_KEY) — or switch to "
+                "tts.auth_mode='adc' in pipeline.yaml to use Vertex AI "
+                "credentials."
             )
         self._client = genai.Client(api_key=api_key)
         logger.info("GeminiTTS client ready — model=%s, voices=%s",
@@ -933,6 +987,10 @@ def build_tts_client(config: dict) -> TTSClient:
             "retries", GeminiTTSClient.DEFAULT_RETRIES,
         ))
         style_prompt = (config or {}).get("style_prompt")
+        # ADC / Vertex AI fields (optional — default is api_key mode).
+        auth_mode = (config or {}).get("auth_mode")
+        gcp_project = (config or {}).get("gcp_project")
+        gcp_location = (config or {}).get("gcp_location")
         return GeminiTTSClient(
             voice_map=voice_map,
             default_voice=default,
@@ -940,6 +998,9 @@ def build_tts_client(config: dict) -> TTSClient:
             max_chunk_chars=max_chunk,
             retries=retries,
             style_prompt=style_prompt,
+            auth_mode=auth_mode,
+            gcp_project=gcp_project,
+            gcp_location=gcp_location,
         )
 
     if provider == "kokoro":

@@ -346,16 +346,28 @@ def _is_permanent_client_error(exc: Exception) -> bool:
 
 
 class GeminiAPIClient(LLMClient):
-    """Google AI Studio Gemini API.
+    """Google Gemini via google-genai SDK.
 
-    Free tier covers Aarva's volume (Gemini 2.5 Flash: 500 RPD, 5 RPM as of
-    May 2026 — observed at runtime from Google's own error response).
-    Requires GEMINI_API_KEY or GOOGLE_API_KEY env var. Get a key from
-    https://aistudio.google.com/apikey.
+    Supports two authentication modes:
+
+      auth_mode='api_key' (legacy / default):
+        Uses the AI Studio Gemini API endpoint
+        (generativelanguage.googleapis.com). Requires GEMINI_API_KEY or
+        GOOGLE_API_KEY (or AARVA_GEMINI_API_KEY) env var. Keys are issued
+        from https://aistudio.google.com/apikey.
+
+      auth_mode='adc' (Vertex AI):
+        Uses Vertex AI endpoint (aiplatform.googleapis.com) with
+        Application Default Credentials picked up from the gcloud setup at
+        ~/.config/gcloud/application_default_credentials.json. Requires
+        gcp_project (e.g., gen-lang-client-XXXXXXXXX) and gcp_location
+        (e.g., 'global', 'us-central1', 'europe-west2'). Model
+        availability varies by region — see Vertex AI docs.
 
     NOTE on subscriptions: a Gemini Advanced consumer subscription ($20/mo)
-    does NOT include API access. You need a separate AI Studio API key
-    (free tier or paid). They are independent products.
+    does NOT include API access. The API-key path needs a separate AI
+    Studio key; the ADC path needs a Google Cloud project with billing
+    and the Vertex AI API enabled.
 
     Throttling: we cap at `rpm` requests per 60 seconds (default 4, one
     below the free tier's 5 RPM ceiling for safety). For paid tier with a
@@ -370,15 +382,41 @@ class GeminiAPIClient(LLMClient):
     DEFAULT_MAX_TOKENS = 16384
     DEFAULT_RPM = 4              # Free-tier safe default. Bump for paid tier.
     DEFAULT_RETRIES = 5          # 503s come in streaks; 1 retry isn't enough.
+    DEFAULT_AUTH_MODE = "api_key"
 
-    def __init__(self, model: str | None = None, retries: int | None = None,
-                 rpm: int | None = None):
+    def __init__(
+        self,
+        model: str | None = None,
+        retries: int | None = None,
+        rpm: int | None = None,
+        *,
+        auth_mode: str | None = None,
+        gcp_project: str | None = None,
+        gcp_location: str | None = None,
+    ):
         self._model = model or self.DEFAULT_MODEL
         self._retries = retries if retries is not None else self.DEFAULT_RETRIES
         self._client = None
         rpm_effective = rpm or self.DEFAULT_RPM
         self._limiter = _RateLimiter(max_calls=rpm_effective, window_seconds=60.0)
         self._rpm = rpm_effective
+        self._auth_mode = (auth_mode or self.DEFAULT_AUTH_MODE).lower()
+        self._gcp_project = gcp_project
+        self._gcp_location = gcp_location
+
+        if self._auth_mode not in ("api_key", "adc"):
+            raise ConfigError(
+                f"Unknown llm.auth_mode '{self._auth_mode}'. "
+                f"Expected 'api_key' or 'adc'."
+            )
+        if self._auth_mode == "adc":
+            if not self._gcp_project or not self._gcp_location:
+                raise ConfigError(
+                    "auth_mode='adc' requires both gcp_project and "
+                    "gcp_location. Set llm.gcp_project (e.g. "
+                    "'gen-lang-client-0889802137') and llm.gcp_location "
+                    "(e.g. 'global') in pipeline.yaml."
+                )
 
     def _load(self) -> None:
         if self._client is not None:
@@ -391,9 +429,28 @@ class GeminiAPIClient(LLMClient):
                 "Install with: pip install google-genai"
             ) from e
 
-        # Check the Aarva-namespaced env var first, then fall back to
-        # the Google-standard names. Cloud deployments typically set
-        # AARVA_GEMINI_API_KEY through their secret manager.
+        if self._auth_mode == "adc":
+            # ADC path — credentials picked up from
+            # ~/.config/gcloud/application_default_credentials.json (set up
+            # via `gcloud auth application-default login` or the
+            # setup_adc.sh bootstrap script). Quotas and billing are at the
+            # Google Cloud project level, not per-key.
+            self._client = genai.Client(
+                vertexai=True,
+                project=self._gcp_project,
+                location=self._gcp_location,
+            )
+            logger.info(
+                "Gemini client ready (ADC/Vertex) — model=%s, project=%s, "
+                "location=%s, rpm=%d, retries=%d",
+                self._model, self._gcp_project, self._gcp_location,
+                self._rpm, self._retries,
+            )
+            return
+
+        # api_key path. Check the Aarva-namespaced env var first, then
+        # fall back to the Google-standard names. Cloud deployments
+        # typically set AARVA_GEMINI_API_KEY through their secret manager.
         api_key = (
             os.environ.get("AARVA_GEMINI_API_KEY")
             or os.environ.get("GEMINI_API_KEY")
@@ -403,7 +460,9 @@ class GeminiAPIClient(LLMClient):
             raise ConfigError(
                 "No Gemini API key found. Set AARVA_GEMINI_API_KEY "
                 "(or GEMINI_API_KEY / GOOGLE_API_KEY) in the environment. "
-                "Get a key from https://aistudio.google.com/apikey"
+                "Get a key from https://aistudio.google.com/apikey, OR "
+                "switch to auth_mode='adc' in pipeline.yaml to use "
+                "Application Default Credentials."
             )
         self._client = genai.Client(api_key=api_key)
         logger.info("Gemini client ready — model=%s, rpm=%d, retries=%d",
@@ -523,6 +582,8 @@ class GeminiAPIClient(LLMClient):
 
     @property
     def name(self) -> str:
+        if self._auth_mode == "adc":
+            return f"gemini_api:{self._model}@vertex:{self._gcp_location}"
         return f"gemini_api:{self._model}"
 
 
@@ -545,6 +606,10 @@ def build_llm_client(config: dict) -> LLMClient:
           retries: optional retry count (overrides provider default)
           rpm:     optional requests-per-minute cap (gemini_api only;
                    default 4 for free-tier safety)
+          # ─ Vertex AI / ADC auth (gemini_api only) ─
+          auth_mode:    'api_key' (default) | 'adc'
+          gcp_project:  required when auth_mode='adc'
+          gcp_location: required when auth_mode='adc' (e.g. 'global')
     """
     cfg = config or {}
     # Default changed from claude_code → gemini_api per project policy
@@ -555,9 +620,19 @@ def build_llm_client(config: dict) -> LLMClient:
     retries = int(retries_raw) if retries_raw is not None else None
     rpm_raw = cfg.get("rpm")
     rpm = int(rpm_raw) if rpm_raw is not None else None
+    auth_mode = cfg.get("auth_mode")
+    gcp_project = cfg.get("gcp_project")
+    gcp_location = cfg.get("gcp_location")
 
     if provider == "gemini_api":
-        return GeminiAPIClient(model=model, retries=retries, rpm=rpm)
+        return GeminiAPIClient(
+            model=model,
+            retries=retries,
+            rpm=rpm,
+            auth_mode=auth_mode,
+            gcp_project=gcp_project,
+            gcp_location=gcp_location,
+        )
     if provider == "claude_code":
         logger.warning(
             "LLM provider is set to claude_code. Project policy is "
