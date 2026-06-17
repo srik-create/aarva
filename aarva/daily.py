@@ -137,10 +137,10 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             else:
                 log.info(
                     "Crosscut build: edition #%d ready — intro=%s, "
-                    "bridges=%d, outro=%s, passages=%d.",
+                    "bridges=%d, outro=%s, passages_loaded=%d.",
                     bstats.edition_id, bstats.intro_generated,
                     bstats.bridges_generated, bstats.outro_generated,
-                    bstats.key_passages_picked,
+                    bstats.passages_loaded,
                 )
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
