@@ -233,13 +233,42 @@ def _get_latest_edition_id(db: Database) -> Optional[int]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 _NARRATOR_PROMPT = """\
-Read this article. Reply with EXACTLY ONE WORD:
+You are matching a voice to a narrator for an audio podcast. Decide
+the narrator's gender from the byline + article body. Reply with
+EXACTLY ONE WORD: MALE, FEMALE, or NEUTRAL.
 
-- MALE: if the article is written in first-person AND the author is clearly male (the byline name is conventionally male or the text explicitly says so)
-- FEMALE: if the article is written in first-person AND the author is clearly female (the byline name is conventionally female or the text explicitly says so)
-- NEUTRAL: in all other cases (third-person reporting, ambiguous byline, multi-author, or no clear first-person voice)
+Two-step reasoning:
 
-When unsure, return NEUTRAL.
+STEP 1 — Is the article written in the first person?
+Look for "I", "me", "my", "mine" used as the author's own voice
+(NOT inside quoted speech from sources). The personal "we" / "us"
+(e.g., "we drove to the coast") also counts; the editorial "we"
+(e.g., "we believe accountability matters") does NOT.
+
+If not first-person → respond NEUTRAL. Stop.
+
+STEP 2 — If first-person, what is the author's gender?
+Use your knowledge of names from ALL cultures, not just Anglo:
+  - Male names exist across cultures: John, Giri, Hiroshi, Ahmed,
+    Tunde, Diego, Jian, Karthik, Olu, Rajiv, Yusuf, Andrei, Pieter,
+    Cheikh, Pranav, Adwait, Sunil, Vikram, Arjun, Rohan, Aravind.
+  - Female names exist across cultures: Sarah, Priya, Yuki, Fatima,
+    Aisha, Mei, Lakshmi, Adaeze, Sofia, Anika, Sneha, Kavita,
+    Meera, Anushka, Shreya, Devika, Nandini, Saraswati.
+
+Also look at the body for gender cues — "my husband", "my wife",
+"as a father of two", "growing up as a girl in", etc.
+
+If the byline name's gender is clear AND the article is first-person
+→ MALE or FEMALE accordingly.
+
+If the byline is truly genderless (initials only, pseudonym, multi-
+author, or a name you genuinely cannot place across any culture)
+AND there are no body cues → NEUTRAL.
+
+Do NOT default to NEUTRAL just because the byline isn't a common
+Anglo name. Indian, Chinese, Arabic, African, Latin American, and
+European names all carry recognisable gender — use that knowledge.
 
 Byline: {byline}
 Article (first 2500 chars):
@@ -248,10 +277,57 @@ Article (first 2500 chars):
 Reply with one word: MALE, FEMALE, or NEUTRAL."""
 
 
+_FIRST_PERSON_RE = re.compile(r"\b(I|my|me|mine)\b")
+# Capture text inside ASCII double quotes AND smart curly quotes (longform
+# pieces vary). We strip these before the first-person scan so quoted
+# interviewee speech doesn't trigger false positives.
+_QUOTED_SPEECH_RES = [
+    re.compile(r'"[^"]*"'),
+    re.compile(r'“[^”]*”'),    # "curly"
+]
+
+
+def _has_first_person_markers(text: str) -> bool:
+    """True iff the article body contains 'I'/'me'/'my'/'mine' as the
+    author's own voice (excluding text inside quoted speech)."""
+    if not text:
+        return False
+    stripped = text
+    for rx in _QUOTED_SPEECH_RES:
+        stripped = rx.sub("", stripped)
+    return bool(_FIRST_PERSON_RE.search(stripped))
+
+
+# Larger excerpt so that articles with first-person passages deeper in
+# the body (common for longform — many magazine pieces open with subject
+# coverage and the author's voice surfaces only after 600-1500 words)
+# are scored correctly. 8000 chars ≈ 1500 words ≈ 2000 tokens, trivial
+# for Gemini 3 Flash.
+_NARRATOR_EXCERPT_CHARS = 8000
+
+
 def _detect_narrator_gender(piece: dict, llm: LLMClient) -> str:
-    """Returns 'male', 'female', or 'neutral'."""
-    excerpt = (piece.get("full_text") or "")[:2500]
+    """Returns 'male', 'female', or 'neutral'.
+
+    Two-stage detection:
+      1. Python regex pre-scan over the WHOLE body (with quoted speech
+         stripped) for first-person markers. If none → NEUTRAL,
+         no LLM call (saves a Gemini round-trip for the ~60-70% of
+         pieces that are third-person reporting).
+      2. If first-person markers exist, an LLM call determines gender
+         from byline + a generous excerpt window. The prompt is told
+         that first-person markers ARE present, so it focuses on
+         gender attribution rather than re-deciding the first-person
+         question (which it can get wrong when those markers live
+         outside its excerpt window).
+    """
+    full_text = piece.get("full_text") or ""
     byline = piece.get("byline") or "Unknown"
+
+    if not _has_first_person_markers(full_text):
+        return "neutral"
+
+    excerpt = full_text[:_NARRATOR_EXCERPT_CHARS]
     prompt = _NARRATOR_PROMPT.format(excerpt=excerpt, byline=byline)
     try:
         response = llm.complete(prompt, expect_json=False, temperature=0.0)
