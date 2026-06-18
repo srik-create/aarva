@@ -498,15 +498,35 @@ stage_8b:
           WRONG: "We rarely stop to ask why cities can't grow their own food."
           RIGHT: "The piece pauses on a question the policy debate
                   rarely asks: why can't cities grow their own food?"
-      — **ALWAYS surface WHEN the piece was published.** Date matters
-        for the listener's interpretation — especially for politics,
-        tech, and current-affairs pieces, where a six-month-old article
-        carries different weight than today's. Weave it in naturally
-        (don't read out "Published 2026-05-14"); use natural language:
-        "writing this March", "in a late-2025 essay", "back in February",
-        "from earlier this year", "published last week", "a 2021
-        interview that…". Use the `published_date` and `today` fields
-        below to pick the right phrasing.
+      — **ALWAYS state the EXACT publication date.** Date matters for
+        the listener's interpretation — especially for politics, tech,
+        and current-affairs pieces, where a six-month-old article
+        carries different weight than today's. This matters even more
+        for listeners hearing the episode months or years after
+        publication: relative phrasing ("last week", "from earlier
+        this year", "back in February") becomes meaningless or
+        misleading when the listener doesn't know when "this year"
+        was, or which February.
+
+        Always cite the EXACT date from `published_date`, in natural
+        spoken English form (never ISO):
+
+          RIGHT: "published on 14 May 2026"
+          RIGHT: "in this piece from 14 May 2026"
+          RIGHT: "writing on 14 May 2026, Sarah Zhang argues…"
+          RIGHT: "a 12 March 2024 essay"
+
+          WRONG: "published 2026-05-14" (don't read ISO out loud)
+          WRONG: "last week" / "a few months back" / "in February"
+                 (relative — becomes meaningless out-of-date)
+          WRONG: "earlier this year" / "back in May" (same problem)
+
+        For pieces more than ~2 years old, "in a May 2024 essay" is
+        acceptable — the year carries enough context. For everything
+        within the last two years, include the day of month.
+
+        Use `today` (passed in below) only to decide MODE A vs B and
+        what framing makes sense — never for relative date phrasing.
 
       ════════════════════════════════════════════════════════════════
       HUMAN VOICE — avoid LLM tells

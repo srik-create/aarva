@@ -88,4 +88,4 @@ git push origin gh-pages
 cd "$PROJECT_ROOT"
 echo "publish: pushed to gh-pages"
 echo "  feed:    https://srik-create.github.io/aarva/feed.xml"
-echo "  latest:  https://srik-create.github.io/aarva/web/latest.html"
+echo "  latest:  https://srik-create.github.io/aarva/output/web/latest.html"
