@@ -47,8 +47,14 @@ class TTSClient(ABC):
         text: str,
         output_path: Path,
         voice_id: Optional[str] = None,
+        extra_style: Optional[str] = None,
     ) -> SynthesisResult:
-        """Synthesize text to WAV. Voice_id overrides the client default if set."""
+        """Synthesize text to WAV. Voice_id overrides the client default if set.
+
+        extra_style is an optional per-call style direction (e.g. an accent
+        steer like "Spoken with an Indian English accent.") that backends
+        MAY honour by appending it to their internal style prompt.
+        Backends that don't support styling silently ignore it."""
         ...
 
     @property
@@ -377,25 +383,40 @@ class GeminiTTSClient(TTSClient):
             chunks.append(current)
         return chunks
 
-    def _synthesize_chunk(self, text: str, gemini_voice: str) -> bytes:
+    def _synthesize_chunk(
+        self,
+        text: str,
+        gemini_voice: str,
+        extra_style: str | None = None,
+    ) -> bytes:
         """One LLM call for one chunk → raw PCM bytes.
 
         Implements retry-with-backoff for the 500 errors Google's docs warn
         are an expected (low-rate) failure mode. Returns the raw PCM that
         gets written into the chunk-concat buffer.
+
+        extra_style: optional per-piece style direction appended to the
+        global style_prompt — used by Stage 9 to add an accent steer
+        (e.g. "Spoken with an educated Indian English accent.") for
+        pieces from publications that have a country: tag in
+        publications.yaml. Applied to every chunk of that piece.
         """
         import random
         import time
 
         from google.genai import types as genai_types  # type: ignore
 
-        # If a style prompt is configured, prepend it to the chunk. This
-        # is the natural-language steering Google's docs encourage — the
-        # model "knows not just what to say, but how to say it".
-        prompt = (
-            f"{self.style_prompt}\n\n{text}"
-            if self.style_prompt else text
-        )
+        # Compose the leading style instructions. style_prompt is the
+        # global "calm editorial register + quality tags" prompt from
+        # pipeline.yaml. extra_style is per-piece (accent steer, etc.).
+        # Whichever ones are set get joined with blank lines.
+        style_parts = []
+        if self.style_prompt:
+            style_parts.append(self.style_prompt)
+        if extra_style:
+            style_parts.append(extra_style)
+        style = "\n\n".join(style_parts)
+        prompt = f"{style}\n\n{text}" if style else text
 
         config = genai_types.GenerateContentConfig(
             response_modalities=["AUDIO"],
@@ -496,6 +517,7 @@ class GeminiTTSClient(TTSClient):
         text: str,
         output_path: Path,
         voice_id: Optional[str] = None,
+        extra_style: str | None = None,
     ) -> SynthesisResult:
         """Synthesize text to a single WAV file.
 
@@ -506,6 +528,11 @@ class GeminiTTSClient(TTSClient):
           - A literal Gemini voice name ('Sulafat', 'Charon', etc.). Used
             when Stage 9 has already planned a specific voice for this
             piece via its own rotation logic.
+
+        `extra_style` (optional) is a per-piece style direction appended
+        to the global style_prompt — Stage 9 uses this to attach an
+        accent steer per publication country. None means no extra
+        steering on top of style_prompt.
         """
         self._load()
 
@@ -553,7 +580,9 @@ class GeminiTTSClient(TTSClient):
         pcm_segments: list[bytes] = []
         for i, chunk in enumerate(chunks):
             try:
-                pcm = self._synthesize_chunk(chunk, gemini_voice)
+                pcm = self._synthesize_chunk(
+                    chunk, gemini_voice, extra_style=extra_style,
+                )
             except Exception as e:
                 raise RuntimeError(
                     f"GeminiTTS failed on chunk {i+1}/{len(chunks)}: {e}"
@@ -707,6 +736,7 @@ class ChatterboxClient(TTSClient):
         text: str,
         output_path: Path,
         voice_id: Optional[str] = None,
+        extra_style: Optional[str] = None,    # accepted for interface parity; ignored
     ) -> SynthesisResult:
         self._load()
         import torch
@@ -803,6 +833,7 @@ class MacSayClient(TTSClient):
         text: str,
         output_path: Path,
         voice_id: Optional[str] = None,
+        extra_style: Optional[str] = None,    # accepted for interface parity; ignored
     ) -> SynthesisResult:
         voice = voice_id or self._default
         output_path = Path(output_path)
@@ -896,6 +927,7 @@ class PiperClient(TTSClient):
         text: str,
         output_path: Path,
         voice_id: Optional[str] = None,
+        extra_style: Optional[str] = None,    # accepted for interface parity; ignored
     ) -> SynthesisResult:
         # Piper's voice is determined by the model file passed at construction
         # time; voice_id is therefore ignored. We accept the parameter for

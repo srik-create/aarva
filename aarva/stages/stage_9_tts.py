@@ -229,6 +229,55 @@ def _get_latest_edition_id(db: Database) -> Optional[int]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Accent steering (per-publication country → TTS style prompt)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Each publication in publications.yaml can carry a `country: us|uk|india`
+# tag. When set, we prepend a per-piece style instruction to the TTS call
+# so the model leans into that regional English flavour. Without a tag,
+# the voice's baseline accent (broadly transatlantic/American) is used.
+#
+# Per Google's docs: accents on Gemini TTS are prompt-driven, not voice-
+# name-driven. The same voice produces different accents based on this
+# steer. More-specific phrasing yields more-pronounced accents.
+
+_COUNTRY_TO_ACCENT_PROMPT: dict[str, str] = {
+    "us":    "Spoken with a neutral American English accent.",
+    "uk":    "Spoken with a British English accent in the style of BBC Radio 4.",
+    "india": "Spoken with an educated Indian English accent "
+             "(urban, English-medium-educated).",
+}
+
+
+def _build_publication_country_map() -> dict[str, str]:
+    """Return {publication_name: country_code} from publications.yaml.
+
+    Publications without a country tag are absent from the map. Loaded
+    once per Stage 9 invocation; the YAML file is small (<10 KB)."""
+    try:
+        from aarva.config import load_publications
+        return {
+            p.name: p.country for p in load_publications()
+            if p.country
+        }
+    except Exception as e:
+        logger.warning("Could not load publications.yaml for accent map: %s", e)
+        return {}
+
+
+def _accent_prompt_for(piece: dict, country_map: dict[str, str]) -> str | None:
+    """Look up the per-piece accent steer for this piece, or None if the
+    piece's publication has no country tag."""
+    pub_name = (piece.get("publication_name") or "").strip()
+    if not pub_name:
+        return None
+    country = country_map.get(pub_name)
+    if not country:
+        return None
+    return _COUNTRY_TO_ACCENT_PROMPT.get(country)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Voice selection
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -558,10 +607,14 @@ def generate_for_edition(
             llm = build_llm_client(config.llm)
 
     audio_dir = config.audio_dir
+    # Pre-load the publication-name → country lookup for accent steering.
+    # Built once per Stage 9 run; reused across every piece's TTS call.
+    country_map = _build_publication_country_map()
     logger.info(
         "Stage 9: synthesizing %d pieces  |  rule=%s  |  "
-        "female pool=%s  |  male pool=%s",
-        len(pieces), rule, female_pool, male_pool,
+        "female pool=%s  |  male pool=%s  |  "
+        "accent-tagged publications: %d",
+        len(pieces), rule, female_pool, male_pool, len(country_map),
     )
 
     # Plan voice assignments for the entire edition up front. This lets
@@ -610,8 +663,17 @@ def generate_for_edition(
         )
         logger.info("      voice: %s  (%s)", voice_id, reason)
 
+        # Per-piece accent steer, if the publication has a country tag.
+        accent_prompt = _accent_prompt_for(piece, country_map)
+        if accent_prompt:
+            logger.info("      accent: %s", accent_prompt)
+
         try:
-            result = tts.synthesize(narration, out_path, voice_id=voice_id)
+            result = tts.synthesize(
+                narration, out_path,
+                voice_id=voice_id,
+                extra_style=accent_prompt,
+            )
         except Exception as e:
             stats.errors += 1
             logger.warning("      synthesis failed: %s", e)
