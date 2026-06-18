@@ -92,8 +92,11 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                 cstats.skipped_for_topic_recency,
             )
             log.info(
-                "Run `python -m aarva.crosscut` to review the longlist "
-                "and pick one pair."
+                "Next steps:\n"
+                "  1. Pick a pair from the longlist:  "
+                "`python -m aarva.crosscut`\n"
+                "  2. Build the crosscut script:      "
+                "`python -m aarva.daily --crosscut-build`"
             )
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
@@ -141,6 +144,19 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                     bstats.edition_id, bstats.intro_generated,
                     bstats.bridges_generated, bstats.outro_generated,
                     bstats.passages_loaded,
+                )
+                log.info(
+                    "Next steps — generate audio + publish:\n"
+                    "  1. Daily hooks/contexts/show-notes: "
+                    "`python -m aarva.daily --stage 8`\n"
+                    "  2. Daily TTS:                       "
+                    "`python -m aarva.daily --stage 9`\n"
+                    "  3. Crosscut TTS:                    "
+                    "`python -m aarva.daily --crosscut-tts`\n"
+                    "  4. Render HTML + RSS:               "
+                    "`python -m aarva.daily --stage 10`\n"
+                    "  5. Deploy to gh-pages:              "
+                    "`bash scripts/publish.sh`"
                 )
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
@@ -249,10 +265,28 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
         review_cfg = config.raw.get("review") or {}
         if stage is None and bool(review_cfg.get("enabled", False)):
             log.info(
-                "Pipeline halting after Stage 7 — review.enabled=true. "
-                "Approve the edition with `python -m aarva.review`, then "
-                "run `bash scripts/finalize_edition.sh` (or re-invoke "
-                "`python -m aarva.daily --stage 8` and onwards)."
+                "Pipeline halting after Stage 7 — review.enabled=true.\n"
+                "Next steps:\n"
+                "  1. Review today's daily:             "
+                "`python -m aarva.review`\n"
+                "  2. Detect crosscut candidates:        "
+                "`python -m aarva.daily --crosscut-detect`\n"
+                "  3. Pick a crosscut pair:              "
+                "`python -m aarva.crosscut`\n"
+                "  4. Build the crosscut script:         "
+                "`python -m aarva.daily --crosscut-build`\n"
+                "  5. Daily hooks/contexts/show-notes:   "
+                "`python -m aarva.daily --stage 8`\n"
+                "  6. Daily TTS:                         "
+                "`python -m aarva.daily --stage 9`\n"
+                "  7. Crosscut TTS:                      "
+                "`python -m aarva.daily --crosscut-tts`\n"
+                "  8. Render HTML + RSS:                 "
+                "`python -m aarva.daily --stage 10`\n"
+                "  9. Deploy to gh-pages:                "
+                "`bash scripts/publish.sh`\n"
+                "\n"
+                "(Skip steps 2–4 + 7 on days without a crosscut.)"
             )
             return
 
