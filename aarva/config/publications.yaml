@@ -21,6 +21,7 @@ publications:
 
   # ─── Tier A — Long-form essays & ideas ─────────────────────────────────────
   - name: Aeon
+    country: uk
     rss_url: https://aeon.co/feed.rss
     homepage: https://aeon.co
     tier: A
@@ -29,6 +30,7 @@ publications:
     notes: CC-licensed, the exemplar long-form essay source
 
   - name: Psyche
+    country: uk
     rss_url: https://psyche.co/feed
     homepage: https://psyche.co
     tier: A
@@ -37,6 +39,7 @@ publications:
     notes: Aeon's sister publication, psychology-focused
 
   - name: Noema
+    country: us
     rss_url: https://www.noemamag.com/feed/
     homepage: https://www.noemamag.com
     tier: A
@@ -45,6 +48,7 @@ publications:
     notes: Berggruen Institute, big-think essays
 
   - name: Asterisk
+    country: us
     rss_url: https://asteriskmag.com/feed
     homepage: https://asteriskmag.com
     tier: A
@@ -64,6 +68,7 @@ publications:
 
   # ─── Tier B — Behind the news ──────────────────────────────────────────────
   - name: ProPublica
+    country: us
     rss_url: https://www.propublica.org/feeds/propublica/main
     homepage: https://www.propublica.org
     tier: B
@@ -72,6 +77,7 @@ publications:
     notes: Investigative; explicit Creative Commons republishing licence
 
   - name: The Marshall Project
+    country: us
     rss_url: https://www.themarshallproject.org/rss/recent
     homepage: https://www.themarshallproject.org
     tier: B
@@ -80,6 +86,7 @@ publications:
     notes: Criminal justice reporting
 
   - name: Lawfare
+    country: us
     # The /feed URL is correct (confirmed via Lawfare's own posts about
     # their RSS), but the publisher actively bot-blocks our fetcher even
     # with a Chrome UA — likely TLS fingerprinting via Cloudflare. To
@@ -95,6 +102,7 @@ publications:
     notes: DISABLED — Cloudflare bot-block defeats Chrome UA
 
   - name: Just Security
+    country: us
     rss_url: https://www.justsecurity.org/feed/
     homepage: https://www.justsecurity.org
     tier: B
@@ -103,6 +111,7 @@ publications:
     notes: NYU-affiliated law/security analysis
 
   - name: War on the Rocks
+    country: us
     rss_url: https://warontherocks.com/feed/
     homepage: https://warontherocks.com
     tier: B
@@ -112,6 +121,7 @@ publications:
 
   # ─── Tier C — News analysis & opinion ──────────────────────────────────────
   - name: The Bulwark
+    country: us
     rss_url: https://www.thebulwark.com/feed
     homepage: https://www.thebulwark.com
     tier: C
@@ -120,6 +130,7 @@ publications:
     notes: Conservative-anti-Trumpist; mostly free posts
 
   - name: Marginal Revolution
+    country: us
     rss_url: https://marginalrevolution.com/feed
     homepage: https://marginalrevolution.com
     tier: C
@@ -128,6 +139,7 @@ publications:
     notes: Tyler Cowen and Alex Tabarrok
 
   - name: Astral Codex Ten
+    country: us
     rss_url: https://www.astralcodexten.com/feed
     homepage: https://www.astralcodexten.com
     tier: C
@@ -137,6 +149,7 @@ publications:
 
   # ─── Tier D — International ────────────────────────────────────────────────
   - name: Rest of World
+    country: us
     rss_url: https://restofworld.org/feed/
     homepage: https://restofworld.org
     tier: D
@@ -146,6 +159,7 @@ publications:
 
   # ─── Tier E — Specialist / vertical ────────────────────────────────────────
   - name: Quanta Magazine
+    country: us
     rss_url: https://api.quantamagazine.org/feed/
     homepage: https://www.quantamagazine.org
     tier: E
@@ -154,6 +168,7 @@ publications:
     notes: Science, math, computer science
 
   - name: The Conversation
+    country: us
     rss_url: https://theconversation.com/us/articles.atom
     homepage: https://theconversation.com
     tier: E
@@ -162,6 +177,7 @@ publications:
     notes: Academic syndication, CC-licensed
 
   - name: Knowable Magazine
+    country: us
     # Corrected: their feed path is /rss, not /feed.
     rss_url: https://knowablemagazine.org/rss
     homepage: https://knowablemagazine.org
@@ -171,6 +187,7 @@ publications:
     notes: Annual Reviews-affiliated academic synthesis
 
   - name: Smithsonian Magazine
+    country: us
     rss_url: https://www.smithsonianmag.com/rss/latest_articles/
     homepage: https://www.smithsonianmag.com
     tier: E
@@ -179,6 +196,7 @@ publications:
     notes: Open longform, history-leaning
 
   - name: Undark
+    country: us
     rss_url: https://undark.org/feed/
     homepage: https://undark.org
     tier: E
@@ -187,6 +205,7 @@ publications:
     notes: Science-policy and science-and-society reporting
 
   - name: Orion Magazine
+    country: us
     rss_url: https://orionmagazine.org/feed/
     homepage: https://orionmagazine.org
     tier: E
@@ -197,6 +216,7 @@ publications:
   # ─── Tier A — additional long-form essays & ideas ──────────────────────────
 
   - name: Public Books
+    country: us
     rss_url: https://www.publicbooks.org/feed/
     homepage: https://www.publicbooks.org
     tier: A
@@ -205,6 +225,7 @@ publications:
     notes: Academic-oriented criticism + ideas
 
   - name: The Hedgehog Review
+    country: us
     # Corrected URL — they publish the web-features feed at
     # /web-features/feed (the /rss endpoint returns 404). The print
     # quarterly is separate; this is the blog-style web features stream.
@@ -216,6 +237,7 @@ publications:
     notes: Institute for Advanced Studies in Culture; culture + ideas
 
   - name: The Drift
+    country: us
     rss_url: https://www.thedriftmag.com/rss/
     homepage: https://www.thedriftmag.com
     tier: A
@@ -226,6 +248,7 @@ publications:
   # ─── Tier B — additional behind-the-news & investigative ───────────────────
 
   - name: Politico Magazine
+    country: us
     # Corrected — feeds live under rss.politico.com, not www.politico.com.
     # The www subdomain has Cloudflare in front of it and returned 403
     # to non-browser fetches.
@@ -237,6 +260,7 @@ publications:
     notes: Long-form political reporting (Magazine, not the daily Playbook)
 
   - name: Reveal
+    country: us
     rss_url: https://revealnews.org/feed/
     homepage: https://revealnews.org
     tier: B
@@ -261,6 +285,7 @@ publications:
     notes: African intellectual platform; politics + culture
 
   - name: Brookings Commentary
+    country: us
     # Both the site-wide /feed/ and the research-specific
     # /feeds/rss/research/ endpoints currently emit malformed XML
     # (undefined entity reference). This is a publisher-side bug; not
@@ -276,6 +301,7 @@ publications:
     notes: DISABLED — publisher feed returns malformed XML
 
   - name: Carnegie Endowment
+    country: us
     rss_url: https://carnegieendowment.org/rss/solr/
     homepage: https://carnegieendowment.org
     tier: B
@@ -286,6 +312,7 @@ publications:
   # ─── Tier C — additional news analysis & opinion ───────────────────────────
 
   - name: Vox
+    country: us
     rss_url: https://www.vox.com/rss/index.xml
     homepage: https://www.vox.com
     tier: C
@@ -302,6 +329,7 @@ publications:
     notes: Daily op-eds from globally-recognised thinkers
 
   - name: The American Prospect
+    country: us
     # Corrected — the canonical feed they link in their own footer is
     # /feed/?partner-feed=main-feed. The previous /api/rss/all.rss path
     # was being rate-limited (429) consistently.
@@ -313,6 +341,7 @@ publications:
     notes: Progressive policy analysis; long-form
 
   - name: Slow Boring
+    country: us
     rss_url: https://www.slowboring.com/feed
     homepage: https://www.slowboring.com
     tier: C
@@ -321,6 +350,7 @@ publications:
     notes: Matt Yglesias Substack; ~30% free posts daily
 
   - name: Noahpinion
+    country: us
     rss_url: https://www.noahpinion.blog/feed
     homepage: https://www.noahpinion.blog
     tier: C
@@ -339,6 +369,7 @@ publications:
     notes: German publication, English edition, European affairs
 
   - name: The Caravan
+    country: india
     # 404 on /feed and /rss; The Caravan appears to have moved fully to
     # subscriber-only access and dropped RSS. Disabled until they
     # restore a feed, or we add a per-publication HTML-scrape backend.
@@ -352,6 +383,7 @@ publications:
     notes: DISABLED — RSS removed; subscriber-only access now
 
   - name: The Hindu
+    country: india
     rss_url: https://www.thehindu.com/news/national/feeder/default.rss
     homepage: https://www.thehindu.com
     tier: D
@@ -360,6 +392,7 @@ publications:
     notes: Indian daily, substantive reportage, long-form leanings
 
   - name: Scroll.in
+    country: india
     rss_url: https://feeds.feedburner.com/ScrollinArticles.rss
     homepage: https://scroll.in
     tier: D
@@ -388,6 +421,7 @@ publications:
   # extraction_failed rates here than on tier A/B pubs.
 
   - name: The Guardian (Long Read)
+    country: uk
     # The Guardian's "Long Read" series — feature-length essays and
     # investigative deep dives. Free, high editorial quality, excellent
     # match for Aarva's editorial bar.
@@ -399,6 +433,7 @@ publications:
     notes: Free, long-form essays — premier match for Aarva's editorial style
 
   - name: The Atlantic
+    country: us
     # Long-form essays, ideas, culture, politics. Metered paywall —
     # some pieces accessible, most require subscription. Articles that
     # extract cleanly will go through; paywalled ones fail extraction
@@ -411,6 +446,7 @@ publications:
     notes: Metered paywall; free articles extract OK, paid ones fail naturally
 
   - name: The Independent
+    country: uk
     # UK general news + some long-form. Largely free with ads;
     # occasional paywall. News skews shorter than Aarva's preferred bar,
     # but the long-form pieces (Indy long reads) are worth picking up.
@@ -422,6 +458,7 @@ publications:
     notes: UK daily; news + long reads. Word-floor filter drops the short pieces
 
   - name: The Telegraph
+    country: uk
     # The Telegraph's /rss.xml endpoint returns 403 to any non-browser
     # fetcher — Cloudflare bot-blocking on user-agent / TLS fingerprint
     # (same pattern as Lawfare). The feed URL itself is correct; the
@@ -451,6 +488,7 @@ publications:
   # ─── Tier A — additional long-form essays & ideas ──────────────────────────
 
   - name: American Scholar
+    country: us
     rss_url: https://theamericanscholar.org/feed/
     homepage: https://theamericanscholar.org
     tier: A
@@ -459,6 +497,7 @@ publications:
     notes: Phi Beta Kappa quarterly — essays, ideas, criticism
 
   - name: Liberties
+    country: us
     # Liberties is a quarterly print journal; web-side RSS coverage may
     # be limited. Probe will tell us whether the feed yields anything.
     rss_url: https://libertiesjournal.com/feed/
@@ -477,6 +516,7 @@ publications:
     notes: Cardus-affiliated; essays on institutions, formation, culture
 
   - name: Compact
+    country: us
     rss_url: https://compactmag.com/feed
     homepage: https://compactmag.com
     tier: A
@@ -487,6 +527,7 @@ publications:
   # ─── Tier C — additional news analysis & opinion ───────────────────────────
 
   - name: The UnPopulist
+    country: us
     # Substack — conventional /feed endpoint.
     rss_url: https://www.theunpopulist.net/feed
     homepage: https://www.theunpopulist.net
@@ -496,6 +537,7 @@ publications:
     notes: Pro-liberal-democracy commentary; mostly free posts
 
   - name: Construction Physics
+    country: us
     # Substack — conventional /feed endpoint.
     rss_url: https://www.construction-physics.com/feed
     homepage: https://www.construction-physics.com
@@ -505,6 +547,7 @@ publications:
     notes: Brian Potter Substack — building, infrastructure, productivity
 
   - name: The Honest Broker
+    country: us
     # Ted Gioia's Substack — conventional /feed endpoint.
     rss_url: https://www.honest-broker.com/feed
     homepage: https://www.honest-broker.com
@@ -514,6 +557,7 @@ publications:
     notes: Ted Gioia on culture, music, the creative economy
 
   - name: Culture Study
+    country: us
     # Anne Helen Petersen's Substack — uses the .substack.com domain.
     rss_url: https://annehelen.substack.com/feed
     homepage: https://annehelen.substack.com
@@ -523,6 +567,7 @@ publications:
     notes: Anne Helen Petersen — work, culture, generational analysis
 
   - name: Cafe Hayek
+    country: us
     rss_url: https://cafehayek.com/feed
     homepage: https://cafehayek.com
     tier: C
@@ -565,6 +610,7 @@ publications:
     notes: Independent Egyptian journalism; English section
 
   - name: Granta
+    country: uk
     rss_url: https://granta.com/feed/
     homepage: https://granta.com
     tier: D
@@ -583,6 +629,7 @@ publications:
   # ─── Tier E — additional specialist / vertical ─────────────────────────────
 
   - name: STAT News
+    country: us
     rss_url: https://www.statnews.com/feed/
     homepage: https://www.statnews.com
     tier: E
@@ -591,6 +638,7 @@ publications:
     notes: Health, medicine, biotech reporting; selective long-form
 
   - name: Tortoise
+    country: uk
     # Tortoise was acquired by / merged with The Observer in early 2025
     # and no longer publishes a general article RSS — only podcast feeds
     # via Acast (e.g., rss.acast.com/the-tortoise-podcast). Their
@@ -604,6 +652,7 @@ publications:
     notes: DISABLED — acquired by The Observer; no general article RSS
 
   - name: The Observer
+    country: uk
     # UK Sunday newspaper. Sold by Guardian Media Group to Tortoise
     # Media in December 2024; transition completed April 2025. The new
     # site at observer.co.uk does not currently expose a public RSS
@@ -632,6 +681,7 @@ publications:
     notes: Coastal science + culture; ARCHIVE-ONLY since late 2023
 
   - name: Emergence Magazine
+    country: us
     rss_url: https://emergencemagazine.org/feed/
     homepage: https://emergencemagazine.org
     tier: E
@@ -654,6 +704,7 @@ publications:
   # ═══════════════════════════════════════════════════════════════════════════
 
   - name: McSweeney's Internet Tendency
+    country: us
     # Humor essays + satirical lists + parody journalism. Short pieces,
     # explicitly funny. The clearest "delight" match in the allowlist.
     rss_url: https://www.mcsweeneys.net/rss
@@ -664,6 +715,7 @@ publications:
     notes: Short-form humor — the delight slot's strongest source
 
   - name: Defector
+    country: us
     # Sports + culture + politics with irreverent, often hilarious voice.
     # Founded by ex-Deadspin staff after the Deadspin implosion. Mostly
     # subscription but a meaningful fraction of pieces are free. Expect
@@ -677,6 +729,7 @@ publications:
     notes: Sports/culture journalism with humor; partial paywall
 
   - name: Atlas Obscura
+    country: us
     # Oddities, weird places, weird history, surprising-corners-of-the-
     # world reporting. Bemused-curious tone. Charming-but-substantive.
     # Canonical feed is /rss.xml (the /articles.rss path is not their feed).
@@ -688,6 +741,7 @@ publications:
     notes: Oddities + place writing; reliable delight + smart_escape source
 
   - name: New Yorker Shouts & Murmurs
+    country: us
     # The New Yorker's humor column. Short pieces, often laugh-out-loud.
     # New Yorker has a paywall overall but Shouts pieces are mostly free.
     rss_url: https://www.newyorker.com/feed/humor
@@ -698,6 +752,7 @@ publications:
     notes: Literary humor column; free pieces extract OK
 
   - name: Today in Tabs
+    country: us
     # Rusty Foster's daily media/internet criticism. Sharp humor, very
     # of-the-moment. Migrated from Substack (and briefly Ghost) to
     # Beehiiv — the canonical feed lives on Beehiiv's RSS infrastructure,
@@ -710,6 +765,7 @@ publications:
     notes: Media + internet criticism with wit; Substack mix
 
   - name: Read Max
+    country: us
     # Max Read's tech/culture criticism on Substack. Witty, often
     # genuinely funny when the topic warrants it. Lives on Substack
     # (maxread.substack.com) — readmax.com is not the canonical URL.
@@ -721,6 +777,7 @@ publications:
     notes: Tech/internet criticism with humor; Substack mix
 
   - name: The Paris Review Daily
+    country: us
     # The literary magazine's daily blog. Playful book essays, weird
     # corners of literary history, charming author profiles. Free
     # alongside the (paywalled) main magazine.
@@ -732,6 +789,7 @@ publications:
     notes: Literary blog; playful book/writer essays
 
   - name: Public Domain Review
+    country: uk
     # Essays on weird historical curiosities, public-domain archives,
     # art oddities. Scholarly-but-light writing. Free + CC-licensed —
     # one of the few pubs we can quote freely.

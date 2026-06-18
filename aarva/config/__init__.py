@@ -48,6 +48,10 @@ class Publication:
     enabled: bool
     licence_status: str | None
     notes: str | None
+    # ISO-style country code used to steer TTS accent (e.g. 'us', 'uk',
+    # 'india'). Optional — None means use the voice's baseline accent.
+    # See stage_9_tts._COUNTRY_TO_ACCENT_PROMPT for the mapping.
+    country: str | None = None
 
 
 @dataclass(frozen=True)
@@ -195,6 +199,7 @@ def load_publications() -> list[Publication]:
             enabled=p.get("enabled", True),
             licence_status=p.get("licence_status"),
             notes=p.get("notes"),
+            country=p.get("country"),
         )
         for p in raw.get("publications", [])
     ]
