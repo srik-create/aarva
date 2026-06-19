@@ -22,7 +22,7 @@ import click
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
-from aarva.output import web_renderer, rss_feed, audio_converter
+from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_9_tts, stage_crosscut,
@@ -346,6 +346,26 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                     "  → Audio will remain as WAV. Podcast apps may reject WAV "
                     "enclosures. Install ffmpeg (brew install ffmpeg) and re-run "
                     "Stage 10 to convert."
+                )
+
+            # 1b. Upload converted MP3s to R2, if R2 is enabled. Runs
+            # AFTER MP3 conversion (so audio_url already points at the
+            # .mp3) and BEFORE RSS generation (so the <enclosure> URLs
+            # in feed.xml are immediately valid when the feed publishes).
+            # No-ops cleanly when tts.r2.enabled is false / unset.
+            try:
+                us = r2_uploader.upload_all_pending(config, db)
+                if us.uploaded or us.errors:
+                    log.info(
+                        "Stage 10 R2 — %d uploaded, %d already in bucket, "
+                        "%d source-missing, %d errors",
+                        us.uploaded, us.skipped_already_present,
+                        us.skipped_source_missing, us.errors,
+                    )
+            except Exception as e:
+                log.warning(
+                    "R2 upload step failed: %s — RSS will still publish "
+                    "but audio URLs may 404 until R2 catches up.", e,
                 )
 
             # 2. Render the most recent DAILY edition's HTML.
