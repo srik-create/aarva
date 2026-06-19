@@ -49,3 +49,12 @@ Pillow>=10.0               # scripts/generate_logo.py (podcast cover)
 # ─── Doc reading (audit + diagnostic scripts) ────────────────────────────
 python-docx>=1.0           # Reads docs/aarva_kickoff.docx in scripts that
                            # cross-reference the kickoff against code state
+
+# ─── Audio CDN (Stage 10 publish) ─────────────────────────────────────────
+# Cloudflare R2 is S3-compatible, so boto3 (AWS SDK) talks to it cleanly.
+# Used by aarva/output/r2_uploader.py to upload MP3s after conversion so
+# RSS <enclosure> URLs point at R2 rather than GitHub Pages (which has a
+# 1 GB site-size soft cap that Aarva would hit in ~15 days at current
+# volume). R2 has 10 GB free + zero egress fees, so this is permanently
+# cheap for podcast hosting.
+boto3>=1.35

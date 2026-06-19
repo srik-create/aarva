@@ -88,10 +88,37 @@ def _format_duration_hhmmss(seconds: Optional[int]) -> str:
     return f"{h:02d}:{m:02d}:{sec:02d}" if h else f"{m:02d}:{sec:02d}"
 
 
-def _audio_full_url(audio_url: str, public_url_base: str) -> str:
-    base = public_url_base.rstrip("/")
+def _audio_full_url(audio_url: str, audio_url_base: str) -> str:
+    """Build the absolute URL for an audio file's <enclosure> tag.
+
+    audio_url_base is the host that serves the audio. By default it
+    equals public_url_base (= GitHub Pages), so audio lives next to
+    HTML. When Cloudflare R2 hosting is enabled in pipeline.yaml
+    (tts.r2.enabled: true), audio_url_base is set to the R2 public URL
+    so listeners stream from R2 while HTML pages stay on GH Pages.
+    """
+    base = audio_url_base.rstrip("/")
     rel = audio_url.lstrip("/")
     return f"{base}/{rel}"
+
+
+def _resolve_audio_url_base(config) -> str:
+    """Return the URL host to use for <enclosure> audio URLs.
+
+    Precedence:
+      1. tts.r2.public_url_base when tts.r2.enabled is true (audio
+         served from Cloudflare R2 — preferred for production).
+      2. output.public_url_base (audio served from the same host as
+         HTML — the default when R2 isn't configured).
+    """
+    tts_cfg = (config.raw.get("tts") or {})
+    r2_cfg = (tts_cfg.get("r2") or {})
+    if r2_cfg.get("enabled"):
+        r2_base = r2_cfg.get("public_url_base")
+        if r2_base:
+            return r2_base
+    output_cfg = (config.raw.get("output") or {})
+    return output_cfg.get("public_url_base", "file:///")
 
 
 def _mime_for(audio_url: str) -> str:
@@ -165,8 +192,11 @@ def _audio_byte_length(audio_url: str, package_root: Path) -> int:
 
 
 def _item_xml(piece: dict, public_url_base: str, package_root: Path,
-              feed_image: str = "") -> str:
-    audio_url = _audio_full_url(piece["audio_url"], public_url_base)
+              feed_image: str = "", audio_url_base: str = "") -> str:
+    audio_url = _audio_full_url(
+        piece["audio_url"],
+        audio_url_base or public_url_base,
+    )
     byte_len = _audio_byte_length(piece["audio_url"], package_root)
     pub_dt = piece.get("published_date") or piece.get("edition_date")
     if isinstance(pub_dt, str):
@@ -241,11 +271,14 @@ def _item_xml(piece: dict, public_url_base: str, package_root: Path,
 
 
 def _crosscut_item_xml(cc: dict, public_url_base: str, package_root: Path,
-                       feed_image: str = "") -> str:
+                       feed_image: str = "", audio_url_base: str = "") -> str:
     """Render ONE RSS item for a crosscut episode (not two — both
     pieces share the same audio file and represent a single listening
     unit)."""
-    audio_url = _audio_full_url(cc["audio_url"], public_url_base)
+    audio_url = _audio_full_url(
+        cc["audio_url"],
+        audio_url_base or public_url_base,
+    )
     byte_len = _audio_byte_length(cc["audio_url"], package_root)
     pub_dt = cc.get("published_date") or cc.get("edition_date")
     if isinstance(pub_dt, str):
@@ -388,10 +421,21 @@ def generate_feed(
     )
     combined.sort(key=_item_pub_dt, reverse=True)
 
+    # Audio URLs use audio_url_base if configured (= R2 public URL when
+    # tts.r2.enabled). Falls back to public_url_base if not — preserving
+    # the old single-host behaviour.
+    audio_url_base = _resolve_audio_url_base(config)
+
     items_xml = "\n".join(
-        _crosscut_item_xml(item, public_url_base, package_root, feed_image)
+        _crosscut_item_xml(
+            item, public_url_base, package_root, feed_image,
+            audio_url_base=audio_url_base,
+        )
         if item["_kind"] == "crosscut"
-        else _item_xml(item, public_url_base, package_root, feed_image)
+        else _item_xml(
+            item, public_url_base, package_root, feed_image,
+            audio_url_base=audio_url_base,
+        )
         for item in combined
     )
     pieces = combined   # for the FeedStats count below

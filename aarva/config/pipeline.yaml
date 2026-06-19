@@ -451,3 +451,31 @@ tts:
 
   # — Piper fallback (used when provider: piper) —
   # model_path: ~/.piper-voices/en_GB-northern_english_male-medium.onnx
+
+  # ─── Cloudflare R2 audio hosting ──────────────────────────────────────
+  # GitHub Pages has a 1 GB published-site soft cap. At Aarva's ~65 MB/day
+  # of MP3 audio, that cap would bite in ~15 days. Cloudflare R2 gives
+  # 10 GB free + zero egress fees + paid-tier is $0.015/GB/month — so
+  # the audio side moves to R2 while RSS + HTML stay on GH Pages.
+  #
+  # When enabled, Stage 10 uploads every MP3 in edition_pieces to R2
+  # after WAV → MP3 conversion. The RSS feed's <enclosure> URLs then
+  # point at R2 (via tts.r2.public_url_base) instead of public_url_base.
+  #
+  # Credentials live in env vars (NOT in this file):
+  #   AARVA_R2_ACCESS_KEY_ID
+  #   AARVA_R2_SECRET_ACCESS_KEY
+  # Get them from R2 → Manage R2 API Tokens → Create token
+  # (scope: Object Read & Write on the bucket).
+  #
+  # Migration path: when aarva.app's custom-domain audio URL is wired
+  # up in Cloudflare DNS, flip public_url_base from the r2.dev URL to
+  # https://audio.aarva.app. No code change needed.
+  r2:
+    enabled: true
+    bucket: aarva-audio
+    endpoint_url: https://81079726a9b1dae5ed171eea53d54d96.r2.cloudflarestorage.com
+    # The r2.dev public URL is rate-limited and not recommended for
+    # production; sufficient at Aarva's current listener scale. Switch
+    # to https://audio.aarva.app once the custom domain is set up.
+    public_url_base: https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev
