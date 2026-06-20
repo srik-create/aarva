@@ -7,11 +7,29 @@
   <channel>
     <title>Aarva</title>
     <link>https://srik-create.github.io/aarva</link>
-    <description>The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI.</description>
-    <itunes:summary>The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI. A daily edition of rigorous long-form pieces, plus a Crosscut episode each day pairing two articles on the same topic from different angles.</itunes:summary>
+    <description>The world as your classroom, the finest journalism as your curriculum.
+
+Written by humans. Narrated by AI.
+
+Every day, you get a selection of handpicked articles from across a spectrum of topics, meant to delight, indulge curiosity and expand your mind.
+
+You also get one edition of &quot;Crosscuts&quot; every day, where you get two potentially diverse-seeming articles but with an interesting, even surprising connection. It is intended to show how we can spot connections and patterns in surprising ways.
+
+This is journalism that delights, educates and expands our minds. Not the anxiety-inducing cycle of breaking news.
+</description>
+    <itunes:summary>The world as your classroom, the finest journalism as your curriculum.
+
+Written by humans. Narrated by AI.
+
+Every day, you get a selection of handpicked articles from across a spectrum of topics, meant to delight, indulge curiosity and expand your mind.
+
+You also get one edition of &quot;Crosscuts&quot; every day, where you get two potentially diverse-seeming articles but with an interesting, even surprising connection. It is intended to show how we can spot connections and patterns in surprising ways.
+
+This is journalism that delights, educates and expands our minds. Not the anxiety-inducing cycle of breaking news.
+</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Sat, 20 Jun 2026 12:13:46 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 20 Jun 2026 12:35:52 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
