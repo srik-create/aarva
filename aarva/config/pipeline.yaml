@@ -25,7 +25,19 @@ output:
 
   # Podcast channel metadata (shown in podcast apps when listeners subscribe).
   feed_title: Aarva
-  feed_description: "The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI."
+  # Block-literal (|) preserves the line breaks the user wrote.
+  # Apple Podcasts and Spotify render the linebreaks as paragraph breaks
+  # in their app UI, so the structure carries across.
+  feed_description: |
+    The world as your classroom, the finest journalism as your curriculum.
+
+    Written by humans. Narrated by AI.
+
+    Every day, you get a selection of handpicked articles from across a spectrum of topics, meant to delight, indulge curiosity and expand your mind.
+
+    You also get one edition of "Crosscuts" every day, where you get two potentially diverse-seeming articles but with an interesting, even surprising connection. It is intended to show how we can spot connections and patterns in surprising ways.
+
+    This is journalism that delights, educates and expands our minds. Not the anxiety-inducing cycle of breaking news.
   feed_author: Aarva
   feed_email: srikant.chakravarti@gmail.com
   feed_link: https://srik-create.github.io/aarva
@@ -37,7 +49,19 @@ output:
 
   # Apple Podcasts / Spotify directory metadata (optional — sensible
   # defaults are computed if these are omitted).
-  feed_summary: "The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI. A daily edition of rigorous long-form pieces, plus a Crosscut episode each day pairing two articles on the same topic from different angles."
+  # iTunes summary — Apple Podcasts reads this; falls back to
+  # feed_description if unset. We mirror feed_description so the two
+  # stay in sync (one source of truth for the long blurb).
+  feed_summary: |
+    The world as your classroom, the finest journalism as your curriculum.
+
+    Written by humans. Narrated by AI.
+
+    Every day, you get a selection of handpicked articles from across a spectrum of topics, meant to delight, indulge curiosity and expand your mind.
+
+    You also get one edition of "Crosscuts" every day, where you get two potentially diverse-seeming articles but with an interesting, even surprising connection. It is intended to show how we can spot connections and patterns in surprising ways.
+
+    This is journalism that delights, educates and expands our minds. Not the anxiety-inducing cycle of breaking news.
   feed_copyright: "© 2026 Aarva"
   feed_type: episodic   # 'episodic' (newest first) or 'serial' (oldest first)
   feed_category: "News"
