@@ -74,6 +74,27 @@ output:
   feed_category_2: "Education"
   feed_subcategory_2: "Self-Improvement"
 
+  # ─── MP3 loudness normalization (ffmpeg loudnorm) ─────────────────────
+  # Every WAV → MP3 conversion runs through ffmpeg's loudnorm filter so
+  # all output MP3s sit at the same perceptual loudness regardless of
+  # per-chunk variance in raw TTS levels. Without this, Gemini's small
+  # per-call gain variation manifested as audible volume jumps between
+  # chunks of the same article. With it, every chunk is at the same
+  # ±0.5 dB perceived loudness.
+  #
+  # Target values (defaults match podcast streaming convention):
+  #   loudness_target_lufs:        -16   (Apple Podcasts standard;
+  #                                       EBU broadcast = -23,
+  #                                       Spotify current = -14)
+  #   loudness_true_peak_dbfs:     -1.5  (under platform limits)
+  #   loudness_range_lu:            11   (conservative for spoken word)
+  #
+  # If platform amplification or perceived volume needs adjustment,
+  # tune these — the most useful knob is loudness_target_lufs.
+  loudness_target_lufs: -16
+  loudness_true_peak_dbfs: -1.5
+  loudness_range_lu: 11
+
 ingestion:
   # How many entries to consider per feed per run. RSS feeds typically return
   # ~10-30 items; we cap to avoid runaway extraction on misbehaving feeds.
