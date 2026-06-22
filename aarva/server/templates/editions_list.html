@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Past editions — Aarva{% endblock %}
+{% block content %}
+  <h1 class="editorial text-3xl font-bold mb-6">Past editions</h1>
+  {% if editions %}
+    <ul class="divide-y divide-stone-200 bg-white rounded-lg border border-stone-200">
+      {% for ed in editions %}
+        <li>
+          <a href="/edition/{{ ed.edition_date }}" class="block px-5 py-3 hover:bg-stone-50">
+            <span class="editorial font-semibold">{{ ed.edition_date }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-stone-500">No editions yet.</p>
+  {% endif %}
+{% endblock %}

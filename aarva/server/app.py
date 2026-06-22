@@ -126,6 +126,8 @@ async def health_db() -> JSONResponse:
 
 # Route modules are imported here so they register handlers against
 # `app`. Each module attaches its own routes via @app.get(...) — kept
-# in separate files for clarity as the surface area grows.
-#
-# (No route modules yet — added in the next commit.)
+# in separate files for clarity as the surface area grows. Imports
+# go at the bottom of app.py (not the top) because the routes
+# themselves `from aarva.server.app import app` — top-of-file imports
+# would create a cycle.
+import aarva.server.routes  # noqa: F401, E402  (side-effect import)

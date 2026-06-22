@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Aarva — {{ edition_date }}{% endblock %}
+
+{% block content %}
+  <div class="mb-8">
+    <p class="text-sm text-stone-500 uppercase tracking-wide">Daily edition</p>
+    <h1 class="editorial text-3xl font-bold mt-1">{{ edition_date }}</h1>
+  </div>
+
+  {% if crosscut %}
+    <section class="mb-10 p-5 bg-amber-50 border border-amber-200 rounded-lg">
+      <p class="text-xs uppercase tracking-wide text-amber-800 font-semibold">Today's Crosscut</p>
+      <h2 class="editorial text-xl font-bold mt-2 leading-tight">
+        {{ crosscut.topic_label or "Two angles" }}
+      </h2>
+      <p class="text-sm text-stone-600 mt-2">
+        <em>{{ crosscut.title_a }}</em>
+        <span class="text-stone-400">×</span>
+        <em>{{ crosscut.title_b }}</em>
+      </p>
+      <audio controls class="mt-4 w-full">
+        <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+      </audio>
+      <p class="text-xs text-stone-500 mt-2">
+        {{ crosscut.duration_seconds | duration }} · narrator {{ crosscut.narrator_voice }}
+      </p>
+    </section>
+  {% endif %}
+
+  {% for group_label, pieces in grouped_pieces.items() %}
+    <section class="mb-10">
+      <h2 class="editorial text-sm uppercase tracking-widest text-stone-500 mb-4">{{ group_label }}</h2>
+      <div class="space-y-6">
+        {% for piece in pieces %}
+          <article class="bg-white p-5 rounded-lg border border-stone-200">
+            <p class="text-xs text-stone-500 uppercase tracking-wide">{{ piece.publication_name }}</p>
+            <h3 class="editorial text-xl font-bold leading-tight mt-1">
+              <a href="/article/{{ piece.article_id }}" class="hover:underline">{{ piece.title }}</a>
+            </h3>
+            {% if piece.byline %}
+              <p class="text-sm text-stone-600 mt-1">by {{ piece.byline }}</p>
+            {% endif %}
+            {% if piece.hook %}
+              <p class="editorial text-stone-700 mt-3 italic">{{ piece.hook }}</p>
+            {% endif %}
+            <audio controls class="mt-3 w-full">
+              <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+            </audio>
+            <p class="text-xs text-stone-500 mt-2">
+              {{ piece.duration_seconds | duration }}
+              {% if piece.narrator_voice %} · narrator {{ piece.narrator_voice }}{% endif %}
+            </p>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  {% if not grouped_pieces %}
+    <p class="text-stone-500">No pieces published yet for {{ edition_date }}.</p>
+  {% endif %}
+{% endblock %}

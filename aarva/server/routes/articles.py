@@ -1,0 +1,56 @@
+"""Per-article detail page.
+
+  /article/<id> — full article view: title, byline, hook, contextualisation,
+                  show notes, audio player, link out to the publication.
+
+This is the page listeners land on when they click an item in
+today's edition (or in search results, Phase 2). Each article lives
+inside one or more editions — we surface which edition(s) it appeared
+in to give it temporal context.
+"""
+from __future__ import annotations
+
+from fastapi import HTTPException, Request
+from fastapi.responses import HTMLResponse
+
+from aarva.server.app import app
+from aarva.server.templates import templates
+
+
+@app.get("/article/{article_id}", response_class=HTMLResponse)
+async def article_detail(request: Request, article_id: int) -> HTMLResponse:
+    """One article's full audio+text page. 404 if the article doesn't
+    have audio published (or doesn't exist)."""
+    db = request.app.state.db
+
+    with db.connect() as conn:
+        # Article + publication + most-recent edition_piece (carries
+        # the audio URL, hook, contextualisation, narrator voice).
+        row = conn.execute("""
+            SELECT a.id, a.title, a.byline, a.canonical_url,
+                   a.word_count, a.published_date,
+                   p.name AS publication_name,
+                   ep.hook, ep.contextualisation, ep.show_notes,
+                   ep.audio_url, ep.duration_seconds, ep.narrator_voice,
+                   e.edition_date, e.edition_type,
+                   s.jtbd_primary, s.jtbd_secondary, s.lens, s.pillar
+              FROM articles a
+              JOIN publications p ON p.id = a.publication_id
+              JOIN edition_pieces ep ON ep.article_id = a.id
+              JOIN editions e ON e.id = ep.edition_id
+              LEFT JOIN article_scores s ON s.article_id = a.id
+             WHERE a.id = ?
+               AND ep.audio_url IS NOT NULL AND ep.audio_url != ''
+             ORDER BY e.edition_date DESC, e.id DESC
+             LIMIT 1
+        """, (article_id,)).fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    return templates.TemplateResponse(
+        request, "article.html",
+        {
+            "piece": dict(row),
+        },
+    )

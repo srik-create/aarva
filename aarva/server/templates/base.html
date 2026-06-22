@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Aarva{% endblock %}</title>
+  <meta name="description" content="The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI." />
+  {# Tailwind via CDN — replaced by a built bundle later if/when build step lands. #}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .editorial { font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif; }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-900">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-baseline justify-between">
+      <a href="/" class="editorial text-2xl font-bold tracking-tight">Aarva</a>
+      <nav class="text-sm text-stone-600 space-x-4">
+        <a href="/editions" class="hover:text-stone-900">Past editions</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="max-w-3xl mx-auto px-4 py-8 text-sm text-stone-500 border-t border-stone-200 mt-12">
+    <p>Aarva — the world as your classroom, the finest journalism as your curriculum.</p>
+    <p class="mt-1">Written by humans. Narrated by AI.</p>
+  </footer>
+</body>
+</html>

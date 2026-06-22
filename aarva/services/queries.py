@@ -71,11 +71,13 @@ def load_daily_pieces_with_audio(
                a.title, a.byline, a.canonical_url,
                p.name AS publication_name,
                e.edition_date, e.published_date, e.edition_type,
-               e.user_id
+               e.user_id,
+               s.jtbd_primary, s.jtbd_secondary, s.lens, s.pillar
           FROM edition_pieces ep
           JOIN editions e ON e.id = ep.edition_id
           JOIN articles a ON a.id = ep.article_id
           JOIN publications p ON p.id = a.publication_id
+          LEFT JOIN article_scores s ON s.article_id = a.id
          WHERE {' AND '.join(where)}
          ORDER BY e.edition_date DESC, ep.position
     """
