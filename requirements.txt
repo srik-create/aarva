@@ -58,3 +58,12 @@ python-docx>=1.0           # Reads docs/aarva_kickoff.docx in scripts that
 # volume). R2 has 10 GB free + zero egress fees, so this is permanently
 # cheap for podcast hosting.
 boto3>=1.35
+
+# ─── Web app (aarva/server/) ──────────────────────────────────────────────
+# Standard ASGI Python stack. Provider-agnostic: the same image runs on
+# Render today, Fly.io / Railway / DO / VPS tomorrow (per AGENTS.md
+# rule 7b — design for portability by default).
+fastapi>=0.110
+uvicorn[standard]>=0.27        # ASGI server; [standard] adds httptools + uvloop
+jinja2>=3.1                    # HTML templates
+python-multipart>=0.0.9        # Form parsing (email-on-request in Phase 3)
