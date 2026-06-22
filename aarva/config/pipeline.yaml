@@ -432,13 +432,16 @@ tts:
   # without retraining. Leave commented out to use the model's defaults.
   style_prompt: |
     [clear, full-bodied voice] [studio-quality recording]
-    [steady, natural pacing] [consistent audio quality throughout]
+    [steady pacing, approximately 140 words per minute]
+    [consistent audio quality throughout]
     Read in a calm, editorial register — like a thoughtful longform
-    podcast host. Steady pacing. Confident but not assertive. Pause
-    naturally on punctuation. Don't dramatise. Maintain even tone
-    and fidelity across the whole passage — no thin, muffled, or
-    compressed sections. Make sure you use the same highest quality
-    of the voice recording for each chunk within the same article.
+    podcast host. Speak at approximately 140 words per minute — a
+    steady editorial pace, neither rushed nor slow. Confident but not
+    assertive. Pause naturally on punctuation. Don't dramatise.
+    Maintain even tone and fidelity across the whole passage — no
+    thin, muffled, or compressed sections. Make sure you use the
+    same highest quality of the voice recording for each chunk
+    within the same article.
 
     LANGUAGE: Narrate ONLY in English (US/UK pronunciation either fine).
     Even when the text contains foreign names, place-names, book titles,
