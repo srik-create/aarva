@@ -70,6 +70,38 @@ Last updated: 2026-06-10
    Web-search the RSS URL first. New library? Web-search the current
    docs first.
 
+## External service providers
+
+7a. **Check before locking us into any third-party service.** Whenever
+   introducing or recommending an external service — hosting (Render,
+   Fly.io, etc.), email (Resend, Postmark, SES), storage (R2, S3),
+   payments, analytics, monitoring, CDNs, anything — surface the
+   choice explicitly before coding around it. Don't bury it in an
+   implementation plan and ship.
+
+7b. **Design for portability by default.** Even when the user accepts
+   a specific service, code so that switching providers later is a
+   config-file change, not a code rewrite. Concrete techniques:
+
+   - All credentials and endpoints come from env vars
+     (`AARVA_<SERVICE>_*`), never hard-coded in source.
+   - Provider SDKs sit behind a thin wrapper (e.g.
+     `aarva/output/r2_uploader.py` shields callers from boto3 specifics)
+     so a future swap touches one file.
+   - Prefer S3-compatible / SMTP / standard interfaces over
+     provider-proprietary APIs where the choice exists.
+   - For runtime hosting: a `Dockerfile` is the source of truth so the
+     same image runs on Render today, Fly.io / Railway / DO / VPS /
+     Kubernetes tomorrow. Provider-specific files (`render.yaml`,
+     `fly.toml`, etc.) are thin and additive — never required for the
+     app to function locally.
+
+7c. **The portability check isn't a veto.** Sometimes vendor lock-in
+   is fine (the alternatives don't exist, or migrating later is cheap
+   regardless). Always raise the trade-off so the user can decide
+   knowingly, but don't refuse to integrate a provider just because
+   it's vendor-specific.
+
 ## LLM usage policy
 
 8. **Claude is for coding only.** All other LLM use (article
