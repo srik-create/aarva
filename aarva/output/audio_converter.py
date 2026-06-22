@@ -41,14 +41,49 @@ def _convert_wav_to_mp3(
     wav_path: Path,
     mp3_path: Path,
     bitrate: str = "64k",
+    loudness_target_lufs: float = -16.0,
+    loudness_true_peak_dbfs: float = -1.5,
+    loudness_range_lu: float = 11.0,
 ) -> None:
-    """Run ffmpeg to convert a WAV to MP3."""
+    """Run ffmpeg to convert a WAV to MP3 + loudness-normalize.
+
+    Loudness normalization via ffmpeg's loudnorm filter brings every
+    output MP3 to a consistent perceptual loudness (target: -16 LUFS,
+    the typical podcast streaming standard for Apple Podcasts and
+    Spotify). Without this, per-chunk variance in Gemini TTS output
+    levels leaks into the final MP3 as audible volume jumps between
+    chunks of the same article. With it, all chunks of all articles
+    are at the same perceived loudness ±~0.5 dB, regardless of what
+    levels the model originally produced.
+
+    loudnorm parameters:
+      I  = target integrated loudness (LUFS). Default -16 = podcast
+           streaming convention. EBU broadcast = -23. Spotify (current)
+           = -14. Apple Podcasts = -16.
+      TP = true peak ceiling (dBFS). -1.5 stays under platform limits
+           (Apple recommends -1, Spotify recommends -2) and prevents
+           inter-sample peaks that could clip on aggressive decoders.
+      LRA = loudness range (LU). 11 is conservative for spoken word
+           (broadcast standard is 7-9; podcasts often 11-13). Higher
+           = more allowed dynamic range; lower = more uniform.
+
+    Single-pass (no measurement run); ~95% accurate, which is fine for
+    spoken-word podcasts. Two-pass (measure-then-apply) is more precise
+    but doubles ffmpeg wall-clock per file — not worth it at Aarva's
+    scale.
+    """
     mp3_path.parent.mkdir(parents=True, exist_ok=True)
+    loudnorm_filter = (
+        f"loudnorm=I={loudness_target_lufs}"
+        f":TP={loudness_true_peak_dbfs}"
+        f":LRA={loudness_range_lu}"
+    )
     cmd = [
         "ffmpeg",
         "-y",                # overwrite if exists
         "-loglevel", "error",
         "-i", str(wav_path),
+        "-af", loudnorm_filter,
         "-codec:a", "libmp3lame",
         "-b:a", bitrate,
         "-ac", "1",          # mono (TTS output is mono; saves space)
@@ -75,6 +110,11 @@ def convert_all_for_publish(
 
     Updates edition_pieces.audio_url to point at the .mp3 path. The .wav
     file is preserved as an archival original.
+
+    Loudness normalization parameters are read from pipeline.yaml's
+    output: block (loudness_target_lufs, loudness_true_peak_dbfs,
+    loudness_range_lu). Defaults match the function defaults if absent
+    from config.
     """
     stats = ConversionStats()
 
@@ -82,6 +122,11 @@ def convert_all_for_publish(
         raise RuntimeError(
             "ffmpeg not found on PATH. Install with: brew install ffmpeg"
         )
+
+    output_cfg = config.raw.get("output", {}) or {}
+    target_lufs = float(output_cfg.get("loudness_target_lufs", -16.0))
+    true_peak = float(output_cfg.get("loudness_true_peak_dbfs", -1.5))
+    lra = float(output_cfg.get("loudness_range_lu", 11.0))
 
     project_root = config.web_dir.parent.parent
 
@@ -120,7 +165,13 @@ def convert_all_for_publish(
         new_url = str(mp3_path.relative_to(project_root))
 
         try:
-            _convert_wav_to_mp3(wav_path, mp3_path, bitrate=bitrate)
+            _convert_wav_to_mp3(
+                wav_path, mp3_path,
+                bitrate=bitrate,
+                loudness_target_lufs=target_lufs,
+                loudness_true_peak_dbfs=true_peak,
+                loudness_range_lu=lra,
+            )
         except Exception as e:
             logger.warning("Conversion failed for %s: %s", wav_path, e)
             stats.errors += 1
