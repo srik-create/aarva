@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 23 June 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-06-23</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 23 June 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · ai and contingency</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-06-23/crosscut_0038.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>27 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Earlier this month, Shayna Korol tracked a move by AI leaders and biosecurity experts to secure DNA synthesis machines, treating them as physical chokepoints against catastrophe. It’s a practical, high-stakes attempt to build hard boundaries around what a machine can do. But writing just a few days later, Julio M. Ottino looks toward Leo Tolstoy to suggest that the real danger might be the feeling of safety itself. There’s a friction between these two perspectives. One seeks security through technical constraints, while the other warns that believing the future is predictable can dull the very human alertness needed to face it. It&#x27;s worth pausing on whether these guardrails provide control or just the comfort of an illusion.</p>
+        <article class='piece'>
+<p class='hook'>Shayna Korol, writing for Vox earlier this month, looks at a rare moment of agreement between fierce tech rivals like Sam Altman and Demis Hassabis. While these CEOs disagree on almost everything else, they’ve both signed an open letter regarding synthetic DNA. Notice the way Korol focuses on nucleotides—the building blocks that can be reordered into pathogens just as easily as vaccines if voluntary screening systems fail.</p>
+<h2 class='title'>The next AI safety fight may actually be about DNA</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Shayna Korol</span></p>
+<p class='source'><a href='https://www.vox.com/future-perfect/491660/artificial-intelligence-openai-anthropic-dna-bioweapons' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Korol presents a world where safety is a matter of finding the right chokepoint—specifically, the screening of genetic sequences by commercial providers. There is a certain comfort in the idea that if the CEOs of OpenAI and Google DeepMind can agree on a set of technical guardrails, the path toward AI-assisted catastrophe might be blocked. But read alongside Julio M. Ottino, that focus on preventative architecture starts to look like the exact dream of certainty that Tolstoy warned against. While Korol points toward the need for a hard science of prediction to stop bad actors, Ottino suggests that the most vital human quality is not the perfection of a plan, but what he calls alertness. The interesting thing is that these two perspectives don&#x27;t just disagree on methods; they disagree on the nature of reality itself. Korol assumes the future can be managed through the right code and the right regulations. Ottino, however, points toward Prince Andrei on the eve of battle, where outcomes hinge on fleeting, unrepeatable moments. Putting the two together suggests that the real risk might not just be the technology itself, but the belief that human agency can be replaced by a system designed to engineer away the inherent randomness of what comes next.</p>
+        <article class='piece'>
+
+<h2 class='title'>Tolstoy and the Illusion of Inevitability</h2>
+<p class='byline'><span class='publication'>The Hedgehog Review</span><span class='sep'>·</span><span>Julio M. Ottino</span></p>
+<p class='source'><a href='https://hedgehogreview.com/web-features/thr/posts/tolstoy-and-the-illusion-of-inevitability' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Screening DNA sequences for pathogens provides a concrete lever to pull, a way to keep the lab bench from becoming a site of danger. It offers the comfort of a technical fix. Still, Tolstoy’s battlefield suggests that history remains a series of accidents. Relying on predictive systems to manage risk might actually dull the sharp alertness required to face a chaotic world. If the focus remains on perfecting the code, how does one stay ready for the things that no algorithm can see coming?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

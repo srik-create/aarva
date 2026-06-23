@@ -29,7 +29,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 </itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Mon, 22 Jun 2026 08:47:49 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 23 Jun 2026 09:30:50 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -45,6 +45,169 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: ai and contingency</title>
+      <itunes:title>Crosscut: ai and contingency</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-06-23.html</link>
+      <description><![CDATA[Earlier this month, Shayna Korol tracked a move by AI leaders and biosecurity experts to secure DNA synthesis machines, treating them as physical chokepoints against catastrophe. It’s a practical, high-stakes attempt to build hard boundaries around what a machine can do. But writing just a few days later, Julio M. Ottino looks toward Leo Tolstoy to suggest that the real danger might be the feeling of safety itself. There’s a friction between these two perspectives. One seeks security through technical constraints, while the other warns that believing the future is predictable can dull the very human alertness needed to face it. It&#x27;s worth pausing on whether these guardrails provide control or just the comfort of an illusion.<br/><br/><em>Korol presents a world where safety is a matter of finding the right chokepoint—specifically, the screening of genetic sequences by commercial providers. There is a certain comfort in the idea that if the CEOs of OpenAI and Google DeepMind can agree on a set of technical guardrails, the path toward AI-assisted catastrophe might be blocked. But read alongside Julio M. Ottino, that focus on preventative architecture starts to look like the exact dream of certainty that Tolstoy warned against. While Korol points toward the need for a hard science of prediction to stop bad actors, Ottino suggests that the most vital human quality is not the perfection of a plan, but what he calls alertness. The interesting thing is that these two perspectives don&#x27;t just disagree on methods; they disagree on the nature of reality itself. Korol assumes the future can be managed through the right code and the right regulations. Ottino, however, points toward Prince Andrei on the eve of battle, where outcomes hinge on fleeting, unrepeatable moments. Putting the two together suggests that the real risk might not just be the technology itself, but the belief that human agency can be replaced by a system designed to engineer away the inherent randomness of what comes next.</em><br/><br/>Screening DNA sequences for pathogens provides a concrete lever to pull, a way to keep the lab bench from becoming a site of danger. It offers the comfort of a technical fix. Still, Tolstoy’s battlefield suggests that history remains a series of accidents. Relying on predictive systems to manage risk might actually dull the sharp alertness required to face a chaotic world. If the focus remains on perfecting the code, how does one stay ready for the things that no algorithm can see coming?<br/><br/>Sources:<br/><a href="https://www.vox.com/future-perfect/491660/artificial-intelligence-openai-anthropic-dna-bioweapons">Vox: The next AI safety fight may actually be about DNA</a><br/><a href="https://hedgehogreview.com/web-features/thr/posts/tolstoy-and-the-illusion-of-inevitability">The Hedgehog Review: Tolstoy and the Illusion of Inevitability</a>]]></description>
+      <content:encoded><![CDATA[Earlier this month, Shayna Korol tracked a move by AI leaders and biosecurity experts to secure DNA synthesis machines, treating them as physical chokepoints against catastrophe. It’s a practical, high-stakes attempt to build hard boundaries around what a machine can do. But writing just a few days later, Julio M. Ottino looks toward Leo Tolstoy to suggest that the real danger might be the feeling of safety itself. There’s a friction between these two perspectives. One seeks security through technical constraints, while the other warns that believing the future is predictable can dull the very human alertness needed to face it. It&#x27;s worth pausing on whether these guardrails provide control or just the comfort of an illusion.<br/><br/><em>Korol presents a world where safety is a matter of finding the right chokepoint—specifically, the screening of genetic sequences by commercial providers. There is a certain comfort in the idea that if the CEOs of OpenAI and Google DeepMind can agree on a set of technical guardrails, the path toward AI-assisted catastrophe might be blocked. But read alongside Julio M. Ottino, that focus on preventative architecture starts to look like the exact dream of certainty that Tolstoy warned against. While Korol points toward the need for a hard science of prediction to stop bad actors, Ottino suggests that the most vital human quality is not the perfection of a plan, but what he calls alertness. The interesting thing is that these two perspectives don&#x27;t just disagree on methods; they disagree on the nature of reality itself. Korol assumes the future can be managed through the right code and the right regulations. Ottino, however, points toward Prince Andrei on the eve of battle, where outcomes hinge on fleeting, unrepeatable moments. Putting the two together suggests that the real risk might not just be the technology itself, but the belief that human agency can be replaced by a system designed to engineer away the inherent randomness of what comes next.</em><br/><br/>Screening DNA sequences for pathogens provides a concrete lever to pull, a way to keep the lab bench from becoming a site of danger. It offers the comfort of a technical fix. Still, Tolstoy’s battlefield suggests that history remains a series of accidents. Relying on predictive systems to manage risk might actually dull the sharp alertness required to face a chaotic world. If the focus remains on perfecting the code, how does one stay ready for the things that no algorithm can see coming?<br/><br/>Sources:<br/><a href="https://www.vox.com/future-perfect/491660/artificial-intelligence-openai-anthropic-dna-bioweapons">Vox: The next AI safety fight may actually be about DNA</a><br/><a href="https://hedgehogreview.com/web-features/thr/posts/tolstoy-and-the-illusion-of-inevitability">The Hedgehog Review: Tolstoy and the Illusion of Inevitability</a>]]></content:encoded>
+      <itunes:summary>Earlier this month, Shayna Korol tracked a move by AI leaders and biosecurity experts to secure DNA synthesis machines, treating them as physical chokepoints against catastrophe. It’s a practical, high-stakes attempt to build hard boundaries around what a machine can do. But writing just a few days later, Julio M. Ottino looks toward Leo Tolstoy to suggest that the real danger might be the feeling of safety itself. There’s a friction between these two perspectives. One seeks security through technical constraints, while the other warns that believing the future is predictable can dull the very human alertness needed to face it. It&#x27;s worth pausing on whether these guardrails provide control or just the comfort of an illusion.
+
+Korol presents a world where safety is a matter of finding the right chokepoint—specifically, the screening of genetic sequences by commercial providers. There is a certain comfort in the idea that if the CEOs of OpenAI and Google DeepMind can agree on a set of technical guardrails, the path toward AI-assisted catastrophe might be blocked. But read alongside Julio M. Ottino, that focus on preventative architecture starts to look like the exact dream of certainty that Tolstoy warned against. While Korol points toward the need for a hard science of prediction to stop bad actors, Ottino suggests that the most vital human quality is not the perfection of a plan, but what he calls alertness. The interesting thing is that these two perspectives don&#x27;t just disagree on methods; they disagree on the nature of reality itself. Korol assumes the future can be managed through the right code and the right regulations. Ottino, however, points toward Prince Andrei on the eve of battle, where outcomes hinge on fleeting, unrepeatable moments. Putting the two together suggests that the real risk might not just be the technology itself, but the belief that human agency can be replaced by a system designed to engineer away the inherent randomness of what comes next.
+
+Screening DNA sequences for pathogens provides a concrete lever to pull, a way to keep the lab bench from becoming a site of danger. It offers the comfort of a technical fix. Still, Tolstoy’s battlefield suggests that history remains a series of accidents. Relying on predictive systems to manage risk might actually dull the sharp alertness required to face a chaotic world. If the focus remains on perfecting the code, how does one stay ready for the things that no algorithm can see coming?
+
+Sources:
+Vox: The next AI safety fight may actually be about DNA
+The Hedgehog Review: Tolstoy and the Illusion of Inevitability</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 08:10:37 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-38</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/crosscut_0038.mp3" length="13149741" type="audio/mpeg"/>
+      <itunes:duration>27:24</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · ai and contingency</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Can ecosystems ‘malfunction’?</title>
+      <itunes:title>Can ecosystems ‘malfunction’?</itunes:title>
+      <link>https://www.theguardian.com/news/2026/jun/18/can-ecosystems-malfunction</link>
+      <description><![CDATA[<em>If an ecosystem has no goals of its own, who decides when it&#x27;s stopped working?</em><br/><br/>Published on 18 June 2026, the piece moves past the headlines of collapsing currents and dying reefs to ask a deeper philosophical question. It explores why the language of &quot;ecosystem services&quot;—treating nature like a machine that can break—might be conceptually flawed. While it is common to view the Amazon as the planet&#x27;s lungs, the text argues that ecosystems do not actually have goals or intrinsic purposes. By untangling the philosophy of science from conservation politics, the piece suggests that responsibility for a changing world lies with human values, rather than a malfunctioning nature.<br/><br/>A philosophical and historical examination of the concept of ecosystem function and the scientific validity of describing natural systems as malfunctioning. Traces the evolution of ecological thought from the 19th century to contemporary natural-capital accounting, distinguishing between objective processes and human-centered goals. Evaluates the implications of using the language of purpose in environmental policy and examines the values that drive ecological restoration.<br/><br/>Read at source: <a href="https://www.theguardian.com/news/2026/jun/18/can-ecosystems-malfunction">The Guardian (Long Read)</a>]]></description>
+      <content:encoded><![CDATA[<em>If an ecosystem has no goals of its own, who decides when it&#x27;s stopped working?</em><br/><br/>Published on 18 June 2026, the piece moves past the headlines of collapsing currents and dying reefs to ask a deeper philosophical question. It explores why the language of &quot;ecosystem services&quot;—treating nature like a machine that can break—might be conceptually flawed. While it is common to view the Amazon as the planet&#x27;s lungs, the text argues that ecosystems do not actually have goals or intrinsic purposes. By untangling the philosophy of science from conservation politics, the piece suggests that responsibility for a changing world lies with human values, rather than a malfunctioning nature.<br/><br/>A philosophical and historical examination of the concept of ecosystem function and the scientific validity of describing natural systems as malfunctioning. Traces the evolution of ecological thought from the 19th century to contemporary natural-capital accounting, distinguishing between objective processes and human-centered goals. Evaluates the implications of using the language of purpose in environmental policy and examines the values that drive ecological restoration.<br/><br/>Read at source: <a href="https://www.theguardian.com/news/2026/jun/18/can-ecosystems-malfunction">The Guardian (Long Read)</a>]]></content:encoded>
+      <itunes:summary>If an ecosystem has no goals of its own, who decides when it&#x27;s stopped working?
+
+Published on 18 June 2026, the piece moves past the headlines of collapsing currents and dying reefs to ask a deeper philosophical question. It explores why the language of &quot;ecosystem services&quot;—treating nature like a machine that can break—might be conceptually flawed. While it is common to view the Amazon as the planet&#x27;s lungs, the text argues that ecosystems do not actually have goals or intrinsic purposes. By untangling the philosophy of science from conservation politics, the piece suggests that responsibility for a changing world lies with human values, rather than a malfunctioning nature.
+
+A philosophical and historical examination of the concept of ecosystem function and the scientific validity of describing natural systems as malfunctioning. Traces the evolution of ecological thought from the 19th century to contemporary natural-capital accounting, distinguishing between objective processes and human-centered goals. Evaluates the implications of using the language of purpose in environmental policy and examines the values that drive ecological restoration.
+
+Read at source: The Guardian (Long Read)</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-3156</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_3156.mp3" length="13186605" type="audio/mpeg"/>
+      <itunes:duration>27:28</itunes:duration>
+      <itunes:author>John Drake</itunes:author>
+      <itunes:subtitle>The Guardian (Long Read)</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Upcoming telescopes could shed light on dark matter – astronomers are looking for these ‘fingerprints’ of the elusive substance</title>
+      <itunes:title>Upcoming telescopes could shed light on dark matter – astronomers are looking for these ‘fingerprints’ of the elusive substance</itunes:title>
+      <link>https://theconversation.com/upcoming-telescopes-could-shed-light-on-dark-matter-astronomers-are-looking-for-these-fingerprints-of-the-elusive-substance-281619</link>
+      <description><![CDATA[<em>Could a faint glow at the center of the Milky Way be the fingerprint of dark matter?</em><br/><br/>Writing on 8 June 2026, the authors shift focus from the visible milestones of space travel to the invisible substance holding the universe together. While lunar missions capture the headlines, a quieter search is unfolding through gamma-ray telescopes. The central challenge isn&#x27;t just identifying dark matter, but distinguishing its faint signals from the energetic noise of spinning stars. It suggests that the next decade of astronomical data might finally turn a mathematical necessity into a tangible discovery.<br/><br/>The search for dark matter through the detection of gamma-ray emissions produced by particle annihilation. Current research evaluates unexplained radiation in the Milky Way and nearby dwarf galaxies to distinguish these potential signals from conventional stellar phenomena. Future missions, including NASA’s COSI and the Vera C. Rubin Observatory, provide the technical capacity to confirm whether these observations represent the first direct evidence of the substance.<br/><br/>Read at source: <a href="https://theconversation.com/upcoming-telescopes-could-shed-light-on-dark-matter-astronomers-are-looking-for-these-fingerprints-of-the-elusive-substance-281619">The Conversation</a>]]></description>
+      <content:encoded><![CDATA[<em>Could a faint glow at the center of the Milky Way be the fingerprint of dark matter?</em><br/><br/>Writing on 8 June 2026, the authors shift focus from the visible milestones of space travel to the invisible substance holding the universe together. While lunar missions capture the headlines, a quieter search is unfolding through gamma-ray telescopes. The central challenge isn&#x27;t just identifying dark matter, but distinguishing its faint signals from the energetic noise of spinning stars. It suggests that the next decade of astronomical data might finally turn a mathematical necessity into a tangible discovery.<br/><br/>The search for dark matter through the detection of gamma-ray emissions produced by particle annihilation. Current research evaluates unexplained radiation in the Milky Way and nearby dwarf galaxies to distinguish these potential signals from conventional stellar phenomena. Future missions, including NASA’s COSI and the Vera C. Rubin Observatory, provide the technical capacity to confirm whether these observations represent the first direct evidence of the substance.<br/><br/>Read at source: <a href="https://theconversation.com/upcoming-telescopes-could-shed-light-on-dark-matter-astronomers-are-looking-for-these-fingerprints-of-the-elusive-substance-281619">The Conversation</a>]]></content:encoded>
+      <itunes:summary>Could a faint glow at the center of the Milky Way be the fingerprint of dark matter?
+
+Writing on 8 June 2026, the authors shift focus from the visible milestones of space travel to the invisible substance holding the universe together. While lunar missions capture the headlines, a quieter search is unfolding through gamma-ray telescopes. The central challenge isn&#x27;t just identifying dark matter, but distinguishing its faint signals from the energetic noise of spinning stars. It suggests that the next decade of astronomical data might finally turn a mathematical necessity into a tangible discovery.
+
+The search for dark matter through the detection of gamma-ray emissions produced by particle annihilation. Current research evaluates unexplained radiation in the Milky Way and nearby dwarf galaxies to distinguish these potential signals from conventional stellar phenomena. Future missions, including NASA’s COSI and the Vera C. Rubin Observatory, provide the technical capacity to confirm whether these observations represent the first direct evidence of the substance.
+
+Read at source: The Conversation</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-1507</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_1507.mp3" length="3903789" type="audio/mpeg"/>
+      <itunes:duration>08:08</itunes:duration>
+      <itunes:author>Christopher Karwin, Assistant Professor of Physics and Astronomy, Clemson University</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Edward Said, My Grandfather, and the Problem of Home</title>
+      <itunes:title>Edward Said, My Grandfather, and the Problem of Home</itunes:title>
+      <link>https://www.publicbooks.org/edward-said-my-grandfather-and-the-problem-of-home/</link>
+      <description><![CDATA[<em>What is the weight of a family’s history that is held in silence rather than in books?</em><br/><br/>Writing on 16 June 2026, the author traces the invisible lines connecting the intellectual legacy of Edward Said to a grandfather’s long silence about his Irish roots. The piece wrestles with the weight of displacement—not just as a political event, but as a quiet, persistent condition that reshapes language and memory. It lingers on a difficult question: how does one reconstruct a sense of home when the original map has been lost to empire or the pressure to simply fit in?<br/><br/>An examination of the psychological toll of exile, framed through the scholarship of Edward Said and the author’s family history. Connects the silence of an Irish-American grandfather with the mechanics of Americanization and imperial displacement across Massachusetts, Ireland, and Puerto Rico. Draws parallels between global decolonial movements and individual memory to consider how language and culture serve as both forms of resistance and tools for mutual understanding.<br/><br/>Read at source: <a href="https://www.publicbooks.org/edward-said-my-grandfather-and-the-problem-of-home/">Public Books</a>]]></description>
+      <content:encoded><![CDATA[<em>What is the weight of a family’s history that is held in silence rather than in books?</em><br/><br/>Writing on 16 June 2026, the author traces the invisible lines connecting the intellectual legacy of Edward Said to a grandfather’s long silence about his Irish roots. The piece wrestles with the weight of displacement—not just as a political event, but as a quiet, persistent condition that reshapes language and memory. It lingers on a difficult question: how does one reconstruct a sense of home when the original map has been lost to empire or the pressure to simply fit in?<br/><br/>An examination of the psychological toll of exile, framed through the scholarship of Edward Said and the author’s family history. Connects the silence of an Irish-American grandfather with the mechanics of Americanization and imperial displacement across Massachusetts, Ireland, and Puerto Rico. Draws parallels between global decolonial movements and individual memory to consider how language and culture serve as both forms of resistance and tools for mutual understanding.<br/><br/>Read at source: <a href="https://www.publicbooks.org/edward-said-my-grandfather-and-the-problem-of-home/">Public Books</a>]]></content:encoded>
+      <itunes:summary>What is the weight of a family’s history that is held in silence rather than in books?
+
+Writing on 16 June 2026, the author traces the invisible lines connecting the intellectual legacy of Edward Said to a grandfather’s long silence about his Irish roots. The piece wrestles with the weight of displacement—not just as a political event, but as a quiet, persistent condition that reshapes language and memory. It lingers on a difficult question: how does one reconstruct a sense of home when the original map has been lost to empire or the pressure to simply fit in?
+
+An examination of the psychological toll of exile, framed through the scholarship of Edward Said and the author’s family history. Connects the silence of an Irish-American grandfather with the mechanics of Americanization and imperial displacement across Massachusetts, Ireland, and Puerto Rico. Draws parallels between global decolonial movements and individual memory to consider how language and culture serve as both forms of resistance and tools for mutual understanding.
+
+Read at source: Public Books</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-2648</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_2648.mp3" length="7946541" type="audio/mpeg"/>
+      <itunes:duration>16:33</itunes:duration>
+      <itunes:author>Morgan Barry</itunes:author>
+      <itunes:subtitle>Public Books</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Anticolonialism in the age of fragmentation</title>
+      <itunes:title>Anticolonialism in the age of fragmentation</itunes:title>
+      <link>https://africasacountry.com/2026/05/anticolonialism-in-the-age-of-fragmentation</link>
+      <description><![CDATA[<em>Can the aspirations for sovereignty survive when a country begins to pull itself apart?</em><br/><br/>In this piece from 27 May 2026 for Africa Is a Country, the focus is on the political impasse in Mali, where the desire for sovereignty meets the harsh realities of military rule and regional violence. The text looks past simple condemnation of the junta to ask why the language of decolonization still holds such power across the Sahel. It suggests that any resolution involves a difficult choice: acknowledging the legitimate hunger for autonomy while refusing to let those hopes be lost to isolation or ethnic fragmentation.<br/><br/>An examination of the escalating security crisis in Mali following coordinated attacks by jihadist and separatist alliances. Situates the current military government’s pursuit of sovereignty within a longer history of anticolonial aspirations and regional ruptures. Traces the entanglement of ethnic grievances and state authority to address the tension between regional demands for autonomy and the emergence of military-led political projects.<br/><br/>Read at source: <a href="https://africasacountry.com/2026/05/anticolonialism-in-the-age-of-fragmentation">Africa Is a Country</a>]]></description>
+      <content:encoded><![CDATA[<em>Can the aspirations for sovereignty survive when a country begins to pull itself apart?</em><br/><br/>In this piece from 27 May 2026 for Africa Is a Country, the focus is on the political impasse in Mali, where the desire for sovereignty meets the harsh realities of military rule and regional violence. The text looks past simple condemnation of the junta to ask why the language of decolonization still holds such power across the Sahel. It suggests that any resolution involves a difficult choice: acknowledging the legitimate hunger for autonomy while refusing to let those hopes be lost to isolation or ethnic fragmentation.<br/><br/>An examination of the escalating security crisis in Mali following coordinated attacks by jihadist and separatist alliances. Situates the current military government’s pursuit of sovereignty within a longer history of anticolonial aspirations and regional ruptures. Traces the entanglement of ethnic grievances and state authority to address the tension between regional demands for autonomy and the emergence of military-led political projects.<br/><br/>Read at source: <a href="https://africasacountry.com/2026/05/anticolonialism-in-the-age-of-fragmentation">Africa Is a Country</a>]]></content:encoded>
+      <itunes:summary>Can the aspirations for sovereignty survive when a country begins to pull itself apart?
+
+In this piece from 27 May 2026 for Africa Is a Country, the focus is on the political impasse in Mali, where the desire for sovereignty meets the harsh realities of military rule and regional violence. The text looks past simple condemnation of the junta to ask why the language of decolonization still holds such power across the Sahel. It suggests that any resolution involves a difficult choice: acknowledging the legitimate hunger for autonomy while refusing to let those hopes be lost to isolation or ethnic fragmentation.
+
+An examination of the escalating security crisis in Mali following coordinated attacks by jihadist and separatist alliances. Situates the current military government’s pursuit of sovereignty within a longer history of anticolonial aspirations and regional ruptures. Traces the entanglement of ethnic grievances and state authority to address the tension between regional demands for autonomy and the emergence of military-led political projects.
+
+Read at source: Africa Is a Country</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-700</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_0700.mp3" length="4805229" type="audio/mpeg"/>
+      <itunes:duration>10:01</itunes:duration>
+      <itunes:author>Djiguikôrô</itunes:author>
+      <itunes:subtitle>Africa Is a Country</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Ahmedabad plane crash: Families of AI 171 crash victims grapple with flight fears, anxiety</title>
+      <itunes:title>Ahmedabad plane crash: Families of AI 171 crash victims grapple with flight fears, anxiety</itunes:title>
+      <link>https://www.thehindu.com/news/national/gujarat/ahmedabad-plane-crash-families-of-ai-171-crash-victims-grapple-with-flight-fears-anxiety/article71079506.ece</link>
+      <description><![CDATA[<em>How does a family move forward when every plane overhead still feels like a threat?</em><br/><br/>In this report published on 9 June 2026, the focus shifts from the immediate chaos of a disaster to the quiet, heavy weight of its aftermath. A year after the AI 171 crash in Ahmedabad, the piece follows those left behind—parents, siblings, and survivors—whose lives remain anchored to a single afternoon. It observes the specific, physical ways grief manifests, from a refusal to board a flight to the involuntary shudder at the sound of an engine overhead, considering how a community attempts to rebuild when the sky itself has become a source of dread.<br/><br/>The enduring psychological and social consequences of the AI 171 crash in Ahmedabad, a disaster that claimed 260 lives. Interviews with bereaved relatives and a ground-level survivor detail the persistent trauma, financial instability, and widespread fear of flying among those affected one year later. These accounts trace the personal histories of several victims and the specific ways their families continue to navigate grief.<br/><br/>Read at source: <a href="https://www.thehindu.com/news/national/gujarat/ahmedabad-plane-crash-families-of-ai-171-crash-victims-grapple-with-flight-fears-anxiety/article71079506.ece">The Hindu</a>]]></description>
+      <content:encoded><![CDATA[<em>How does a family move forward when every plane overhead still feels like a threat?</em><br/><br/>In this report published on 9 June 2026, the focus shifts from the immediate chaos of a disaster to the quiet, heavy weight of its aftermath. A year after the AI 171 crash in Ahmedabad, the piece follows those left behind—parents, siblings, and survivors—whose lives remain anchored to a single afternoon. It observes the specific, physical ways grief manifests, from a refusal to board a flight to the involuntary shudder at the sound of an engine overhead, considering how a community attempts to rebuild when the sky itself has become a source of dread.<br/><br/>The enduring psychological and social consequences of the AI 171 crash in Ahmedabad, a disaster that claimed 260 lives. Interviews with bereaved relatives and a ground-level survivor detail the persistent trauma, financial instability, and widespread fear of flying among those affected one year later. These accounts trace the personal histories of several victims and the specific ways their families continue to navigate grief.<br/><br/>Read at source: <a href="https://www.thehindu.com/news/national/gujarat/ahmedabad-plane-crash-families-of-ai-171-crash-victims-grapple-with-flight-fears-anxiety/article71079506.ece">The Hindu</a>]]></content:encoded>
+      <itunes:summary>How does a family move forward when every plane overhead still feels like a threat?
+
+In this report published on 9 June 2026, the focus shifts from the immediate chaos of a disaster to the quiet, heavy weight of its aftermath. A year after the AI 171 crash in Ahmedabad, the piece follows those left behind—parents, siblings, and survivors—whose lives remain anchored to a single afternoon. It observes the specific, physical ways grief manifests, from a refusal to board a flight to the involuntary shudder at the sound of an engine overhead, considering how a community attempts to rebuild when the sky itself has become a source of dread.
+
+The enduring psychological and social consequences of the AI 171 crash in Ahmedabad, a disaster that claimed 260 lives. Interviews with bereaved relatives and a ground-level survivor detail the persistent trauma, financial instability, and widespread fear of flying among those affected one year later. These accounts trace the personal histories of several victims and the specific ways their families continue to navigate grief.
+
+Read at source: The Hindu</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-1606</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_1606.mp3" length="2832045" type="audio/mpeg"/>
+      <itunes:duration>05:54</itunes:duration>
+      <itunes:author>The Hindu</itunes:author>
+      <itunes:subtitle>The Hindu</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Harriet Beecher Stowe Wrote a Work of Fiction That Seemed So Real That It Changed the History of the Country</title>
+      <itunes:title>Harriet Beecher Stowe Wrote a Work of Fiction That Seemed So Real That It Changed the History of the Country</itunes:title>
+      <link>https://www.smithsonianmag.com/history/harriet-beecher-stowe-wrote-work-fiction-that-seemed-so-real-changed-history-country-180988826/</link>
+      <description><![CDATA[<em>Can a story built from shards of real life move a country more than facts alone?</em><br/><br/>The piece, published on 8 June 2026, considers the way a work of fiction can shift the course of history. Harriet Beecher Stowe didn&#x27;t rely on abstract arguments but instead gathered shards of lived experience to create a narrative that felt more real than the news of her day. It raises a quiet, persistent question about the power of empathy: why does a story often succeed where data fails? By looking back at the mid-nineteenth century, the writing finds a blueprint for how literature can dismantle a status quo.<br/><br/>An account of how Harriet Beecher Stowe synthesized first-person slave narratives, abolitionist reporting, and personal loss to write the 1852 novel Uncle Tom’s Cabin. It traces the book’s trajectory from a commercial sensation to a political catalyst that galvanized anti-slavery sentiment before the Civil War, while detailing Stowe’s published defense of her factual sources and subsequent censorship efforts by Southern legislatures.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/harriet-beecher-stowe-wrote-work-fiction-that-seemed-so-real-changed-history-country-180988826/">Smithsonian Magazine</a>]]></description>
+      <content:encoded><![CDATA[<em>Can a story built from shards of real life move a country more than facts alone?</em><br/><br/>The piece, published on 8 June 2026, considers the way a work of fiction can shift the course of history. Harriet Beecher Stowe didn&#x27;t rely on abstract arguments but instead gathered shards of lived experience to create a narrative that felt more real than the news of her day. It raises a quiet, persistent question about the power of empathy: why does a story often succeed where data fails? By looking back at the mid-nineteenth century, the writing finds a blueprint for how literature can dismantle a status quo.<br/><br/>An account of how Harriet Beecher Stowe synthesized first-person slave narratives, abolitionist reporting, and personal loss to write the 1852 novel Uncle Tom’s Cabin. It traces the book’s trajectory from a commercial sensation to a political catalyst that galvanized anti-slavery sentiment before the Civil War, while detailing Stowe’s published defense of her factual sources and subsequent censorship efforts by Southern legislatures.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/harriet-beecher-stowe-wrote-work-fiction-that-seemed-so-real-changed-history-country-180988826/">Smithsonian Magazine</a>]]></content:encoded>
+      <itunes:summary>Can a story built from shards of real life move a country more than facts alone?
+
+The piece, published on 8 June 2026, considers the way a work of fiction can shift the course of history. Harriet Beecher Stowe didn&#x27;t rely on abstract arguments but instead gathered shards of lived experience to create a narrative that felt more real than the news of her day. It raises a quiet, persistent question about the power of empathy: why does a story often succeed where data fails? By looking back at the mid-nineteenth century, the writing finds a blueprint for how literature can dismantle a status quo.
+
+An account of how Harriet Beecher Stowe synthesized first-person slave narratives, abolitionist reporting, and personal loss to write the 1852 novel Uncle Tom’s Cabin. It traces the book’s trajectory from a commercial sensation to a political catalyst that galvanized anti-slavery sentiment before the Civil War, while detailing Stowe’s published defense of her factual sources and subsequent censorship efforts by Southern legislatures.
+
+Read at source: Smithsonian Magazine</itunes:summary>
+      <pubDate>Tue, 23 Jun 2026 07:38:59 +0000</pubDate>
+      <guid isPermaLink="false">aarva-37-1529</guid>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-23/article_1529.mp3" length="5928621" type="audio/mpeg"/>
+      <itunes:duration>12:21</itunes:duration>
+      <itunes:author>Smithsonian Magazine</itunes:author>
+      <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: world cup narratives</title>
       <itunes:title>Crosscut: world cup narratives</itunes:title>
@@ -68,7 +231,7 @@ The Conversation: We ran 100,000 computer simulations of the World Cup. And the 
 Defector: Eloy Room Saved A Place For Himself And Curacao In World Cup History</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:50:26 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-36</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/crosscut_0036.mp3" length="6269805" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/crosscut_0036.mp3" length="6269613" type="audio/mpeg"/>
       <itunes:duration>13:04</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · world cup narratives</itunes:subtitle>
@@ -91,7 +254,7 @@ A chronicle of Fields Medalist Terry Tao’s shift from solitary research toward
 Read at source: Quanta Magazine</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:30:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-35-1498</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1498.mp3" length="14282157" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1498.mp3" length="14281965" type="audio/mpeg"/>
       <itunes:duration>29:45</itunes:duration>
       <itunes:author>Kevin Hartnett</itunes:author>
       <itunes:subtitle>Quanta Magazine</itunes:subtitle>
@@ -114,7 +277,7 @@ A personal reflection on returning to India after a decade abroad, centered on t
 Read at source: Scroll.in</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:30:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-35-1634</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1634.mp3" length="3055341" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1634.mp3" length="3055149" type="audio/mpeg"/>
       <itunes:duration>06:22</itunes:duration>
       <itunes:author>Rahul Fernandes</itunes:author>
       <itunes:subtitle>Scroll.in</itunes:subtitle>
@@ -137,7 +300,7 @@ An examination of the large-scale data-collection efforts fueling China’s huma
 Read at source: Rest of World</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:30:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-35-1265</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1265.mp3" length="2657133" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_1265.mp3" length="2656941" type="audio/mpeg"/>
       <itunes:duration>05:32</itunes:duration>
       <itunes:author>Viola Zhou</itunes:author>
       <itunes:subtitle>Rest of World</itunes:subtitle>
@@ -160,7 +323,7 @@ An analysis of the iterative cycle between Ukrainian frontline units and defense
 Read at source: War on the Rocks</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:30:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-35-57</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_0057.mp3" length="6970797" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_0057.mp3" length="6970605" type="audio/mpeg"/>
       <itunes:duration>14:31</itunes:duration>
       <itunes:author>Viktoriia Honcharuk</itunes:author>
       <itunes:subtitle>War on the Rocks</itunes:subtitle>
@@ -183,7 +346,7 @@ A memoir of relocation and recovery that traces the neurological parallels betwe
 Read at source: Psyche</itunes:summary>
       <pubDate>Mon, 22 Jun 2026 07:30:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-35-3427</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_3427.mp3" length="5795373" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-22/article_3427.mp3" length="5795181" type="audio/mpeg"/>
       <itunes:duration>12:04</itunes:duration>
       <itunes:author>Henrick Karoliszyn</itunes:author>
       <itunes:subtitle>Psyche</itunes:subtitle>
@@ -214,7 +377,7 @@ The American Prospect: Why That Next Hamburger Is Going to Cost You
 Eurozine: Competing for the origin of life</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:24:38 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-34</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/crosscut_0034.mp3" length="11310381" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/crosscut_0034.mp3" length="11310189" type="audio/mpeg"/>
       <itunes:duration>23:34</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · biological containment science</itunes:subtitle>
@@ -237,7 +400,7 @@ An examination of the internal rewards and sensory pleasures associated with the
 Read at source: Aeon</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-1659</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_1659.mp3" length="9105837" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_1659.mp3" length="9105645" type="audio/mpeg"/>
       <itunes:duration>18:58</itunes:duration>
       <itunes:author>Sarah Hendrickx</itunes:author>
       <itunes:subtitle>Aeon</itunes:subtitle>
@@ -260,7 +423,7 @@ Pakistan’s mediation of the peace agreement between the United States and Iran
 Read at source: The Diplomat</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-3459</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3459.mp3" length="4796589" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3459.mp3" length="4796397" type="audio/mpeg"/>
       <itunes:duration>09:59</itunes:duration>
       <itunes:author>Umair Jamal</itunes:author>
       <itunes:subtitle>The Diplomat</itunes:subtitle>
@@ -283,7 +446,7 @@ Five individuals recount the end of slavery across Virginia, Missouri, North Car
 Read at source: The Bulwark</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-3442</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3442.mp3" length="7447533" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3442.mp3" length="7447341" type="audio/mpeg"/>
       <itunes:duration>15:31</itunes:duration>
       <itunes:author>Booker T. Washington et al.</itunes:author>
       <itunes:subtitle>The Bulwark</itunes:subtitle>
@@ -306,7 +469,7 @@ An examination of the psychological and spiritual benefits of prayer for those w
 Read at source: Vox</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-2957</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_2957.mp3" length="4210221" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_2957.mp3" length="4210029" type="audio/mpeg"/>
       <itunes:duration>08:46</itunes:duration>
       <itunes:author>Casper ter Kuile</itunes:author>
       <itunes:subtitle>Vox</itunes:subtitle>
@@ -329,7 +492,7 @@ An examination of the role of cultural rituals in bridging social and political 
 Read at source: The Conversation</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-2628</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_2628.mp3" length="3796845" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_2628.mp3" length="3796653" type="audio/mpeg"/>
       <itunes:duration>07:55</itunes:duration>
       <itunes:author>Steve S. Medeiros, PhD Candidate in Anthropology, University of Connecticut</itunes:author>
       <itunes:subtitle>The Conversation</itunes:subtitle>
@@ -352,7 +515,7 @@ An examination of Simon Paré-Poupart’s memoir, Trash!, which chronicles his d
 Read at source: The Atlantic</itunes:summary>
       <pubDate>Sun, 21 Jun 2026 08:01:09 +0000</pubDate>
       <guid isPermaLink="false">aarva-33-3366</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3366.mp3" length="5415213" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-21/article_3366.mp3" length="5415021" type="audio/mpeg"/>
       <itunes:duration>11:17</itunes:duration>
       <itunes:author>Lily Meyer</itunes:author>
       <itunes:subtitle>The Atlantic</itunes:subtitle>
@@ -383,7 +546,7 @@ Noema: Heritage Exists Beyond Humankind
 Smithsonian Magazine: A Vietnam Veteran Collected Fossils for 66 Years. One, Mislabeled &#x27;Baby Lamprey,&#x27; Made Paleontologists Reconsider How Vertebrates Moved From Water to Land</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:30:56 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-32</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/crosscut_0032.mp3" length="14446701" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/crosscut_0032.mp3" length="14446509" type="audio/mpeg"/>
       <itunes:duration>30:06</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · animal history and evolution</itunes:subtitle>
@@ -406,7 +569,7 @@ An account of the relationship between a father and his oldest daughter, shaped 
 Read at source: The Marshall Project</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:07:11 +0000</pubDate>
       <guid isPermaLink="false">aarva-31-3429</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3429.mp3" length="3220461" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3429.mp3" length="3220269" type="audio/mpeg"/>
       <itunes:duration>06:42</itunes:duration>
       <itunes:author>Demetrius Buckley</itunes:author>
       <itunes:subtitle>The Marshall Project</itunes:subtitle>
@@ -429,7 +592,7 @@ A study of Leonard Cohen’s spiritual philosophy through his lifelong friendshi
 Read at source: Compact</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:07:11 +0000</pubDate>
       <guid isPermaLink="false">aarva-31-3580</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3580.mp3" length="8484717" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3580.mp3" length="8484525" type="audio/mpeg"/>
       <itunes:duration>17:41</itunes:duration>
       <itunes:author>M.G. Scott</itunes:author>
       <itunes:subtitle>Compact</itunes:subtitle>
@@ -452,7 +615,7 @@ The modern antimonopoly movement’s transition from empirical economic inquiry 
 Read at source: Noahpinion</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:07:11 +0000</pubDate>
       <guid isPermaLink="false">aarva-31-1371</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_1371.mp3" length="12467757" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_1371.mp3" length="12467565" type="audio/mpeg"/>
       <itunes:duration>25:58</itunes:duration>
       <itunes:author>Noah Smith</itunes:author>
       <itunes:subtitle>Noahpinion</itunes:subtitle>
@@ -475,7 +638,7 @@ A comparative study of two Vincent van Gogh sunflower paintings exhibited togeth
 Read at source: Defector</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:07:11 +0000</pubDate>
       <guid isPermaLink="false">aarva-31-3422</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3422.mp3" length="4824045" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3422.mp3" length="4823853" type="audio/mpeg"/>
       <itunes:duration>10:03</itunes:duration>
       <itunes:author>Kelsey McKinney</itunes:author>
       <itunes:subtitle>Defector</itunes:subtitle>
@@ -498,7 +661,7 @@ A survey of paternal care strategies across the animal kingdom, from the male pr
 Read at source: Smithsonian Magazine</itunes:summary>
       <pubDate>Sat, 20 Jun 2026 10:07:11 +0000</pubDate>
       <guid isPermaLink="false">aarva-31-3266</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3266.mp3" length="4669101" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-20/article_3266.mp3" length="4668909" type="audio/mpeg"/>
       <itunes:duration>09:44</itunes:duration>
       <itunes:author>Smithsonian Magazine</itunes:author>
       <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
@@ -529,7 +692,7 @@ Defector: AI Animal Videos Are Ruining One Of The Internet’s Last Good Things
 Smithsonian Magazine: A Vietnam Veteran Collected Fossils for 66 Years. One, Mislabeled &#x27;Baby Lamprey,&#x27; Made Paleontologists Reconsider How Vertebrates Moved From Water to Land</itunes:summary>
       <pubDate>Fri, 19 Jun 2026 09:35:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-30</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/crosscut_0030.mp3" length="10559085" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/crosscut_0030.mp3" length="10558893" type="audio/mpeg"/>
       <itunes:duration>22:00</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · documenting the real</itunes:subtitle>
@@ -552,7 +715,7 @@ The development of Carvykti, a CAR-T therapy for multiple myeloma, reflects a re
 Read at source: Works in Progress</itunes:summary>
       <pubDate>Fri, 19 Jun 2026 08:25:06 +0000</pubDate>
       <guid isPermaLink="false">aarva-29-1437</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1437.mp3" length="10768173" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1437.mp3" length="10767981" type="audio/mpeg"/>
       <itunes:duration>22:26</itunes:duration>
       <itunes:author>Works in Progress</itunes:author>
       <itunes:subtitle>Works in Progress</itunes:subtitle>
@@ -575,7 +738,7 @@ An examination of how artificial intelligence is expected to define the 2028 U.S
 Read at source: Noema</itunes:summary>
       <pubDate>Fri, 19 Jun 2026 08:25:06 +0000</pubDate>
       <guid isPermaLink="false">aarva-29-1661</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1661.mp3" length="7264941" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1661.mp3" length="7264749" type="audio/mpeg"/>
       <itunes:duration>15:08</itunes:duration>
       <itunes:author>Nathan Gardels</itunes:author>
       <itunes:subtitle>Noema</itunes:subtitle>
@@ -598,7 +761,7 @@ A critical survey of Chelsey Minnis’s poetry and its career-long rejection of 
 Read at source: The Paris Review Daily</itunes:summary>
       <pubDate>Fri, 19 Jun 2026 08:25:06 +0000</pubDate>
       <guid isPermaLink="false">aarva-29-2523</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_2523.mp3" length="5253741" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_2523.mp3" length="5253549" type="audio/mpeg"/>
       <itunes:duration>10:57</itunes:duration>
       <itunes:author>Jordan Castro</itunes:author>
       <itunes:subtitle>The Paris Review Daily</itunes:subtitle>
@@ -621,7 +784,7 @@ The formal identification of Microeledone galapagensis, a palm-sized octopus spe
 Read at source: Smithsonian Magazine</itunes:summary>
       <pubDate>Fri, 19 Jun 2026 08:25:06 +0000</pubDate>
       <guid isPermaLink="false">aarva-29-1795</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1795.mp3" length="2495853" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-19/article_1795.mp3" length="2495661" type="audio/mpeg"/>
       <itunes:duration>05:12</itunes:duration>
       <itunes:author>Smithsonian Magazine</itunes:author>
       <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
@@ -646,7 +809,7 @@ Quanta Magazine: Are Memories Transferable — or Edible?
 The Atlantic: The Cult of Delayed Gratification Is a Lie</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 12:42:17 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-28</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/crosscut_0028.mp3" length="20894253" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/crosscut_0028.mp3" length="20894061" type="audio/mpeg"/>
       <itunes:duration>43:32</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · revisiting behavioral icons</itunes:subtitle>
@@ -669,7 +832,7 @@ A comparative study of the maritime evasion tactics used by North Korea and Russ
 Read at source: War on the Rocks</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-1455</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_1455.mp3" length="8799597" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_1455.mp3" length="8799405" type="audio/mpeg"/>
       <itunes:duration>18:20</itunes:duration>
       <itunes:author>Olivia Vassalotti</itunes:author>
       <itunes:subtitle>War on the Rocks</itunes:subtitle>
@@ -692,7 +855,7 @@ An examination of the moral psychology of artificial intelligence and the challe
 Read at source: Knowable Magazine</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-3079</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_3079.mp3" length="8371821" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_3079.mp3" length="8371629" type="audio/mpeg"/>
       <itunes:duration>17:26</itunes:duration>
       <itunes:author>Tim Vernimmen</itunes:author>
       <itunes:subtitle>Knowable Magazine</itunes:subtitle>
@@ -715,7 +878,7 @@ An examination of Leo Tolstoy’s philosophy of history in War and Peace, focusi
 Read at source: The Hedgehog Review</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2650</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2650.mp3" length="6564333" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2650.mp3" length="6564141" type="audio/mpeg"/>
       <itunes:duration>13:40</itunes:duration>
       <itunes:author>Julio M. Ottino</itunes:author>
       <itunes:subtitle>The Hedgehog Review</itunes:subtitle>
@@ -738,7 +901,7 @@ An examination of the systemic limitations of a medical model that prioritizes r
 Read at source: STAT News</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2892</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2892.mp3" length="3615405" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2892.mp3" length="3615213" type="audio/mpeg"/>
       <itunes:duration>07:32</itunes:duration>
       <itunes:author>Elizabeth Bevins</itunes:author>
       <itunes:subtitle>STAT News</itunes:subtitle>
@@ -761,7 +924,7 @@ An examination of the challenges inherent in tallying the fundamental particles 
 Read at source: Quanta Magazine</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2612</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2612.mp3" length="7014573" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2612.mp3" length="7014381" type="audio/mpeg"/>
       <itunes:duration>14:37</itunes:duration>
       <itunes:author>Natalie Wolchover</itunes:author>
       <itunes:subtitle>Quanta Magazine</itunes:subtitle>
@@ -784,7 +947,7 @@ An analysis of the diverse forms of paternal absence and their influence on the 
 Read at source: The Conversation</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2624</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2624.mp3" length="4287405" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2624.mp3" length="4287213" type="audio/mpeg"/>
       <itunes:duration>08:56</itunes:duration>
       <itunes:author>Matthew Alemu, Special Advisor, Poverty Solutions, University of Michigan; Northeastern University</itunes:author>
       <itunes:subtitle>The Conversation</itunes:subtitle>
@@ -807,7 +970,7 @@ The rise of clothing-rental services has led many young women to trade garment o
 Read at source: The Atlantic</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2406</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2406.mp3" length="5930157" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2406.mp3" length="5929965" type="audio/mpeg"/>
       <itunes:duration>12:21</itunes:duration>
       <itunes:author>Annie Joy Williams</itunes:author>
       <itunes:subtitle>The Atlantic</itunes:subtitle>
@@ -830,7 +993,7 @@ An account of the Algerian national football team’s residency in Lawrence, Kan
 Read at source: Africa Is a Country</itunes:summary>
       <pubDate>Thu, 18 Jun 2026 11:19:51 +0000</pubDate>
       <guid isPermaLink="false">aarva-27-2691</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2691.mp3" length="3142125" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-18/article_2691.mp3" length="3141933" type="audio/mpeg"/>
       <itunes:duration>06:33</itunes:duration>
       <itunes:author>Maher Mezahi</itunes:author>
       <itunes:subtitle>Africa Is a Country</itunes:subtitle>
@@ -855,7 +1018,7 @@ The Conversation: FIFA’s Haiti jersey ban echoes the long campaign to discredi
 Africa Is a Country: No stress</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 15:18:03 +0000</pubDate>
       <guid isPermaLink="false">aarva-crosscut-26</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/crosscut_0026.mp3" length="9162093" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/crosscut_0026.mp3" length="9161901" type="audio/mpeg"/>
       <itunes:duration>19:05</itunes:duration>
       <itunes:author>Aarva</itunes:author>
       <itunes:subtitle>Crosscut · football and national identity</itunes:subtitle>
@@ -878,7 +1041,7 @@ A series of probabilistic forecasts regarding the development, safety, and geopo
 Read at source: Astral Codex Ten</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-2230</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2230.mp3" length="19182765" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2230.mp3" length="19182573" type="audio/mpeg"/>
       <itunes:duration>39:58</itunes:duration>
       <itunes:author>Scott Alexander</itunes:author>
       <itunes:subtitle>Astral Codex Ten</itunes:subtitle>
@@ -901,7 +1064,7 @@ An examination of the risks artificial intelligence poses to nuclear stability, 
 Read at source: Vox</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-1337</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_1337.mp3" length="11826093" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_1337.mp3" length="11825901" type="audio/mpeg"/>
       <itunes:duration>24:38</itunes:duration>
       <itunes:author>Joshua Keating</itunes:author>
       <itunes:subtitle>Vox</itunes:subtitle>
@@ -924,7 +1087,7 @@ A historical account of the Goan community’s social and legal standing in late
 Read at source: Scroll.in</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-2779</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2779.mp3" length="6879597" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2779.mp3" length="6879405" type="audio/mpeg"/>
       <itunes:duration>14:20</itunes:duration>
       <itunes:author>Selma Carvalho</itunes:author>
       <itunes:subtitle>Scroll.in</itunes:subtitle>
@@ -947,7 +1110,7 @@ Updated ethical guidelines prohibiting newsroom staff from wagering on news even
 Read at source: ProPublica</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-2553</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2553.mp3" length="3057645" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2553.mp3" length="3057453" type="audio/mpeg"/>
       <itunes:duration>06:22</itunes:duration>
       <itunes:author>Diego Sorbara</itunes:author>
       <itunes:subtitle>ProPublica</itunes:subtitle>
@@ -970,7 +1133,7 @@ Alexander Zverev’s victory at Roland-Garros is examined alongside the domestic
 Read at source: Defector</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-2497</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2497.mp3" length="4156461" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2497.mp3" length="4156269" type="audio/mpeg"/>
       <itunes:duration>08:39</itunes:duration>
       <itunes:author>Giri Nathan</itunes:author>
       <itunes:subtitle>Defector</itunes:subtitle>
@@ -993,7 +1156,7 @@ A history of the kite’s development from its ancient origins in China and Poly
 Read at source: Public Domain Review</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-3045</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_3045.mp3" length="5555181" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_3045.mp3" length="5554989" type="audio/mpeg"/>
       <itunes:duration>11:34</itunes:duration>
       <itunes:author>Public Domain Review</itunes:author>
       <itunes:subtitle>Public Domain Review</itunes:subtitle>
@@ -1016,7 +1179,7 @@ An examination of the &quot;U-shaped happiness curve&quot; and the psychological
 Read at source: Psyche</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-2547</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2547.mp3" length="6332397" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_2547.mp3" length="6332205" type="audio/mpeg"/>
       <itunes:duration>13:11</itunes:duration>
       <itunes:author>Xianmin Gong &amp; Natalie Wong</itunes:author>
       <itunes:subtitle>Psyche</itunes:subtitle>
@@ -1039,7 +1202,7 @@ A multi-organization expedition to the remote highlands of Buru, Indonesia, has 
 Read at source: Smithsonian Magazine</itunes:summary>
       <pubDate>Wed, 17 Jun 2026 14:54:41 +0000</pubDate>
       <guid isPermaLink="false">aarva-25-1528</guid>
-      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_1528.mp3" length="3822957" type="audio/mpeg"/>
+      <enclosure url="https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev/output/audio/2026-06-17/article_1528.mp3" length="3822765" type="audio/mpeg"/>
       <itunes:duration>07:58</itunes:duration>
       <itunes:author>Smithsonian Magazine</itunes:author>
       <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
