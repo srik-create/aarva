@@ -166,6 +166,16 @@ Last updated: 2026-06-10
     (e.g., "before we add search, the deferred crosscut-embeddings
     item should land first — still that order?").
 
+17b. **`docs/project_brief.md` is the persistent context.** It
+    captures what Aarva is, the architecture in one paragraph,
+    standing user preferences, and the full chronological decisions
+    log. Read it at session start — together with `AGENTS.md` and
+    `docs/roadmap.md` it's enough to operate without re-deriving
+    context from the conversation. When you make a meaningful
+    decision (editorial, infrastructure, web-app), add a row to the
+    appropriate table in the same commit. Treat the doc and the
+    code change as one unit.
+
 ## Version control
 
 20. **Never commit or push without explicit user sign-off.** At the
