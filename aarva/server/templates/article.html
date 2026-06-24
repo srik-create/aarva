@@ -1,51 +1,130 @@
 {% extends "base.html" %}
 {% block title %}{{ piece.title }} — Aarva{% endblock %}
 {% block content %}
-  <article>
-    <p class="text-xs text-cream-muted uppercase tracking-widest">{{ piece.publication_name }}</p>
-    <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-cream-text">{{ piece.title | title_case }}</h1>
+  {# Wrap the article in an expanded card whose colour matches the
+     JTBD tile that brought the listener here — so the article page
+     visually inherits its home-page identity. #}
+  <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
+    <p class="text-xs text-ink-light uppercase tracking-widest">{{ piece.publication_name }}</p>
+    <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">{{ piece.title | title_case }}</h1>
     {% if piece.byline %}
-      <p class="text-cream-light mt-3">by {{ piece.byline }}</p>
+      <p class="text-ink-light mt-3">by {{ piece.byline }}</p>
     {% endif %}
     {% if piece.published_date %}
-      <p class="text-sm text-cream-muted mt-1">Published {{ piece.published_date }}</p>
+      <p class="text-sm text-ink-light mt-1">Published {{ piece.published_date }}</p>
     {% endif %}
 
     {% if piece.hook %}
-      <p class="hook text-cream-text mt-8 text-xl leading-relaxed">{{ piece.hook }}</p>
+      <p class="hook text-ink mt-8 text-xl leading-relaxed">{{ piece.hook }}</p>
     {% endif %}
 
-    <div class="mt-8">
-      <audio controls>
+    {# ─── Custom audio player with big round Play CTA ─────────────── #}
+    <div class="mt-10" data-player>
+      <div class="flex items-center gap-5">
+        <button type="button"
+                aria-label="Play"
+                class="play-btn shrink-0 w-20 h-20 rounded-full bg-night text-{{ card_color }} flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                data-play-button>
+          {# Play triangle (becomes pause via JS) #}
+          <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <div class="flex-1">
+          <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+            <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+          </div>
+          <p class="text-sm text-ink-light mt-2">
+            <span data-current-time>0:00</span>
+            <span class="mx-1">/</span>
+            <span data-total-time>{{ piece.duration_seconds | duration }}</span>
+            {% if piece.narrator_voice %}
+              <span class="mx-1">·</span> Narrator {{ piece.narrator_voice }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      <audio data-audio class="hidden" preload="metadata">
         <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
       </audio>
-      <p class="text-xs text-cream-muted mt-2">
-        {{ piece.duration_seconds | duration }}
-        {% if piece.narrator_voice %} · Narrator {{ piece.narrator_voice }}{% endif %}
-      </p>
     </div>
 
     {% if piece.contextualisation %}
-      <div class="mt-10">
-        <h2 class="editorial text-xs uppercase tracking-widest text-mint mb-3 font-medium">Context</h2>
-        <p class="text-cream-text leading-relaxed">{{ piece.contextualisation }}</p>
+      <div class="mt-12">
+        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">Context</h2>
+        <p class="text-ink leading-relaxed">{{ piece.contextualisation }}</p>
       </div>
     {% endif %}
 
     {% if piece.show_notes %}
       <div class="mt-10">
-        <h2 class="editorial text-xs uppercase tracking-widest text-mint mb-3 font-medium">Show notes</h2>
-        <div class="text-cream-text leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
+        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">Show notes</h2>
+        <div class="text-ink leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
       </div>
     {% endif %}
 
     {% if piece.canonical_url %}
       <p class="mt-12">
         <a href="{{ piece.canonical_url }}" target="_blank" rel="noopener"
-           class="inline-block px-5 py-3 bg-peach text-peach-dark hover:bg-peach/80 transition-colors rounded-full text-sm font-medium">
+           class="inline-block text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
           Read at {{ piece.publication_name }} →
         </a>
       </p>
     {% endif %}
   </article>
+
+  {# Tiny vanilla-JS audio controller. No deps. Wires the custom UI
+     above to the hidden <audio> element. #}
+  <script>
+    (function() {
+      function fmt(seconds) {
+        if (!seconds || isNaN(seconds)) return '--:--';
+        const s = Math.floor(seconds);
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const ss = (s % 60).toString().padStart(2, '0');
+        return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${ss}` : `${m}:${ss}`;
+      }
+      document.querySelectorAll('[data-player]').forEach(function(player) {
+        const audio   = player.querySelector('[data-audio]');
+        const btn     = player.querySelector('[data-play-button]');
+        const playIco = btn.querySelector('.play-icon');
+        const pauseIco= btn.querySelector('.pause-icon');
+        const track   = player.querySelector('[data-progress-track]');
+        const fill    = player.querySelector('[data-progress-fill]');
+        const curT    = player.querySelector('[data-current-time]');
+        const totT    = player.querySelector('[data-total-time]');
+
+        btn.addEventListener('click', function() {
+          if (audio.paused) { audio.play(); } else { audio.pause(); }
+        });
+        audio.addEventListener('play',  function() {
+          playIco.classList.add('hidden'); pauseIco.classList.remove('hidden');
+          btn.setAttribute('aria-label', 'Pause');
+        });
+        audio.addEventListener('pause', function() {
+          playIco.classList.remove('hidden'); pauseIco.classList.add('hidden');
+          btn.setAttribute('aria-label', 'Play');
+        });
+        audio.addEventListener('timeupdate', function() {
+          if (audio.duration) {
+            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+            curT.textContent = fmt(audio.currentTime);
+          }
+        });
+        audio.addEventListener('loadedmetadata', function() {
+          if (audio.duration) totT.textContent = fmt(audio.duration);
+        });
+        audio.addEventListener('ended', function() {
+          fill.style.width = '0%';
+          curT.textContent = '0:00';
+        });
+        track.addEventListener('click', function(e) {
+          if (!audio.duration) return;
+          const rect = track.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          audio.currentTime = audio.duration * ratio;
+        });
+      });
+    })();
+  </script>
 {% endblock %}

@@ -36,6 +36,21 @@ _JTBD_DISPLAY_ORDER = [
     ("other",            "Other reads",     "paper",    "cream-light"),
 ]
 
+# Lookup: jtbd key → card colour token. Used by /article/<id> to render
+# the per-article detail page in a card the same colour as the home-page
+# tile for that piece. Kept in sync with _JTBD_DISPLAY_ORDER above.
+_JTBD_CARD_COLOR: dict[str, str] = {
+    key: card_color for key, _, card_color, _ in _JTBD_DISPLAY_ORDER
+}
+
+
+def card_color_for_jtbd(jtbd_primary: str | None) -> str:
+    """Return the card-colour token for a JTBD key (e.g. 'keep_ahead'
+    → 'sky'). Falls back to 'paper' for unknown / missing JTBDs."""
+    if not jtbd_primary:
+        return "paper"
+    return _JTBD_CARD_COLOR.get(jtbd_primary, "paper")
+
 
 def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
     """Bucket pieces into JTBD groups in display order. Returns a list
