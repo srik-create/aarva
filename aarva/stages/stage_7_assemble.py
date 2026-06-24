@@ -178,6 +178,15 @@ def _load_candidates(db: Database) -> list[Candidate]:
     ran end up with cluster_id=NULL. That's fine — the topic-cap logic
     treats NULL as "ungrouped" and lets them all through, which is the
     right default since unclustered articles have no known topic affinity.
+
+    Hard-exclude articles that the reviewer rejected in any past edition.
+    Without this, `aarva.review` rejection only resets the article's
+    status back to 'scored' (so Stage 7 can re-fill the same slot in the
+    same edition), which means tomorrow's edition sees the same article
+    again in the candidate pool — defeating the point of the rejection.
+    The NOT EXISTS subquery against edition_rejections enforces the
+    cross-edition block. To 'un-reject' an article later, run:
+        DELETE FROM edition_rejections WHERE article_id = ?
     """
     with db.connect() as conn:
         rows = conn.execute("""
@@ -191,6 +200,10 @@ def _load_candidates(db: Database) -> list[Candidate]:
               JOIN publications p ON p.id = a.publication_id
               LEFT JOIN article_clusters ac ON ac.article_id = a.id
              WHERE a.status = 'scored'
+               AND NOT EXISTS (
+                   SELECT 1 FROM edition_rejections er
+                    WHERE er.article_id = a.id
+               )
         """).fetchall()
     return [
         Candidate(
