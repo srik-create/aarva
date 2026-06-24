@@ -19,21 +19,31 @@
       theme: {
         extend: {
           colors: {
-            // Warm cream backgrounds — slightly paper-like
-            'cream':       '#F8F4ED',  // page background
-            'paper':       '#FFFBF5',  // card surfaces
-            'ink':         '#3A2E1E',  // primary text (warm dark brown)
-            'ink-light':   '#7A6C5A',  // secondary text
-            'ink-muted':   '#9C8E7C',  // tertiary / metadata
-            // Accents — dusty pastels, hand-mixed palette
-            'rose':        '#E8C7B8',  // dusty rose — crosscut highlight, hover
-            'rose-dark':   '#A8755C',  // text on rose backgrounds
-            'sage':        '#C4D0BC',  // soft sage — section dividers
-            'sage-dark':   '#5C6E52',  // text on sage
-            'mustard':     '#D4A04C',  // warm yellow — links, accents
-            'mustard-dark':'#8B6420',  // hover state on links
+            // Bases — slightly warmer cream + cleaner paper
+            'cream':        '#F5EEDF',  // page background — bolder warm cream
+            'paper':        '#FFFAEF',  // card surfaces — warm off-white
+            'ink':          '#2D2418',  // primary text (deep warm brown)
+            'ink-light':    '#6E5F4B',  // secondary text
+            'ink-muted':    '#9C8E7C',  // tertiary / metadata
+
+            // Pastel accent palette — pairs of (tint / dark variant for text)
+            // Used to give each JTBD section its own quiet identity, and
+            // for the crosscut highlight + CTA pill.
+            'sky':          '#B7D2E2',  // dusty blue — future-gazing
+            'sky-dark':     '#3D6985',
+            'peach':        '#F3C9A8',  // warm peach — crosscut card, CTA pill
+            'peach-dark':   '#9C5733',
+            'lemon':        '#EBD978',  // soft yellow — curiosity
+            'lemon-dark':   '#7A6818',
+            'mint':         '#B6D4BA',  // soft green — smart-escape
+            'mint-dark':    '#3F5F44',
+            'blush':        '#EDB6C0',  // soft pink — delight
+            'blush-dark':   '#8C3D4F',
+            'lavender':     '#C7BEDE',  // soft purple — behind-the-news
+            'lavender-dark':'#4F4279',
+
             // Borders — barely-there warm grey
-            'border-soft': '#E6DDD0',
+            'border-soft':  '#E6DCC8',
           },
           fontFamily: {
             'serif': ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
@@ -77,7 +87,7 @@
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
       <a href="/" class="editorial text-2xl font-bold tracking-tightish text-ink">Aarva</a>
       <nav class="text-sm text-ink-light space-x-5">
-        <a href="/editions" class="hover:text-mustard-dark transition-colors">Past editions</a>
+        <a href="/editions" class="hover:text-sky-dark transition-colors">Past editions</a>
       </nav>
     </div>
   </header>

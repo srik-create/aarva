@@ -21,35 +21,35 @@ from aarva.services.queries import (
 )
 
 
-# Display order for JTBD sections on the home page. Matches the
-# editorial framing: feature first, then lens cards (perspective
-# pieces), then curiosity, then the lighter delight + smart_escape
-# slots. Unknown / null JTBDs land in 'other' at the bottom.
+# Display order for JTBD sections on the home page. Each entry:
+#   (jtbd_key, display_label, accent_color_class)
+# The accent class is a Tailwind text color token (see base.html's
+# tailwind.config palette). Each JTBD gets a distinct accent so the
+# section dividers carry a quiet visual rhythm down the page.
 _JTBD_DISPLAY_ORDER = [
-    ("keep_ahead",        "Future-gazing"),
-    ("keep_up_to_date",   "Behind the news"),
-    ("curiosity",         "For the curious"),
-    ("delight",           "Small delights"),
-    ("smart_escape",      "Smart escape"),
-    ("other",             "Other reads"),
+    ("keep_ahead",       "Future-gazing",   "sky-dark"),
+    ("keep_up_to_date",  "Behind the news", "lavender-dark"),
+    ("curiosity",        "For the curious", "lemon-dark"),
+    ("delight",          "Small delights",  "blush-dark"),
+    ("smart_escape",     "Smart escape",    "mint-dark"),
+    ("other",            "Other reads",     "ink-muted"),
 ]
 
 
-def _group_pieces_by_jtbd(pieces: list[dict]) -> "OrderedDict[str, list[dict]]":
-    """Bucket pieces into JTBD groups in display order. Empty groups
-    are omitted from the result so the template doesn't render
-    sections with no content."""
-    buckets: dict[str, list[dict]] = {key: [] for key, _ in _JTBD_DISPLAY_ORDER}
+def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
+    """Bucket pieces into JTBD groups in display order. Returns a list
+    of dicts {label, accent, pieces} ready for Jinja iteration. Empty
+    groups are omitted so the template doesn't render empty sections."""
+    buckets: dict[str, list[dict]] = {key: [] for key, _, _ in _JTBD_DISPLAY_ORDER}
     for p in pieces:
         jtbd = p.get("jtbd_primary") or "other"
         if jtbd not in buckets:
             jtbd = "other"
         buckets[jtbd].append(p)
-    # Preserve the canonical order, drop empty buckets, attach labels.
-    grouped: "OrderedDict[str, list[dict]]" = OrderedDict()
-    for key, label in _JTBD_DISPLAY_ORDER:
+    grouped: list[dict] = []
+    for key, label, accent in _JTBD_DISPLAY_ORDER:
         if buckets[key]:
-            grouped[label] = buckets[key]
+            grouped.append({"label": label, "accent": accent, "pieces": buckets[key]})
     return grouped
 
 

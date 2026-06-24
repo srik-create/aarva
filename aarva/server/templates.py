@@ -44,5 +44,19 @@ def _format_audio_url(audio_url: str | None, audio_base: str = "") -> str:
     return f"{base}/{rel}" if base else f"/{rel}"
 
 
+def _sentence_case(s: str | None) -> str:
+    """Sentence-case a string: first letter capitalised, rest left alone.
+
+    Different from Python's .capitalize() (which lowercases the tail —
+    breaks proper nouns) and from .title() (which uppercases every word —
+    too aggressive). For LLM-generated labels like crosscut topic_label
+    that come back lowercase, this just nudges the first letter up.
+    """
+    if not s:
+        return s or ""
+    return s[0].upper() + s[1:]
+
+
 templates.env.filters["duration"] = _format_duration
 templates.env.filters["audio_url"] = _format_audio_url
+templates.env.filters["sentence_case"] = _sentence_case

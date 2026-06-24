@@ -9,10 +9,10 @@
   </div>
 
   {% if crosscut %}
-    <section class="mb-12 p-6 bg-rose/30 border border-rose rounded-2xl">
-      <p class="text-xs uppercase tracking-widest text-rose-dark font-semibold">Today's Crosscut</p>
+    <section class="mb-12 p-6 bg-peach/40 border border-peach rounded-2xl">
+      <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Today's Crosscut</p>
       <h2 class="editorial text-2xl font-semibold mt-2 leading-snug text-ink">
-        {{ crosscut.topic_label or "Two angles" }}
+        {{ (crosscut.topic_label or "Two angles") | sentence_case }}
       </h2>
       <p class="text-sm text-ink-light mt-3 leading-relaxed">
         <em class="editorial">{{ crosscut.title_a }}</em>
@@ -23,20 +23,20 @@
         <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
       </audio>
       <p class="text-xs text-ink-muted mt-2">
-        {{ crosscut.duration_seconds | duration }} · narrator {{ crosscut.narrator_voice }}
+        {{ crosscut.duration_seconds | duration }} · Narrator {{ crosscut.narrator_voice }}
       </p>
     </section>
   {% endif %}
 
-  {% for group_label, pieces in grouped_pieces.items() %}
+  {% for group in grouped_pieces %}
     <section class="mb-12">
-      <h2 class="editorial text-xs uppercase tracking-widest text-sage-dark mb-5 font-medium">{{ group_label }}</h2>
+      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.accent }} mb-5 font-medium">{{ group.label }}</h2>
       <div class="space-y-6">
-        {% for piece in pieces %}
+        {% for piece in group.pieces %}
           <article class="bg-paper p-6 rounded-2xl border border-border-soft">
             <p class="text-xs text-ink-muted uppercase tracking-wide">{{ piece.publication_name }}</p>
             <h3 class="editorial text-2xl font-semibold leading-snug mt-1 text-ink">
-              <a href="/article/{{ piece.article_id }}" class="hover:text-mustard-dark transition-colors">{{ piece.title }}</a>
+              <a href="/article/{{ piece.article_id }}" class="hover:text-sky-dark transition-colors">{{ piece.title }}</a>
             </h3>
             {% if piece.byline %}
               <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
@@ -49,7 +49,7 @@
             </audio>
             <p class="text-xs text-ink-muted mt-2">
               {{ piece.duration_seconds | duration }}
-              {% if piece.narrator_voice %} · narrator {{ piece.narrator_voice }}{% endif %}
+              {% if piece.narrator_voice %} · Narrator {{ piece.narrator_voice }}{% endif %}
             </p>
           </article>
         {% endfor %}
