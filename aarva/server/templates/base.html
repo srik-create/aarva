@@ -5,30 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Aarva{% endblock %}</title>
   <meta name="description" content="The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI." />
-  {# Tailwind via CDN — replaced by a built bundle later if/when build step lands. #}
+
+  {# ─── Typography ─────────────────────────────────────────────────── #}
+  {# Fraunces (serif, variable) for headings; Inter (sans) for body.   #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  {# ─── Tailwind via CDN with custom config ────────────────────────── #}
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Warm cream backgrounds — slightly paper-like
+            'cream':       '#F8F4ED',  // page background
+            'paper':       '#FFFBF5',  // card surfaces
+            'ink':         '#3A2E1E',  // primary text (warm dark brown)
+            'ink-light':   '#7A6C5A',  // secondary text
+            'ink-muted':   '#9C8E7C',  // tertiary / metadata
+            // Accents — dusty pastels, hand-mixed palette
+            'rose':        '#E8C7B8',  // dusty rose — crosscut highlight, hover
+            'rose-dark':   '#A8755C',  // text on rose backgrounds
+            'sage':        '#C4D0BC',  // soft sage — section dividers
+            'sage-dark':   '#5C6E52',  // text on sage
+            'mustard':     '#D4A04C',  // warm yellow — links, accents
+            'mustard-dark':'#8B6420',  // hover state on links
+            // Borders — barely-there warm grey
+            'border-soft': '#E6DDD0',
+          },
+          fontFamily: {
+            'serif': ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
+            'sans':  ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+          },
+          letterSpacing: {
+            'tightish': '-0.01em',
+          },
+        },
+      },
+    }
+  </script>
+
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .editorial { font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif; }
+    /* Default body uses our sans; headings opt into serif via the
+       `.editorial` utility class kept from earlier templates. */
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .editorial {
+      font-family: 'Fraunces', Georgia, Cambria, serif;
+      font-optical-sizing: auto;
+      letter-spacing: -0.01em;
+    }
+    /* Tighter typographic block on hooks — italic Fraunces is lovely */
+    .hook {
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+    /* Soft, subtle audio player styling — strip the harsh defaults */
+    audio {
+      width: 100%;
+      filter: sepia(0.15) saturate(0.85) hue-rotate(-10deg);
+      border-radius: 9999px;
+    }
   </style>
+
+  <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
 </head>
-<body class="bg-stone-50 text-stone-900">
-  <header class="border-b border-stone-200 bg-white">
-    <div class="max-w-3xl mx-auto px-4 py-4 flex items-baseline justify-between">
-      <a href="/" class="editorial text-2xl font-bold tracking-tight">Aarva</a>
-      <nav class="text-sm text-stone-600 space-x-4">
-        <a href="/editions" class="hover:text-stone-900">Past editions</a>
+<body class="bg-cream text-ink antialiased">
+  <header class="border-b border-border-soft bg-paper">
+    <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
+      <a href="/" class="editorial text-2xl font-bold tracking-tightish text-ink">Aarva</a>
+      <nav class="text-sm text-ink-light space-x-5">
+        <a href="/editions" class="hover:text-mustard-dark transition-colors">Past editions</a>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-8">
+  <main class="max-w-3xl mx-auto px-5 py-10">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="max-w-3xl mx-auto px-4 py-8 text-sm text-stone-500 border-t border-stone-200 mt-12">
-    <p>Aarva — the world as your classroom, the finest journalism as your curriculum.</p>
+  <footer class="max-w-3xl mx-auto px-5 py-10 text-sm text-ink-muted border-t border-border-soft mt-16">
+    <p class="editorial text-base">Aarva</p>
+    <p class="mt-1">The world as your classroom, the finest journalism as your curriculum.</p>
     <p class="mt-1">Written by humans. Narrated by AI.</p>
   </footer>
 </body>

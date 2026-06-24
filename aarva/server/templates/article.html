@@ -2,44 +2,47 @@
 {% block title %}{{ piece.title }} — Aarva{% endblock %}
 {% block content %}
   <article>
-    <p class="text-sm text-stone-500 uppercase tracking-wide">{{ piece.publication_name }}</p>
-    <h1 class="editorial text-3xl font-bold leading-tight mt-1">{{ piece.title }}</h1>
+    <p class="text-xs text-ink-muted uppercase tracking-widest">{{ piece.publication_name }}</p>
+    <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">{{ piece.title }}</h1>
     {% if piece.byline %}
-      <p class="text-stone-600 mt-2">by {{ piece.byline }}</p>
+      <p class="text-ink-light mt-3">by {{ piece.byline }}</p>
     {% endif %}
     {% if piece.published_date %}
-      <p class="text-sm text-stone-500 mt-1">Published {{ piece.published_date }}</p>
+      <p class="text-sm text-ink-muted mt-1">Published {{ piece.published_date }}</p>
     {% endif %}
 
     {% if piece.hook %}
-      <p class="editorial italic text-stone-700 mt-6 text-lg leading-relaxed">{{ piece.hook }}</p>
+      <p class="hook text-ink mt-8 text-xl leading-relaxed">{{ piece.hook }}</p>
     {% endif %}
 
-    <audio controls class="mt-6 w-full">
-      <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-    </audio>
-    <p class="text-xs text-stone-500 mt-2">
-      {{ piece.duration_seconds | duration }}
-      {% if piece.narrator_voice %} · narrator {{ piece.narrator_voice }}{% endif %}
-    </p>
+    <div class="mt-8">
+      <audio controls>
+        <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+      </audio>
+      <p class="text-xs text-ink-muted mt-2">
+        {{ piece.duration_seconds | duration }}
+        {% if piece.narrator_voice %} · narrator {{ piece.narrator_voice }}{% endif %}
+      </p>
+    </div>
 
     {% if piece.contextualisation %}
-      <div class="mt-8 prose prose-stone max-w-none">
-        <h2 class="editorial text-sm uppercase tracking-widest text-stone-500">Context</h2>
-        <p class="editorial text-stone-700 leading-relaxed">{{ piece.contextualisation }}</p>
+      <div class="mt-10">
+        <h2 class="editorial text-xs uppercase tracking-widest text-sage-dark mb-3 font-medium">Context</h2>
+        <p class="text-ink leading-relaxed">{{ piece.contextualisation }}</p>
       </div>
     {% endif %}
 
     {% if piece.show_notes %}
-      <div class="mt-8">
-        <h2 class="editorial text-sm uppercase tracking-widest text-stone-500 mb-2">Show notes</h2>
-        <div class="text-stone-700 leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
+      <div class="mt-10">
+        <h2 class="editorial text-xs uppercase tracking-widest text-sage-dark mb-3 font-medium">Show notes</h2>
+        <div class="text-ink leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
       </div>
     {% endif %}
 
     {% if piece.canonical_url %}
-      <p class="mt-8 text-sm">
-        <a href="{{ piece.canonical_url }}" target="_blank" rel="noopener" class="text-amber-700 hover:text-amber-900 underline">
+      <p class="mt-12">
+        <a href="{{ piece.canonical_url }}" target="_blank" rel="noopener"
+           class="inline-block px-5 py-3 bg-rose/40 text-rose-dark hover:bg-rose/60 transition-colors rounded-full text-sm font-medium">
           Read at {{ piece.publication_name }} →
         </a>
       </p>
