@@ -19,19 +19,22 @@
       theme: {
         extend: {
           colors: {
-            // Bases — slightly warmer cream + cleaner paper
-            'cream':        '#F5EEDF',  // page background — bolder warm cream
-            'paper':        '#FFFAEF',  // card surfaces — warm off-white
-            'ink':          '#2D2418',  // primary text (deep warm brown)
-            'ink-light':    '#6E5F4B',  // secondary text
-            'ink-muted':    '#9C8E7C',  // tertiary / metadata
+            // Dark theme: warm dark background with pastel cards "floating"
+            // on top. Each JTBD gets its own card colour.
+            'night':        '#1A1410',  // page background — deep coffee brown
+            'night-soft':   '#251B14',  // header / footer subtle lift
+            'night-border': '#3A2D22',  // dividers, soft borders on dark
+            'cream-text':   '#F5EEDF',  // primary text on dark (former cream)
+            'cream-light':  '#B7A78D',  // secondary text on dark
+            'cream-muted':  '#7E715E',  // tertiary / metadata on dark
+            'ink':          '#2D2418',  // text on pastel cards (deep warm brown)
+            'ink-light':    '#6E5F4B',  // secondary text on cards
 
-            // Pastel accent palette — pairs of (tint / dark variant for text)
-            // Used to give each JTBD section its own quiet identity, and
-            // for the crosscut highlight + CTA pill.
+            // Pastel cards — saturated enough to "lift" off the dark page.
+            // Each pairs with -dark for any inline metadata text on the card.
             'sky':          '#B7D2E2',  // dusty blue — future-gazing
-            'sky-dark':     '#3D6985',
-            'peach':        '#F3C9A8',  // warm peach — crosscut card, CTA pill
+            'sky-dark':     '#2C5878',
+            'peach':        '#F3C9A8',  // warm peach — crosscut highlight + CTA
             'peach-dark':   '#9C5733',
             'lemon':        '#EBD978',  // soft yellow — curiosity
             'lemon-dark':   '#7A6818',
@@ -41,9 +44,7 @@
             'blush-dark':   '#8C3D4F',
             'lavender':     '#C7BEDE',  // soft purple — behind-the-news
             'lavender-dark':'#4F4279',
-
-            // Borders — barely-there warm grey
-            'border-soft':  '#E6DCC8',
+            'paper':        '#F5EEDF',  // neutral cream card (other / fallback)
           },
           fontFamily: {
             'serif': ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
@@ -72,22 +73,21 @@
       font-style: italic;
       font-weight: 400;
     }
-    /* Soft, subtle audio player styling — strip the harsh defaults */
+    /* Audio player: subtle, doesn't fight the pastel cards */
     audio {
       width: 100%;
-      filter: sepia(0.15) saturate(0.85) hue-rotate(-10deg);
       border-radius: 9999px;
     }
   </style>
 
   <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
 </head>
-<body class="bg-cream text-ink antialiased">
-  <header class="border-b border-border-soft bg-paper">
+<body class="bg-night text-cream-text antialiased">
+  <header class="border-b border-night-border bg-night-soft">
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
-      <a href="/" class="editorial text-2xl font-bold tracking-tightish text-ink">Aarva</a>
-      <nav class="text-sm text-ink-light space-x-5">
-        <a href="/editions" class="hover:text-sky-dark transition-colors">Past editions</a>
+      <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
+      <nav class="text-sm text-cream-light space-x-5">
+        <a href="/editions" class="hover:text-cream-text transition-colors">Past editions</a>
       </nav>
     </div>
   </header>
@@ -96,8 +96,8 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="max-w-3xl mx-auto px-5 py-10 text-sm text-ink-muted border-t border-border-soft mt-16">
-    <p class="editorial text-base">Aarva</p>
+  <footer class="max-w-3xl mx-auto px-5 py-10 text-sm text-cream-muted border-t border-night-border mt-16">
+    <p class="editorial text-base text-cream-light">Aarva</p>
     <p class="mt-1">The world as your classroom, the finest journalism as your curriculum.</p>
     <p class="mt-1">Written by humans. Narrated by AI.</p>
   </footer>

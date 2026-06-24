@@ -4,25 +4,25 @@
 
 {% block content %}
   <div class="mb-10">
-    <p class="text-xs text-ink-muted uppercase tracking-widest">Daily edition</p>
-    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-ink">{{ edition_date }}</h1>
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Daily edition</p>
+    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-cream-text">{{ edition_date }}</h1>
   </div>
 
   {% if crosscut %}
-    <section class="mb-12 p-6 bg-peach/40 border border-peach rounded-2xl">
+    <section class="mb-12 p-6 bg-peach rounded-2xl text-ink">
       <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Today's Crosscut</p>
-      <h2 class="editorial text-2xl font-semibold mt-2 leading-snug text-ink">
-        {{ (crosscut.topic_label or "Two angles") | sentence_case }}
+      <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">
+        {{ (crosscut.topic_label or "Two angles") | title_case }}
       </h2>
       <p class="text-sm text-ink-light mt-3 leading-relaxed">
-        <em class="editorial">{{ crosscut.title_a }}</em>
-        <span class="text-ink-muted mx-1">×</span>
-        <em class="editorial">{{ crosscut.title_b }}</em>
+        <em class="editorial">{{ crosscut.title_a | title_case }}</em>
+        <span class="text-ink-light mx-1">×</span>
+        <em class="editorial">{{ crosscut.title_b | title_case }}</em>
       </p>
       <audio controls class="mt-4">
         <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
       </audio>
-      <p class="text-xs text-ink-muted mt-2">
+      <p class="text-xs text-ink-light mt-2">
         {{ crosscut.duration_seconds | duration }} · Narrator {{ crosscut.narrator_voice }}
       </p>
     </section>
@@ -30,13 +30,13 @@
 
   {% for group in grouped_pieces %}
     <section class="mb-12">
-      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.accent }} mb-5 font-medium">{{ group.label }}</h2>
-      <div class="space-y-6">
+      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.header_color }} mb-5 font-medium">{{ group.label }}</h2>
+      <div class="space-y-5">
         {% for piece in group.pieces %}
-          <article class="bg-paper p-6 rounded-2xl border border-border-soft">
-            <p class="text-xs text-ink-muted uppercase tracking-wide">{{ piece.publication_name }}</p>
+          <article class="bg-{{ group.card_color }} p-6 rounded-2xl text-ink">
+            <p class="text-xs text-ink-light uppercase tracking-wide">{{ piece.publication_name }}</p>
             <h3 class="editorial text-2xl font-semibold leading-snug mt-1 text-ink">
-              <a href="/article/{{ piece.article_id }}" class="hover:text-sky-dark transition-colors">{{ piece.title }}</a>
+              <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
             </h3>
             {% if piece.byline %}
               <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
@@ -47,7 +47,7 @@
             <audio controls class="mt-4">
               <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
             </audio>
-            <p class="text-xs text-ink-muted mt-2">
+            <p class="text-xs text-ink-light mt-2">
               {{ piece.duration_seconds | duration }}
               {% if piece.narrator_voice %} · Narrator {{ piece.narrator_voice }}{% endif %}
             </p>
@@ -58,6 +58,6 @@
   {% endfor %}
 
   {% if not grouped_pieces %}
-    <p class="text-ink-muted">No pieces published yet for {{ edition_date }}.</p>
+    <p class="text-cream-muted">No pieces published yet for {{ edition_date }}.</p>
   {% endif %}
 {% endblock %}
