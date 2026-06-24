@@ -19,12 +19,34 @@
         <span class="text-ink-light mx-1">×</span>
         <em class="editorial">{{ crosscut.title_b | title_case }}</em>
       </p>
-      <audio controls class="mt-4">
-        <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-      </audio>
-      <p class="text-xs text-ink-light mt-2">
-        {{ crosscut.duration_seconds | duration }} · Narrator {{ crosscut.narrator_voice }}
-      </p>
+      {# Custom player (compact variant — same component as the article
+         detail page, smaller round button to fit the tile context). #}
+      <div class="mt-5" data-player>
+        <div class="flex items-center gap-4">
+          <button type="button" aria-label="Play"
+                  class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                  data-play-button>
+            <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <div class="flex-1">
+            <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+              <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+            </div>
+            <p class="text-xs text-ink-light mt-2">
+              <span data-current-time>0:00</span>
+              <span class="mx-1">/</span>
+              <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
+              {% if crosscut.narrator_voice %}
+                <span class="mx-1">·</span> Narrator {{ crosscut.narrator_voice }}
+              {% endif %}
+            </p>
+          </div>
+        </div>
+        <audio data-audio class="hidden" preload="metadata">
+          <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+        </audio>
+      </div>
     </section>
   {% endif %}
 
@@ -44,13 +66,34 @@
             {% if piece.hook %}
               <p class="hook text-ink mt-4 text-lg leading-relaxed">{{ piece.hook }}</p>
             {% endif %}
-            <audio controls class="mt-4">
-              <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-            </audio>
-            <p class="text-xs text-ink-light mt-2">
-              {{ piece.duration_seconds | duration }}
-              {% if piece.narrator_voice %} · Narrator {{ piece.narrator_voice }}{% endif %}
-            </p>
+            {# Custom player (compact). Same component as article detail
+               page; smaller round button + thinner row to fit the tile. #}
+            <div class="mt-5" data-player>
+              <div class="flex items-center gap-4">
+                <button type="button" aria-label="Play"
+                        class="shrink-0 w-14 h-14 rounded-full bg-night text-{{ group.card_color }} flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                        data-play-button>
+                  <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                </button>
+                <div class="flex-1">
+                  <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                    <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+                  </div>
+                  <p class="text-xs text-ink-light mt-2">
+                    <span data-current-time>0:00</span>
+                    <span class="mx-1">/</span>
+                    <span data-total-time>{{ piece.duration_seconds | duration }}</span>
+                    {% if piece.narrator_voice %}
+                      <span class="mx-1">·</span> Narrator {{ piece.narrator_voice }}
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+              <audio data-audio class="hidden" preload="metadata">
+                <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+              </audio>
+            </div>
           </article>
         {% endfor %}
       </div>

@@ -108,57 +108,5 @@
     {% endif %}
   </article>
 
-  {# Reuse the same custom-player JS as article.html. #}
-  <script>
-    (function() {
-      function fmt(seconds) {
-        if (!seconds || isNaN(seconds)) return '--:--';
-        const s = Math.floor(seconds);
-        const h = Math.floor(s / 3600);
-        const m = Math.floor((s % 3600) / 60);
-        const ss = (s % 60).toString().padStart(2, '0');
-        return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${ss}` : `${m}:${ss}`;
-      }
-      document.querySelectorAll('[data-player]').forEach(function(player) {
-        const audio   = player.querySelector('[data-audio]');
-        const btn     = player.querySelector('[data-play-button]');
-        const playIco = btn.querySelector('.play-icon');
-        const pauseIco= btn.querySelector('.pause-icon');
-        const track   = player.querySelector('[data-progress-track]');
-        const fill    = player.querySelector('[data-progress-fill]');
-        const curT    = player.querySelector('[data-current-time]');
-        const totT    = player.querySelector('[data-total-time]');
-        btn.addEventListener('click', function() {
-          if (audio.paused) { audio.play(); } else { audio.pause(); }
-        });
-        audio.addEventListener('play',  function() {
-          playIco.classList.add('hidden'); pauseIco.classList.remove('hidden');
-          btn.setAttribute('aria-label', 'Pause');
-        });
-        audio.addEventListener('pause', function() {
-          playIco.classList.remove('hidden'); pauseIco.classList.add('hidden');
-          btn.setAttribute('aria-label', 'Play');
-        });
-        audio.addEventListener('timeupdate', function() {
-          if (audio.duration) {
-            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-            curT.textContent = fmt(audio.currentTime);
-          }
-        });
-        audio.addEventListener('loadedmetadata', function() {
-          if (audio.duration) totT.textContent = fmt(audio.duration);
-        });
-        audio.addEventListener('ended', function() {
-          fill.style.width = '0%';
-          curT.textContent = '0:00';
-        });
-        track.addEventListener('click', function(e) {
-          if (!audio.duration) return;
-          const rect = track.getBoundingClientRect();
-          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          audio.currentTime = audio.duration * ratio;
-        });
-      });
-    })();
-  </script>
+  {# Player JS is shared via base.html. #}
 {% endblock %}
