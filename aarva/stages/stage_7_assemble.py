@@ -59,13 +59,27 @@ class SlotSpec:
     publication_filter: Optional[str] = None   # case-insens. substr match on pub name
     topic_keyword: Optional[str] = None        # case-insens. substr match on title
     description: str = ""
+    # Per-slot freshness window. None = no date filter (the default,
+    # appropriate for evergreen slots like deep_feature, curiosity,
+    # smart_escape, delight). For news-y / forward-looking slots
+    # (lens_card_future, lens_card_behind), the slot is meaningless
+    # if the candidate is months old — so we cap to last N days.
+    # Configurable per slot via assembly.slot_max_age_days in
+    # pipeline.yaml (overrides the V01_SLOTS default).
+    max_age_days: Optional[int] = None
 
 
 V01_SLOTS: list[SlotSpec] = [
     SlotSpec("deep_feature",      description="anchor long-form piece, any lens"),
-    SlotSpec("lens_card_future",  lens="future_gazing"),
+    # Future-gazing pieces lose relevance fast — a 'where the world is
+    # heading' essay from 3 months ago is in a different world than
+    # today. Capped to the last 6 days by default; override via
+    # assembly.slot_max_age_days.lens_card_future in pipeline.yaml.
+    SlotSpec("lens_card_future",  lens="future_gazing",       max_age_days=6),
     SlotSpec("lens_card_humans",  lens="humans_and_humanity"),
-    SlotSpec("lens_card_behind",  lens="behind_the_news"),
+    # Behind-the-news is news-adjacent context — only meaningful if the
+    # underlying news is still recent. Same 6-day cap as future-gazing.
+    SlotSpec("lens_card_behind",  lens="behind_the_news",     max_age_days=6),
     SlotSpec("curiosity",         jtbd="curiosity"),
     # Two smart-escape slots: lineups skew cerebral and the reviewer
     # benefits from a light-hearted alternative they can keep or drop
@@ -86,9 +100,11 @@ V01_SLOTS: list[SlotSpec] = [
 # the SlotSpec side replays the same lens/JTBD constraints as V01_SLOTS.
 SLOT_ALIASES: dict[str, SlotSpec] = {
     "feature":   SlotSpec("deep_feature",     description="extra deep feature"),
-    "future":    SlotSpec("lens_card_future", lens="future_gazing"),
+    "future":    SlotSpec("lens_card_future", lens="future_gazing",
+                          max_age_days=6),
     "humans":    SlotSpec("lens_card_humans", lens="humans_and_humanity"),
-    "behind":    SlotSpec("lens_card_behind", lens="behind_the_news"),
+    "behind":    SlotSpec("lens_card_behind", lens="behind_the_news",
+                          max_age_days=6),
     "curiosity": SlotSpec("curiosity",        jtbd="curiosity"),
     "escape":    SlotSpec("smart_escape",     jtbd="smart_escape"),
     "delight":   SlotSpec("delight",          jtbd="delight"),
@@ -113,6 +129,7 @@ class Candidate:
     publication_id: int
     publication_name: str
     cluster_id: Optional[int]   # event cluster from Stage 1.5, for topic-cap
+    published_date: Optional[date]   # used by slots with max_age_days
 
 
 # Length buckets (kickoff §2: short ≤ 8 min, medium 8-15 min, long > 15 min).
@@ -178,10 +195,20 @@ def _load_candidates(db: Database) -> list[Candidate]:
     ran end up with cluster_id=NULL. That's fine — the topic-cap logic
     treats NULL as "ungrouped" and lets them all through, which is the
     right default since unclustered articles have no known topic affinity.
+
+    Hard-exclude articles that the reviewer rejected in any past edition.
+    Without this, `aarva.review` rejection only resets the article's
+    status back to 'scored' (so Stage 7 can re-fill the same slot in the
+    same edition), which means tomorrow's edition sees the same article
+    again in the candidate pool — defeating the point of the rejection.
+    The NOT EXISTS subquery against edition_rejections enforces the
+    cross-edition block. To 'un-reject' an article later, run:
+        DELETE FROM edition_rejections WHERE article_id = ?
     """
     with db.connect() as conn:
         rows = conn.execute("""
             SELECT a.id, a.title, a.word_count, a.publication_id,
+                   a.published_date,
                    p.name AS publication_name,
                    s.lens, s.pillar, s.jtbd_primary, s.jtbd_secondary,
                    COALESCE(s.ranking_score, 0.0) AS ranking_score,
@@ -191,6 +218,10 @@ def _load_candidates(db: Database) -> list[Candidate]:
               JOIN publications p ON p.id = a.publication_id
               LEFT JOIN article_clusters ac ON ac.article_id = a.id
              WHERE a.status = 'scored'
+               AND NOT EXISTS (
+                   SELECT 1 FROM edition_rejections er
+                    WHERE er.article_id = a.id
+               )
         """).fetchall()
     return [
         Candidate(
@@ -205,9 +236,23 @@ def _load_candidates(db: Database) -> list[Candidate]:
             publication_id=int(r["publication_id"]),
             publication_name=r["publication_name"],
             cluster_id=(int(r["cluster_id"]) if r["cluster_id"] is not None else None),
+            published_date=_parse_iso_date(r["published_date"]),
         )
         for r in rows
     ]
+
+
+def _parse_iso_date(value) -> Optional[date]:
+    """SQLite's date columns come back as strings ('2026-06-20') or
+    None. Parse to a date object, swallow malformed values as None."""
+    if not value:
+        return None
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except (ValueError, TypeError):
+        return None
 
 
 def _articles_used_in_past_editions(db: Database) -> set[int]:
@@ -559,9 +604,18 @@ def _approved_pieces_for_edition(db: Database, edition_id: int) -> dict[str, lis
 # Slot selection
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _matches_slot(candidate: Candidate, slot: SlotSpec) -> bool:
+def _matches_slot(
+    candidate: Candidate,
+    slot: SlotSpec,
+    today: Optional[date] = None,
+) -> bool:
     """Strict match: lens + JTBD (primary OR secondary) + publication +
-    topic keyword must all match if specified. Unspecified = wildcard."""
+    topic keyword + freshness window must all match if specified.
+    Unspecified = wildcard.
+
+    today: edition date the slot is being filled for. Required when
+    slot.max_age_days is set (otherwise the freshness check no-ops).
+    """
     if slot.lens is not None and candidate.lens != slot.lens:
         return False
     if slot.jtbd is not None:
@@ -577,6 +631,16 @@ def _matches_slot(candidate: Candidate, slot: SlotSpec) -> bool:
         # Case-insensitive substring match against title. Excerpt search
         # is intentionally out of scope (Candidate doesn't carry it).
         if slot.topic_keyword.lower() not in (candidate.title or "").lower():
+            return False
+    if slot.max_age_days is not None and today is not None:
+        # News-y slots (lens_card_future / lens_card_behind) require the
+        # candidate to be within the freshness window. Articles with no
+        # published_date are excluded — we can't verify their age, and
+        # for time-sensitive slots, the safer default is to skip.
+        if candidate.published_date is None:
+            return False
+        age = (today - candidate.published_date).days
+        if age > slot.max_age_days:
             return False
     return True
 
@@ -596,6 +660,7 @@ def _select_for_slot(
     publication_penalties: Optional[dict[int, float]] = None,
     taste_scores: Optional[dict[int, float]] = None,
     taste_bias_weight: float = 0.0,
+    today: Optional[date] = None,
 ) -> Optional[Candidate]:
     """Pick the best candidate for a slot.
 
@@ -617,7 +682,7 @@ def _select_for_slot(
     """
     pool = [c for c in candidates
             if c.article_id not in already_chosen
-            and _matches_slot(c, slot)]
+            and _matches_slot(c, slot, today=today)]
     if not pool:
         return None
 
@@ -918,6 +983,20 @@ def assemble_edition(
     max_per_publication = int(assembly_cfg.get("max_per_publication_per_edition", 1))
     max_per_cluster = int(assembly_cfg.get("max_per_cluster_per_edition", 1))
 
+    # Apply per-slot max_age_days overrides from pipeline.yaml. The
+    # V01_SLOTS defaults (6 days for lens_card_future and
+    # lens_card_behind) already match the intent. This block lets the
+    # user adjust them or add caps to other slots via
+    # assembly.slot_max_age_days without code changes.
+    slot_age_overrides = assembly_cfg.get("slot_max_age_days", {}) or {}
+    if slot_age_overrides:
+        from dataclasses import replace
+        edition_slots = [
+            replace(s, max_age_days=int(slot_age_overrides[s.name]))
+            if s.name in slot_age_overrides else s
+            for s in edition_slots
+        ]
+
     # Length-distribution targets scale to the number of slots in this
     # particular edition (after any add/drop overrides).
     length_dist_cfg = assembly_cfg.get("length_distribution", {}) or {}
@@ -1058,6 +1137,7 @@ def assemble_edition(
             publication_penalties=publication_penalties,
             taste_scores=taste_scores,
             taste_bias_weight=taste_bias_weight,
+            today=today,
         )
         if pick is None:
             stats.slots_skipped.append(slot.name)
