@@ -52,11 +52,19 @@
 
   {% for group in grouped_pieces %}
     <section class="mb-12">
-      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.header_color }} mb-5 font-medium">{{ group.label }}</h2>
+      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.header_color }} mb-5 font-medium">
+        {% if group.slug %}
+          <a href="/category/{{ group.slug }}" class="hover:opacity-70 transition-opacity">{{ group.label }} →</a>
+        {% else %}
+          {{ group.label }}
+        {% endif %}
+      </h2>
       <div class="space-y-5">
         {% for piece in group.pieces %}
           <article class="bg-{{ group.card_color }} p-6 rounded-2xl text-ink">
-            <p class="text-xs text-ink-light uppercase tracking-wide">{{ piece.publication_name }}</p>
+            <p class="text-xs text-ink-light uppercase tracking-wide">
+              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
+            </p>
             <h3 class="editorial text-2xl font-semibold leading-snug mt-1 text-ink">
               <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
             </h3>

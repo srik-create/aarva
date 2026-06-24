@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ publication.name }} — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-10">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Publication</p>
+    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-cream-text">{{ publication.name }}</h1>
+    {% if publication.homepage %}
+      <p class="mt-3 text-sm">
+        <a href="{{ publication.homepage }}" target="_blank" rel="noopener"
+           class="text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted/40 hover:decoration-cream-light transition-colors">
+          {{ publication.homepage }} →
+        </a>
+      </p>
+    {% endif %}
+  </div>
+
+  {% if pieces %}
+    <div class="space-y-4">
+      {% for piece in pieces %}
+        <article class="bg-night-soft rounded-2xl p-6 text-cream-text">
+          <p class="text-xs text-cream-muted uppercase tracking-wide">
+            <span>{{ piece.edition_date }}</span>
+            {% if piece.jtbd_primary %}
+              <span class="mx-2">·</span>
+              <span>{{ piece.jtbd_primary | replace("_", " ") | title_case }}</span>
+            {% endif %}
+          </p>
+          <h3 class="editorial text-xl font-semibold leading-snug mt-1 text-cream-text">
+            <a href="/article/{{ piece.article_id }}" class="hover:text-peach transition-colors">{{ piece.title | title_case }}</a>
+          </h3>
+          {% if piece.byline %}
+            <p class="text-sm text-cream-light mt-1">by {{ piece.byline }}</p>
+          {% endif %}
+          {% if piece.hook %}
+            <p class="hook text-cream-light mt-3 leading-relaxed">{{ piece.hook }}</p>
+          {% endif %}
+          <p class="text-xs text-cream-muted mt-3">
+            {{ piece.duration_seconds | duration }}
+            {% if piece.narrator_voice %} · Narrator {{ piece.narrator_voice }}{% endif %}
+          </p>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-cream-muted">No published pieces from this publication yet.</p>
+  {% endif %}
+{% endblock %}

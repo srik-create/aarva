@@ -8,4 +8,6 @@ Importing this package triggers all route registrations as a
 side-effect — aarva/server/app.py imports this at module-load time
 so every route is wired up before uvicorn starts serving.
 """
-from aarva.server.routes import home, editions, articles, crosscuts    # noqa: F401
+from aarva.server.routes import (   # noqa: F401
+    landing, home, editions, articles, crosscuts, categories, publications,
+)

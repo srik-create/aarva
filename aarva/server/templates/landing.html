@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Aarva — Daily audio journalism, narrated by AI{% endblock %}
+{% block content %}
+  <section class="mt-8 md:mt-16">
+    <p class="hook text-cream-light text-lg md:text-xl leading-relaxed">
+      The world as your classroom, the finest journalism as your curriculum.
+    </p>
+    <h1 class="editorial text-5xl md:text-6xl font-bold tracking-tightish mt-6 text-cream-text leading-tight">
+      Daily audio<br/>journalism,<br/>narrated by AI.
+    </h1>
+
+    <div class="mt-10 flex items-center gap-4">
+      <a href="/today"
+         class="inline-flex items-center gap-3 px-6 py-3 bg-peach text-ink rounded-full font-medium hover:bg-peach/80 transition-colors">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Listen to today's edition
+      </a>
+      <a href="/editions" class="text-sm text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted/40 hover:decoration-cream-light transition-colors">
+        Past editions
+      </a>
+    </div>
+  </section>
+
+  <section class="mt-20 md:mt-28 max-w-2xl">
+    <h2 class="editorial text-2xl font-semibold text-cream-text">What Aarva does</h2>
+    <p class="text-cream-light mt-4 leading-relaxed">
+      Every day, Aarva selects a small set of long-form journalism pieces — essays,
+      reporting, ideas — across a span of topics. We narrate them and shape them into
+      a single daily edition you can listen to like a podcast.
+    </p>
+    <p class="text-cream-light mt-4 leading-relaxed">
+      You also get a <em>Crosscut</em> each day: two articles played back-to-back with
+      a bridge between them, surfacing connections you'd otherwise miss.
+    </p>
+    <p class="text-cream-light mt-4 leading-relaxed">
+      Pieces are chosen for rigour and editorial integrity, not for engagement.
+      No breaking news. No anxiety cycle. Journalism that delights, educates and
+      expands the mind.
+    </p>
+  </section>
+
+  <section class="mt-20 md:mt-28 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-night-soft rounded-2xl p-6">
+      <p class="editorial text-3xl font-bold text-cream-text">{{ n_pieces }}</p>
+      <p class="text-sm text-cream-light mt-2">pieces published</p>
+    </div>
+    <div class="bg-night-soft rounded-2xl p-6">
+      <p class="editorial text-3xl font-bold text-cream-text">{{ n_pubs }}</p>
+      <p class="text-sm text-cream-light mt-2">publications curated</p>
+    </div>
+    <div class="bg-night-soft rounded-2xl p-6">
+      <p class="editorial text-3xl font-bold text-cream-text">Daily</p>
+      <p class="text-sm text-cream-light mt-2">new edition every day</p>
+    </div>
+  </section>
+
+  <section class="mt-20 md:mt-28 max-w-2xl">
+    <h2 class="editorial text-2xl font-semibold text-cream-text">Browse</h2>
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="/today" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Today's edition</p>
+        <p class="text-sm text-cream-light mt-1">Latest selection, JTBD-grouped.</p>
+      </a>
+      <a href="/editions" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Past editions</p>
+        <p class="text-sm text-cream-light mt-1">Browse by date.</p>
+      </a>
+      <a href="/categories" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Categories</p>
+        <p class="text-sm text-cream-light mt-1">Future-gazing, behind the news, more.</p>
+      </a>
+      <a href="/publications" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Publications</p>
+        <p class="text-sm text-cream-light mt-1">The sources we draw from.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="mt-20 md:mt-28 max-w-2xl">
+    <h2 class="editorial text-2xl font-semibold text-cream-text">Or subscribe wherever you listen</h2>
+    <p class="text-cream-light mt-4 leading-relaxed">
+      Aarva is a podcast feed. Subscribe in Apple Podcasts, Spotify, YouTube,
+      or any podcast app via the
+      <a href="https://srik-create.github.io/aarva/feed.xml" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">RSS feed</a>.
+    </p>
+  </section>
+{% endblock %}

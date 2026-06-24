@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Categories — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-10">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Browse</p>
+    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-cream-text">Categories</h1>
+    <p class="text-cream-light mt-4 max-w-2xl leading-relaxed">
+      Aarva organises pieces by what they're doing for the listener. Click any
+      category to see every piece in it.
+    </p>
+  </div>
+
+  <div class="space-y-4">
+    {% for cat in categories %}
+      <a href="/category/{{ cat.slug }}"
+         class="block bg-{{ cat.card_color }} text-ink rounded-2xl p-6 hover:opacity-90 transition-opacity">
+        <div class="flex items-baseline justify-between gap-4">
+          <h2 class="editorial text-2xl font-semibold leading-snug">{{ cat.label }}</h2>
+          <p class="text-sm text-ink-light shrink-0">{{ cat.count }} piece{% if cat.count != 1 %}s{% endif %}</p>
+        </div>
+        <p class="text-ink-light mt-3 leading-relaxed">{{ cat.description }}</p>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

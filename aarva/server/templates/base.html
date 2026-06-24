@@ -87,8 +87,14 @@
   <header class="border-b border-night-border bg-night-soft">
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
       <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
-      <nav class="text-sm text-cream-light space-x-5">
-        <a href="/editions" class="hover:text-cream-text transition-colors">Past editions</a>
+      <nav class="text-sm text-cream-light space-x-5 hidden sm:block">
+        <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
+        <a href="/editions" class="hover:text-cream-text transition-colors">Editions</a>
+        <a href="/categories" class="hover:text-cream-text transition-colors">Categories</a>
+        <a href="/publications" class="hover:text-cream-text transition-colors">Publications</a>
+      </nav>
+      <nav class="text-sm text-cream-light sm:hidden">
+        <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
       </nav>
     </div>
   </header>

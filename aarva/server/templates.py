@@ -105,6 +105,27 @@ def _title_case(s: str | None) -> str:
     return " ".join(out)
 
 
+_SLUG_NON_ALNUM = None  # lazy-compiled in _publication_slug
+
+
+def _publication_slug(name: str | None) -> str:
+    """URL-safe slug from a publication name.
+    'ProPublica'         → 'propublica'
+    'The Marshall Project' → 'the-marshall-project'
+    'Le Monde diplomatique (English)' → 'le-monde-diplomatique-english'
+
+    Used in /publication/<slug>. Round-trip: server compares slugify(pub.name)
+    against the route arg, so the mapping is implicit (no slug table)."""
+    import re
+    global _SLUG_NON_ALNUM
+    if _SLUG_NON_ALNUM is None:
+        _SLUG_NON_ALNUM = re.compile(r"[^a-z0-9]+")
+    if not name:
+        return ""
+    return _SLUG_NON_ALNUM.sub("-", name.lower()).strip("-")
+
+
 templates.env.filters["duration"] = _format_duration
 templates.env.filters["audio_url"] = _format_audio_url
 templates.env.filters["title_case"] = _title_case
+templates.env.filters["publication_slug"] = _publication_slug

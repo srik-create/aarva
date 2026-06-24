@@ -5,7 +5,9 @@
      JTBD tile that brought the listener here — so the article page
      visually inherits its home-page identity. #}
   <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
-    <p class="text-xs text-ink-light uppercase tracking-widest">{{ piece.publication_name }}</p>
+    <p class="text-xs text-ink-light uppercase tracking-widest">
+      <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
+    </p>
     <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">{{ piece.title | title_case }}</h1>
     {% if piece.byline %}
       <p class="text-ink-light mt-3">by {{ piece.byline }}</p>

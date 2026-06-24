@@ -1,12 +1,15 @@
-"""Home page (`/`) — today's daily edition, JTBD-grouped.
+"""Today's daily edition view (`/today`).
 
 Shows the most recent daily edition's pieces, organised by JTBD
 (deep_feature / lens cards / curiosity / smart_escape / delight).
 If today hasn't published yet, falls back to the latest daily.
+
+Routes:
+  /today  — today's daily edition (JTBD-grouped, with today's crosscut
+            surfaced above if one is published).
 """
 from __future__ import annotations
 
-from collections import OrderedDict
 from datetime import date
 from typing import Optional
 
@@ -14,6 +17,7 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 
 from aarva.server.app import app
+from aarva.server.jtbd_meta import JTBD_INFO
 from aarva.server.templates import templates
 from aarva.services.queries import (
     load_crosscut_episodes,
@@ -21,59 +25,44 @@ from aarva.services.queries import (
 )
 
 
-# Display order for JTBD sections on the home page. Each entry:
-#   (jtbd_key, display_label, card_color, header_text_color)
-# - card_color: Tailwind colour token used for the article card backgrounds
-#   in that section. Each JTBD gets its own pastel.
-# - header_text_color: lighter tint for the section label text on the dark
-#   page background.
-_JTBD_DISPLAY_ORDER = [
-    ("keep_ahead",       "Future-gazing",   "sky",      "sky"),
-    ("keep_up_to_date",  "Behind the news", "lavender", "lavender"),
-    ("curiosity",        "For the curious", "lemon",    "lemon"),
-    ("delight",          "Small delights",  "blush",    "blush"),
-    ("smart_escape",     "Smart escape",    "mint",     "mint"),
-    ("other",            "Other reads",     "paper",    "cream-light"),
-]
-
-# Lookup: jtbd key → card colour token. Used by /article/<id> to render
-# the per-article detail page in a card the same colour as the home-page
-# tile for that piece. Kept in sync with _JTBD_DISPLAY_ORDER above.
-_JTBD_CARD_COLOR: dict[str, str] = {
-    key: card_color for key, _, card_color, _ in _JTBD_DISPLAY_ORDER
+# Display order for "Other reads" — pieces with a JTBD outside the
+# main editorial taxonomy, or unknown JTBDs. Rendered at the bottom of
+# the daily.
+_OTHER_GROUP = {
+    "label": "Other reads",
+    "card_color": "paper",
+    "header_color": "cream-light",
 }
-
-
-def card_color_for_jtbd(jtbd_primary: str | None) -> str:
-    """Return the card-colour token for a JTBD key (e.g. 'keep_ahead'
-    → 'sky'). Falls back to 'paper' for unknown / missing JTBDs."""
-    if not jtbd_primary:
-        return "paper"
-    return _JTBD_CARD_COLOR.get(jtbd_primary, "paper")
 
 
 def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
     """Bucket pieces into JTBD groups in display order. Returns a list
-    of dicts {label, card_color, header_color, pieces} ready for Jinja
-    iteration. Empty groups are omitted so the template doesn't render
-    empty sections."""
-    buckets: dict[str, list[dict]] = {
-        key: [] for key, _, _, _ in _JTBD_DISPLAY_ORDER
-    }
+    of dicts {label, card_color, header_color, slug, pieces} ready for
+    Jinja iteration. Empty groups are omitted so the template doesn't
+    render empty sections."""
+    buckets: dict[str, list[dict]] = {j["key"]: [] for j in JTBD_INFO}
+    other_bucket: list[dict] = []
+    known_keys = set(buckets.keys())
+
     for p in pieces:
-        jtbd = p.get("jtbd_primary") or "other"
-        if jtbd not in buckets:
-            jtbd = "other"
-        buckets[jtbd].append(p)
+        jtbd = p.get("jtbd_primary")
+        if jtbd in known_keys:
+            buckets[jtbd].append(p)
+        else:
+            other_bucket.append(p)
+
     grouped: list[dict] = []
-    for key, label, card_color, header_color in _JTBD_DISPLAY_ORDER:
-        if buckets[key]:
+    for j in JTBD_INFO:
+        if buckets[j["key"]]:
             grouped.append({
-                "label": label,
-                "card_color": card_color,
-                "header_color": header_color,
-                "pieces": buckets[key],
+                "label": j["label"],
+                "card_color": j["card_color"],
+                "header_color": j["header_color"],
+                "slug": j["slug"],
+                "pieces": buckets[j["key"]],
             })
+    if other_bucket:
+        grouped.append({**_OTHER_GROUP, "slug": None, "pieces": other_bucket})
     return grouped
 
 
@@ -90,16 +79,14 @@ def _latest_daily_edition_id(db) -> Optional[int]:
     return int(row["id"]) if row else None
 
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request) -> HTMLResponse:
+@app.get("/today", response_class=HTMLResponse)
+async def today(request: Request) -> HTMLResponse:
     """Today's daily edition, JTBD-grouped, with the day's crosscut
     (if one was published) appearing as a featured card above."""
     db = request.app.state.db
-    pipeline_cfg = request.app.state.pipeline_cfg
 
     edition_id = _latest_daily_edition_id(db)
     if edition_id is None:
-        # Pre-launch state — DB has articles but no edition yet.
         return templates.TemplateResponse(
             request, "home_empty.html", {},
         )
@@ -110,10 +97,6 @@ async def home(request: Request) -> HTMLResponse:
         pieces[0]["edition_date"] if pieces else date.today().isoformat()
     )
 
-    # Today's crosscut, if any. Match on the same edition_date as the
-    # daily so we don't surface yesterday's crosscut alongside today's
-    # daily during the brief window between daily publish + crosscut
-    # publish.
     crosscuts = load_crosscut_episodes(db) if pieces else []
     todays_crosscut = next(
         (cc for cc in crosscuts if str(cc["edition_date"]) == edition_date_str),

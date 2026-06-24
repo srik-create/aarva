@@ -14,7 +14,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from aarva.server.app import app
-from aarva.server.routes.home import card_color_for_jtbd
+from aarva.server.jtbd_meta import card_color_for_jtbd
 from aarva.server.templates import templates
 
 
