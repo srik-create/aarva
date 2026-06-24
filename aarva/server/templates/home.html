@@ -12,7 +12,7 @@
     <section class="mb-12 p-6 bg-peach rounded-2xl text-ink">
       <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Today's Crosscut</p>
       <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">
-        {{ (crosscut.topic_label or "Two angles") | title_case }}
+        <a href="/crosscut/{{ crosscut.edition_id }}" class="hover:opacity-70 transition-opacity">{{ (crosscut.topic_label or "Two angles") | title_case }}</a>
       </h2>
       <p class="text-sm text-ink-light mt-3 leading-relaxed">
         <em class="editorial">{{ crosscut.title_a | title_case }}</em>

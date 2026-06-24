@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}{{ crosscut.topic_label or "Crosscut" }} — Aarva{% endblock %}
+{% block content %}
+  <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
+    <p class="text-xs text-peach-dark uppercase tracking-widest font-semibold">Crosscut</p>
+    <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">
+      {{ (crosscut.topic_label or "Two angles") | title_case }}
+    </h1>
+    {% if crosscut.edition_date %}
+      <p class="text-sm text-ink-light mt-2">Published {{ crosscut.edition_date }}</p>
+    {% endif %}
+
+    {# ─── Custom audio player ─────────────────────────────────────── #}
+    <div class="mt-10" data-player>
+      <div class="flex items-center gap-5">
+        <button type="button"
+                aria-label="Play"
+                class="play-btn shrink-0 w-20 h-20 rounded-full bg-night text-{{ card_color }} flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                data-play-button>
+          <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <div class="flex-1">
+          <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+            <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+          </div>
+          <p class="text-sm text-ink-light mt-2">
+            <span data-current-time>0:00</span>
+            <span class="mx-1">/</span>
+            <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
+            {% if crosscut.narrator_voice %}
+              <span class="mx-1">·</span> Narrator {{ crosscut.narrator_voice }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      <audio data-audio class="hidden" preload="metadata">
+        <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
+      </audio>
+    </div>
+
+    {# ─── The two source articles ─────────────────────────────────── #}
+    <div class="mt-12">
+      <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-4 font-semibold">In this episode</h2>
+      <div class="space-y-4">
+        {# Article A #}
+        <div class="bg-ink/5 rounded-2xl p-5">
+          <p class="text-xs text-ink-light uppercase tracking-wide">{{ crosscut.pub_a }}</p>
+          <h3 class="editorial text-lg font-semibold leading-snug mt-1 text-ink">
+            {% if crosscut.article_a_id %}
+              <a href="/article/{{ crosscut.article_a_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_a | title_case }}</a>
+            {% else %}
+              {{ crosscut.title_a | title_case }}
+            {% endif %}
+          </h3>
+          {% if crosscut.byline_a %}
+            <p class="text-sm text-ink-light mt-1">by {{ crosscut.byline_a }}</p>
+          {% endif %}
+          {% if crosscut.url_a %}
+            <p class="mt-3">
+              <a href="{{ crosscut.url_a }}" target="_blank" rel="noopener"
+                 class="text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
+                Read at {{ crosscut.pub_a }} →
+              </a>
+            </p>
+          {% endif %}
+        </div>
+
+        {# Article B #}
+        <div class="bg-ink/5 rounded-2xl p-5">
+          <p class="text-xs text-ink-light uppercase tracking-wide">{{ crosscut.pub_b }}</p>
+          <h3 class="editorial text-lg font-semibold leading-snug mt-1 text-ink">
+            {% if crosscut.article_b_id %}
+              <a href="/article/{{ crosscut.article_b_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_b | title_case }}</a>
+            {% else %}
+              {{ crosscut.title_b | title_case }}
+            {% endif %}
+          </h3>
+          {% if crosscut.byline_b %}
+            <p class="text-sm text-ink-light mt-1">by {{ crosscut.byline_b }}</p>
+          {% endif %}
+          {% if crosscut.url_b %}
+            <p class="mt-3">
+              <a href="{{ crosscut.url_b }}" target="_blank" rel="noopener"
+                 class="text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
+                Read at {{ crosscut.pub_b }} →
+              </a>
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ─── Intro / bridge / outro context ──────────────────────────── #}
+    {% if crosscut.intro_text or crosscut.bridge_between or crosscut.outro_text %}
+      <div class="mt-12">
+        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">The connection</h2>
+        {% if crosscut.intro_text %}
+          <p class="text-ink leading-relaxed">{{ crosscut.intro_text }}</p>
+        {% endif %}
+        {% if crosscut.bridge_between %}
+          <p class="text-ink leading-relaxed mt-4">{{ crosscut.bridge_between }}</p>
+        {% endif %}
+        {% if crosscut.outro_text %}
+          <p class="text-ink leading-relaxed mt-4 italic">{{ crosscut.outro_text }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </article>
+
+  {# Reuse the same custom-player JS as article.html. #}
+  <script>
+    (function() {
+      function fmt(seconds) {
+        if (!seconds || isNaN(seconds)) return '--:--';
+        const s = Math.floor(seconds);
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const ss = (s % 60).toString().padStart(2, '0');
+        return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${ss}` : `${m}:${ss}`;
+      }
+      document.querySelectorAll('[data-player]').forEach(function(player) {
+        const audio   = player.querySelector('[data-audio]');
+        const btn     = player.querySelector('[data-play-button]');
+        const playIco = btn.querySelector('.play-icon');
+        const pauseIco= btn.querySelector('.pause-icon');
+        const track   = player.querySelector('[data-progress-track]');
+        const fill    = player.querySelector('[data-progress-fill]');
+        const curT    = player.querySelector('[data-current-time]');
+        const totT    = player.querySelector('[data-total-time]');
+        btn.addEventListener('click', function() {
+          if (audio.paused) { audio.play(); } else { audio.pause(); }
+        });
+        audio.addEventListener('play',  function() {
+          playIco.classList.add('hidden'); pauseIco.classList.remove('hidden');
+          btn.setAttribute('aria-label', 'Pause');
+        });
+        audio.addEventListener('pause', function() {
+          playIco.classList.remove('hidden'); pauseIco.classList.add('hidden');
+          btn.setAttribute('aria-label', 'Play');
+        });
+        audio.addEventListener('timeupdate', function() {
+          if (audio.duration) {
+            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+            curT.textContent = fmt(audio.currentTime);
+          }
+        });
+        audio.addEventListener('loadedmetadata', function() {
+          if (audio.duration) totT.textContent = fmt(audio.duration);
+        });
+        audio.addEventListener('ended', function() {
+          fill.style.width = '0%';
+          curT.textContent = '0:00';
+        });
+        track.addEventListener('click', function(e) {
+          if (!audio.duration) return;
+          const rect = track.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          audio.currentTime = audio.duration * ratio;
+        });
+      });
+    })();
+  </script>
+{% endblock %}
