@@ -156,6 +156,16 @@ Last updated: 2026-06-10
     tracked. Mark in_progress before starting, completed when truly
     done.
 
+17a. **`docs/roadmap.md` is the persistent project tracker.** TaskList
+    resets between sessions; `docs/roadmap.md` doesn't. At the start
+    of any session, read it. When a deferred item gets done, when a
+    phase completes, or when something new gets deferred — update
+    `docs/roadmap.md` in the same commit/PR. The doc should never lag
+    reality by more than one commit. Surface relevant deferred items
+    proactively when the user starts adjacent work
+    (e.g., "before we add search, the deferred crosscut-embeddings
+    item should land first — still that order?").
+
 ## Version control
 
 20. **Never commit or push without explicit user sign-off.** At the
