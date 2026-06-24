@@ -523,7 +523,21 @@ tts:
     enabled: true
     bucket: aarva-audio
     endpoint_url: https://81079726a9b1dae5ed171eea53d54d96.r2.cloudflarestorage.com
-    # The r2.dev public URL is rate-limited and not recommended for
-    # production; sufficient at Aarva's current listener scale. Switch
-    # to https://audio.aarva.app once the custom domain is set up.
-    public_url_base: https://pub-ddc5a0e32aab4b87904a044990b2daf6.r2.dev
+    # Custom domain on the aarva-audio bucket (set up via R2 dashboard:
+    # Bucket → Settings → Public Access → Custom Domains). Serves
+    # through Cloudflare's full edge network — no r2.dev rate limit,
+    # caching enabled, SynthID watermark preserved (which TTS adds
+    # automatically anyway).
+    #
+    # YouTube's RSS ingestion was failing against the old r2.dev URL
+    # because YouTube pulls multiple episodes in close succession and
+    # tripped the r2.dev rate limit. Apple Podcasts succeeded because
+    # Apple trickle-fetches one episode at a time over hours. Custom
+    # domain bypasses the r2.dev rate limit entirely. Verified live:
+    # `curl -sI https://audio.aarva.app/output/audio/<date>/<file>.mp3`
+    # returns HTTP/2 200.
+    #
+    # Same bucket, same objects, different URL — no migration of files
+    # needed. The r2.dev URL is still enabled as a parallel access path
+    # but isn't used by anything we publish.
+    public_url_base: https://audio.aarva.app
