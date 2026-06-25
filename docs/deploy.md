@@ -110,8 +110,43 @@ The persistent disk starts empty. You need to copy
 The service is configured to auto-restart on file change; if it
 doesn't pick up the new DB, click **Restart** in the dashboard.
 
-**Option B — repeatable sync after every daily run** (deferred —
-write `scripts/sync_db_to_render.sh` later if this becomes routine).
+**Option B — automated sync after every daily run.**
+
+`scripts/sync_db_to_render.sh` packs the laptop DB with
+`sqlite3 .backup`, gzips it, and POSTs to `/admin/sync-db` on the live
+service. The endpoint validates the payload, atomic-replaces
+`/data/aarva.db`, and returns the new article count. `run_daily.sh`
+calls it as the last step of the daily pipeline, so each morning's
+edition lands on aarva.app automatically.
+
+**One-time setup:**
+
+1. Generate a sync token:
+   ```bash
+   python3 -c 'import secrets; print(secrets.token_urlsafe(32))'
+   ```
+2. Add it to `~/.aarva.env` on the laptop (the file `run_daily.sh`
+   sources before each run):
+   ```bash
+   export AARVA_RENDER_SYNC_TOKEN="<paste the token>"
+   ```
+3. Add the SAME value on Render: dashboard → your `aarva-web` service
+   → **Environment** → **Add Environment Variable** → key
+   `AARVA_RENDER_SYNC_TOKEN`, value the token. Render redeploys
+   automatically once you save.
+
+After that, every daily run pushes the DB. Test it manually any time
+with:
+```bash
+bash scripts/sync_db_to_render.sh
+```
+Successful runs print the new article count from the server. Exit
+codes: `0` synced, `1` config error, `2` snapshot failed, `3` upload
+failed.
+
+**Security model:** bearer-token auth on a POST endpoint; HTTPS-only;
+constant-time token compare; 200 MB body cap; rejects empty DBs so a
+broken laptop run can't wipe the live data.
 
 ### 5. Custom domain (Cloudflare DNS for aarva.app)
 
@@ -152,12 +187,20 @@ pick branch.
 ### Updating the SQLite DB
 
 The DB on Render's persistent disk is the source of truth for what
-the web app serves. Two ways to update it:
+the web app serves. `scripts/sync_db_to_render.sh` (Option B in §4
+above) is the canonical way to update it — and it runs automatically
+at the end of every daily pipeline via `scripts/run_daily.sh`. To
+force a sync ad-hoc (e.g., you re-ran a stage and want the change
+live before tomorrow):
+```bash
+bash scripts/sync_db_to_render.sh
+```
+The endpoint refuses empty DBs and rolls back on any error, so an
+ad-hoc sync is safe to run any time.
 
-1. **Manual sync after each daily run** — repeat step 4 above.
-2. **Future automation** — a `scripts/sync_db_to_render.sh` that pushes
-   the DB to R2 + triggers Render to download it on next request.
-   Deferred to Phase 2/3.
+If for some reason the endpoint is unreachable (Render outage,
+network), the Render shell flow from §4 Option A is the manual
+fallback.
 
 ### Monitoring
 

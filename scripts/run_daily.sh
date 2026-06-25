@@ -56,4 +56,14 @@ python -m aarva.daily
 echo "[run_daily] pipeline complete — publishing to gh-pages…"
 bash "$PROJECT_ROOT/scripts/publish.sh"
 
+# Push the updated DB to Render so the web app at aarva.app reflects
+# today's edition. Skipped silently if AARVA_RENDER_SYNC_TOKEN isn't
+# set so dev / hand-runs without web-deploy context still complete.
+if [ -n "${AARVA_RENDER_SYNC_TOKEN:-}" ]; then
+    echo "[run_daily] syncing DB to Render…"
+    bash "$PROJECT_ROOT/scripts/sync_db_to_render.sh"
+else
+    echo "[run_daily] skipping Render sync (AARVA_RENDER_SYNC_TOKEN unset)"
+fi
+
 echo "[run_daily] done — $(date '+%H:%M:%S')"
