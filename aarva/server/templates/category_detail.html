@@ -25,7 +25,11 @@
           {% if piece.hook %}
             <p class="hook text-ink mt-4 text-lg leading-relaxed">{{ piece.hook }}</p>
           {% endif %}
-          <div class="mt-5" data-player>
+          {# Compact player; data-track-* attrs feed the shared player in base.html. #}
+          <div class="mt-5" data-player
+               data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+               data-track-title="{{ piece.title | title_case }}"
+               data-track-link="/article/{{ piece.article_id }}">
             <div class="flex items-center gap-4">
               <button type="button" aria-label="Play"
                       class="shrink-0 w-14 h-14 rounded-full bg-night text-{{ info.card_color }} flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
@@ -47,9 +51,6 @@
                 </p>
               </div>
             </div>
-            <audio data-audio class="hidden" preload="metadata">
-              <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-            </audio>
           </div>
         </article>
       {% endfor %}

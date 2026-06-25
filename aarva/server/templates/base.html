@@ -79,6 +79,12 @@
       width: 100%;
       border-radius: 9999px;
     }
+    /* When the persistent mini-player is visible at the bottom of the
+       viewport, pad the body so the footer / page content doesn't sit
+       under it. ~84px = bar height + a comfortable gap. */
+    body.mini-active {
+      padding-bottom: 84px;
+    }
   </style>
 
   <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
@@ -292,60 +298,277 @@
     })();
   </script>
 
-  {# Shared audio-player controller. Any element with [data-player]
-     containing [data-audio] + [data-play-button] + [data-progress-track]
-     + [data-progress-fill] + [data-current-time] + [data-total-time]
-     gets wired up. No-op on pages without these elements. #}
+  {# ─── Persistent audio player ───────────────────────────────────── #}
+  {# One <audio> element drives every play surface on the site. The
+     in-page round play buttons (article / crosscut / home tiles) are
+     remote controls that read from `data-track-*` attributes on each
+     `[data-player]` block; they call into the shared controller, which
+     swaps the audio src, mirrors playback state into the in-page UI
+     for the currently-playing track, and surfaces a sticky mini-bar
+     at the bottom of the viewport. State (src, position, playing,
+     title, link) persists in sessionStorage so playback survives a
+     page navigation — the new page restores the audio, re-paints the
+     mini-bar, and re-attempts play. Browsers may block the auto-resume
+     (Safari iOS especially); when they do, the mini-bar stays visible
+     and the listener taps once to continue. #}
+  <audio id="aarva-shared-audio" class="hidden" preload="metadata"></audio>
+
+  <div data-mini-player class="hidden fixed bottom-0 inset-x-0 z-40 bg-night-soft border-t border-night-border shadow-2xl">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+      <button type="button" data-mini-toggle aria-label="Play"
+              class="shrink-0 w-11 h-11 rounded-full bg-peach text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform">
+        <svg viewBox="0 0 24 24" class="mini-play-icon w-5 h-5 ml-0.5" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24" class="mini-pause-icon w-5 h-5 hidden" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <a data-mini-link href="/today" class="flex-1 min-w-0 group hover:opacity-90 transition-opacity">
+        <p data-mini-title class="text-sm text-cream-text font-medium truncate"></p>
+        <div class="flex items-center gap-2 mt-1">
+          <span data-mini-current class="text-[10px] text-cream-muted shrink-0">0:00</span>
+          <div data-mini-track class="h-1 flex-1 bg-night-border rounded-full overflow-hidden cursor-pointer">
+            <div data-mini-fill class="h-full bg-cream-light rounded-full" style="width:0%"></div>
+          </div>
+          <span data-mini-total class="text-[10px] text-cream-muted shrink-0">0:00</span>
+        </div>
+      </a>
+      <button type="button" data-mini-close aria-label="Close player"
+              class="shrink-0 w-9 h-9 rounded-full text-cream-muted hover:text-cream-text hover:bg-night-border transition-colors inline-flex items-center justify-center">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+  </div>
+
   <script>
     (function() {
+      const STATE_KEY = 'aarva-player-state';
+
+      const audio = document.getElementById('aarva-shared-audio');
+      const bar   = document.querySelector('[data-mini-player]');
+      if (!audio || !bar) return;
+
+      const miniToggle  = bar.querySelector('[data-mini-toggle]');
+      const miniLink    = bar.querySelector('[data-mini-link]');
+      const miniTitle   = bar.querySelector('[data-mini-title]');
+      const miniCurrent = bar.querySelector('[data-mini-current]');
+      const miniTotal   = bar.querySelector('[data-mini-total]');
+      const miniTrack   = bar.querySelector('[data-mini-track]');
+      const miniFill    = bar.querySelector('[data-mini-fill]');
+      const miniClose   = bar.querySelector('[data-mini-close]');
+      const miniPlayIco = bar.querySelector('.mini-play-icon');
+      const miniPauseIco= bar.querySelector('.mini-pause-icon');
+
+      // What's currently loaded into the shared audio element. Kept
+      // alongside <audio>.src because URL normalisation (relative ->
+      // absolute) makes string compares against the original src
+      // unreliable; storing the originally-set value here is simpler.
+      let current = { src: null, title: '', link: '' };
+
       function fmt(seconds) {
-        if (!seconds || isNaN(seconds)) return '--:--';
+        if (!seconds || isNaN(seconds)) return '0:00';
         const s = Math.floor(seconds);
         const h = Math.floor(s / 3600);
         const m = Math.floor((s % 3600) / 60);
         const ss = (s % 60).toString().padStart(2, '0');
         return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${ss}` : `${m}:${ss}`;
       }
-      document.querySelectorAll('[data-player]').forEach(function(player) {
-        const audio   = player.querySelector('[data-audio]');
-        const btn     = player.querySelector('[data-play-button]');
-        const playIco = btn.querySelector('.play-icon');
-        const pauseIco= btn.querySelector('.pause-icon');
-        const track   = player.querySelector('[data-progress-track]');
-        const fill    = player.querySelector('[data-progress-fill]');
-        const curT    = player.querySelector('[data-current-time]');
-        const totT    = player.querySelector('[data-total-time]');
-        btn.addEventListener('click', function() {
-          if (audio.paused) { audio.play(); } else { audio.pause(); }
-        });
-        audio.addEventListener('play', function() {
-          playIco.classList.add('hidden'); pauseIco.classList.remove('hidden');
-          btn.setAttribute('aria-label', 'Pause');
-        });
-        audio.addEventListener('pause', function() {
-          playIco.classList.remove('hidden'); pauseIco.classList.add('hidden');
-          btn.setAttribute('aria-label', 'Play');
-        });
-        audio.addEventListener('timeupdate', function() {
-          if (audio.duration) {
-            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-            curT.textContent = fmt(audio.currentTime);
+
+      function showBar() {
+        bar.classList.remove('hidden');
+        document.body.classList.add('mini-active');
+      }
+
+      function hideBar() {
+        bar.classList.add('hidden');
+        document.body.classList.remove('mini-active');
+      }
+
+      function saveState() {
+        if (!current.src) {
+          try { sessionStorage.removeItem(STATE_KEY); } catch (e) {}
+          return;
+        }
+        try {
+          sessionStorage.setItem(STATE_KEY, JSON.stringify({
+            src: current.src,
+            title: current.title,
+            link: current.link,
+            currentTime: audio.currentTime || 0,
+            isPlaying: !audio.paused,
+          }));
+        } catch (e) { /* private mode / quota — silently ignore */ }
+      }
+
+      function loadState() {
+        try {
+          return JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null');
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Paint mini-bar + every in-page player whose data-track-src
+      // matches the currently-loaded track. Non-matching in-page
+      // players are forced back to the "not playing" visual state so
+      // a paused thumbnail can't look like it's mid-playback.
+      function updateUI() {
+        miniTitle.textContent = current.title || '';
+        miniLink.href = current.link || '/today';
+        miniCurrent.textContent = fmt(audio.currentTime);
+        miniTotal.textContent = audio.duration ? fmt(audio.duration) : '0:00';
+        miniFill.style.width = (audio.duration ? (audio.currentTime / audio.duration * 100) : 0) + '%';
+        if (audio.paused) {
+          miniPlayIco.classList.remove('hidden');
+          miniPauseIco.classList.add('hidden');
+          miniToggle.setAttribute('aria-label', 'Play');
+        } else {
+          miniPlayIco.classList.add('hidden');
+          miniPauseIco.classList.remove('hidden');
+          miniToggle.setAttribute('aria-label', 'Pause');
+        }
+
+        document.querySelectorAll('[data-player]').forEach(function(player) {
+          const trackSrc = player.dataset.trackSrc;
+          const btn      = player.querySelector('[data-play-button]');
+          const playIco  = btn && btn.querySelector('.play-icon');
+          const pauseIco = btn && btn.querySelector('.pause-icon');
+          const fill     = player.querySelector('[data-progress-fill]');
+          const curT     = player.querySelector('[data-current-time]');
+          const totT     = player.querySelector('[data-total-time]');
+
+          if (trackSrc && trackSrc === current.src) {
+            if (audio.paused) {
+              playIco  && playIco.classList.remove('hidden');
+              pauseIco && pauseIco.classList.add('hidden');
+              btn      && btn.setAttribute('aria-label', 'Play');
+            } else {
+              playIco  && playIco.classList.add('hidden');
+              pauseIco && pauseIco.classList.remove('hidden');
+              btn      && btn.setAttribute('aria-label', 'Pause');
+            }
+            if (fill) fill.style.width = (audio.duration ? (audio.currentTime / audio.duration * 100) : 0) + '%';
+            if (curT) curT.textContent = fmt(audio.currentTime);
+            if (totT && audio.duration) totT.textContent = fmt(audio.duration);
+          } else {
+            playIco  && playIco.classList.remove('hidden');
+            pauseIco && pauseIco.classList.add('hidden');
+            if (fill) fill.style.width = '0%';
+            if (curT) curT.textContent = '0:00';
           }
         });
-        audio.addEventListener('loadedmetadata', function() {
-          if (audio.duration) totT.textContent = fmt(audio.duration);
+      }
+
+      // Public API the in-page play buttons call.
+      function playTrack(src, title, link) {
+        if (current.src === src) {
+          // Same track — toggle.
+          if (audio.paused) audio.play().catch(function(){});
+          else audio.pause();
+          return;
+        }
+        current = { src: src, title: title || '', link: link || '/today' };
+        audio.src = src;
+        audio.currentTime = 0;
+        showBar();
+        audio.play().catch(function(){});
+        updateUI();
+        saveState();
+      }
+
+      // ─── Audio element events ─────────────────────────────────────
+      audio.addEventListener('play',           function() { updateUI(); saveState(); });
+      audio.addEventListener('pause',          function() { updateUI(); saveState(); });
+      audio.addEventListener('loadedmetadata', updateUI);
+      audio.addEventListener('ended',          function() { updateUI(); saveState(); });
+      (function() {
+        let last = 0;
+        audio.addEventListener('timeupdate', function() {
+          updateUI();
+          const now = Date.now();
+          if (now - last > 3000) {     // throttle disk writes
+            last = now;
+            saveState();
+          }
         });
-        audio.addEventListener('ended', function() {
-          fill.style.width = '0%';
-          curT.textContent = '0:00';
-        });
-        track.addEventListener('click', function(e) {
-          if (!audio.duration) return;
-          const rect = track.getBoundingClientRect();
-          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          audio.currentTime = audio.duration * ratio;
-        });
+      })();
+
+      // ─── Mini-bar controls ───────────────────────────────────────
+      miniToggle.addEventListener('click', function() {
+        if (!audio.src) return;
+        if (audio.paused) audio.play().catch(function(){});
+        else audio.pause();
       });
+      miniTrack.addEventListener('click', function(e) {
+        if (!audio.duration) return;
+        const rect = miniTrack.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        audio.currentTime = audio.duration * ratio;
+        saveState();
+      });
+      miniClose.addEventListener('click', function() {
+        audio.pause();
+        audio.removeAttribute('src');
+        audio.load();
+        current = { src: null, title: '', link: '' };
+        hideBar();
+        try { sessionStorage.removeItem(STATE_KEY); } catch (e) {}
+        updateUI();
+      });
+
+      // ─── In-page [data-player] wiring ────────────────────────────
+      document.querySelectorAll('[data-player]').forEach(function(player) {
+        const btn        = player.querySelector('[data-play-button]');
+        const trackSrc   = player.dataset.trackSrc;
+        const trackTitle = player.dataset.trackTitle || '';
+        const trackLink  = player.dataset.trackLink || '';
+        if (!btn || !trackSrc) return;
+
+        btn.addEventListener('click', function() {
+          playTrack(trackSrc, trackTitle, trackLink);
+        });
+
+        const track = player.querySelector('[data-progress-track]');
+        if (track) {
+          track.addEventListener('click', function(e) {
+            // Only allow scrubbing on the in-page UI if it matches the
+            // current track — non-current tracks should be played
+            // from the start via the button, not scrubbed blindly.
+            if (trackSrc !== current.src || !audio.duration) return;
+            const rect = track.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            audio.currentTime = audio.duration * ratio;
+            saveState();
+          });
+        }
+      });
+
+      // Final save on nav. pagehide covers iOS Safari which doesn't
+      // reliably fire beforeunload (bfcache).
+      window.addEventListener('beforeunload', saveState);
+      window.addEventListener('pagehide',     saveState);
+
+      // ─── Restore state on page load ──────────────────────────────
+      const saved = loadState();
+      if (saved && saved.src) {
+        current = { src: saved.src, title: saved.title || '', link: saved.link || '/today' };
+        audio.src = saved.src;
+        showBar();
+        updateUI();
+
+        const seekWhenReady = function() {
+          if (saved.currentTime > 0) {
+            try { audio.currentTime = saved.currentTime; } catch (e) {}
+          }
+          audio.removeEventListener('loadedmetadata', seekWhenReady);
+          if (saved.isPlaying) {
+            // Attempt resume. If the browser blocks (autoplay policy)
+            // we silently stay paused and the mini-bar play button
+            // is one tap away.
+            audio.play().catch(function(){});
+          }
+          updateUI();
+        };
+        if (audio.readyState >= 1) seekWhenReady();
+        else audio.addEventListener('loadedmetadata', seekWhenReady);
+      }
     })();
   </script>
 </body>

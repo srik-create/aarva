@@ -11,7 +11,12 @@
     {% endif %}
 
     {# ─── Custom audio player ─────────────────────────────────────── #}
-    <div class="mt-10" data-player>
+    {# Wrapper carries the track metadata for the site-wide shared
+       player in base.html; the in-page UI is a remote control. #}
+    <div class="mt-10" data-player
+         data-track-src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+         data-track-title="{{ (crosscut.topic_label or 'Crosscut') | title_case }}"
+         data-track-link="/crosscut/{{ crosscut.edition_id }}">
       <div class="flex items-center gap-5">
         <button type="button"
                 aria-label="Play"
@@ -34,9 +39,6 @@
           </p>
         </div>
       </div>
-      <audio data-audio class="hidden" preload="metadata">
-        <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-      </audio>
     </div>
 
     {# ─── The two source articles ─────────────────────────────────── #}
