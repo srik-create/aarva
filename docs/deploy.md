@@ -112,12 +112,24 @@ doesn't pick up the new DB, click **Restart** in the dashboard.
 
 **Option B — automated sync after every daily run.**
 
-`scripts/sync_db_to_render.sh` packs the laptop DB with
-`sqlite3 .backup`, gzips it, and POSTs to `/admin/sync-db` on the live
-service. The endpoint validates the payload, atomic-replaces
-`/data/aarva.db`, and returns the new article count. `run_daily.sh`
-calls it as the last step of the daily pipeline, so each morning's
-edition lands on aarva.app automatically.
+`scripts/sync_db_to_render.sh`:
+1. Snapshots the laptop DB with `sqlite3 .backup` (consistent
+   point-in-time copy, safe even if the pipeline is mid-write).
+2. Gzips the snapshot.
+3. Uploads the gzipped file to R2 at a fixed key (`_data/aarva-db.gz`).
+4. POSTs a tiny JSON trigger (`{"r2_key": "_data/aarva-db.gz"}`) to
+   `/admin/sync-db` on aarva.app.
+
+`/admin/sync-db` (on the server) verifies the bearer token, downloads
+the gzipped DB from R2, gunzips, validates it (`SELECT COUNT(*) FROM
+articles` > 0), and atomic-replaces `/data/aarva.db`. The R2 hop is
+the design that works around Render's 100-second request timeout — a
+30 MB direct POST from a residential connection can exceed it; R2
+ingest from the laptop is reliable and the server-side R2 fetch
+happens on Render's fast backbone.
+
+`run_daily.sh` calls this script as the last step of the daily
+pipeline, so each morning's edition lands on aarva.app automatically.
 
 **One-time setup:**
 
@@ -126,14 +138,20 @@ edition lands on aarva.app automatically.
    python3 -c 'import secrets; print(secrets.token_urlsafe(32))'
    ```
 2. Add it to `~/.aarva.env` on the laptop (the file `run_daily.sh`
-   sources before each run):
+   sources before each run — `.zshrc` alone isn't enough because
+   launchd doesn't load it):
    ```bash
-   export AARVA_RENDER_SYNC_TOKEN="<paste the token>"
+   echo 'export AARVA_RENDER_SYNC_TOKEN="<paste the token>"' >> ~/.aarva.env
    ```
-3. Add the SAME value on Render: dashboard → your `aarva-web` service
-   → **Environment** → **Add Environment Variable** → key
-   `AARVA_RENDER_SYNC_TOKEN`, value the token. Render redeploys
-   automatically once you save.
+3. Add three env vars on Render — dashboard → your `aarva-web` service
+   → **Environment** → **Add Environment Variable**. Set each as
+   `sync: false` is already declared in `render.yaml`:
+   - `AARVA_RENDER_SYNC_TOKEN` — the same value as step 2
+   - `AARVA_R2_ACCESS_KEY_ID` — same value as in `~/.aarva.env` on the
+     laptop (used by the audio pipeline)
+   - `AARVA_R2_SECRET_ACCESS_KEY` — same
+   
+   Render redeploys automatically after saving each one.
 
 After that, every daily run pushes the DB. Test it manually any time
 with:
@@ -141,12 +159,14 @@ with:
 bash scripts/sync_db_to_render.sh
 ```
 Successful runs print the new article count from the server. Exit
-codes: `0` synced, `1` config error, `2` snapshot failed, `3` upload
-failed.
+codes: `0` synced, `1` config error, `2` snapshot failed, `3` R2 upload
+failed, `4` server-trigger POST failed.
 
-**Security model:** bearer-token auth on a POST endpoint; HTTPS-only;
-constant-time token compare; 200 MB body cap; rejects empty DBs so a
-broken laptop run can't wipe the live data.
+**Security model:** bearer-token auth on the POST endpoint (constant-
+time compare); HTTPS-only; refuses to operate if either the bearer
+token or R2 credentials are unset on the server (503); 200 MB cap on
+the fetched R2 object; rejects empty DBs so a broken laptop run can't
+wipe live data.
 
 ### 5. Custom domain (Cloudflare DNS for aarva.app)
 
