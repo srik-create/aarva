@@ -10,4 +10,5 @@ so every route is wired up before uvicorn starts serving.
 """
 from aarva.server.routes import (   # noqa: F401
     landing, home, editions, articles, crosscuts, categories, publications,
+    admin,
 )

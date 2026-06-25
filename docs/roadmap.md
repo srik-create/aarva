@@ -70,7 +70,7 @@ follow `docs/deploy.md` to bring aarva.app live.
 | **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | Code complete on `webapp-phase-1`. Operator deploy steps in `docs/deploy.md`. |
 | **2. Search** | NL + structured filter search interface, search results page, integration with `aarva.search` backend (lexical + semantic + Gemini-parsed NL) | Not started |
 | **3. Crosscut on demand** | Automatic crosscut suggestion on search results, email-on-request, in-DB job queue, background TTS worker, status page, email-when-ready, generated crosscuts re-enter the searchable catalog | Not started |
-| **4. Polish + extras** | Mobile fine-tuning, logo, copywriting pass, automated DB sync to Render (currently manual), `scripts/sync_db_to_render.sh` | Not started |
+| **4. Polish + extras** | Mobile fine-tuning, logo, copywriting pass | Automated DB sync to Render is done (`scripts/sync_db_to_render.sh` + `/admin/sync-db` endpoint, runs as the last step of `run_daily.sh`). Remaining items not started. |
 
 Pre-Phase-2 dependency: deferred item #1 (crosscut embeddings).
 

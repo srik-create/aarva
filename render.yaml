@@ -28,6 +28,13 @@ services:
       # Update once Cloudflare DNS points aarva.app at this service.
       - key: AARVA_SERVER_PUBLIC_URL
         value: https://aarva.app
+      # Shared secret for the /admin/sync-db endpoint. NOT stored in
+      # this file — set the value manually in the Render dashboard
+      # (Environment tab). Must match the value in ~/.aarva.env on the
+      # operator's laptop. Generate with:
+      #     python3 -c 'import secrets; print(secrets.token_urlsafe(32))'
+      - key: AARVA_RENDER_SYNC_TOKEN
+        sync: false
 
     # 1 GB persistent disk for the SQLite DB + future state. SQLite
     # is ~80-200 MB; this leaves room for the next year+ of growth.
