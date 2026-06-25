@@ -330,6 +330,16 @@
           <span data-mini-total class="text-[10px] text-cream-muted shrink-0">0:00</span>
         </div>
       </a>
+      {# Playback speed: text button shows current rate ("1×"); tapping
+         opens a small popover above with all available rates. Rate is
+         persisted via localStorage and re-applied on each new track. #}
+      <div class="relative shrink-0">
+        <button type="button" data-mini-speed aria-label="Playback speed"
+                class="h-9 px-2 min-w-[2.25rem] rounded-full text-xs font-medium text-cream-light hover:text-cream-text hover:bg-night-border transition-colors inline-flex items-center justify-center">
+          <span data-mini-speed-label>1×</span>
+        </button>
+        <div data-mini-speed-menu class="hidden absolute bottom-full right-0 mb-2 bg-night border border-night-border rounded-2xl shadow-2xl py-1 min-w-[88px]"></div>
+      </div>
       <button type="button" data-mini-close aria-label="Close player"
               class="shrink-0 w-9 h-9 rounded-full text-cream-muted hover:text-cream-text hover:bg-night-border transition-colors inline-flex items-center justify-center">
         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
@@ -340,6 +350,8 @@
   <script>
     (function() {
       const STATE_KEY = 'aarva-player-state';
+      const RATE_KEY  = 'aarva-player-rate';
+      const RATES     = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5];
 
       const audio = document.getElementById('aarva-shared-audio');
       const bar   = document.querySelector('[data-mini-player]');
@@ -355,6 +367,9 @@
       const miniClose   = bar.querySelector('[data-mini-close]');
       const miniPlayIco = bar.querySelector('.mini-play-icon');
       const miniPauseIco= bar.querySelector('.mini-pause-icon');
+      const speedBtn    = bar.querySelector('[data-mini-speed]');
+      const speedLabel  = bar.querySelector('[data-mini-speed-label]');
+      const speedMenu   = bar.querySelector('[data-mini-speed-menu]');
 
       // What's currently loaded into the shared audio element. Kept
       // alongside <audio>.src because URL normalisation (relative ->
@@ -511,6 +526,85 @@
         hideBar();
         try { sessionStorage.removeItem(STATE_KEY); } catch (e) {}
         updateUI();
+      });
+
+      // ─── Playback speed ──────────────────────────────────────────
+      // Rate is per-listener (not per-track), so it lives in
+      // localStorage — survives across sessions, not just the tab.
+      function loadRate() {
+        try {
+          const r = parseFloat(localStorage.getItem(RATE_KEY));
+          if (isFinite(r) && r > 0) return r;
+        } catch (e) {}
+        return 1;
+      }
+      function saveRate(r) {
+        try { localStorage.setItem(RATE_KEY, String(r)); } catch (e) {}
+      }
+      function fmtRate(r) {
+        // "1×" not "1.0×"; integer rates render without decimals.
+        return (r % 1 === 0) ? String(r) : String(r);
+      }
+      function applyRate(r) {
+        audio.playbackRate = r;
+        if (speedLabel) speedLabel.textContent = fmtRate(r) + '×';
+      }
+      function buildSpeedMenu() {
+        if (!speedMenu) return;
+        const r = audio.playbackRate || 1;
+        speedMenu.innerHTML = RATES.map(function(rate) {
+          const isCurrent = Math.abs(rate - r) < 0.001;
+          const cls = isCurrent
+            ? 'text-cream-text font-medium'
+            : 'text-cream-light';
+          return '<button type="button" data-rate="' + rate + '" '
+               + 'class="block w-full text-left px-4 py-2 text-sm '
+               + cls + ' hover:bg-night-soft hover:text-cream-text transition-colors">'
+               + fmtRate(rate) + '×</button>';
+        }).join('');
+      }
+
+      if (speedBtn && speedMenu) {
+        // Apply persisted rate at init so the first track starts at the
+        // listener's preferred speed without waiting for them to set it.
+        applyRate(loadRate());
+
+        speedBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          buildSpeedMenu();
+          speedMenu.classList.toggle('hidden');
+        });
+
+        speedMenu.addEventListener('click', function(e) {
+          const opt = e.target.closest('[data-rate]');
+          if (!opt) return;
+          const r = parseFloat(opt.dataset.rate);
+          if (!isFinite(r) || r <= 0) return;
+          applyRate(r);
+          saveRate(r);
+          speedMenu.classList.add('hidden');
+        });
+
+        // Tap anywhere else → close the menu.
+        document.addEventListener('click', function(e) {
+          if (speedMenu.classList.contains('hidden')) return;
+          if (!speedMenu.contains(e.target) && !speedBtn.contains(e.target)) {
+            speedMenu.classList.add('hidden');
+          }
+        });
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && !speedMenu.classList.contains('hidden')) {
+            speedMenu.classList.add('hidden');
+          }
+        });
+      }
+
+      // Some browsers reset playbackRate to 1.0 when audio.src changes.
+      // Re-apply the saved rate whenever new metadata arrives so the
+      // listener's preferred speed sticks across tracks and reloads.
+      audio.addEventListener('loadedmetadata', function() {
+        audio.playbackRate = loadRate();
       });
 
       // ─── In-page [data-player] wiring ────────────────────────────
