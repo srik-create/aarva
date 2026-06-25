@@ -100,6 +100,19 @@
   </header>
 
   <main class="max-w-3xl mx-auto px-5 py-10">
+    {# Back arrow on every page except the landing and home. Mobile-
+       friendly 40px tap target. Uses history.back() when possible,
+       falls back to /today for direct visits via shared links. #}
+    {% if request.url.path not in ['/', '/today'] %}
+      <a href="/today"
+         onclick="if (window.history.length > 1) { window.history.back(); return false; }"
+         aria-label="Back"
+         class="-ml-2 mb-6 inline-flex items-center justify-center w-10 h-10 rounded-full text-cream-light hover:text-cream-text hover:bg-night-soft transition-colors">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </a>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 
