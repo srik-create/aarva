@@ -82,6 +82,18 @@
   </style>
 
   <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
+
+  {# ─── PWA: Add to Home Screen ───────────────────────────────────── #}
+  {# Manifest covers Android / Chromium installs. apple-touch-icon +
+     apple-mobile-web-app-* meta tags handle iOS Safari ("Add to Home
+     Screen"). theme-color paints the iOS status bar / Android nav bar
+     to match the page background so the standalone app looks seamless. #}
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aarva">
+  <meta name="theme-color" content="#1A1410">
 </head>
 <body class="bg-night text-cream-text antialiased">
   <header class="border-b border-night-border bg-night-soft">
@@ -107,7 +119,165 @@
     <p class="editorial text-base text-cream-light">Aarva</p>
     <p class="mt-1">The world as your classroom, the finest journalism as your curriculum.</p>
     <p class="mt-1">Written by humans. Narrated by AI.</p>
+    {# "Add to Home Screen" affordance. JS reveals this only when the
+       browser supports it AND the app isn't already running standalone.
+       Tapping it triggers the native install prompt where available
+       (Chrome Android), or shows a small modal with platform-specific
+       instructions (iOS Safari). #}
+    <p data-pwa-install-wrapper class="hidden mt-5">
+      <button type="button" data-pwa-install
+              class="inline-flex items-center gap-2 text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+        Add Aarva to your Home Screen
+      </button>
+    </p>
   </footer>
+
+  {# ─── PWA install modal ─────────────────────────────────────────── #}
+  {# Hidden by default; revealed by the PWA controller below when the
+     listener taps the footer "Add to Home Screen" button on a platform
+     that needs instructions (iOS Safari has no install-prompt API, so
+     listeners have to use Share → Add to Home Screen manually). #}
+  <div data-pwa-modal class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+    <div class="bg-night-soft border border-night-border rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl">
+      <div class="flex items-start justify-between gap-4">
+        <h2 class="editorial text-xl font-semibold text-cream-text">Add Aarva to your Home Screen</h2>
+        <button type="button" data-pwa-modal-close aria-label="Close"
+                class="-mr-2 -mt-1 shrink-0 w-9 h-9 inline-flex items-center justify-center text-cream-muted hover:text-cream-text rounded-full hover:bg-night-border transition-colors">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+
+      {# iOS Safari instructions #}
+      <div data-pwa-help-ios class="hidden mt-5 text-cream-light leading-relaxed">
+        <p>Open Aarva like a regular app — no install, no permissions.</p>
+        <ol class="mt-4 space-y-3 text-sm">
+          <li class="flex gap-3">
+            <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-night-border text-cream-text text-xs font-medium">1</span>
+            <span>Tap the <strong class="text-cream-text">Share</strong> button (square with an up arrow) at the bottom of Safari.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-night-border text-cream-text text-xs font-medium">2</span>
+            <span>Scroll down and tap <strong class="text-cream-text">Add to Home Screen</strong>.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-night-border text-cream-text text-xs font-medium">3</span>
+            <span>Tap <strong class="text-cream-text">Add</strong> in the top right.</span>
+          </li>
+        </ol>
+      </div>
+
+      {# Android instructions — only shown if beforeinstallprompt didn't fire #}
+      <div data-pwa-help-android class="hidden mt-5 text-cream-light leading-relaxed">
+        <p>Open Aarva like a regular app — no install, no permissions.</p>
+        <ol class="mt-4 space-y-3 text-sm">
+          <li class="flex gap-3">
+            <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-night-border text-cream-text text-xs font-medium">1</span>
+            <span>Tap the <strong class="text-cream-text">menu</strong> button (three dots) at the top right of Chrome.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-night-border text-cream-text text-xs font-medium">2</span>
+            <span>Tap <strong class="text-cream-text">Install app</strong> or <strong class="text-cream-text">Add to Home screen</strong>.</span>
+          </li>
+        </ol>
+      </div>
+
+      {# Desktop / other browsers — generic guidance #}
+      <div data-pwa-help-other class="hidden mt-5 text-cream-light leading-relaxed">
+        <p>Look for an <strong class="text-cream-text">Add to Home Screen</strong> or <strong class="text-cream-text">Install</strong> option in your browser's share or menu icon.</p>
+        <p class="text-sm text-cream-muted mt-3">On desktop Chrome or Edge, the address bar shows an install icon when a site is installable.</p>
+      </div>
+    </div>
+  </div>
+
+  {# ─── PWA install controller ────────────────────────────────────── #}
+  {# Decides whether to show the footer "Add to Home Screen" link and
+     whether tapping it triggers the native Android install prompt or
+     the platform-specific instructions modal. Already-installed PWA
+     sessions hide the link entirely. #}
+  <script>
+    (function() {
+      const ua = navigator.userAgent;
+      const isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
+      const isAndroid = /Android/i.test(ua);
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+      const wrapper = document.querySelector('[data-pwa-install-wrapper]');
+      const btn     = document.querySelector('[data-pwa-install]');
+      const modal   = document.querySelector('[data-pwa-modal]');
+      const helps = {
+        ios:     document.querySelector('[data-pwa-help-ios]'),
+        android: document.querySelector('[data-pwa-help-android]'),
+        other:   document.querySelector('[data-pwa-help-other]'),
+      };
+      if (!wrapper || !btn || !modal) return;
+      if (isStandalone) return;   // already an app
+
+      let deferredPrompt = null;
+
+      // Chrome (Android / desktop) fires this when the PWA is installable.
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        wrapper.classList.remove('hidden');
+      });
+
+      // iOS Safari never fires beforeinstallprompt — show the footer
+      // link immediately so iPhone listeners can find the instructions.
+      if (isIOS) {
+        wrapper.classList.remove('hidden');
+      }
+
+      function hideAllHelp() {
+        Object.values(helps).forEach(el => el && el.classList.add('hidden'));
+      }
+
+      function showModalFor(platform) {
+        hideAllHelp();
+        const target = helps[platform] || helps.other;
+        if (target) target.classList.remove('hidden');
+        modal.classList.remove('hidden');
+      }
+
+      function closeModal() {
+        modal.classList.add('hidden');
+        hideAllHelp();
+      }
+
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (deferredPrompt) {
+          // Native install prompt (Chrome Android, Edge desktop, etc.).
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function() {
+            deferredPrompt = null;
+            wrapper.classList.add('hidden');
+          });
+        } else if (isIOS) {
+          showModalFor('ios');
+        } else if (isAndroid) {
+          showModalFor('android');
+        } else {
+          showModalFor('other');
+        }
+      });
+
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target.closest('[data-pwa-modal-close]')) {
+          closeModal();
+        }
+      });
+
+      // Esc to close
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
 
   {# Shared audio-player controller. Any element with [data-player]
      containing [data-audio] + [data-play-button] + [data-progress-track]
