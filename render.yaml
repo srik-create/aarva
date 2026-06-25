@@ -35,6 +35,16 @@ services:
       #     python3 -c 'import secrets; print(secrets.token_urlsafe(32))'
       - key: AARVA_RENDER_SYNC_TOKEN
         sync: false
+      # R2 credentials — used by /admin/sync-db to pull the gzipped
+      # SQLite snapshot the laptop has uploaded to R2. Same values as
+      # the AARVA_R2_* vars in ~/.aarva.env on the laptop. Set
+      # manually in the Render dashboard; the bucket + endpoint URL
+      # come from aarva/config/pipeline.yaml (already in the
+      # container) so they don't need to be duplicated here.
+      - key: AARVA_R2_ACCESS_KEY_ID
+        sync: false
+      - key: AARVA_R2_SECRET_ACCESS_KEY
+        sync: false
 
     # 1 GB persistent disk for the SQLite DB + future state. SQLite
     # is ~80-200 MB; this leaves room for the next year+ of growth.
