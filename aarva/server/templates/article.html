@@ -21,7 +21,14 @@
     {% endif %}
 
     {# ─── Custom audio player with big round Play CTA ─────────────── #}
-    <div class="mt-10" data-player>
+    {# Audio src + title + link live on the wrapper as data-track-*
+       attributes; the shared player in base.html drives a single
+       <audio> element across the whole site, so there's no per-tile
+       <audio> any more. The play button becomes a remote control. #}
+    <div class="mt-10" data-player
+         data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+         data-track-title="{{ piece.title | title_case }}"
+         data-track-link="/article/{{ piece.article_id }}">
       <div class="flex items-center gap-5">
         <button type="button"
                 aria-label="Play"
@@ -45,9 +52,6 @@
           </p>
         </div>
       </div>
-      <audio data-audio class="hidden" preload="metadata">
-        <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-      </audio>
     </div>
 
     {% if piece.contextualisation %}

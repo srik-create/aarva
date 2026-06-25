@@ -20,8 +20,13 @@
         <em class="editorial">{{ crosscut.title_b | title_case }}</em>
       </p>
       {# Custom player (compact variant — same component as the article
-         detail page, smaller round button to fit the tile context). #}
-      <div class="mt-5" data-player>
+         detail page, smaller round button to fit the tile context).
+         data-track-* attributes feed the site-wide shared player in
+         base.html; this wrapper is a remote control, not a sound source. #}
+      <div class="mt-5" data-player
+           data-track-src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+           data-track-title="{{ (crosscut.topic_label or 'Crosscut') | title_case }}"
+           data-track-link="/crosscut/{{ crosscut.edition_id }}">
         <div class="flex items-center gap-4">
           <button type="button" aria-label="Play"
                   class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
@@ -43,9 +48,6 @@
             </p>
           </div>
         </div>
-        <audio data-audio class="hidden" preload="metadata">
-          <source src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-        </audio>
       </div>
     </section>
   {% endif %}
@@ -75,8 +77,12 @@
               <p class="hook text-ink mt-4 text-lg leading-relaxed">{{ piece.hook }}</p>
             {% endif %}
             {# Custom player (compact). Same component as article detail
-               page; smaller round button + thinner row to fit the tile. #}
-            <div class="mt-5" data-player>
+               page; smaller round button + thinner row to fit the tile.
+               data-track-* attributes feed the shared player in base.html. #}
+            <div class="mt-5" data-player
+                 data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+                 data-track-title="{{ piece.title | title_case }}"
+                 data-track-link="/article/{{ piece.article_id }}">
               <div class="flex items-center gap-4">
                 <button type="button" aria-label="Play"
                         class="shrink-0 w-14 h-14 rounded-full bg-night text-{{ group.card_color }} flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
@@ -98,9 +104,6 @@
                   </p>
                 </div>
               </div>
-              <audio data-audio class="hidden" preload="metadata">
-                <source src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}" type="audio/mpeg">
-              </audio>
             </div>
           </article>
         {% endfor %}
