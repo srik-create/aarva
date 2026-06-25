@@ -1,0 +1,38 @@
+# Aarva web service — Render.com deployment config.
+#
+# Provider-specific: this file is what Render reads to provision the
+# service. The actual build artefact (Dockerfile at repo root) is
+# portable to any host; only this YAML is Render-shaped. To migrate
+# to Fly.io / Railway / DigitalOcean / Kubernetes, add the equivalent
+# config file for that provider; the Dockerfile stays unchanged.
+#
+# See docs/deploy.md for the full setup runbook (one-time account
+# creation, env-var injection, Cloudflare DNS for aarva.app).
+
+services:
+  - type: web
+    name: aarva-web
+    runtime: docker
+    plan: starter          # ~$7/month; bump to standard if needed
+    dockerfilePath: ./Dockerfile
+    region: oregon         # change to fra / ord / sin for latency to your audience
+    healthCheckPath: /health
+    autoDeploy: true       # rebuild on git push to main
+    envVars:
+      # Persistent disk mount path — SQLite DB lives here, survives
+      # deploys.
+      - key: AARVA_DB_PATH
+        value: /data/aarva.db
+      - key: AARVA_LOG_LEVEL
+        value: INFO
+      # Update once Cloudflare DNS points aarva.app at this service.
+      - key: AARVA_SERVER_PUBLIC_URL
+        value: https://aarva.app
+
+    # 1 GB persistent disk for the SQLite DB + future state. SQLite
+    # is ~80-200 MB; this leaves room for the next year+ of growth.
+    # Render's smallest disk size; ~$0.25/month.
+    disk:
+      name: aarva-data
+      mountPath: /data
+      sizeGB: 1
