@@ -1,0 +1,72 @@
+# What NOT to copy into the Docker image. Keeps the image small +
+# avoids leaking secrets / huge audio binaries into the container.
+
+# Git internals
+.git
+.gitignore
+.gitattributes
+
+# Python build artefacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+.tox
+
+# Virtual environments
+.venv
+venv
+env
+ENV
+
+# Editor / OS noise
+.DS_Store
+.idea
+.vscode
+*.swp
+*~
+
+# Local secrets (never commit, never bake)
+.env
+.env.local
+.env.*.local
+
+# Pipeline outputs — generated each day by the daily run, sent to R2
+# / gh-pages from the operator's laptop. The container has no use for
+# these (audio is served from R2; HTML/RSS from GH Pages or rendered
+# by the FastAPI server at request time).
+aarva/output/audio/
+aarva/output/web/
+aarva/output/feed.xml
+aarva/output/*.wav
+aarva/output/*.mp3
+
+# Local development DB — the production container mounts /data
+# from a persistent volume; don't bake the laptop DB into the image
+# (would also be many MB of avoidable layer bloat).
+aarva/data/*.db
+aarva/data/*.db-wal
+aarva/data/*.db-shm
+
+# Operator scripts — used from the laptop, not inside the container
+scripts/
+
+# Logs
+logs/
+*.log
+
+# Docs (not needed in the running container)
+docs/
+
+# Tests
+tests/
+aarva/tests/
+
+# macOS iCloud-conflict duplicates (per AGENTS.md rule 24)
+*\ 2
+*\ 2.*

@@ -5,36 +5,23 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-06-27
 
 ---
 
 ## Status (one-line)
 
-Pipeline is mature and stable on Vertex AI / R2 hosting. Web app
-Phase 1 (FastAPI skeleton + daily/edition/article routes) in progress
-on the `webapp-phase-1` branch.
+Web app Phase 1 complete on `webapp-phase-1` branch — ready to merge,
+deploy to Render, point aarva.app DNS. Pipeline continues to run from
+operator's laptop; audio served from Cloudflare R2 (audio.aarva.app);
+RSS+HTML still on GitHub Pages.
 
 ---
 
 ## In progress
 
-### Web app — Phase 1: daily browsing
-**Branch:** `webapp-phase-1`
-**Commits landed:** AGENTS.md portability rules; FastAPI scaffold with
-`/health`; home + edition + article routes with JTBD grouping;
-Tailwind via CDN (utilitarian styling).
-**Remaining:**
-- Design system overhaul (warm pastel palette, serif headings + sans
-  body, more artisanal feel).
-- Clickable JTBD + publication names → new browse routes
-  `/category/<jtbd>`, `/publication/<id>`, plus list pages
-  `/categories` and `/publications`.
-- Marketing landing page at `/`; today's daily moves to `/today`.
-- Nav: add Publications + Categories.
-- Original-article link on piece cards (already on article detail).
-- Dockerfile + `render.yaml` + `docs/deploy.md` (portability per
-  AGENTS.md rule 7b).
+Nothing in flight. Ready to merge `webapp-phase-1` → main, then
+follow `docs/deploy.md` to bring aarva.app live.
 
 ---
 
@@ -80,10 +67,10 @@ Tailwind via CDN (utilitarian styling).
 
 | Phase | Scope | Status |
 |---|---|---|
-| **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | In progress |
+| **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | Code complete on `webapp-phase-1`. Operator deploy steps in `docs/deploy.md`. |
 | **2. Search** | NL + structured filter search interface, search results page, integration with `aarva.search` backend (lexical + semantic + Gemini-parsed NL) | Not started |
 | **3. Crosscut on demand** | Automatic crosscut suggestion on search results, email-on-request, in-DB job queue, background TTS worker, status page, email-when-ready, generated crosscuts re-enter the searchable catalog | Not started |
-| **4. Polish + deploy** | Mobile fine-tuning, deploy to Render with `aarva.app` domain via Cloudflare DNS, logo, copywriting pass | Not started |
+| **4. Polish + extras** | Mobile fine-tuning, logo, copywriting pass, automated DB sync to Render (currently manual), `scripts/sync_db_to_render.sh` | Not started |
 
 Pre-Phase-2 dependency: deferred item #1 (crosscut embeddings).
 
@@ -93,13 +80,22 @@ Pre-Phase-2 dependency: deferred item #1 (crosscut embeddings).
 
 Most recent first.
 
+- **Web app — Phase 1 code complete.** Thirteen commits on
+  `webapp-phase-1`: FastAPI scaffold, JTBD-grouped daily browsing,
+  custom dark-mode design system (warm cream-text on coffee-brown
+  background, per-JTBD pastel cards, Fraunces + Inter typography),
+  custom audio player (round play CTA, harmonised across home and
+  detail pages), browse-by-category (`/category/<slug>`), browse-by-
+  publication (`/publication/<slug>`), marketing landing page at `/`
+  with philosopher-founder voice copy, per-crosscut detail page,
+  uniform title-case treatment for all headings, `Dockerfile` +
+  `render.yaml` + full `docs/deploy.md` runbook.
+- **AGENTS.md rules 7a/7b** — surface external service provider
+  choices to the user explicitly; design for portability (env vars,
+  thin SDK wrappers, Dockerfile as canonical build).
 - **R2 custom domain (`audio.aarva.app`)** — switched from rate-limited
   `pub-xxx.r2.dev` to the custom domain after YouTube ingestion
   started failing. Same R2 bucket; one-line YAML change.
-- **Phase 1 (web app) — first two commits** — AGENTS.md portability
-  rules; FastAPI scaffold with `/health` + lifespan; home + edition +
-  article routes with JTBD grouping (Tailwind via CDN, baseline
-  styling).
 - **Stage 7 fixes** — hard-exclude rejected articles from candidate
   pool (cross-edition rejection memory); per-slot `max_age_days`
   freshness window (6 days for `lens_card_future` and `lens_card_behind`).

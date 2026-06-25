@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Publications — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-10">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Browse</p>
+    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-cream-text">Publications</h1>
+    <p class="text-cream-light mt-4 max-w-2xl leading-relaxed">
+      The sources Aarva draws from. Click any to see every piece we've
+      published from that title.
+    </p>
+  </div>
+
+  {% if publications %}
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {% for pub in publications %}
+        <li>
+          <a href="/publication/{{ pub.slug }}"
+             class="block bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="editorial text-lg font-semibold text-cream-text">{{ pub.name }}</span>
+              <span class="text-xs text-cream-muted shrink-0">{{ pub.n_pieces }}</span>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-cream-muted">No publications with published pieces yet.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Aarva{% endblock %}</title>
+  <meta name="description" content="The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI." />
+
+  {# ─── Typography ─────────────────────────────────────────────────── #}
+  {# Fraunces (serif, variable) for headings; Inter (sans) for body.   #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  {# ─── Tailwind via CDN with custom config ────────────────────────── #}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Dark theme: warm dark background with pastel cards "floating"
+            // on top. Each JTBD gets its own card colour.
+            'night':        '#1A1410',  // page background — deep coffee brown
+            'night-soft':   '#251B14',  // header / footer subtle lift
+            'night-border': '#3A2D22',  // dividers, soft borders on dark
+            'cream-text':   '#F5EEDF',  // primary text on dark (former cream)
+            'cream-light':  '#B7A78D',  // secondary text on dark
+            'cream-muted':  '#7E715E',  // tertiary / metadata on dark
+            'ink':          '#2D2418',  // text on pastel cards (deep warm brown)
+            'ink-light':    '#6E5F4B',  // secondary text on cards
+
+            // Pastel cards — desaturated ~15% from the earlier pass so
+            // they sit calmer against the dark page. Each pairs with
+            // -dark for inline metadata text on the card.
+            'sky':          '#BFCEDB',  // dusty blue — future-gazing
+            'sky-dark':     '#2C5878',
+            'peach':        '#E6C8B0',  // warm peach — crosscut + CTA
+            'peach-dark':   '#9C5733',
+            'lemon':        '#DDCF85',  // muted yellow — curiosity
+            'lemon-dark':   '#6E5E15',
+            'mint':         '#BCD0BF',  // soft green — smart-escape
+            'mint-dark':    '#3F5F44',
+            'blush':        '#DFB7BE',  // muted pink — delight
+            'blush-dark':   '#8C3D4F',
+            'lavender':     '#C8C2D8',  // muted purple — behind-the-news
+            'lavender-dark':'#4F4279',
+            'paper':        '#E8DFCE',  // neutral muted cream card (other)
+          },
+          fontFamily: {
+            'serif': ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
+            'sans':  ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+          },
+          letterSpacing: {
+            'tightish': '-0.01em',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    /* Default body uses our sans; headings opt into serif via the
+       `.editorial` utility class kept from earlier templates. */
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .editorial {
+      font-family: 'Fraunces', Georgia, Cambria, serif;
+      font-optical-sizing: auto;
+      letter-spacing: -0.01em;
+    }
+    /* Tighter typographic block on hooks — italic Fraunces is lovely */
+    .hook {
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+    /* Audio player: subtle, doesn't fight the pastel cards */
+    audio {
+      width: 100%;
+      border-radius: 9999px;
+    }
+  </style>
+
+  <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
+</head>
+<body class="bg-night text-cream-text antialiased">
+  <header class="border-b border-night-border bg-night-soft">
+    <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
+      <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
+      <nav class="text-sm text-cream-light space-x-5 hidden sm:block">
+        <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
+        <a href="/editions" class="hover:text-cream-text transition-colors">Editions</a>
+        <a href="/categories" class="hover:text-cream-text transition-colors">Categories</a>
+        <a href="/publications" class="hover:text-cream-text transition-colors">Publications</a>
+      </nav>
+      <nav class="text-sm text-cream-light sm:hidden">
+        <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-5 py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="max-w-3xl mx-auto px-5 py-10 text-sm text-cream-muted border-t border-night-border mt-16">
+    <p class="editorial text-base text-cream-light">Aarva</p>
+    <p class="mt-1">The world as your classroom, the finest journalism as your curriculum.</p>
+    <p class="mt-1">Written by humans. Narrated by AI.</p>
+  </footer>
+
+  {# Shared audio-player controller. Any element with [data-player]
+     containing [data-audio] + [data-play-button] + [data-progress-track]
+     + [data-progress-fill] + [data-current-time] + [data-total-time]
+     gets wired up. No-op on pages without these elements. #}
+  <script>
+    (function() {
+      function fmt(seconds) {
+        if (!seconds || isNaN(seconds)) return '--:--';
+        const s = Math.floor(seconds);
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const ss = (s % 60).toString().padStart(2, '0');
+        return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${ss}` : `${m}:${ss}`;
+      }
+      document.querySelectorAll('[data-player]').forEach(function(player) {
+        const audio   = player.querySelector('[data-audio]');
+        const btn     = player.querySelector('[data-play-button]');
+        const playIco = btn.querySelector('.play-icon');
+        const pauseIco= btn.querySelector('.pause-icon');
+        const track   = player.querySelector('[data-progress-track]');
+        const fill    = player.querySelector('[data-progress-fill]');
+        const curT    = player.querySelector('[data-current-time]');
+        const totT    = player.querySelector('[data-total-time]');
+        btn.addEventListener('click', function() {
+          if (audio.paused) { audio.play(); } else { audio.pause(); }
+        });
+        audio.addEventListener('play', function() {
+          playIco.classList.add('hidden'); pauseIco.classList.remove('hidden');
+          btn.setAttribute('aria-label', 'Pause');
+        });
+        audio.addEventListener('pause', function() {
+          playIco.classList.remove('hidden'); pauseIco.classList.add('hidden');
+          btn.setAttribute('aria-label', 'Play');
+        });
+        audio.addEventListener('timeupdate', function() {
+          if (audio.duration) {
+            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+            curT.textContent = fmt(audio.currentTime);
+          }
+        });
+        audio.addEventListener('loadedmetadata', function() {
+          if (audio.duration) totT.textContent = fmt(audio.duration);
+        });
+        audio.addEventListener('ended', function() {
+          fill.style.width = '0%';
+          curT.textContent = '0:00';
+        });
+        track.addEventListener('click', function(e) {
+          if (!audio.duration) return;
+          const rect = track.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          audio.currentTime = audio.duration * ratio;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
