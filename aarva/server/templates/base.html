@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {# viewport-fit=cover lets env(safe-area-inset-*) return non-zero
+     values on iPhones with the home indicator / notch, which the
+     mini-player uses to keep its play button clear of the indicator. #}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>{% block title %}Aarva{% endblock %}</title>
   <meta name="description" content="The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI." />
 
@@ -81,9 +84,18 @@
     }
     /* When the persistent mini-player is visible at the bottom of the
        viewport, pad the body so the footer / page content doesn't sit
-       under it. ~84px = bar height + a comfortable gap. */
+       under it. ~84px = bar height + a comfortable gap; we add the
+       iOS home-indicator inset on top of that so the gap is preserved
+       on iPhones with safe-area > 0. */
     body.mini-active {
-      padding-bottom: 84px;
+      padding-bottom: calc(84px + env(safe-area-inset-bottom));
+    }
+    /* Mini-player inner container: push its content above the iPhone
+       home indicator. The bar's dark background still paints down to
+       bottom: 0 (handled by the outer fixed div), so the indicator
+       area gets the bar's colour, not the page background. */
+    [data-mini-player-inner] {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
   </style>
 
@@ -314,7 +326,7 @@
   <audio id="aarva-shared-audio" class="hidden" preload="metadata"></audio>
 
   <div data-mini-player class="hidden fixed bottom-0 inset-x-0 z-40 bg-night-soft border-t border-night-border shadow-2xl">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+    <div data-mini-player-inner class="max-w-3xl mx-auto px-4 pt-3 flex items-center gap-3">
       <button type="button" data-mini-toggle aria-label="Play"
               class="shrink-0 w-11 h-11 rounded-full bg-peach text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform">
         <svg viewBox="0 0 24 24" class="mini-play-icon w-5 h-5 ml-0.5" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
