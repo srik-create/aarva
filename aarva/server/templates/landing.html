@@ -1,13 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Aarva — Daily audio journalism, narrated by AI{% endblock %}
+{% block title %}Aarva — Daily thoughtful journalism for you to listen to{% endblock %}
 {% block content %}
   <section class="mt-8 md:mt-16">
     <p class="hook text-cream-light text-lg md:text-xl leading-relaxed">
       The world as your classroom, the finest journalism as your curriculum.
     </p>
     <h1 class="editorial text-5xl md:text-6xl font-bold tracking-tightish mt-6 text-cream-text leading-tight">
-      Daily audio<br/>journalism,<br/>narrated by AI.
+      Daily thoughtful<br/>journalism for you<br/>to listen to.
     </h1>
+
+    <p class="text-cream-light text-lg leading-relaxed mt-8 max-w-2xl">
+      Every day, a handpicked selection of the most thoughtful,
+      mind-expanding, wonder-inducing journalism — from across a range
+      of topics. Gathered, narrated, and delivered for your ears.
+    </p>
 
     <div class="mt-10 flex items-center gap-4">
       <a href="/today"
@@ -21,45 +27,76 @@
     </div>
   </section>
 
-  <section class="mt-20 md:mt-28 max-w-2xl">
-    <h2 class="editorial text-2xl font-semibold text-cream-text">What Aarva does</h2>
-    <p class="text-cream-light mt-4 leading-relaxed">
-      Every day, Aarva selects a small set of long-form journalism pieces — essays,
-      reporting, ideas — across a span of topics. We narrate them and shape them into
-      a single daily edition you can listen to like a podcast.
+  <section class="mt-24 md:mt-32 max-w-2xl">
+    <h2 class="editorial text-3xl font-semibold text-cream-text leading-snug">What you get each day</h2>
+
+    <p class="editorial italic text-cream-text text-xl mt-6 leading-relaxed">
+      Aarva isn't a feed. It's an edition.
     </p>
-    <p class="text-cream-light mt-4 leading-relaxed">
-      You also get a <em>Crosscut</em> each day: two articles played back-to-back with
-      a bridge between them, surfacing connections you'd otherwise miss.
+
+    <p class="text-cream-light mt-6 leading-relaxed">
+      Two things land each day.
     </p>
+
     <p class="text-cream-light mt-4 leading-relaxed">
-      Pieces are chosen for rigour and editorial integrity, not for engagement.
-      No breaking news. No anxiety cycle. Journalism that delights, educates and
-      expands the mind.
+      The first is a set of narrated articles, arranged not by topic
+      but by what each piece is doing for you — what's coming next,
+      what sits behind the headlines, what scratches a deep curiosity,
+      what restores you, what makes you smile.
+    </p>
+
+    <p class="text-cream-light mt-4 leading-relaxed">
+      The second is the <em class="editorial text-cream-text">Crosscut</em>. One
+      bespoke episode in which two pieces from related territory are
+      placed in conversation. Bridges between them. Angles surfaced.
+      Connections drawn out. Designed to make you think more deeply —
+      and to notice the unexpected adjacencies in the world we live in.
     </p>
   </section>
 
-  <section class="mt-20 md:mt-28 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-night-soft rounded-2xl p-6">
-      <p class="editorial text-3xl font-bold text-cream-text">{{ n_pieces }}</p>
-      <p class="text-sm text-cream-light mt-2">pieces published</p>
-    </div>
-    <div class="bg-night-soft rounded-2xl p-6">
-      <p class="editorial text-3xl font-bold text-cream-text">{{ n_pubs }}</p>
-      <p class="text-sm text-cream-light mt-2">publications curated</p>
-    </div>
-    <div class="bg-night-soft rounded-2xl p-6">
-      <p class="editorial text-3xl font-bold text-cream-text">Daily</p>
-      <p class="text-sm text-cream-light mt-2">new edition every day</p>
-    </div>
+  <section class="mt-24 md:mt-32 max-w-2xl">
+    <h2 class="editorial text-3xl font-semibold text-cream-text leading-snug">How pieces are chosen</h2>
+
+    <p class="text-cream-light mt-6 leading-relaxed">
+      Every piece comes from a small set of trusted sources — a list
+      that keeps growing as we find writing that lives up to the bar.
+      Each one is checked for rigour and editorial integrity, not for
+      clicks.
+    </p>
+
+    <p class="text-cream-light mt-4 leading-relaxed">
+      Selections are made to ignite questions. To generate wonder and
+      delight. To expand horizons. To build bridges.
+    </p>
+
+    <p class="editorial text-cream-text text-xl mt-6 leading-relaxed">
+      No breaking news. No anxiety cycle.<br/>
+      Just journalism that delights, educates, and expands the mind.
+    </p>
   </section>
 
-  <section class="mt-20 md:mt-28 max-w-2xl">
-    <h2 class="editorial text-2xl font-semibold text-cream-text">Browse</h2>
+  <section class="mt-24 md:mt-32 max-w-2xl">
+    <h2 class="editorial text-3xl font-semibold text-cream-text leading-snug">How you engage</h2>
+
+    <p class="text-cream-light mt-6 leading-relaxed">
+      Audio first — so you can engage with it whenever. On a walk. In
+      the kitchen. Between meetings. The day's edition is yours to
+      reach for when reading isn't possible.
+    </p>
+
+    <p class="text-cream-light mt-4 leading-relaxed">
+      And when a piece pulls you in and you'd rather read it,
+      every Aarva page links back to the original, where the
+      publication's words live untouched.
+    </p>
+  </section>
+
+  <section class="mt-24 md:mt-32 max-w-2xl">
+    <h2 class="editorial text-2xl font-semibold text-cream-text">Start anywhere</h2>
     <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
       <a href="/today" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
         <p class="editorial text-lg font-semibold text-cream-text">Today's edition</p>
-        <p class="text-sm text-cream-light mt-1">Latest selection, JTBD-grouped.</p>
+        <p class="text-sm text-cream-light mt-1">The latest selection.</p>
       </a>
       <a href="/editions" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
         <p class="editorial text-lg font-semibold text-cream-text">Past editions</p>
@@ -67,7 +104,7 @@
       </a>
       <a href="/categories" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
         <p class="editorial text-lg font-semibold text-cream-text">Categories</p>
-        <p class="text-sm text-cream-light mt-1">Future-gazing, behind the news, more.</p>
+        <p class="text-sm text-cream-light mt-1">Browse by what a piece is doing for you.</p>
       </a>
       <a href="/publications" class="bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
         <p class="editorial text-lg font-semibold text-cream-text">Publications</p>
@@ -77,11 +114,10 @@
   </section>
 
   <section class="mt-20 md:mt-28 max-w-2xl">
-    <h2 class="editorial text-2xl font-semibold text-cream-text">Or subscribe wherever you listen</h2>
-    <p class="text-cream-light mt-4 leading-relaxed">
-      Aarva is a podcast feed. Subscribe in Apple Podcasts, Spotify, YouTube,
-      or any podcast app via the
-      <a href="https://srik-create.github.io/aarva/feed.xml" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">RSS feed</a>.
+    <p class="text-cream-light leading-relaxed">
+      Or subscribe via your podcast app of choice —
+      <a href="https://srik-create.github.io/aarva/feed.xml" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">RSS</a>,
+      Apple Podcasts, Spotify, YouTube. Aarva arrives wherever you listen.
     </p>
   </section>
 {% endblock %}
