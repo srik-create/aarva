@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
-# Aarva daily run — invoked by launchd at 8:00am every morning.
+# Aarva daily run — invoked manually by the operator.
+#
+# Per the decision recorded in docs/project_brief.md (2026-06-26),
+# the daily run is NOT scheduled via launchd; the operator runs it
+# explicitly when they want today's edition to ship. The plist file
+# `scripts/app.aarva.daily.plist` exists as a starting point if
+# scheduled runs are ever wanted in the future — load it with
+# `launchctl load ~/Library/LaunchAgents/app.aarva.daily.plist`.
 #
 # Does the full publish cycle:
 #   1. Activate the project venv
 #   2. Run the pipeline (Stages 1 → 10)
 #   3. Sync to gh-pages and push
+#   4. Sync DB to Render so aarva.app reflects today's edition
 #
-# All output (stdout + stderr) is captured to the log file referenced by
-# the launchd plist (~/Library/Logs/aarva-daily.log).
-#
-# Manual invocation:
+# Invocation:
 #   bash scripts/run_daily.sh
-#
-# launchd invocation uses the absolute path — see
-# ~/Library/LaunchAgents/app.aarva.daily.plist.
 
 set -euo pipefail
 
