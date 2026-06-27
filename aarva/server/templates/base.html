@@ -138,11 +138,13 @@
   </header>
 
   <main class="max-w-3xl mx-auto px-5 py-10">
-    {# Back arrow on every page except the landing and home. Mobile-
-       friendly 40px tap target. Uses history.back() when possible,
-       falls back to /today for direct visits via shared links. #}
-    {% if request.url.path not in ['/', '/today'] %}
-      <a href="/today"
+    {# Back arrow on every page except the landing. Mobile-friendly
+       44px tap target. Uses history.back() when possible, falls back
+       to / for /today (so you can return to the landing) and /today
+       for everything else (the editorial home). #}
+    {% if request.url.path != '/' %}
+      {% set back_fallback = '/' if request.url.path == '/today' else '/today' %}
+      <a href="{{ back_fallback }}"
          onclick="if (window.history.length > 1) { window.history.back(); return false; }"
          aria-label="Back"
          class="-ml-2 mb-6 inline-flex items-center justify-center w-11 h-11 rounded-full text-cream-light hover:text-cream-text hover:bg-night-soft transition-colors">
