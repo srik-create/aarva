@@ -97,6 +97,14 @@
     [data-mini-player-inner] {
       padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
+    /* Header: viewport-fit=cover means content extends under the iOS
+       status bar (clock / signal / battery). Push the header's content
+       down by safe-area-inset-top so the wordmark + nav don't collide
+       with system UI. The header's dark background still paints up to
+       the very top, so the bar area gets coloured cleanly. */
+    [data-site-header] {
+      padding-top: env(safe-area-inset-top);
+    }
   </style>
 
   <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
@@ -114,7 +122,7 @@
   <meta name="theme-color" content="#1A1410">
 </head>
 <body class="bg-night text-cream-text antialiased">
-  <header class="border-b border-night-border bg-night-soft">
+  <header data-site-header class="border-b border-night-border bg-night-soft">
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
       <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
       <nav class="text-sm text-cream-light space-x-5 hidden sm:block">
