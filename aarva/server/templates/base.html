@@ -131,11 +131,63 @@
         <a href="/categories" class="hover:text-cream-text transition-colors">Categories</a>
         <a href="/publications" class="hover:text-cream-text transition-colors">Publications</a>
       </nav>
-      <nav class="text-sm text-cream-light sm:hidden">
-        <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
-      </nav>
+      {# Mobile: hamburger that opens the sidebar drawer below.
+         Desktop keeps its inline nav above (sm:block). #}
+      <button type="button" data-nav-toggle aria-label="Open menu"
+              class="sm:hidden -mr-2 w-11 h-11 inline-flex items-center justify-center rounded-full text-cream-light hover:text-cream-text hover:bg-night-border transition-colors">
+        <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true">
+          <path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/>
+        </svg>
+      </button>
     </div>
   </header>
+
+  {# ─── Mobile sidebar drawer ─────────────────────────────────────── #}
+  {# Hidden by default; opened by the hamburger in the header. Slides
+     in from the right (full-height). Backdrop click, close button, or
+     Esc all dismiss it. Built so future auth links (login/signup) can
+     slot into the nav list below the main browse links. #}
+  <div data-nav-drawer class="hidden fixed inset-0 z-50 sm:hidden">
+    <div data-nav-backdrop class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <aside class="absolute top-0 right-0 bottom-0 w-72 max-w-[80vw] bg-night-soft border-l border-night-border shadow-2xl flex flex-col" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-night-border">
+        <span class="editorial text-base font-semibold text-cream-text">Menu</span>
+        <button type="button" data-nav-close aria-label="Close menu"
+                class="-mr-2 w-9 h-9 inline-flex items-center justify-center rounded-full text-cream-muted hover:text-cream-text hover:bg-night-border transition-colors">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+      <nav class="flex-1 py-2 text-cream-light overflow-y-auto">
+        <a href="/" class="block px-5 py-3 hover:text-cream-text hover:bg-night-border transition-colors">Homepage</a>
+        <a href="/today" class="block px-5 py-3 hover:text-cream-text hover:bg-night-border transition-colors">Today</a>
+        <a href="/editions" class="block px-5 py-3 hover:text-cream-text hover:bg-night-border transition-colors">Editions</a>
+        <a href="/categories" class="block px-5 py-3 hover:text-cream-text hover:bg-night-border transition-colors">Categories</a>
+        <a href="/publications" class="block px-5 py-3 hover:text-cream-text hover:bg-night-border transition-colors">Publications</a>
+      </nav>
+    </aside>
+  </div>
+
+  <script>
+    (function() {
+      const toggle   = document.querySelector('[data-nav-toggle]');
+      const drawer   = document.querySelector('[data-nav-drawer]');
+      const backdrop = document.querySelector('[data-nav-backdrop]');
+      const closeBtn = document.querySelector('[data-nav-close]');
+      if (!toggle || !drawer) return;
+
+      function open() { drawer.classList.remove('hidden'); }
+      function close() { drawer.classList.add('hidden'); }
+
+      toggle.addEventListener('click', open);
+      backdrop && backdrop.addEventListener('click', close);
+      closeBtn && closeBtn.addEventListener('click', close);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !drawer.classList.contains('hidden')) close();
+      });
+    })();
+  </script>
 
   <main class="max-w-3xl mx-auto px-5 py-10">
     {# Back arrow on every page except the landing. Mobile-friendly
