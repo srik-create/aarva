@@ -125,7 +125,28 @@ def _publication_slug(name: str | None) -> str:
     return _SLUG_NON_ALNUM.sub("-", name.lower()).strip("-")
 
 
+def _card_color(jtbd_primary: str | None) -> str:
+    """Tailwind card-colour token for an article's JTBD. Used in
+    templates that mix articles from multiple JTBDs (e.g. the
+    publication detail page) so each article keeps the colour you
+    saw it in on /today or /category/<slug>."""
+    from aarva.server.jtbd_meta import card_color_for_jtbd
+    return card_color_for_jtbd(jtbd_primary)
+
+
+def _jtbd_label(jtbd_primary: str | None) -> str:
+    """Human-readable label for a JTBD key. Falls back to empty so
+    templates can `{% if piece.jtbd_primary | jtbd_label %}` cleanly."""
+    from aarva.server.jtbd_meta import JTBD_BY_KEY
+    if not jtbd_primary:
+        return ""
+    info = JTBD_BY_KEY.get(jtbd_primary)
+    return info["label"] if info else ""
+
+
 templates.env.filters["duration"] = _format_duration
 templates.env.filters["audio_url"] = _format_audio_url
 templates.env.filters["title_case"] = _title_case
 templates.env.filters["publication_slug"] = _publication_slug
+templates.env.filters["card_color"] = _card_color
+templates.env.filters["jtbd_label"] = _jtbd_label
