@@ -1,11 +1,12 @@
-"""Per-crosscut detail page.
+"""Crosscut browse routes.
 
-  /crosscut/<edition_id> — full crosscut episode view: title, both
-                           source articles, big play button, intro /
-                           bridge / outro text + show notes, links out
-                           to the two original articles.
-
-Wraps the content in a peach card to match the home-page crosscut tile.
+  /crosscuts             — list of every past crosscut episode,
+                           newest first. Each row is a peach card
+                           with topic label, the two source titles,
+                           date, and a compact player.
+  /crosscut/<edition_id> — per-episode detail (title, big play button,
+                           intro / bridge / outro text, links to the
+                           two source articles).
 """
 from __future__ import annotations
 
@@ -15,6 +16,17 @@ from fastapi.responses import HTMLResponse
 from aarva.server.app import app
 from aarva.server.templates import templates
 from aarva.services.queries import load_crosscut_episodes
+
+
+@app.get("/crosscuts", response_class=HTMLResponse)
+async def crosscuts_list(request: Request) -> HTMLResponse:
+    """List of all past crosscut episodes, newest first."""
+    db = request.app.state.db
+    crosscuts = load_crosscut_episodes(db)
+    return templates.TemplateResponse(
+        request, "crosscuts_list.html",
+        {"crosscuts": crosscuts},
+    )
 
 
 @app.get("/crosscut/{edition_id}", response_class=HTMLResponse)

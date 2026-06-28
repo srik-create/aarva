@@ -21,7 +21,8 @@ from aarva.server.templates import templates
 
 @app.get("/categories", response_class=HTMLResponse)
 async def categories_list(request: Request) -> HTMLResponse:
-    """List page: one card per JTBD with description + piece count."""
+    """List page: one card per JTBD with description + piece count,
+    plus a 'Crosscuts' tile that points at the crosscut browse page."""
     db = request.app.state.db
     with db.connect() as conn:
         # Count pieces per JTBD (using primary OR secondary). One query
@@ -33,6 +34,18 @@ async def categories_list(request: Request) -> HTMLResponse:
              WHERE ep.audio_url IS NOT NULL AND ep.audio_url != ''
              GROUP BY s.jtbd_primary
         """).fetchall()
+        # Count distinct crosscut episodes too — surfaced in the
+        # Crosscuts tile below the JTBD cards.
+        crosscut_row = conn.execute("""
+            SELECT COUNT(*) AS n
+              FROM editions e
+              JOIN edition_pieces ep ON ep.edition_id = e.id
+             WHERE e.edition_type = 'crosscut'
+               AND ep.audio_url IS NOT NULL AND ep.audio_url != ''
+               AND ep.position = 0
+               AND ep.flagged_at IS NULL
+        """).fetchone()
+        crosscut_count = int(crosscut_row["n"]) if crosscut_row else 0
     counts: dict[str, int] = {r["k"]: int(r["n"]) for r in rows if r["k"]}
 
     categories = [
@@ -47,7 +60,10 @@ async def categories_list(request: Request) -> HTMLResponse:
     ]
     return templates.TemplateResponse(
         request, "categories_list.html",
-        {"categories": categories},
+        {
+            "categories": categories,
+            "crosscut_count": crosscut_count,
+        },
     )
 
 

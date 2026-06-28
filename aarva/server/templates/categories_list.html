@@ -21,5 +21,19 @@
         <p class="text-ink-light mt-3 leading-relaxed">{{ cat.description }}</p>
       </a>
     {% endfor %}
+
+    {# Crosscuts isn't a JTBD — it's a different content type — but
+       lives in the same "browse by what kind of thing" mental model,
+       so it gets a tile here too. The tile points at /crosscuts
+       (a dedicated route, not /category/<slug>). Peach matches the
+       crosscut card colour on /today and the crosscut detail page. #}
+    <a href="/crosscuts"
+       class="block bg-peach text-ink rounded-2xl p-6 hover:opacity-90 transition-opacity">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 class="editorial text-2xl font-semibold leading-snug">Crosscuts</h2>
+        <p class="text-sm text-ink-light shrink-0">{{ crosscut_count }} episode{% if crosscut_count != 1 %}s{% endif %}</p>
+      </div>
+      <p class="text-ink-light mt-3 leading-relaxed">Paired-listening episodes — two articles in conversation, with bridges drawing out their non-obvious connections.</p>
+    </a>
   </div>
 {% endblock %}
