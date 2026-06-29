@@ -207,14 +207,32 @@ def _run_job(
         )
 
     # 4. Run TTS — this is the long-pole step (~15 min for a normal
-    # crosscut at the configured chunk size). The TTS path uploads
-    # audio to R2 and writes audio_url onto the edition_pieces rows.
+    # crosscut at the configured chunk size). The TTS path produces a
+    # WAV per piece and writes audio_url onto the edition_pieces rows.
     update_progress(db, job_id, "Rendering the audio (~15 min)…")
     tts_stats = synthesize_crosscut_episode(config, db, edition_id=edition_id)
     if tts_stats.errors:
         raise RuntimeError(
             f"synthesize_crosscut_episode reported errors: {tts_stats!r}"
         )
+
+    # 4b. Convert WAV → MP3 (with loudness normalisation) and upload
+    # to R2. The daily pipeline runs this via `scripts/publish.sh`
+    # as Stage 10; for on-demand builds we do it inline here so the
+    # episode is immediately listenable. Both calls are idempotent —
+    # already-converted MP3s and already-uploaded R2 keys are skipped.
+    update_progress(db, job_id, "Converting to MP3 and uploading…")
+    from aarva.output import audio_converter, r2_uploader
+    conv_stats = audio_converter.convert_all_for_publish(config, db)
+    logger.info(
+        "episode_worker: job %d conversion stats: %r",
+        job_id, conv_stats,
+    )
+    upload_stats = r2_uploader.upload_all_pending(config, db)
+    logger.info(
+        "episode_worker: job %d R2 upload stats: %r",
+        job_id, upload_stats,
+    )
 
     # 5. Notify the listener (stub in dev — logs only).
     update_progress(db, job_id, "Sending the notification…")
