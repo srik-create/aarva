@@ -210,6 +210,37 @@ CREATE INDEX IF NOT EXISTS idx_crosscut_candidates_selected
     ON crosscut_pair_candidates(selected_at);
 
 
+-- Crosscut embeddings for the search index. Each published crosscut
+-- episode can have multiple embedding variants under different `source`
+-- values, so the search layer (Phase 2) can blend or pick depending on
+-- the query shape. Today we store two:
+--   - 'pairing_summary': embed the editorial text (topic_label +
+--                        intro_text + bridge_between + outro_text).
+--                        Captures the curatorial layer — why these two
+--                        pieces sit together — that a simple article
+--                        mean would miss.
+--   - 'article_mean'   : mean of the two source articles' BGE vectors,
+--                        L2-renormalised. No extra inference cost;
+--                        useful as a fallback when pairing text is
+--                        empty and as a complementary signal.
+-- UNIQUE(edition_id, source, embedding_model) lets a single crosscut
+-- carry several variants without collisions, and lets us swap models
+-- later without ALTER TABLE migrations.
+CREATE TABLE IF NOT EXISTS crosscut_embeddings (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    edition_id      INTEGER NOT NULL REFERENCES editions(id) ON DELETE CASCADE,
+    source          TEXT    NOT NULL,
+    embedding       BLOB    NOT NULL,    -- float32 numpy bytes, L2-normalised
+    embedding_model TEXT    NOT NULL,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(edition_id, source, embedding_model)
+);
+CREATE INDEX IF NOT EXISTS idx_crosscut_embeddings_edition
+    ON crosscut_embeddings(edition_id);
+CREATE INDEX IF NOT EXISTS idx_crosscut_embeddings_model
+    ON crosscut_embeddings(embedding_model);
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -651,6 +682,32 @@ class Database:
             conn.execute(
                 "UPDATE articles SET embedding = ?, embedding_model = ? WHERE id = ?",
                 (embedding_bytes, embedding_model, article_id),
+            )
+
+    def set_crosscut_embedding(
+        self,
+        edition_id: int,
+        source: str,
+        embedding_bytes: bytes,
+        embedding_model: str,
+    ) -> None:
+        """Insert-or-update a crosscut embedding.
+
+        Keys on the UNIQUE(edition_id, source, embedding_model)
+        constraint so re-running the embed pass for an already-embedded
+        episode just refreshes the vector (and the created_at stamp)
+        rather than duplicating rows."""
+        with self.connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO crosscut_embeddings
+                    (edition_id, source, embedding, embedding_model)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(edition_id, source, embedding_model) DO UPDATE
+                   SET embedding  = excluded.embedding,
+                       created_at = CURRENT_TIMESTAMP
+                """,
+                (edition_id, source, embedding_bytes, embedding_model),
             )
 
     def get_articles_needing_embedding(
