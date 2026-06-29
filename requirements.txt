@@ -66,4 +66,11 @@ boto3>=1.35
 fastapi>=0.110
 uvicorn[standard]>=0.27        # ASGI server; [standard] adds httptools + uvloop
 jinja2>=3.1                    # HTML templates
-python-multipart>=0.0.9        # Form parsing (email-on-request in Phase 3)
+python-multipart>=0.0.9        # Form parsing (email collection on episode-create)
+
+# ─── Email (listener "your episode is ready" notifications) ──────────────
+# Used by aarva/services/email.py. The service falls back to a stub
+# (logs the would-send body) when RESEND_API_KEY is unset, so the SDK
+# being installed doesn't force email-on. Domain verification + DKIM
+# happen in the Resend dashboard against aarva.app.
+resend>=2.0

@@ -45,6 +45,18 @@ services:
         sync: false
       - key: AARVA_R2_SECRET_ACCESS_KEY
         sync: false
+      # Resend API key — drives the "your episode is ready" email
+      # sent to listeners after an on-demand build completes.
+      # Set in the Render dashboard. When unset, aarva/services/email.py
+      # automatically falls back to a stub (logs only) — useful for
+      # staging or for development branches that shouldn't email.
+      - key: RESEND_API_KEY
+        sync: false
+      # Optional: override the From header. Default in the code is
+      # "Aarva <hello@aarva.app>". Set this only if you want a
+      # different display name / address.
+      - key: AARVA_EMAIL_FROM
+        sync: false
 
     # 1 GB persistent disk for the SQLite DB + future state. SQLite
     # is ~80-200 MB; this leaves room for the next year+ of growth.
