@@ -64,9 +64,23 @@ async def lifespan(app: FastAPI):
     app.state.pipeline_cfg = pipeline_cfg
     app.state.db = db
 
+    # Background worker for on-demand episode builds. Daemon thread
+    # polls the jobs table for build_crosscut jobs and runs the full
+    # crosscut pipeline (script-gen + TTS + R2 upload + embed). One
+    # concurrent build, FIFO. Stuck-job recovery runs at startup
+    # inside start_worker(). See aarva/services/episode_worker.py.
+    from aarva.services.episode_worker import start_worker
+    app.state.episode_worker = start_worker(db, pipeline_cfg)
+
     yield
 
     logger.info("Aarva server shutting down")
+    # Clean stop so an in-progress build can wind down (the loop
+    # checks stop_event between jobs; a running job finishes first).
+    try:
+        app.state.episode_worker.stop(timeout=5.0)
+    except Exception as e:
+        logger.warning("episode_worker stop failed: %s", e)
 
 
 app = FastAPI(
