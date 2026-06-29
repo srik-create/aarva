@@ -191,6 +191,128 @@ The Render-given URL works, but we want `aarva.app`.
 After this lands, update `render.yaml`'s `AARVA_SERVER_PUBLIC_URL` to
 `https://aarva.app` if it isn't already, and re-deploy.
 
+### 6. Email — wire Resend for episode-ready notifications
+
+The on-demand episode-create flow (Phase 2) sends listeners a "your
+episode is ready" email when their build completes. Until
+`RESEND_API_KEY` is set on Render the email backend automatically
+falls back to a stub (logs the would-send payload). Wire Resend
+once you want the real emails to fire.
+
+> The steps below were verified against Resend's docs at
+> `https://resend.com/docs/` on 2026-06-29. Resend's dashboard
+> evolves; if a step's UI label has shifted, trust the dashboard
+> and tell me so this runbook can be updated.
+
+**Decide: apex or subdomain.**
+
+Resend recommends sending from a **subdomain** like
+`send.aarva.app` over the apex `aarva.app` so that the email
+domain's reputation stays isolated from the rest of the apex
+domain's usage. Trade-off: a tiny bit more DNS bookkeeping
+(records on the subdomain) and the From address has to use the
+subdomain (e.g. `hello@send.aarva.app`).
+
+For v1 with low listener volume the apex is fine and simpler;
+when listener volume grows enough that sender reputation matters
+in its own right, switch to the subdomain. The steps below
+assume **apex (`aarva.app`)**; substitute `send.aarva.app` if
+you prefer to follow Resend's recommendation.
+
+**One-time setup:**
+
+1. **Sign up.** Create an account at [resend.com](https://resend.com).
+   Free tier covers ~3,000 emails/month + 100/day — comfortably
+   more than Aarva's v1 volume.
+
+2. **Add the sending domain.** Resend dashboard →
+   [Domains](https://resend.com/domains) → **Add Domain** →
+   enter `aarva.app` (or your chosen subdomain). Resend
+   generates the DNS records you need.
+
+3. **Copy the DNS records EXACTLY as Resend shows them.** The
+   exact set varies — typically Resend will give you:
+   - One **TXT** record for **SPF** (the value starts with
+     `v=spf1 include:amazonses.com ~all` or similar).
+   - One **MX** record for the SPF return path (points at a
+     `feedback-smtp.<region>.amazonses.com` host).
+   - One **TXT** record for **DKIM** (host is something like
+     `resend._domainkey`; value is a long `v=DKIM1; k=rsa; p=...`
+     public key).
+   - Optionally one **TXT** for **DMARC** (Resend suggests but
+     doesn't require this).
+
+   Some of these are MX, some TXT — match whatever Resend's
+   "Records" table specifies. **Don't guess record types from
+   this doc — read them off the Resend page**, because Resend's
+   recommended set evolves and varies by region.
+
+4. **Add each record in Cloudflare.** Cloudflare dashboard for
+   `aarva.app` → **DNS** → **Records** → **Add record**. For
+   each record Resend gave you:
+   - **Type**: match Resend's column (TXT / MX / etc.) exactly.
+   - **Name**: paste Resend's Host/Name value verbatim. Cloudflare
+     accepts `aarva.app`-relative names — paste what Resend shows.
+   - **Content / Target**: paste Resend's Value column verbatim.
+   - For MX records, set **Priority** to whatever Resend shows
+     (usually 10).
+   - **Proxy status: DNS only (grey cloud).** Cloudflare's
+     orange-cloud proxy mangles email-auth records — don't
+     proxy these. TXT and MX must be DNS-only.
+   - **TTL**: Auto.
+
+   Save. Repeat for each row.
+
+5. **Verify in Resend.** Back on the domain page, click **Verify
+   DNS Records**. Cloudflare DNS propagation is usually 1–10
+   minutes; if the first click shows pending, wait 5 minutes and
+   click again. The domain status flows:
+   `not_started → pending → verified`. Once green and verified,
+   you can send.
+
+6. **Generate an API key.** Resend dashboard →
+   [API Keys](https://resend.com/api-keys) → **Create API Key**.
+   - **Name**: `aarva-render-prod` (or similar identifier).
+   - **Permission**: **Sending access** (UI label) — corresponds
+     to `sending_access` in the API. The full-access scope is
+     not needed; sending-access is more constrained.
+   - **Domain**: restrict to the verified domain you set up in
+     step 2 (`aarva.app` or `send.aarva.app`).
+   
+   Click **Create**. Resend shows the key value (starts with
+   `re_`) **once**. Copy it immediately — there's no way to
+   view it again later.
+
+7. **Add the key to Render.** Render dashboard → your `aarva-web`
+   service → **Environment** → **Add Environment Variable**:
+   - **Key**: `RESEND_API_KEY`
+   - **Value**: the `re_…` token from step 6
+   
+   Save. Render auto-deploys (~2 min) with the new env var.
+
+8. **Verify end-to-end.** Trigger an on-demand build from
+   `aarva.app/create` (your own email is fine for testing). Watch
+   Render's Logs tab for:
+   ```
+   send_email: Resend ok to=<email> id=<msg_id>
+   ```
+   instead of the `[email-stub] RESEND_API_KEY unset` warning.
+   The email should land in the listener's inbox within a minute.
+   First-time delivery sometimes goes to Promotions/Spam — drag
+   to Inbox so future ones train through.
+
+**Optional — override the From header.** The code defaults to
+`Aarva <hello@aarva.app>`. If you went the subdomain route, set
+`AARVA_EMAIL_FROM` on Render to `Aarva <hello@send.aarva.app>`
+(or whatever address sits at your verified domain). The address
+**must** be at the verified domain — Resend will reject a From
+header that doesn't match.
+
+**Swapping providers later.** `aarva/services/email.py` exposes a
+single `send_email(...)` function; the Resend-specific bits sit
+behind one `if api_key:` branch. To move to Postmark / SES /
+SMTP later, replace that branch — no callers change.
+
 ---
 
 ## Ongoing operation
