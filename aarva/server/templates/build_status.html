@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Building your episode — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-10">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Episode build</p>
+    <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
+      {{ payload.topic_label | title_case }}
+    </h1>
+    {% if payload.prompt %}
+      <p class="text-sm text-cream-muted mt-3">From the prompt: "{{ payload.prompt }}"</p>
+    {% endif %}
+  </div>
+
+  {% if job.status == 'completed' and job.result and job.result.episode_path %}
+    <section class="p-6 bg-peach rounded-2xl text-ink">
+      <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Ready to listen</p>
+      <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">Your episode is built.</h2>
+      <p class="text-ink-light mt-3">A listen link has been sent to your email.</p>
+      <p class="mt-5">
+        <a href="{{ job.result.episode_path }}"
+           class="inline-flex items-center gap-3 px-5 py-3 bg-night text-peach rounded-full font-medium hover:opacity-90 transition-opacity">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Open your episode
+        </a>
+      </p>
+    </section>
+
+  {% elif job.status == 'failed' %}
+    <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
+      <p class="text-xs uppercase tracking-widest text-blush-dark font-semibold">Build failed</p>
+      <h2 class="editorial text-xl font-semibold mt-2 text-cream-text leading-snug">Something didn't go right.</h2>
+      {% if job.error_message %}
+        <p class="text-sm text-cream-muted mt-3 font-mono">{{ job.error_message }}</p>
+      {% endif %}
+      <p class="text-sm text-cream-light mt-4">
+        You can try a different prompt and pairing from the <a href="/" class="underline underline-offset-4 decoration-cream-muted">homepage</a>.
+      </p>
+    </section>
+
+  {% else %}
+    {# pending or running — keep polling. #}
+    <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
+      <div class="flex items-start gap-4">
+        <div class="shrink-0 mt-1">
+          {# Subtle spinner — pure CSS circle. #}
+          <div class="w-6 h-6 rounded-full border-2 border-cream-muted/30 border-t-cream-text animate-spin"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs uppercase tracking-widest text-cream-muted">
+            {% if job.status == 'pending' %}Queued{% else %}Building{% endif %}
+          </p>
+          <h2 class="editorial text-xl font-semibold mt-2 text-cream-text leading-snug">
+            We're putting your episode together.
+          </h2>
+          {% if job.progress %}
+            <p class="text-cream-light mt-3">{{ job.progress }}</p>
+          {% else %}
+            <p class="text-cream-light mt-3">Setting up the build…</p>
+          {% endif %}
+          <p class="text-sm text-cream-muted mt-4">
+            Building a new episode takes about 15 minutes (intro, bridges, and the audio render). Leave this page open to watch progress, or close it — we'll email you when it's ready.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {# Polling — refresh the whole page every 7s. Cheap because the
+       page is light and the server is local during dev. Could switch
+       to HTMX partial refreshes later if it gets chatty. #}
+    <script>
+      setTimeout(function() {
+        window.location.reload();
+      }, 7000);
+    </script>
+  {% endif %}
+{% endblock %}

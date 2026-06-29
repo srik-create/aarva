@@ -64,6 +64,18 @@ async def lifespan(app: FastAPI):
     app.state.pipeline_cfg = pipeline_cfg
     app.state.db = db
 
+    # Embedding + LLM clients are built once at startup and reused by
+    # the route handlers (in particular the episode-candidate flow,
+    # which calls Gemini and BGE on every prompt). Building them
+    # per-request would re-load the ~110 MB BGE model from disk on
+    # every search; once at boot is much friendlier.
+    from aarva.clients.embedding import build_embedding_client
+    from aarva.clients.llm import build_llm_client
+    app.state.embedding_client = build_embedding_client(
+        pipeline_cfg.raw.get("embedding", {})
+    )
+    app.state.llm_client = build_llm_client(pipeline_cfg.llm)
+
     # Background worker for on-demand episode builds. Daemon thread
     # polls the jobs table for build_crosscut jobs and runs the full
     # crosscut pipeline (script-gen + TTS + R2 upload + embed). One
