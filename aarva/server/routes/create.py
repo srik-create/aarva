@@ -49,7 +49,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from aarva.server.app import app
 from aarva.server.templates import templates
 from aarva.services.episode_candidates import propose_candidates
-from aarva.services.episode_jobs import enqueue_build_job, get_job
+from aarva.services.episode_jobs import (
+    BuildQuotaExceeded, enqueue_build_job, get_job,
+)
 from aarva.services.queries import load_crosscut_episodes
 
 logger = logging.getLogger(__name__)
@@ -138,15 +140,29 @@ async def create_build(request: Request):
         raise HTTPException(status_code=400, detail="topic_label is required.")
 
     db = request.app.state.db
-    job_id = enqueue_build_job(
-        db,
-        prompt=prompt,
-        article_a_id=article_a_id,
-        article_b_id=article_b_id,
-        topic_label=topic_label,
-        why=why,
-        requester_email=email,
-    )
+    try:
+        job_id = enqueue_build_job(
+            db,
+            prompt=prompt,
+            article_a_id=article_a_id,
+            article_b_id=article_b_id,
+            topic_label=topic_label,
+            why=why,
+            requester_email=email,
+        )
+    except BuildQuotaExceeded as e:
+        # Listener has already used their slots for the last 24 hours.
+        # Render a friendly page rather than letting this become a 500.
+        return templates.TemplateResponse(
+            request, "create_quota_exceeded.html",
+            {
+                "prompt": prompt,
+                "email": email,
+                "count": e.count,
+                "limit": e.limit,
+            },
+            status_code=429,
+        )
     return RedirectResponse(url=f"/build/{job_id}", status_code=303)
 
 

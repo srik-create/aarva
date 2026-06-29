@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Daily limit reached — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-8">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Daily limit reached</p>
+    <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
+      You've already created {{ count }} episode{% if count != 1 %}s{% endif %} in the last 24 hours.
+    </h1>
+  </div>
+
+  <div class="p-6 bg-night-soft border border-night-border rounded-2xl">
+    <p class="text-cream-light leading-relaxed">
+      Aarva caps episode creation at {{ limit }} per email address per day. Each build runs a full audio render at Aarva's editorial bar, so the cap keeps things sustainable while the service is in early access.
+    </p>
+    {% if prompt %}
+      <p class="text-cream-light leading-relaxed mt-4">
+        Your prompt &mdash;
+        <em class="editorial text-cream-text">"{{ prompt }}"</em>
+        &mdash; will work again once a slot opens. The window is rolling, so a slot opens as soon as one of your earlier builds passes the 24-hour mark.
+      </p>
+    {% endif %}
+  </div>
+
+  <section class="mt-10">
+    <h2 class="editorial text-2xl font-semibold text-cream-text leading-snug">In the meantime</h2>
+    <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="/today" class="block bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Today's edition</p>
+        <p class="text-sm text-cream-light mt-1">The curator's daily pick.</p>
+      </a>
+      <a href="/listener-created" class="block bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Listener-created</p>
+        <p class="text-sm text-cream-light mt-1">Episodes others have requested.</p>
+      </a>
+      <a href="/crosscuts" class="block bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Crosscuts</p>
+        <p class="text-sm text-cream-light mt-1">Past paired-listening episodes from Aarva.</p>
+      </a>
+      <a href="/categories" class="block bg-night-soft hover:bg-night-border rounded-2xl p-5 transition-colors">
+        <p class="editorial text-lg font-semibold text-cream-text">Categories</p>
+        <p class="text-sm text-cream-light mt-1">Browse by what a piece is doing for you.</p>
+      </a>
+    </div>
+  </section>
+{% endblock %}

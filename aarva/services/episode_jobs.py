@@ -40,6 +40,28 @@ logger = logging.getLogger(__name__)
 JOB_KIND = "build_crosscut"
 
 
+# Per-email build cap. Each build costs ~$0.80 in Gemini TTS — a small
+# cap keeps cost predictable while still letting a curious listener
+# try a couple of pairings the same day. Tune higher (or move to a
+# paid tier) when demand justifies it.
+DEFAULT_BUILDS_PER_24H = 2
+
+
+class BuildQuotaExceeded(Exception):
+    """Raised by `enqueue_build_job` when the requester has hit their
+    per-24-hour build cap. The route handler catches this and renders
+    a friendly 'try again tomorrow' page instead of letting it
+    propagate as a 500."""
+    def __init__(self, email: str, count: int, limit: int):
+        self.email = email
+        self.count = count
+        self.limit = limit
+        super().__init__(
+            f"{email} has {count} build(s) in the last 24h "
+            f"(limit: {limit})"
+        )
+
+
 # ─── User upsert ──────────────────────────────────────────────────────────
 
 def ensure_user_for_email(db: Database, email: str) -> int:
@@ -73,6 +95,27 @@ def ensure_user_for_email(db: Database, email: str) -> int:
 
 # ─── Enqueue ──────────────────────────────────────────────────────────────
 
+def _count_builds_24h(db: Database, user_id: int) -> int:
+    """Count this user's build_crosscut jobs in the last 24 hours.
+
+    Only `pending`, `running`, and `completed` count — `failed` and
+    `cancelled` are excluded so a system error on Aarva's side doesn't
+    burn a slot the listener owns."""
+    with db.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT COUNT(*) AS n
+              FROM jobs
+             WHERE kind = ?
+               AND user_id = ?
+               AND status IN ('pending', 'running', 'completed')
+               AND created_at >= datetime('now', '-24 hours')
+            """,
+            (JOB_KIND, int(user_id)),
+        ).fetchone()
+    return int(row["n"]) if row else 0
+
+
 def enqueue_build_job(
     db: Database,
     *,
@@ -82,13 +125,24 @@ def enqueue_build_job(
     topic_label: str,
     why: str,
     requester_email: str,
+    builds_per_24h_limit: int = DEFAULT_BUILDS_PER_24H,
 ) -> int:
     """Queue a new on-demand build. Returns the job_id.
 
     Creates / upserts the requester's users row so the eventual
     `editions.user_id` can point at them. The job_id is the listener's
-    status-page key — pass it back as part of the redirect."""
+    status-page key — pass it back as part of the redirect.
+
+    Raises BuildQuotaExceeded when the requester has hit the per-24h
+    cap. No DB write happens in that case (the users row upsert is
+    cheap and idempotent so still runs — harmless either way)."""
     user_id = ensure_user_for_email(db, requester_email)
+
+    count_today = _count_builds_24h(db, user_id)
+    if count_today >= builds_per_24h_limit:
+        raise BuildQuotaExceeded(
+            requester_email, count_today, builds_per_24h_limit,
+        )
 
     payload = {
         "prompt": prompt,
