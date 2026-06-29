@@ -150,15 +150,29 @@ def load_crosscut_episodes(
     edition_id: Optional[int] = None,
     since_date: Optional[date] = None,
     include_user_id_null: bool = True,
+    user_generated_only: bool = False,
     include_flagged: bool = False,
 ) -> list[dict[str, Any]]:
     """Crosscut episodes flattened into one row per edition with both
     pieces' metadata joined in. Used by RSS feed, HTML renderer, and
     personalised feed service.
 
-    Crosscut episodes are always global today (user_id IS NULL); the
-    parameter is kept for forward compatibility with eventual
-    per-user crosscut variants."""
+    user_id semantics:
+      - Pipeline-generated crosscuts have user_id IS NULL — these are
+        the editorial daily crosscut. `/today`, `/crosscuts`, and the
+        RSS feed show these.
+      - Listener-generated crosscuts (web-app on-demand episodes) have
+        user_id SET to the requester's user row. `/listener-created`
+        shows these.
+
+    Filter behaviour:
+      - When `edition_id` is supplied (single-row lookup, e.g. the
+        `/crosscut/<id>` detail page) — the user_id filter is skipped
+        entirely so the detail page works for BOTH kinds. The primary
+        key already uniquely identifies the row.
+      - Otherwise: `user_generated_only=True` → only user_id IS NOT
+        NULL; else `include_user_id_null=True` (default) → only
+        user_id IS NULL; else (both False) → no user_id filter."""
     where: list[str] = [
         "e.edition_type = 'crosscut'",
         "ep_a.audio_url IS NOT NULL AND ep_a.audio_url != ''",
@@ -170,8 +184,13 @@ def load_crosscut_episodes(
     if since_date is not None:
         where.append("e.edition_date >= ?")
         params.append(since_date.isoformat())
-    if include_user_id_null:
-        where.append("e.user_id IS NULL")
+    # user_id filter only applied for list-style queries (edition_id
+    # not specified). Detail-page lookups by ID work for any user_id.
+    if edition_id is None:
+        if user_generated_only:
+            where.append("e.user_id IS NOT NULL")
+        elif include_user_id_null:
+            where.append("e.user_id IS NULL")
     if not include_flagged:
         where.append("ep_a.flagged_at IS NULL")
 
