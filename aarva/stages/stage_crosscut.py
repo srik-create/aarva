@@ -1080,19 +1080,22 @@ def build_episode_script(
 
     # Embed the new episode into the search vector space. Both variants
     # (pairing_summary text + mean of source-article vectors) land in
-    # crosscut_embeddings. Non-blocking: a failure here doesn't taint
-    # the built episode — if embedding fails the episode is still
-    # listenable and discoverable via /editions and /crosscuts, just
-    # not via search until the backfill script catches it up.
+    # crosscut_embeddings, tagged with the current embedding model so a
+    # later model swap can be detected (and `article_mean` re-derived
+    # by re-running scripts/backfill_crosscut_embeddings.py). Non-
+    # blocking: a failure here doesn't taint the built episode — if
+    # embedding fails the episode is still listenable and discoverable
+    # via /editions and /crosscuts, just not via search until the
+    # backfill script catches it up.
     try:
         from aarva.clients.embedding import build_embedding_client
         from aarva.services.crosscut_embeddings import embed_crosscut_episode
         emb_client = build_embedding_client(config.raw.get("embedding", {}))
         emb_stats = embed_crosscut_episode(db, emb_client, stats.edition_id)
         logger.info(
-            "Crosscut build: embedded edition #%d "
+            "Crosscut build: embedded edition #%d into %s space "
             "(pairing_summary=%d, article_mean=%d, errors=%d)",
-            stats.edition_id,
+            stats.edition_id, emb_client.name,
             emb_stats.pairing_embedded, emb_stats.article_mean_embedded,
             emb_stats.errors,
         )

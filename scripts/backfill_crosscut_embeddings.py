@@ -6,6 +6,25 @@ variants (pairing_summary + article_mean) via
 re-runnable; episodes that already have the embedding from the current
 model get a no-op upsert.
 
+WHEN TO RUN
+-----------
+The daily pipeline already auto-embeds new crosscut episodes (via
+`stage_crosscut.build_episode_script`), so day-to-day operation
+shouldn't need this script. Run it manually in these cases:
+
+  1. One-off catch-up: after this feature first landed, to backfill
+     the episodes that pre-dated the auto-embed wiring.
+  2. **After an embedding-model swap** (e.g. BGE-base → BGE-large
+     in `pipeline.yaml`'s `embedding:` block). Stage 1.5 re-embeds
+     articles automatically on model change, but the crosscut
+     `article_mean` vectors stored against the old model name need
+     this script to be re-derived under the new one. Old rows stay
+     in the table but are ignored by search (it filters on the
+     current model).
+  3. Diagnostic: if a known recent episode isn't appearing in
+     search results that it ought to, re-running the backfill
+     (--since YYYY-MM-DD) refreshes its vectors as a quick test.
+
 Usage:
     python scripts/backfill_crosscut_embeddings.py
     python scripts/backfill_crosscut_embeddings.py --dry-run
