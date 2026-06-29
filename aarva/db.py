@@ -451,14 +451,25 @@ class Database:
                 conn.execute(
                     "DROP INDEX IF EXISTS idx_editions_date_type"
                 )
+                # Drop the previous partial index that locked crosscut
+                # to one-per-day too. As of 2026-06-29 listeners can
+                # generate on-demand crosscut episodes via the web app,
+                # which means a given date can carry MULTIPLE crosscut
+                # rows: one pipeline-generated (user_id IS NULL) plus
+                # any number of listener-generated (user_id SET). The
+                # daily singleton constraint stays — the daily pipeline
+                # must not double-create.
+                conn.execute(
+                    "DROP INDEX IF EXISTS idx_editions_date_type_singleton"
+                )
                 conn.execute(
                     "CREATE UNIQUE INDEX IF NOT EXISTS "
-                    "idx_editions_date_type_singleton "
-                    "ON editions(edition_date, edition_type) "
-                    "WHERE edition_type IN ('daily', 'crosscut')"
+                    "idx_editions_date_daily_singleton "
+                    "ON editions(edition_date) "
+                    "WHERE edition_type = 'daily'"
                 )
             except sqlite3.OperationalError as e:
-                logger.warning("Could not create composite editions index: %s", e)
+                logger.warning("Could not create editions singleton index: %s", e)
 
     def _migrate_editions_uniqueness(self, conn: sqlite3.Connection) -> None:
         """Rebuild `editions` if it still has either:

@@ -125,6 +125,18 @@ def _publication_slug(name: str | None) -> str:
     return _SLUG_NON_ALNUM.sub("-", name.lower()).strip("-")
 
 
+def _duration_minutes(seconds: float | int | None) -> str:
+    """Render seconds as a coarse 'X min' string for listener-facing
+    cards where 'M:SS' precision isn't useful. Returns empty string
+    for None / 0 so templates can skip the line cleanly."""
+    if not seconds:
+        return ""
+    minutes = round(int(seconds) / 60)
+    if minutes <= 0:
+        return ""
+    return f"{minutes} min"
+
+
 def _card_color(jtbd_primary: str | None) -> str:
     """Tailwind card-colour token for an article's JTBD. Used in
     templates that mix articles from multiple JTBDs (e.g. the
@@ -150,3 +162,4 @@ templates.env.filters["title_case"] = _title_case
 templates.env.filters["publication_slug"] = _publication_slug
 templates.env.filters["card_color"] = _card_color
 templates.env.filters["jtbd_label"] = _jtbd_label
+templates.env.filters["duration_minutes"] = _duration_minutes

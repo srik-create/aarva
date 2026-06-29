@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Create an episode — Aarva{% endblock %}
+{% block content %}
+  <div class="mb-8">
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Your prompt</p>
+    <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
+      "{{ prompt }}"
+    </h1>
+  </div>
+
+  {# Explainer — what an "episode" is. Visible immediately while the
+     candidates fetch runs (so the listener has something to read
+     during the 5–10s Gemini call). #}
+  <div class="mb-10 p-5 bg-night-soft border border-night-border rounded-2xl">
+    <p class="text-cream-light leading-relaxed">
+      Each episode will be two pieces of journalism narrated together — with a bridge between them drawing out a connection, all related to your search query. Pick a pairing below to have it created for you.
+    </p>
+  </div>
+
+  {# Candidates land here, fetched async from /api/candidates so the
+     listener sees a loading state instead of a frozen tab while the
+     LLM composes pairings. JS replaces this container's content with
+     the rendered fragment. If JS is disabled / the fetch fails the
+     loading message stays + the error path swaps in a refresh hint. #}
+  <div data-candidates-container>
+    <div class="p-6 bg-peach rounded-2xl text-ink">
+      <div class="flex items-center gap-4">
+        <div class="shrink-0 w-7 h-7 rounded-full border-2 border-ink/20 border-t-ink animate-spin"></div>
+        <div class="flex-1 min-w-0">
+          <p class="editorial text-lg font-semibold leading-snug">Looking for the right pairings…</p>
+          <p class="text-sm text-ink-light mt-1">Aarva is matching your prompt against ~5,000 articles in the catalog and composing new pairings. Usually 5–10 seconds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const container = document.querySelector('[data-candidates-container]');
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q') || '';
+      if (!q || !container) return;
+
+      fetch('/api/candidates?q=' + encodeURIComponent(q), {
+        headers: { 'Accept': 'text/html' },
+      })
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        })
+        .then(function(html) {
+          container.innerHTML = html;
+        })
+        .catch(function(err) {
+          console.error('candidate fetch failed:', err);
+          container.innerHTML =
+            '<div class="p-6 bg-night-soft border border-night-border rounded-2xl">' +
+            '  <p class="text-cream-light">Something went wrong finding pairings. Refresh the page to try again, or rephrase your prompt.</p>' +
+            '</div>';
+        });
+    })();
+  </script>
+{% endblock %}
