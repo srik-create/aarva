@@ -476,10 +476,15 @@ tts:
   #     about quality drift on outputs longer than a few minutes).
   #   - Larger chunks → fewer chunk transitions, where listeners notice
   #     Gemini's per-request tone variation most.
-  # 2500 chars ≈ 1.5 min audio per chunk lands the trade-off. The chunker
-  # NEVER splits mid-sentence — if a single sentence exceeds this cap it
-  # becomes its own oversize chunk.
-  max_chunk_chars: 2500
+  # 1800 chars ≈ ~2 min audio per chunk at the 140 WPM pace target.
+  # Listener feedback (2026-06-29): 2500 chars showed audible drift
+  # late in each chunk that reset at the chunk boundary — dropped to
+  # 1800 to keep each request below the drift threshold, accepting
+  # ~40% more chunks in exchange. The chunker NEVER splits mid-
+  # sentence — if a single sentence exceeds this cap it becomes its
+  # own oversize chunk. Packing rule (paragraphs first, sentences as
+  # fallback) is preserved.
+  max_chunk_chars: 1800
 
   # Retries for the documented "rare" Gemini TTS 500 errors. Exponential
   # backoff with jitter.

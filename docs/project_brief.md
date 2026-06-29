@@ -143,6 +143,7 @@ future-us knows whether to revisit.
 | 2026-06-25 | TTS pace target: 140 WPM via inline tag | Listener-feedback informed | Yes — prompts.yaml |
 | 2026-06-25 | Loudness normalize MP3s to -16 LUFS via ffmpeg loudnorm | Per-chunk volume variance was audible | Yes — `output.loudness_target_lufs` |
 | 2026-06-26 | R2 URL: `pub-xxx.r2.dev` → `audio.aarva.app` | r2.dev rate limit broke YouTube ingestion | Yes — config-only `tts.r2.public_url_base` |
+| 2026-06-29 | TTS `max_chunk_chars` 2500 → 1800 | Listener feedback: voice quality drifts audibly within each ~3-min chunk and resets at the chunk boundary. Smaller chunks (~2 min) keep each request short enough to stay before the drift, at the cost of ~40% more chunks → slightly more API calls and more chunk transitions. The chunker still packs paragraphs first / sentences as fallback / never splits mid-sentence. | Yes — `tts.max_chunk_chars` in pipeline.yaml |
 | 2026-06-26 | Daily run is invoked manually by the operator (not via launchd) | User prefers explicit control over each daily run — a moment to glance at the previous day's output / decide to skip a day / pause without fighting an automation. The pipeline is not so time-sensitive that automation is worth the loss of agency. `scripts/app.aarva.daily.plist` exists as a starting point if scheduled runs are ever desired but is not actively loaded. | Yes — `launchctl load ~/Library/LaunchAgents/app.aarva.daily.plist` activates the scheduled run |
 
 ### Web app
