@@ -7,7 +7,7 @@ Source of truth for orientation. Read this at the start of any session
 - `docs/roadmap.md` — what's next, what's deferred, recent commits
 - `docs/aarva_architecture_v1.md` — deep technical reference (schema, stages)
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-06-29
 
 ---
 
@@ -71,8 +71,22 @@ outro → TTS as one continuous 20-30 min episode.
 - TTS: Gemini 3.1 Flash TTS Preview
 - Embeddings: local BGE-base (`sentence-transformers`)
 
-**Web app under construction**: FastAPI server in `aarva/server/`,
-target deploy to Render.com at `aarva.app`.
+**Web app live at `aarva.app`**: FastAPI server in `aarva/server/`,
+hosted on Render.com (Dockerfile-canonical). Two phases shipped:
+
+- Phase 1 — browse-by-X surface (Today, Editions, Categories,
+  Crosscuts, Publications, Listener-created), per-JTBD pastel
+  cards, persistent sticky audio mini-bar with state across
+  page navigations, PWA installable.
+- Phase 2 — listener-initiated episode creation. Prompt input on
+  every page, candidate page with 3 pairings (mixed existing-
+  match + Gemini-proposed new), background worker builds picked
+  pairings via the existing crosscut pipeline, email-when-ready
+  (currently stub, Resend pending env-var set on Render).
+
+DB lives on Render's persistent disk at `/data/aarva.db`; the
+laptop pipeline syncs it nightly via the R2 → /admin/sync-db
+relay (see `docs/deploy.md`).
 
 ---
 
@@ -177,13 +191,18 @@ information / a creative decision before they can be acted on.)
   the most critical "why this matters" in one sentence, not just
   describe the piece. Pipeline prompt rewrite — deferred from web
   app phase 1.
-- **Crosscut listener-notification mechanism.** When a user requests
-  an on-demand crosscut and it takes ~15 min to render, how do we
-  notify them when ready? Email is current plan; could also be
-  in-page polling, browser push, shareable status URL.
-- **Multi-crosscut per day.** Current schema enforces one. User has
-  asked to support multiple. Documented in roadmap; deferred until
-  after web app phase 1.
+- ~~**Crosscut listener-notification mechanism.**~~ Resolved
+  2026-06-29: email primary (Resend, currently stubbed until the
+  API key lands on Render) + a `/build/<job_id>` status page the
+  listener can keep open for live progress. PWA push deferred —
+  iOS Safari needs the app installed to home screen first, and
+  the v1 surface ships without a service worker.
+- ~~**Multi-crosscut per day.**~~ Resolved 2026-06-29: the
+  partial UNIQUE index on `editions(edition_date, edition_type)`
+  was narrowed so only `edition_type='daily'` keeps the
+  one-per-day singleton. Crosscut now permits one
+  pipeline-generated row per day plus any number of listener-
+  generated rows. See decision log row 2026-06-29.
 - **Cloudflare Pages alternative for HTML+RSS.** Currently HTML/RSS
   serve from GitHub Pages; once web app lands at aarva.app, those
   static artifacts could move to Cloudflare Pages or be served by
