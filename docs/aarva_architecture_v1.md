@@ -2,6 +2,8 @@
 
 This is the build-ready architecture for Aarva v0.1. It is consciously narrower than the kickoff doc's full architecture — v0.1 ships the daily-edition pipeline end-to-end, deferring personalisation, the wire branch, pairings, the Discover UI, and the native app to v0.2+.
 
+> **Status (2026-06-29):** the v0.1 pipeline shipped and has been extended substantially. The original spec below remains the historical baseline; for what's actually running today read the **Post-v0.1 changes (live)** section near the bottom — it covers the Cloudflare R2 audio path, the FastAPI web app, listener-initiated episode creation, automated DB sync to Render, the crosscut + crosscut-embedding subsystems, and more. Where the original spec and Post-v0.1 disagree, Post-v0.1 wins.
+
 ## Design commitments
 
 The full editorial design is in `aarva_kickoff.docx`. The v0.1 build holds to these specific commitments from it:
@@ -586,6 +588,310 @@ scored articles using the current prompt. Useful after a prompt
 update; sends each article's full text + fingerprint to Gemini and
 updates `article_scores.jtbd_primary` + `jtbd_secondary` in place.
 Has `--dry-run`, `--pub`, `--limit`, `--all` flags.
+
+### Audio hosting on Cloudflare R2
+
+The original spec stored MP3s under `aarva/data/audio/YYYY-MM-DD/`
+and served them from GitHub Pages alongside the HTML / RSS. GH
+Pages' 1 GB soft cap was about 15 days away at production volume,
+so audio is now hosted on **Cloudflare R2** (S3-compatible object
+store, 10 GB free + zero egress fees).
+
+- New module `aarva/output/r2_uploader.py` — thin wrapper around
+  boto3's S3 client. `upload_all_pending(config, db)` walks every
+  `edition_pieces.audio_url`, checks R2 via `head_object`, uploads
+  the missing MP3s. Idempotent.
+- Configuration block in `pipeline.yaml`:
+  ```yaml
+  tts:
+    r2:
+      enabled: true
+      bucket: aarva-audio
+      endpoint_url: https://<account>.r2.cloudflarestorage.com
+      public_url_base: https://audio.aarva.app
+  ```
+- Custom domain `audio.aarva.app` fronts R2 (Cloudflare DNS proxy →
+  R2 public bucket). Replaced an earlier `pub-xxx.r2.dev` URL that
+  hit YouTube's ingestion rate limits.
+- RSS feed `<enclosure url>` and the web app's audio `<source>` both
+  point at the R2 custom domain.
+- Credentials via `AARVA_R2_ACCESS_KEY_ID` and
+  `AARVA_R2_SECRET_ACCESS_KEY` env vars (never in YAML). The same
+  pair is set on the Render web service so the `/admin/sync-db`
+  endpoint can fetch DB snapshots from R2 too.
+- One-off backfill: `scripts/migrate_audio_to_r2.py`.
+
+### TTS pacing and loudness normalisation
+
+Two listener-feedback fixes that landed alongside the Gemini TTS
+upgrade:
+
+- **140 WPM pace target.** The TTS `style_prompt` carries an
+  explicit `(140 WPM)` pacing tag. Slows the narration enough to
+  feel deliberate without sounding plodding. Empirically the most
+  natural pace for the editorial voice.
+- **`max_chunk_chars: 1800`.** Each Gemini TTS request renders ~2
+  minutes of audio. Lower than the original 2500 because voice
+  quality audibly drifts on longer single-shot outputs and resets
+  at chunk boundaries. The chunker (in `aarva/clients/tts.py`)
+  packs paragraphs first, sentences as fallback, and never splits
+  mid-sentence.
+- **ffmpeg loudness normalisation to −16 LUFS.** Stage 10's
+  `aarva/output/audio_converter.py` runs every WAV through
+  `ffmpeg -af loudnorm` before MP3 conversion. Listener feedback
+  was that per-chunk volume variance was audible; the normalisation
+  closes the gap. Targets configurable via `output.loudness_*`
+  keys in `pipeline.yaml`.
+
+### Stage 10 — publish (explicit)
+
+The original spec implied Stage 10 ("publish") inside the daily
+orchestrator but didn't name a module. The current Stage 10 path:
+
+1. `aarva/output/audio_converter.py::convert_all_for_publish` —
+   WAV → MP3 with loudnorm (see above). Updates
+   `edition_pieces.audio_url` to point at the `.mp3` path.
+2. `aarva/output/r2_uploader.py::upload_all_pending` — uploads
+   missing MP3s to R2 (see above).
+3. `aarva/output/web_renderer.py` — writes per-edition HTML.
+4. `aarva/output/rss_feed.py` — regenerates `feed.xml` with
+   `<enclosure>` URLs pointing at R2.
+5. `scripts/publish.sh` — pushes web + RSS to the GH Pages branch.
+
+The on-demand episode-build flow (Phase 2 web-app work, below)
+calls steps 1 + 2 inline in the worker thread so listener-initiated
+episodes become listenable without waiting for the next daily run.
+
+### Web app — Phase 1 (listener-facing browse)
+
+A FastAPI + Jinja + HTMX-ready web app shipped in
+`aarva/server/`, deployed to Render at **aarva.app**. Read-only
+against the existing SQLite DB on a Render persistent disk.
+
+**Routes (`aarva/server/routes/`):**
+
+- `landing.py` — marketing landing at `/`.
+- `home.py` — `/today` daily edition; JTBD-grouped article tiles +
+  daily crosscut card.
+- `editions.py` — `/edition/<date>` past edition view, `/editions`
+  index.
+- `articles.py` — `/article/<id>` per-article detail page.
+- `crosscuts.py` — `/crosscut/<edition_id>` episode detail,
+  `/crosscuts` catalog.
+- `categories.py` — `/categories` JTBD list (with a "Crosscuts"
+  tile pointing at `/crosscuts`), `/category/<slug>` per-JTBD
+  list.
+- `publications.py` — `/publications` source list,
+  `/publication/<slug>` per-source list.
+- `admin.py` — `/admin/sync-db` (see *Render hosting* below).
+
+**Design system (in `aarva/server/templates/base.html`):**
+
+- Dark theme: warm coffee-brown background (`#1A1410`),
+  cream-text foreground (`#F5EEDF`), per-JTBD pastel cards
+  (`sky` / `lavender` / `lemon` / `mint` / `blush`).
+- Fraunces (serif, variable) for editorial headings, Inter (sans)
+  for body. Loaded from Google Fonts via CDN; bundled in
+  `scripts/fonts/Fraunces-Bold.ttf` for build-time icon generation.
+- Tailwind via CDN (no build step). Custom palette + JTBD colour
+  map defined inline.
+- Mobile-first responsive. Header collapses to a hamburger drawer
+  on `< sm` viewports; back arrow on every page except `/`;
+  iPhone safe-area-inset-top / -bottom honoured.
+
+**Persistent audio player.**
+A single `<audio id="aarva-shared-audio">` in `base.html` drives
+every play surface on the site. In-page round play buttons act as
+remote controls via `data-track-*` attributes. A sticky mini-bar
+at the bottom of the viewport shows the current track, scrubber,
+time, and a speed selector (`0.5×` / `0.75×` / `1×` / `1.25×` /
+`1.5×` / `2×` / `2.5×`, persisted via `localStorage`). Player
+state (src, position, playing, title, link) is persisted in
+`sessionStorage` so playback survives page navigation — the
+mini-bar reappears on the next page, audio resumes if the
+browser's autoplay policy permits.
+
+**PWA (Add-to-Home-Screen).**
+`aarva/server/static/manifest.json` + iOS apple-touch-icon +
+apple-mobile-web-app meta tags make Aarva installable as a
+home-screen "app" (iOS Safari via Share → Add to Home Screen;
+Android Chrome via the native `beforeinstallprompt`). Footer
+button reveals a platform-specific instructions modal on tap.
+Icons generated via `scripts/generate_pwa_icons.py` (renders
+"Aarva" in cream Fraunces on the night-brown background).
+
+**Database access.**
+The web app is **read-only** against the SQLite DB. The pipeline
+on the operator's laptop produces the DB; the web app on Render
+serves it. The `/admin/sync-db` endpoint (below) ferries updates
+between the two.
+
+### Render hosting + automated DB sync
+
+- **Hosting**: Render.com (Starter plan ~$7/month) via a
+  Dockerfile at the repo root. `render.yaml` declares the service,
+  the 1 GB persistent disk mounted at `/data` (SQLite lives at
+  `/data/aarva.db`), and the env-var manifest. Dockerfile is
+  intentionally provider-neutral — Fly.io / Railway / a bare VPS
+  work with the same image; only the `render.yaml`-equivalent
+  changes.
+- **Custom domain**: `aarva.app` via Cloudflare DNS. CNAME at the
+  apex (Cloudflare flattens), `www.aarva.app` CNAME → apex, both
+  Proxy: DNS-only (grey cloud) so Render handles TLS itself.
+- **Automated DB sync**. The pipeline runs on the operator's
+  laptop, but the production DB lives on Render's persistent disk.
+  After each daily run:
+  1. `scripts/sync_db_to_render.sh` snapshots the laptop DB via
+     `sqlite3 .backup`, gzips it, uploads to R2 at a fixed key
+     (`s3://aarva-audio/_data/aarva-db.gz`).
+  2. Same script POSTs a tiny JSON trigger (`{"r2_key": "..."}`)
+     to `/admin/sync-db` on aarva.app, authenticated by a shared
+     bearer token (`AARVA_RENDER_SYNC_TOKEN` env var on both
+     sides).
+  3. The endpoint downloads from R2 over Render's backbone (much
+     faster than the laptop's residential uplink), validates the
+     SQLite file (article count > 0), and atomic-`os.replace()`s
+     `/data/aarva.db`. New SQLite connections immediately see the
+     new file.
+- **Why the R2 relay (vs. POSTing the gzip directly):** Render
+  has a hard ~100s request timeout on the Starter plan. A 30 MB
+  upload from a residential link routinely overruns it. R2
+  ingest from the laptop is resilient (boto3 retries); R2 →
+  Render is fast. Documented in `docs/deploy.md`.
+
+### Crosscut embeddings — episodes in the vector space
+
+Articles have lived in a single BGE-base vector space since
+Stage 1.5; crosscuts didn't. As a Phase-2 pre-dependency,
+crosscut episodes now embed too — searchable by the same cosine
+similarity that powers article lookup.
+
+- New table `crosscut_embeddings(id, edition_id, source,
+  embedding BLOB, embedding_model, created_at)` with
+  `UNIQUE(edition_id, source, embedding_model)`.
+- Each crosscut carries TWO vectors (different `source` values):
+  - `pairing_summary` — embedding of the episode's editorial text
+    (`topic_label + intro_text + bridge_between + outro_text`).
+    Captures the curatorial layer.
+  - `article_mean` — L2-renormalised mean of the two source
+    articles' BGE vectors. Cheap fallback when pairing text is
+    sparse, and a complementary signal for blending.
+- New service module: `aarva/services/crosscut_embeddings.py`
+  with `embed_crosscut_episode(db, client, edition_id)`.
+  Idempotent via the UNIQUE constraint + `ON CONFLICT DO UPDATE`.
+- New backfill script:
+  `scripts/backfill_crosscut_embeddings.py` (one-off + after any
+  embedding-model swap).
+- Auto-embed hook: `stage_crosscut.build_episode_script` calls
+  `embed_crosscut_episode` after persisting a new episode, so
+  every new crosscut (pipeline or listener-generated) lands in
+  the vector space at creation time.
+
+### Web app — Phase 2 (listener-initiated episode creation)
+
+The original Phase-2 plan was "search". It collapsed into a
+single creation flow with no search-results surface: the prompt
+input at the top of every page accepts free-form text, proposes
+3 episode candidates, and (on accept) builds a real listenable
+episode in the background.
+
+**The flow.**
+
+1. Prompt input in `base.html` header — visible on every page,
+   placeholder "Create an episode on anything". Submitting goes
+   to `GET /create?q=...`.
+2. `/create` renders an instant shell (prompt header + explainer
+   + peach loading card). Inline JS fetches `/api/candidates?q=…`
+   while the shell sits in front of the listener.
+3. `/api/candidates` returns an HTML fragment with up to 3
+   candidate cards (no `<html>`/`<body>` wrap; pure inner HTML
+   for the shell's swap-in). JS replaces the loading card.
+4. Cards mix two kinds:
+   - **Already on Aarva** — existing crosscut episodes whose
+     `crosscut_embeddings` row matches the prompt above a
+     similarity threshold (best of the two `source` vectors per
+     episode). Tap "Listen now" → `/crosscut/<id>`.
+   - **New — we'll create it for you** — Gemini-proposed pairings
+     from the top ~30 articles closest to the prompt in the
+     vector space. Each carries a topic label, the two source
+     titles + bylines, the publication line, an estimated
+     duration (computed from word counts at 140 WPM), and a 4–5
+     sentence editorial 'why' (Gemini explicitly told never to
+     invent author credentials). The card has an inline email
+     form; submitting POSTs to `/create/build`.
+5. `/create/build` validates the picked pair + email, calls
+   `enqueue_build_job` (creates / upserts a `users` row from the
+   email so the eventual `editions.user_id` can point at the
+   requester), and 303-redirects to `/build/<job_id>`.
+6. `/build/<job_id>` is the status page. Self-refreshes every
+   7 s; shows the worker's progress text until completion;
+   final state is a "Play your episode" CTA → `/crosscut/<id>`.
+7. After completion the episode lives at `/crosscut/<id>` and on
+   the new `/listener-created` catalog (same peach-card layout as
+   `/crosscuts`).
+
+**Schema.**
+
+- Multiple crosscut rows per date are now allowed. The partial
+  UNIQUE index on `(edition_date, edition_type)` was loosened —
+  only `edition_type='daily'` retains the one-per-day singleton
+  (renamed `idx_editions_date_daily_singleton`). Crosscut now
+  permits one pipeline-generated row (`user_id IS NULL`) per
+  date plus any number of listener-generated rows
+  (`user_id IS NOT NULL`).
+- `editions.user_id` distinguishes the two kinds. `/today` and
+  `/crosscuts` filter to `user_id IS NULL` (editorial catalog
+  stays curated); `/listener-created` filters to
+  `user_id IS NOT NULL`; `/crosscut/<id>` works for either —
+  primary-key lookup skips the user filter.
+
+**Modules.**
+
+- `aarva/services/episode_candidates.py` — `propose_candidates()`
+  is the pure function the route layer calls. Reuses the existing
+  BGE embedding client + Gemini LLM client (both built once at
+  app boot, attached to `app.state`).
+- `aarva/services/episode_jobs.py` — `enqueue_build_job`,
+  `claim_next_pending` (atomic via `BEGIN IMMEDIATE`),
+  `mark_completed`, `mark_failed`, `update_progress`,
+  `reset_stuck_jobs`. Sits on top of the existing `jobs` table
+  documented in *App-layer foundation* above.
+- `aarva/services/episode_worker.py` — in-process daemon thread
+  spawned from `aarva.server.app`'s lifespan(). Polls the jobs
+  table; on a claimed job, INSERTs a `crosscut_pair_candidates`
+  row matching the listener's pick (so the existing
+  `stage_crosscut.build_episode_script` finds it via
+  `_selected_candidate`), calls the existing crosscut build
+  pipeline, stamps `editions.user_id`, runs Stage 10 (WAV→MP3 +
+  R2 upload), sends the ready-email, marks the job complete.
+- `aarva/services/email.py` — thin wrapper with two backends.
+  Stub (logs to stdout) when `RESEND_API_KEY` is unset; Resend
+  when set. Provider choice is env-driven, not config — so a
+  Render deploy with the env var flips automatically.
+- `aarva/server/routes/create.py` — 5 endpoints (`/create`,
+  `/api/candidates`, `/create/build`, `/build/<job_id>`,
+  `/listener-created`).
+- Templates: `create.html` (shell + loading state),
+  `_candidates_fragment.html` (the cards),
+  `build_status.html` (status page), `listener_created.html`
+  (catalog), `create_quota_exceeded.html` (rate-limit page).
+
+**Cost containment.**
+
+Each accepted build costs ~$0.80 in Gemini TTS at current
+pricing. Per-email cap: 2 builds per rolling 24h window. Counts
+only `pending` / `running` / `completed` jobs (a failed build
+doesn't burn a slot). Over the cap → `BuildQuotaExceeded` →
+429 + friendly page. Tunable via `DEFAULT_BUILDS_PER_24H` in
+`episode_jobs.py`. The candidate-only flow (prompt → cards,
+no build) costs ~$0.01 per submit and is currently uncapped.
+
+**Why the in-process worker (vs. a Render Background Worker
+service).** Single concurrent build at v1 volume; zero extra
+hosting cost; the `claim_next_pending` transaction is atomic so
+scaling to N workers is a config change. Trade-off: a web-app
+crash kills any in-flight build. Acceptable at v1; revisit when
+listener volume justifies the $7/mo separate worker plan.
 
 ## App-layer foundation (Phase A)
 

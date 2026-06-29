@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-06-27
+**Last updated:** 2026-06-29
 
 ---
 
@@ -60,13 +60,11 @@ follow `docs/deploy.md` to bring aarva.app live.
 | Phase | Scope | Status |
 |---|---|---|
 | **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | Code complete on `webapp-phase-1`. Operator deploy steps in `docs/deploy.md`. |
-| **2. Episode creation on demand** | Header prompt input ("create an episode on anything") on every page; candidate page proposing up to 3 episodes (existing matches from `crosscut_embeddings` + new Gemini-proposed pairings from articles near the prompt); pick → email-collection → in-process worker thread runs the existing `stage_crosscut.build_episode_script` pipeline → status page → email-when-ready (Resend). Built episodes re-enter the public catalog. **Supersedes the original Phase 2 (Search) + Phase 3 (Crosscut on demand) split — see decision log 2026-06-29.** | In progress on `webapp-episode-creation`. |
-| **3. Polish + extras** | Mobile fine-tuning, logo, copywriting pass | Automated DB sync to Render is done (`scripts/sync_db_to_render.sh` + `/admin/sync-db` endpoint, runs as the last step of `run_daily.sh`). Remaining items not started. |
+| **2. Episode creation on demand** | Header prompt input ("create an episode on anything") on every page; candidate page proposing up to 3 episodes (existing matches from `crosscut_embeddings` + new Gemini-proposed pairings from articles near the prompt); pick → email-collection → in-process worker thread runs the existing `stage_crosscut.build_episode_script` pipeline → status page → email-when-ready. Built episodes re-enter the public catalog at `/listener-created`. **Supersedes the original Phase 2 (Search) + Phase 3 (Crosscut on demand) split — see decision log 2026-06-29.** | **Shipped 2026-06-29.** Merged via PR #38. Email currently uses the stub backend (logs); Resend swap is a one-env-var flip on Render. |
+| **3. Polish + extras** | Mobile fine-tuning, logo, copywriting pass, Resend wiring, optional move of the build worker to a dedicated Render Background Worker service | Automated DB sync done. Resend wiring + worker-service split are the two near-term items. Logo + copy are open-ended. |
 
-Pre-Phase-2 dependency landed (2026-06-29): crosscut episodes are now
-embedded into the same BGE vector space as articles, so the candidate
-service can match a prompt against existing episodes alongside
-proposing new pairings.
+All Phase-2 dependencies have landed. Phase 3 has no required blockers
+and can be picked up piece by piece.
 
 ---
 
@@ -74,13 +72,30 @@ proposing new pairings.
 
 Most recent first.
 
+- **Web app — Phase 2 shipped: listener-initiated episode creation
+  (2026-06-29).** Header prompt input on every page; instant-loading
+  `/create` shell that fetches candidates asynchronously from a new
+  `/api/candidates` endpoint; up to 3 candidates per prompt mixing
+  existing crosscut matches (queried against `crosscut_embeddings`)
+  with Gemini-proposed new pairings (4–5 sentence editorial 'why'
+  with author context, estimated duration, byline + publication
+  metadata); pick → email → background build via in-process worker
+  thread that reuses `stage_crosscut.build_episode_script` plus
+  inline Stage 10 (WAV→MP3 + R2 upload) so the episode is
+  immediately listenable; status page polls until completion;
+  `/listener-created` catalog as a dedicated browse surface.
+  Schema: editions.user_id distinguishes pipeline-generated from
+  listener-generated; per-day singleton constraint loosened so the
+  same date can carry both. Cost containment: 2 builds per email
+  per rolling 24h, friendly 429 page over the cap. Email is
+  stubbed (logs) until `RESEND_API_KEY` is set on Render. PR #38.
 - **Crosscut embeddings (2026-06-29).** New `crosscut_embeddings`
   table; per-episode dual embeddings (`pairing_summary` text + mean
   of source-article vectors); `aarva/services/crosscut_embeddings.py`
   service module; `scripts/backfill_crosscut_embeddings.py` for
   existing episodes; auto-embed call wired into
   `stage_crosscut.build_episode_script` so new crosscuts land in the
-  search index automatically. Removes the Phase-2 pre-dependency that
+  search index automatically. Removed the Phase-2 pre-dependency that
   was deferred item #1 in this doc.
 - **Web app — Phase 1 code complete.** Thirteen commits on
   `webapp-phase-1`: FastAPI scaffold, JTBD-grouped daily browsing,
