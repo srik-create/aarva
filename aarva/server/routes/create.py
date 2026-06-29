@@ -1,13 +1,25 @@
 """Episode-creation routes.
 
-Four endpoints make up the listener-facing creation flow:
+Five endpoints make up the listener-facing creation flow:
 
-  GET  /create?q=<prompt>      Render the candidate page. Calls
-                               aarva.services.episode_candidates
-                               to get up to 3 candidates for the
-                               prompt. Empty q → redirect to /.
+  GET  /create?q=<prompt>      Render the candidate-page SHELL —
+                               prompt header, explainer, loading
+                               animation. Cheap; no DB / LLM work.
+                               The candidates load async via the
+                               fetch below so the listener sees a
+                               spinner instead of a frozen tab while
+                               Gemini composes pairings. Empty q →
+                               redirect to /.
 
-  POST /create/build           Form submit from the candidate page.
+  GET  /api/candidates?q=...   HTML fragment of the candidate cards.
+                               Called by create.html's inline JS.
+                               Returns just the inner-HTML, not a
+                               full page (no <html>/<head>/<body>).
+                               Heavy: embeds the prompt, queries
+                               crosscut_embeddings for existing
+                               matches, calls Gemini for new pairings.
+
+  POST /create/build           Form submit from a candidate card.
                                Validates the picked article pair +
                                requester email, queues a
                                build_crosscut job in the existing
@@ -47,10 +59,27 @@ logger = logging.getLogger(__name__)
 
 @app.get("/create", response_class=HTMLResponse)
 async def create_candidates(request: Request) -> HTMLResponse:
-    """Show up to 3 candidate episodes for the listener's prompt."""
+    """Render the candidate-page shell. No LLM / DB work here — the
+    candidates load asynchronously via /api/candidates."""
     q = (request.query_params.get("q") or "").strip()
     if not q:
         return RedirectResponse(url="/", status_code=303)
+
+    return templates.TemplateResponse(
+        request, "create.html",
+        {"prompt": q},
+    )
+
+
+@app.get("/api/candidates", response_class=HTMLResponse)
+async def api_candidates(request: Request) -> HTMLResponse:
+    """Returns the candidate cards as an HTML fragment (no <html>/
+    <head>/<body>). Called by create.html's inline JS. This is where
+    the actual embedding + Gemini work happens — kept off /create so
+    the page-shell render stays instant."""
+    q = (request.query_params.get("q") or "").strip()
+    if not q:
+        return HTMLResponse("", status_code=400)
 
     db = request.app.state.db
     embedding_client = request.app.state.embedding_client
@@ -65,15 +94,12 @@ async def create_candidates(request: Request) -> HTMLResponse:
             n=3,
         )
     except Exception as e:
-        logger.exception("create_candidates: propose_candidates crashed: %s", e)
+        logger.exception("api_candidates: propose_candidates crashed: %s", e)
         candidates = []
 
     return templates.TemplateResponse(
-        request, "create.html",
-        {
-            "prompt": q,
-            "candidates": candidates,
-        },
+        request, "_candidates_fragment.html",
+        {"prompt": q, "candidates": candidates},
     )
 
 
