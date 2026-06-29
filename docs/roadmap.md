@@ -60,13 +60,13 @@ follow `docs/deploy.md` to bring aarva.app live.
 | Phase | Scope | Status |
 |---|---|---|
 | **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | Code complete on `webapp-phase-1`. Operator deploy steps in `docs/deploy.md`. |
-| **2. Search** | NL + structured filter search interface, search results page, integration with `aarva.search` backend (lexical + semantic + Gemini-parsed NL) | Not started |
-| **3. Crosscut on demand** | Automatic crosscut suggestion on search results, email-on-request, in-DB job queue, background TTS worker, status page, email-when-ready, generated crosscuts re-enter the searchable catalog | Not started |
-| **4. Polish + extras** | Mobile fine-tuning, logo, copywriting pass | Automated DB sync to Render is done (`scripts/sync_db_to_render.sh` + `/admin/sync-db` endpoint, runs as the last step of `run_daily.sh`). Remaining items not started. |
+| **2. Episode creation on demand** | Header prompt input ("create an episode on anything") on every page; candidate page proposing up to 3 episodes (existing matches from `crosscut_embeddings` + new Gemini-proposed pairings from articles near the prompt); pick → email-collection → in-process worker thread runs the existing `stage_crosscut.build_episode_script` pipeline → status page → email-when-ready (Resend). Built episodes re-enter the public catalog. **Supersedes the original Phase 2 (Search) + Phase 3 (Crosscut on demand) split — see decision log 2026-06-29.** | In progress on `webapp-episode-creation`. |
+| **3. Polish + extras** | Mobile fine-tuning, logo, copywriting pass | Automated DB sync to Render is done (`scripts/sync_db_to_render.sh` + `/admin/sync-db` endpoint, runs as the last step of `run_daily.sh`). Remaining items not started. |
 
 Pre-Phase-2 dependency landed (2026-06-29): crosscut episodes are now
-embedded into the same BGE vector space as articles. Phase 2 can
-start.
+embedded into the same BGE vector space as articles, so the candidate
+service can match a prompt against existing episodes alongside
+proposing new pairings.
 
 ---
 
