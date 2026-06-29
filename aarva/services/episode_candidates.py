@@ -73,11 +73,20 @@ class Candidate:
     is the data shape only."""
     kind: str                       # 'existing' | 'new'
     topic_label: str
-    why: str                        # one-sentence connection rationale
+    why: str                        # 4–5 sentence description; for
+                                    # existing matches this is the
+                                    # actual episode intro_text, for
+                                    # new pairings it's the Gemini-
+                                    # generated rationale (includes
+                                    # author names + expertise where
+                                    # the model can confidently
+                                    # identify them).
     title_a: str
     title_b: str
     publication_a: str
     publication_b: str
+    byline_a: str = ""
+    byline_b: str = ""
 
     # Filled when kind == 'existing'
     edition_id: Optional[int] = None
@@ -85,6 +94,13 @@ class Candidate:
     # Filled when kind == 'new'
     article_a_id: Optional[int] = None
     article_b_id: Optional[int] = None
+
+    # Approximate listening duration in seconds. For 'existing' this is
+    # the actual rendered duration_seconds from the crosscut. For 'new'
+    # this is estimated from the two source articles' word counts plus
+    # intro/bridge/outro overhead at the 140 WPM pace target. Surfaced
+    # to the listener so they can pick by length as well as by topic.
+    duration_seconds_estimate: int = 0
 
     # For sort stability + presentation
     score: float = 0.0              # higher = better match for prompt
@@ -158,15 +174,13 @@ def _existing_matches(
         if not rows:
             continue
         cc = rows[0]
-        # `why` for existing matches uses the editorial intro_text if
-        # available (the actual hook the listener will hear in the
-        # episode) — falls back to topic_label otherwise.
-        why = (cc.get("intro_text") or "").strip().split("\n", 1)[0]
+        # `why` for existing matches is the full editorial intro_text
+        # (the actual hook the listener will hear when they play the
+        # episode) — captures the connection in the curator's voice.
+        # Falls back to topic_label only when intro_text is missing.
+        why = (cc.get("intro_text") or "").strip()
         if not why:
             why = cc.get("topic_label") or "Two pieces in conversation."
-        # Trim to a single concise line.
-        if len(why) > 240:
-            why = why[:237].rsplit(" ", 1)[0] + "…"
         candidates.append(Candidate(
             kind="existing",
             topic_label=(cc.get("topic_label") or "Two angles").strip(),
@@ -175,7 +189,10 @@ def _existing_matches(
             title_b=str(cc.get("title_b") or ""),
             publication_a=str(cc.get("pub_a") or ""),
             publication_b=str(cc.get("pub_b") or ""),
+            byline_a=str(cc.get("byline_a") or ""),
+            byline_b=str(cc.get("byline_b") or ""),
             edition_id=edition_id,
+            duration_seconds_estimate=int(cc.get("duration_seconds") or 0),
             score=score,
         ))
     return candidates
@@ -188,7 +205,7 @@ _PROPOSAL_PROMPT = """You compose paired-listening episode ideas for Aarva — a
 LISTENER PROMPT
 {{ prompt }}
 
-ARTICLE POOL (the 30 articles closest to the prompt in our vector space, format: ID — Publication — Title — short excerpt)
+ARTICLE POOL (the 30 articles closest to the prompt in our vector space, format: ID — Publication — Title — by Byline — short excerpt)
 {{ pool }}
 
 ALREADY-CHOSEN ARTICLE IDS (do not propose pairings involving any of these — they're already covered by existing episodes returned to the listener)
@@ -215,7 +232,7 @@ Return JSON ONLY — no prose, no markdown fences. A single object with one key:
       "article_a_id": <int from pool>,
       "article_b_id": <int from pool, different from a>,
       "topic_label":  "<short editorial label — 4–8 words, no quotes>",
-      "why":          "<one sentence, max ~30 words, explaining the connection between A and B in plain language. Avoid LLM-tell vocabulary (delve, navigate, tapestry, etc.) and first person (no 'we', 'us', 'our').>"
+      "why":          "<a 4–5 sentence paragraph (~80–120 words) describing the proposed episode to the listener. Cover three things: (1) what each piece argues or describes; (2) how the two connect — the angle that makes pairing them worthwhile; (3) the authors by name (always — they're in the pool data) and one short phrase of relevant expertise IF you can confidently identify them from prior knowledge (otherwise leave the expertise claim out — do NOT invent credentials). Plain language. NO first person ('I/we/us/our'). NO LLM-tell vocabulary: delve, delves, navigate, tapestry, robust, fascinating, intricate, multifaceted, paramount, crucial, landscape (as metaphor), realm, embark, unpack, resonates with.>"
     }
   ]
 }
@@ -233,11 +250,16 @@ def _load_article_pool(
 ) -> list[dict]:
     """Top-n articles closest to the prompt in vector space, excluding
     any IDs the caller passes (typically the source articles of
-    existing-match crosscuts, to avoid duplicate proposals)."""
+    existing-match crosscuts, to avoid duplicate proposals).
+
+    Pulls byline + word_count too — byline so the LLM can mention
+    authors by name in its rationale, word_count so we can estimate
+    listening duration without inventing a separate query."""
     with db.connect() as conn:
         rows = conn.execute(
             """
             SELECT a.id, a.title, a.excerpt, a.embedding,
+                   a.byline, a.word_count,
                    p.name AS publication
               FROM articles a
               JOIN publications p ON p.id = a.publication_id
@@ -257,8 +279,10 @@ def _load_article_pool(
         scored.append((sim, {
             "id": int(r["id"]),
             "title": r["title"],
+            "byline": (r["byline"] or "").strip(),
             "excerpt": (r["excerpt"] or "")[:DEFAULT_EXCERPT_CHARS],
             "publication": r["publication"],
+            "word_count": int(r["word_count"] or 0),
             "score": sim,
         }))
     scored.sort(key=lambda t: t[0], reverse=True)
@@ -267,14 +291,39 @@ def _load_article_pool(
 
 def _format_pool_for_prompt(pool: list[dict]) -> str:
     """Render the article pool as readable lines for Gemini. ID prefix
-    is so Gemini can echo back integer IDs we validate against."""
+    is so Gemini can echo back integer IDs we validate against. Byline
+    is surfaced so the rationale can name authors."""
     parts = []
     for a in pool:
         excerpt = a["excerpt"].replace("\n", " ").strip()
+        byline = a["byline"] or "unknown"
         parts.append(
-            f'{a["id"]} — {a["publication"]} — {a["title"]} — {excerpt}'
+            f'{a["id"]} — {a["publication"]} — {a["title"]} — by {byline} — {excerpt}'
         )
     return "\n\n".join(parts)
+
+
+# Estimated speech rate (WPM) used to translate word counts → listening
+# duration. Mirrors the TTS pace tag in pipeline.yaml — keep in sync.
+_TTS_WPM = 140
+
+# Word budget for the editorial overhead a crosscut adds on top of the
+# two source articles: intro (~150) + bridge-A (~80) + bridge-between
+# (~150) + outro (~100) = ~480 words. Adjust here if the prompts in
+# stage_crosscut.py change.
+_OVERHEAD_WORDS = 480
+
+
+def _estimate_duration_seconds(word_count_a: int, word_count_b: int) -> int:
+    """Estimate listening duration for a new pairing.
+
+    Falls back to 1500 words/article when word_count is missing/zero
+    (a reasonable median for the catalog). Adds the editorial overhead
+    above before converting to seconds at the configured WPM."""
+    wc_a = word_count_a if word_count_a and word_count_a > 0 else 1500
+    wc_b = word_count_b if word_count_b and word_count_b > 0 else 1500
+    total_words = wc_a + wc_b + _OVERHEAD_WORDS
+    return int(total_words * 60 / _TTS_WPM)
 
 
 def _propose_new_pairings(
@@ -331,16 +380,29 @@ def _propose_new_pairings(
             continue
         a = pool_by_id[a_id]
         b = pool_by_id[b_id]
+        # Cap `why` generously now that the prompt asks for ~120 words
+        # (~700 chars). The hard cap is defensive against a runaway
+        # response, not a normal-case constraint.
+        why_text = str(p.get("why") or "").strip()
+        if len(why_text) > 1200:
+            why_text = why_text[:1197].rsplit(" ", 1)[0] + "…"
+        if not why_text:
+            why_text = "Two pieces in conversation."
         out.append(Candidate(
             kind="new",
             topic_label=str(p.get("topic_label") or "").strip()[:80] or "Two angles",
-            why=str(p.get("why") or "").strip()[:280] or "Two pieces in conversation.",
+            why=why_text,
             title_a=a["title"],
             title_b=b["title"],
             publication_a=a["publication"],
             publication_b=b["publication"],
+            byline_a=a["byline"],
+            byline_b=b["byline"],
             article_a_id=a_id,
             article_b_id=b_id,
+            duration_seconds_estimate=_estimate_duration_seconds(
+                a["word_count"], b["word_count"],
+            ),
             # Average of the two articles' prompt-similarities — pure
             # presentation-order metric, not used by the build flow.
             score=(a["score"] + b["score"]) / 2,

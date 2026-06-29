@@ -1,39 +1,53 @@
 {% extends "base.html" %}
 {% block title %}Create an episode — Aarva{% endblock %}
 {% block content %}
-  <div class="mb-10">
+  <div class="mb-8">
     <p class="text-xs text-cream-muted uppercase tracking-widest">Your prompt</p>
     <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
       "{{ prompt }}"
     </h1>
-    <p class="text-cream-light mt-4 max-w-2xl leading-relaxed">
-      {% if candidates %}
-        Here are three episodes Aarva thinks you'd enjoy. Listen to ones that already exist, or have a new one created for you.
-      {% else %}
-        Nothing matched closely enough to suggest. Try a different prompt — broader, narrower, or framed around what you'd want to hear.
-      {% endif %}
+  </div>
+
+  {# Explainer — what an "episode" is in this product. #}
+  <div class="mb-10 p-5 bg-night-soft border border-night-border rounded-2xl">
+    <p class="text-cream-light leading-relaxed">
+      Each episode will be two pieces of journalism narrated together — with a bridge between them drawing out a connection, all related to your search query. Pick a pairing below to have it created for you.
     </p>
   </div>
 
   {% if candidates %}
+    <p class="text-cream-light mb-5 leading-relaxed">
+      Choose one episode to be created from the options below.
+    </p>
+
     <div class="space-y-5">
       {% for c in candidates %}
         <section class="p-6 bg-peach rounded-2xl text-ink">
-          <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">
-            {% if c.kind == 'existing' %}Already on Aarva{% else %}New — we'll create it for you{% endif %}
-          </p>
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">
+              {% if c.kind == 'existing' %}Already on Aarva{% else %}New — we'll create it for you{% endif %}
+            </p>
+            {% if c.duration_seconds_estimate %}
+              <p class="text-xs text-ink-light">
+                {% if c.kind == 'new' %}~{% endif %}{{ c.duration_seconds_estimate | duration_minutes }}
+              </p>
+            {% endif %}
+          </div>
+
           <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">{{ c.topic_label | title_case }}</h2>
+
           <p class="text-sm text-ink-light mt-3 leading-relaxed">
-            <em class="editorial">{{ c.title_a | title_case }}</em>
+            <em class="editorial">{{ c.title_a | title_case }}</em>{% if c.byline_a %}, by {{ c.byline_a }}{% endif %}
             <span class="text-ink-light mx-1">×</span>
-            <em class="editorial">{{ c.title_b | title_case }}</em>
+            <em class="editorial">{{ c.title_b | title_case }}</em>{% if c.byline_b %}, by {{ c.byline_b }}{% endif %}
           </p>
-          <p class="text-sm text-ink-light mt-2">
+          <p class="text-xs text-ink-light mt-1">
             {{ c.publication_a }} &middot; {{ c.publication_b }}
           </p>
-          <p class="hook text-ink mt-4 text-lg leading-relaxed">{{ c.why }}</p>
 
-          <div class="mt-5">
+          <p class="hook text-ink mt-5 leading-relaxed whitespace-pre-line">{{ c.why }}</p>
+
+          <div class="mt-6">
             {% if c.kind == 'existing' %}
               <a href="/crosscut/{{ c.edition_id }}"
                  class="inline-flex items-center gap-3 px-5 py-3 bg-night text-peach rounded-full font-medium hover:opacity-90 transition-opacity">
@@ -70,7 +84,7 @@
   {% else %}
     <div class="mt-6 p-6 bg-night-soft border border-night-border rounded-2xl">
       <p class="text-cream-light">
-        Try something like
+        Nothing matched closely enough to suggest. Try something like
         <a href="/create?q=how+belief+forms" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">"how belief forms"</a>,
         <a href="/create?q=the+future+of+work" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">"the future of work"</a>,
         or
