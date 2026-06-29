@@ -1077,6 +1077,33 @@ def build_episode_script(
         "review CLI.",
         stats.edition_id,
     )
+
+    # Embed the new episode into the search vector space. Both variants
+    # (pairing_summary text + mean of source-article vectors) land in
+    # crosscut_embeddings. Non-blocking: a failure here doesn't taint
+    # the built episode — if embedding fails the episode is still
+    # listenable and discoverable via /editions and /crosscuts, just
+    # not via search until the backfill script catches it up.
+    try:
+        from aarva.clients.embedding import build_embedding_client
+        from aarva.services.crosscut_embeddings import embed_crosscut_episode
+        emb_client = build_embedding_client(config.raw.get("embedding", {}))
+        emb_stats = embed_crosscut_episode(db, emb_client, stats.edition_id)
+        logger.info(
+            "Crosscut build: embedded edition #%d "
+            "(pairing_summary=%d, article_mean=%d, errors=%d)",
+            stats.edition_id,
+            emb_stats.pairing_embedded, emb_stats.article_mean_embedded,
+            emb_stats.errors,
+        )
+    except Exception as e:
+        logger.warning(
+            "Crosscut build: search-index embedding failed for edition "
+            "#%d: %s (non-blocking; run "
+            "scripts/backfill_crosscut_embeddings.py to retry)",
+            stats.edition_id, e,
+        )
+
     return stats
 
 
