@@ -8,18 +8,40 @@ A persistent embedding space is the foundation of:
   - Drift detection (Q7)
   - Pairing detection (Q31)
 
-Production default: **Vertex AI Gemini Embedding** (`gemini-embedding-001`),
-matching the rest of Aarva's Gemini stack (LLM + TTS already live there).
+Production default: **Gemini Embedding** (`gemini-embedding-001`), the
+same model used by the rest of Aarva's Gemini stack (LLM + TTS).
 API-based — no PyTorch on the server. The previous default was a local
 sentence-transformers BGE-base model; that ran fine on the operator's
 laptop but OOM'd Render Starter (512 MB) once the model + PyTorch
-runtime loaded into memory, so the production deploy moved to Vertex AI
-on 2026-06-30.
+runtime loaded into memory, so the production deploy moved to a Gemini
+API embedding client on 2026-06-30.
+
+Auth — two modes, same model
+----------------------------
+`GeminiEmbeddingClient` supports both auth paths the wider Gemini stack
+uses, mirroring `GeminiAPIClient` in `aarva/clients/llm.py`:
+
+  - `auth_mode='api_key'` — calls AI Studio's
+    generativelanguage.googleapis.com endpoint with an API key from
+    AARVA_GEMINI_API_KEY / GEMINI_API_KEY / GOOGLE_API_KEY. This is the
+    production default; the paid-tier AI Studio terms (no training on
+    prompts) satisfy gibran.ai's data-governance constraints.
+  - `auth_mode='adc'` — calls Vertex AI via
+    us-central1-aiplatform.googleapis.com with Application Default
+    Credentials. Useful on laptops with `gcloud auth
+    application-default login` and on GCP-hosted compute with attached
+    service accounts. Requires `gcp_project` and `gcp_location` in the
+    config block.
+
+The model name, task-type parameters, and `output_dimensionality`
+behaviour are identical across the two paths, so vectors produced under
+one auth mode are interchangeable with vectors produced under the other
+— no re-embed is needed when flipping the mode.
 
 `LocalEmbeddingClient` (sentence-transformers / BGE) and
 `OpenAIEmbeddingClient` remain available as alternatives — useful for
-offline development or if Vertex AI is ever unreachable. Switching
-backend is a YAML edit in `pipeline.yaml`'s `embedding:` block.
+offline development or if Gemini is ever unreachable. Switching backend
+is a YAML edit in `pipeline.yaml`'s `embedding:` block.
 
 Importing this module does NOT load any vendor SDK; concrete
 implementations defer their imports so users only pay for the backend
@@ -27,9 +49,9 @@ they actually use.
 
 Task-type semantics
 -------------------
-The Vertex AI Gemini Embedding model is asymmetric: it produces
-DIFFERENT vectors for the same text depending on the `task_type`
-parameter. Per Google's documentation:
+The Gemini Embedding model is asymmetric: it produces DIFFERENT vectors
+for the same text depending on the `task_type` parameter. Per Google's
+documentation:
   - Embed indexed content (articles, episode pairing summaries) with
     `task_type='RETRIEVAL_DOCUMENT'`.
   - Embed the listener's open-ended query with
@@ -224,17 +246,27 @@ class OpenAIEmbeddingClient(EmbeddingClient):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Vertex AI backend (production default — see module docstring)
+# Gemini backend (production default — see module docstring)
 # ─────────────────────────────────────────────────────────────────────────────
 
-class VertexAIEmbeddingClient(EmbeddingClient):
-    """Vertex AI Gemini Embedding via the `google-genai` Python SDK.
+class GeminiEmbeddingClient(EmbeddingClient):
+    """Gemini Embedding via the `google-genai` Python SDK, with two
+    interchangeable auth paths.
 
-    Auth is ADC (Application Default Credentials) — same path the
-    pipeline's LLM client already uses. No API key required as long as
-    `gcloud auth application-default login` has been run locally or the
-    container runs in a GCP environment with a service account
-    attached.
+    Auth modes (see module docstring for the production rationale):
+      - 'api_key' (production default): AI Studio endpoint. Reads
+        AARVA_GEMINI_API_KEY / GEMINI_API_KEY / GOOGLE_API_KEY from the
+        environment. Works on any compute — no GCP service account or
+        ADC bootstrap needed. The paid-tier no-train terms cover
+        Aarva's data-governance constraints.
+      - 'adc': Vertex AI endpoint with Application Default Credentials.
+        Requires `gcp_project` + `gcp_location`. Useful on a laptop with
+        `gcloud auth application-default login` or on GCP-hosted
+        compute with an attached service account.
+
+    Both modes hit the same underlying model and respect the same
+    `task_type` + `output_dimensionality` knobs, so vectors are
+    interchangeable across modes (no re-embed when flipping).
 
     Model: `gemini-embedding-001` (text). The model emits a 3072-dim
     vector natively and supports Matryoshka truncation — `output_
@@ -258,10 +290,12 @@ class VertexAIEmbeddingClient(EmbeddingClient):
     DEFAULT_DIM = 768
     DEFAULT_LOCATION = "us-central1"
     DEFAULT_TASK_TYPE = "RETRIEVAL_DOCUMENT"
+    DEFAULT_AUTH_MODE = "api_key"
 
     def __init__(
         self,
         *,
+        auth_mode: Optional[str] = None,
         project: Optional[str] = None,
         location: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -270,11 +304,22 @@ class VertexAIEmbeddingClient(EmbeddingClient):
         self.model_name = model_name or self.DEFAULT_MODEL
         self.location = location or self.DEFAULT_LOCATION
         self.output_dim = int(output_dimensionality or self.DEFAULT_DIM)
-        # Project may be None and inferred by the SDK from the
-        # environment (GOOGLE_CLOUD_PROJECT or gcloud config). We
-        # store it explicitly when supplied so the error message
-        # if auth fails points at the right spot.
+        # Project may be None for api_key mode. For adc mode the SDK
+        # would otherwise infer it from the environment, but we require
+        # explicit config so the error message points at the right spot
+        # if auth fails.
         self.project = project
+        self.auth_mode = (auth_mode or self.DEFAULT_AUTH_MODE).lower()
+        if self.auth_mode not in ("api_key", "adc"):
+            raise ValueError(
+                f"Unknown embedding auth_mode '{self.auth_mode}'. "
+                f"Expected 'api_key' or 'adc'."
+            )
+        if self.auth_mode == "adc" and not self.project:
+            raise ValueError(
+                "auth_mode='adc' requires gcp_project in pipeline.yaml's "
+                "embedding block (e.g. 'gen-lang-client-0889802137')."
+            )
         self._client = None
 
     def _load(self) -> None:
@@ -284,27 +329,46 @@ class VertexAIEmbeddingClient(EmbeddingClient):
             from google import genai      # type: ignore[import-not-found]
         except ImportError as e:
             raise RuntimeError(
-                "VertexAIEmbeddingClient requires google-genai. "
+                "GeminiEmbeddingClient requires google-genai. "
                 "Install with:  pip install google-genai"
             ) from e
 
-        # vertexai=True picks ADC + the named project/location instead
-        # of the public AI Studio API-key path. The SDK reads
-        # GOOGLE_CLOUD_PROJECT if `project` isn't passed.
-        if self.project:
+        if self.auth_mode == "adc":
+            # vertexai=True picks ADC + the named project/location
+            # instead of the public AI Studio API-key path.
             self._client = genai.Client(
                 vertexai=True,
                 project=self.project,
                 location=self.location,
             )
-        else:
-            self._client = genai.Client(
-                vertexai=True,
-                location=self.location,
+            logger.info(
+                "GeminiEmbeddingClient ready (adc/Vertex) — model=%s dim=%d "
+                "project=%s location=%s",
+                self.model_name, self.output_dim, self.project, self.location,
             )
+            return
+
+        # api_key path. Check the Aarva-namespaced env var first, then
+        # fall back to the Google-standard names. Cloud deployments
+        # typically set AARVA_GEMINI_API_KEY through their secret manager.
+        import os as _os
+        api_key = (
+            _os.environ.get("AARVA_GEMINI_API_KEY")
+            or _os.environ.get("GEMINI_API_KEY")
+            or _os.environ.get("GOOGLE_API_KEY")
+        )
+        if not api_key:
+            raise RuntimeError(
+                "No Gemini API key found. Set AARVA_GEMINI_API_KEY "
+                "(or GEMINI_API_KEY / GOOGLE_API_KEY) in the environment. "
+                "Get a key from https://aistudio.google.com/apikey, OR "
+                "switch to auth_mode='adc' in pipeline.yaml to use "
+                "Application Default Credentials instead."
+            )
+        self._client = genai.Client(api_key=api_key)
         logger.info(
-            "VertexAIEmbeddingClient ready — model=%s dim=%d location=%s",
-            self.model_name, self.output_dim, self.location,
+            "GeminiEmbeddingClient ready (api_key/AI Studio) — model=%s dim=%d",
+            self.model_name, self.output_dim,
         )
 
     def embed(
@@ -355,8 +419,16 @@ class VertexAIEmbeddingClient(EmbeddingClient):
     def name(self) -> str:
         # Encode the dimension so 768 / 1536 / 3072 variants don't
         # collide in `embedding_model` columns. e.g.
-        # 'gemini-embedding-001-768'.
+        # 'gemini-embedding-001-768'. Note: the same name is used
+        # regardless of auth_mode, since vectors are interchangeable.
         return f"{self.model_name}-{self.output_dim}"
+
+
+# Backwards-compatible alias. The class used to be called
+# VertexAIEmbeddingClient when ADC was the only supported path. Kept
+# importable so any in-flight branches / scripts that reference the old
+# name still work. Prefer the new name in new code.
+VertexAIEmbeddingClient = GeminiEmbeddingClient
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -368,28 +440,40 @@ def build_embedding_client(config: dict) -> EmbeddingClient:
 
     Expected config shape:
         embedding:
-          provider:              local | openai | vertex_ai
+          provider:              local | openai | gemini
           model:                 <optional model override>
-          # Vertex AI only:
-          location:              us-central1 (default)
-          project:               <optional; defaults to GOOGLE_CLOUD_PROJECT>
+          # Gemini only:
+          auth_mode:             api_key (default) | adc
+          # auth_mode='adc' also requires:
+          gcp_project:           <e.g. 'gen-lang-client-0889802137'>
+          gcp_location:          us-central1 (default)
           output_dimensionality: 768 (default) | 1536 | 3072
+
+    The legacy provider name `vertex_ai` is accepted as an alias for
+    `gemini` with `auth_mode='adc'` defaulted, so existing config files
+    keep working through the transition.
     """
-    provider = (config or {}).get("provider", "local")
-    model = (config or {}).get("model")
+    cfg = config or {}
+    provider = cfg.get("provider", "local")
+    model = cfg.get("model")
 
     if provider == "local":
         return LocalEmbeddingClient(model_name=model)
     if provider == "openai":
         return OpenAIEmbeddingClient(model_name=model)
-    if provider == "vertex_ai":
+    if provider in ("gemini", "vertex_ai"):
         # Accepts both gcp_project/gcp_location (matching the llm
         # block's convention) and the simpler project/location names
         # for forward-compat. gcp_project wins when both are set.
-        cfg = config or {}
         project = cfg.get("gcp_project") or cfg.get("project")
         location = cfg.get("gcp_location") or cfg.get("location")
-        return VertexAIEmbeddingClient(
+        # `vertex_ai` is a legacy alias that defaults to ADC; `gemini`
+        # defaults to whatever GeminiEmbeddingClient.DEFAULT_AUTH_MODE
+        # is (currently api_key). Explicit auth_mode in the config
+        # always wins over either default.
+        default_auth = "adc" if provider == "vertex_ai" else None
+        return GeminiEmbeddingClient(
+            auth_mode=cfg.get("auth_mode") or default_auth,
             project=project,
             location=location,
             model_name=model,
