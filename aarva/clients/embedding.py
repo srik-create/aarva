@@ -383,10 +383,16 @@ def build_embedding_client(config: dict) -> EmbeddingClient:
     if provider == "openai":
         return OpenAIEmbeddingClient(model_name=model)
     if provider == "vertex_ai":
+        # Accepts both gcp_project/gcp_location (matching the llm
+        # block's convention) and the simpler project/location names
+        # for forward-compat. gcp_project wins when both are set.
+        cfg = config or {}
+        project = cfg.get("gcp_project") or cfg.get("project")
+        location = cfg.get("gcp_location") or cfg.get("location")
         return VertexAIEmbeddingClient(
-            project=(config or {}).get("project"),
-            location=(config or {}).get("location"),
+            project=project,
+            location=location,
             model_name=model,
-            output_dimensionality=(config or {}).get("output_dimensionality"),
+            output_dimensionality=cfg.get("output_dimensionality"),
         )
     raise ValueError(f"Unknown embedding provider: {provider}")
