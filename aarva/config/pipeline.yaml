@@ -157,19 +157,46 @@ consolidation:
   # consolidated pool (anti-source-dominance).
   max_per_publication: 3
 
-# Embedding backend (used by Stage 1.5 and later by personalisation).
+# Embedding backend (used by Stage 1.5 + crosscut embeddings + the
+# /create candidate flow).
+#
+# Production default is `vertex_ai` — matches the existing Gemini
+# stack (LLM + TTS already on Vertex AI), no PyTorch on the server
+# (Render Starter's 512 MB cap OOM'd when BGE+PyTorch loaded into
+# memory on first prompt — see decision log 2026-06-30).
+#
+# Options:
+#   vertex_ai: Gemini Embedding via google-genai SDK. ADC auth (same
+#              project as the LLM). Cost is fractions of a cent per
+#              call; one-time re-embed of the catalog cost < $1.
+#   local:     sentence-transformers on the user's machine. Free.
+#              No API key. Requires `pip install sentence-transformers`
+#              (~2 GB with PyTorch). Kept available as a fallback /
+#              offline-dev mode; not used in production.
+#   openai:    OpenAI embeddings API. Available but not the default —
+#              standing preference is to keep all non-coding LLM /
+#              embedding traffic on Gemini.
 embedding:
-  # Options: local | openai
-  #   - local: sentence-transformers on user's machine. Free. No API key.
-  #     Requires `pip install sentence-transformers` (~2GB with PyTorch).
-  #     First run downloads model (~110MB for bge-base-en-v1.5).
-  #   - openai: OpenAI embeddings API. ~$0.50/month at Aarva's volume.
-  #     Requires OPENAI_API_KEY env var and `pip install openai`.
-  provider: local
-  # Model identifier. For 'local': any sentence-transformers / HuggingFace
-  # model. For 'openai': 'text-embedding-3-small' or 'text-embedding-3-large'.
-  # Leave null to use the default for the provider.
-  model: BAAI/bge-base-en-v1.5
+  provider: vertex_ai
+
+  # Vertex AI-specific config.
+  # Model: 'gemini-embedding-001' is the current text default (per
+  # Google's docs as of 2026-06-30). Output is 3072-dim natively; we
+  # truncate via Matryoshka to `output_dimensionality` and
+  # L2-renormalise. 768 matches the previous BGE-base storage shape
+  # so the articles.embedding BLOB layout is unchanged.
+  model: gemini-embedding-001
+  output_dimensionality: 768
+
+  # GCP project + region. `project` falls back to GOOGLE_CLOUD_PROJECT
+  # env var when null. `us-central1` is the broadest Vertex AI region
+  # for embedding models.
+  project: null
+  location: us-central1
+
+  # Legacy `local` config (kept commented for easy fallback):
+  # provider: local
+  # model: BAAI/bge-base-en-v1.5
 
 review:
   # Cold-start human review (kickoff §2: "Cold-start phase uses lightweight
