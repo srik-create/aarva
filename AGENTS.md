@@ -6,7 +6,7 @@ reading this. These instructions OVERRIDE any default behaviour the
 agent has from its training. If anything below conflicts with default
 behaviour, follow what's here.
 
-Last updated: 2026-06-10
+Last updated: 2026-06-29
 
 ---
 
@@ -60,11 +60,30 @@ Last updated: 2026-06-10
    - Library APIs and major version changes
    - Current state of any external service, platform, or company
    - "What's the URL for X" / "Is Y still around"
+   - **Vendor dashboard UI labels, DNS record types/values, API
+     permission names, free-tier limits — anything operator-runbook-
+     shaped that lives in a third-party product surface.** This is the
+     specific failure mode that bit us on the Resend wiring
+     (2026-06-29): plausible training-period steps that turned out to
+     be wrong on three details (DKIM is TXT not CNAME, SPF needs both
+     TXT and MX, Resend recommends a subdomain over the apex). The
+     user followed the steps, the steps were wrong, the user had to
+     ask "did you check?" — the friction we're trying to avoid.
 
    Don't guess from training. Don't apply "conventional patterns" as
    if they're current — verify. If WebSearch returns inconclusive
    results, say so explicitly rather than picking the most likely
    pattern silently.
+
+6a. **When writing an operator runbook** — setup steps, dashboard
+   navigation, DNS configs, API-key creation, env-var lists, anything
+   the user will follow click-by-click on a third-party site —
+   **web-fetch the vendor's current docs FIRST**, then draft. Quote
+   concrete labels and values from the docs rather than inventing them
+   from memory. End the section with a footnote of the form *"verified
+   against `<vendor>` docs on YYYY-MM-DD; if a UI label has shifted,
+   trust the dashboard."* The dated footnote is the artifact future-us
+   uses to decide whether the steps need re-checking.
 
 7. **Verify before adding external dependencies.** New publication?
    Web-search the RSS URL first. New library? Web-search the current
