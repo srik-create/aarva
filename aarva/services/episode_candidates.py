@@ -433,7 +433,16 @@ def propose_candidates(
     if not prompt:
         return []
 
-    prompt_vec = embedding_client.embed([prompt])[0]
+    # task_type='RETRIEVAL_QUERY' is the asymmetric-retrieval pair to
+    # the RETRIEVAL_DOCUMENT embedding that the article + crosscut
+    # vectors were indexed under (see aarva/clients/embedding.py for
+    # the task-type semantics). Local BGE / OpenAI clients ignore the
+    # kwarg — only Vertex AI uses it. Per Google's docs, mixing
+    # QUERY + DOCUMENT this way gives better top-K than embedding
+    # both sides identically.
+    prompt_vec = embedding_client.embed(
+        [prompt], task_type="RETRIEVAL_QUERY",
+    )[0]
 
     # 1) existing matches
     existing = _existing_matches(

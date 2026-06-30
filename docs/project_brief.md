@@ -7,7 +7,7 @@ Source of truth for orientation. Read this at the start of any session
 - `docs/roadmap.md` — what's next, what's deferred, recent commits
 - `docs/aarva_architecture_v1.md` — deep technical reference (schema, stages)
 
-**Last updated:** 2026-06-29
+**Last updated:** 2026-06-30
 
 ---
 
@@ -69,7 +69,7 @@ outro → TTS as one continuous 20-30 min episode.
 - HTML + RSS: GitHub Pages (`srik-create.github.io/aarva`)
 - LLM: Gemini 3 Flash Preview via Vertex AI (ADC, gibran.ai's GCP project)
 - TTS: Gemini 3.1 Flash TTS Preview
-- Embeddings: local BGE-base (`sentence-transformers`)
+- Embeddings: Vertex AI `gemini-embedding-001` (768-dim Matryoshka)
 
 **Web app live at `aarva.app`**: FastAPI server in `aarva/server/`,
 hosted on Render.com (Dockerfile-canonical). Two phases shipped:
@@ -158,6 +158,7 @@ future-us knows whether to revisit.
 | 2026-06-25 | Loudness normalize MP3s to -16 LUFS via ffmpeg loudnorm | Per-chunk volume variance was audible | Yes — `output.loudness_target_lufs` |
 | 2026-06-26 | R2 URL: `pub-xxx.r2.dev` → `audio.aarva.app` | r2.dev rate limit broke YouTube ingestion | Yes — config-only `tts.r2.public_url_base` |
 | 2026-06-29 | TTS `max_chunk_chars` 2500 → 1800 | Listener feedback: voice quality drifts audibly within each ~3-min chunk and resets at the chunk boundary. Smaller chunks (~2 min) keep each request short enough to stay before the drift, at the cost of ~40% more chunks → slightly more API calls and more chunk transitions. The chunker still packs paragraphs first / sentences as fallback / never splits mid-sentence. | Yes — `tts.max_chunk_chars` in pipeline.yaml |
+| 2026-06-30 | **Embeddings: local BGE-base → Vertex AI `gemini-embedding-001` (768-dim Matryoshka).** Production server (Render Starter, 512 MB) OOM'd when `LocalEmbeddingClient` lazy-loaded PyTorch + the BGE model on the first prompt. Switched the embedding stack to Vertex AI's API-based Gemini Embedding model — same Vertex AI ADC project as the LLM + TTS. New `VertexAIEmbeddingClient` in `aarva/clients/embedding.py` with asymmetric `RETRIEVAL_QUERY` / `RETRIEVAL_DOCUMENT` task-type plumbing (listener prompts vs. indexed content). Native output is 3072-dim; truncated to 768 via Matryoshka to keep the existing DB blob shape (no layout migration). All ~5,100 articles + the crosscut catalog re-embedded via `scripts/reembed_to_vertex_ai.py`. `sentence-transformers` + PyTorch dropped from runtime `requirements.txt` (LocalEmbeddingClient stays in tree as offline-dev fallback). Two other candidate fixes considered + rejected: Render Standard upgrade ($25/mo for 2 GB, doesn't help if more in-memory ML lands later); HuggingFace Inference API for runtime queries only (free-tier credits are tight, added latency, new vendor dep). | Aligns with the standing "Gemini for all non-coding LLM" preference; removes PyTorch from the production image (cold-starts faster, ~700 MB lighter); cost is fractions of a cent per call + < $1 one-time re-embed. | Yes — `embedding:` block in pipeline.yaml is provider-switchable; `local` config is kept commented out in the file as the rollback path |
 | 2026-06-26 | Daily run is invoked manually by the operator (not via launchd) | User prefers explicit control over each daily run — a moment to glance at the previous day's output / decide to skip a day / pause without fighting an automation. The pipeline is not so time-sensitive that automation is worth the loss of agency. `scripts/app.aarva.daily.plist` exists as a starting point if scheduled runs are ever desired but is not actively loaded. | Yes — `launchctl load ~/Library/LaunchAgents/app.aarva.daily.plist` activates the scheduled run |
 
 ### Web app

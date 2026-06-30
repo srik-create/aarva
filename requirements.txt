@@ -24,7 +24,15 @@ python-dateutil>=2.8       # Lenient date parsing in RSS entries
 # ─── Stage 1.5 consolidation ──────────────────────────────────────────────
 numpy>=1.26                # Embedding vector math
 scikit-learn>=1.4          # TF-IDF fallback path; cosine_similarity
-sentence-transformers>=3.0 # Local embeddings via BGE-base (default backend)
+# sentence-transformers — removed from the runtime image 2026-06-30.
+# The production embedding backend moved to Vertex AI (see
+# pipeline.yaml's `embedding:` block). The LocalEmbeddingClient in
+# aarva/clients/embedding.py is still in-tree as an offline-dev
+# fallback; install sentence-transformers manually if you flip
+# `embedding.provider` back to `local`:
+#     pip install 'sentence-transformers>=3.0'
+# It was removed because PyTorch + the BGE-base model push past
+# Render Starter's 512 MB RAM ceiling when loaded on first prompt.
 
 # ─── LLM clients (Stage 4+5+6, Stage 8a/b, Stage 9 narrator detection) ────
 # google-genai is the production default per project policy
