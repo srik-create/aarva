@@ -12,14 +12,29 @@
 #   AARVA_SERVER_PUBLIC_URL — public-facing URL (e.g. https://aarva.app)
 #   AARVA_LOG_LEVEL         — INFO (default) | DEBUG | WARNING
 #
-# The web app process is read-only on the DB and makes no LLM or R2
-# calls itself; audio URLs in the RSS feed point at audio.aarva.app
-# (R2) and the pipeline that produces audio runs separately. So the
-# container needs neither AARVA_GEMINI_API_KEY nor R2 credentials.
+# The web app serves read-only DB traffic AND runs the /create build
+# worker in-process. The build worker calls Gemini for LLM + TTS,
+# converts the resulting WAV to MP3 with loudnorm, and uploads the
+# MP3 to R2. So the container DOES need:
+#   - AARVA_GEMINI_API_KEY or GCP ADC (auth to Gemini)
+#   - AARVA_R2_ACCESS_KEY_ID / _SECRET_ACCESS_KEY (audio upload)
+#   - ffmpeg on PATH (audio conversion; installed below)
+# The earlier assumption that Render only serves and never produces
+# audio became stale when /create landed on 2026-06-29.
 
 FROM python:3.12-slim
 
 WORKDIR /app
+
+# System deps for the /create build worker.
+#   ffmpeg — used by aarva/output/audio_converter.py to convert the
+#            Gemini-TTS WAV output to loudnorm'd MP3 before R2 upload.
+#            Without it, episode_worker crashes at convert_all_for_
+#            publish with "ffmpeg not found on PATH".
+# Cleaning apt cache in the same RUN keeps the layer small.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Python deps first so the layer cache survives code changes.
 # requirements.txt includes the full pipeline deps; the web server
