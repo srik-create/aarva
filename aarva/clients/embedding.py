@@ -291,12 +291,21 @@ class GeminiEmbeddingClient(EmbeddingClient):
     DEFAULT_LOCATION = "us-central1"
     DEFAULT_TASK_TYPE = "RETRIEVAL_DOCUMENT"
     DEFAULT_AUTH_MODE = "api_key"
-    # Vertex AI's embed endpoint caps requests at 2048 instances per
-    # call (400 INVALID_ARGUMENT above that). AI Studio's ceiling is
-    # usually equal or lower depending on model. 2000 leaves a small
-    # buffer under the Vertex limit and works for both auth paths, so
-    # callers don't need to know about the API-level cap.
-    MAX_BATCH_SIZE = 2000
+    # Per-call batch size for the embed endpoint. Vertex AI enforces
+    # a model-specific ceiling — for `gemini-embedding-001` the
+    # supported range is 1..250 (documented via the 400
+    # INVALID_ARGUMENT the API returns above 250). There's also a
+    # higher-level absolute cap at 2048 that shows up when the
+    # request first arrives, but the tighter per-model limit is what
+    # actually binds in practice. AI Studio's ceiling is usually
+    # equal-or-lower, so this value works for both auth paths.
+    #
+    # 200 leaves a buffer under the 250 ceiling in case Google
+    # tightens it further; verified by the 2026-06-30 daily-run
+    # error message that named the limit explicitly. Callers don't
+    # need to know about the API cap — the client's embed() method
+    # chunks transparently.
+    MAX_BATCH_SIZE = 200
 
     def __init__(
         self,
