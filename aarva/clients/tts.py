@@ -577,30 +577,39 @@ class GeminiTTSClient(TTSClient):
         )
         silence_bytes = b"\x00\x00" * silence_samples  # 16-bit zeros
 
-        pcm_segments: list[bytes] = []
-        for i, chunk in enumerate(chunks):
-            try:
-                pcm = self._synthesize_chunk(
-                    chunk, gemini_voice, extra_style=extra_style,
-                )
-            except Exception as e:
-                raise RuntimeError(
-                    f"GeminiTTS failed on chunk {i+1}/{len(chunks)}: {e}"
-                ) from e
-            pcm_segments.append(pcm)
-            if i < len(chunks) - 1:
-                pcm_segments.append(silence_bytes)
-            logger.info(
-                "  GeminiTTS chunk %d/%d done (%d bytes)",
-                i + 1, len(chunks), len(pcm),
-            )
-
-        combined = b"".join(pcm_segments)
+        # Stream each PCM chunk straight to the wav file rather than
+        # accumulating them in Python memory. A 30-minute crosscut can
+        # produce ~90 MB of raw PCM across ~15 chunks; holding all of
+        # that in a list + a joined bytes object is what pushed the
+        # Render Starter (512 MB) over its ceiling on 2026-07-02.
+        # writeframes appends to the RIFF data section incrementally,
+        # and Python releases each chunk right after it's written.
+        # Peak memory now scales with a single chunk (~6 MB), not the
+        # full episode.
         with wave.open(str(output_path), "wb") as wf:
             wf.setnchannels(self.GEMINI_CHANNELS)
             wf.setsampwidth(self.GEMINI_SAMPLE_WIDTH)
             wf.setframerate(self.GEMINI_SAMPLE_RATE)
-            wf.writeframes(combined)
+            for i, chunk in enumerate(chunks):
+                try:
+                    pcm = self._synthesize_chunk(
+                        chunk, gemini_voice, extra_style=extra_style,
+                    )
+                except Exception as e:
+                    raise RuntimeError(
+                        f"GeminiTTS failed on chunk {i+1}/{len(chunks)}: {e}"
+                    ) from e
+                wf.writeframes(pcm)
+                if i < len(chunks) - 1:
+                    wf.writeframes(silence_bytes)
+                logger.info(
+                    "  GeminiTTS chunk %d/%d done (%d bytes)",
+                    i + 1, len(chunks), len(pcm),
+                )
+                # Explicitly drop the reference so CPython can reuse
+                # the allocation for the next chunk instead of growing
+                # RSS. Redundant in principle but cheap insurance.
+                del pcm
 
         if not output_path.exists() or output_path.stat().st_size == 0:
             raise RuntimeError(f"GeminiTTS produced no output for {output_path}")
