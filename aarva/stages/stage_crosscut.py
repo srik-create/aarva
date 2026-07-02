@@ -137,6 +137,22 @@ def _load_crosscut_pool(
                AND COALESCE(s.ranking_score, 0) >= ?
                AND a.embedding IS NOT NULL
                AND COALESCE(a.published_date, a.ingested_date) >= ?
+               -- Exclude articles already used in a published edition
+               -- (daily or crosscut). Stage 7 does this via
+               -- `a.status = 'scored'`; the crosscut pool is looser
+               -- (also accepts 'in_basket' etc.) so we spell out the
+               -- exclusion instead of restricting to a single status.
+               AND a.status != 'in_edition'
+               -- Exclude articles the reviewer rejected in any past
+               -- edition. Mirrors Stage 7's NOT EXISTS clause — the
+               -- rejection block is durable across editions via the
+               -- edition_rejections table. Without this, an article
+               -- the reviewer said "no" to for the daily can still
+               -- surface as a crosscut candidate.
+               AND NOT EXISTS (
+                   SELECT 1 FROM edition_rejections er
+                    WHERE er.article_id = a.id
+               )
         """, (ranking_score_floor, since)).fetchall()
 
     out: list[_CrosscutArticle] = []
