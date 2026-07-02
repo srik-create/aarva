@@ -141,7 +141,7 @@ def _run_job(
     the loop which marks the job failed."""
     from aarva.services.email import send_email
     from aarva.services.episode_jobs import (
-        mark_completed, update_progress,
+        mark_completed, stamp_edition_id, update_progress,
     )
     from aarva.stages.stage_crosscut import (
         build_episode_script, synthesize_crosscut_episode,
@@ -161,50 +161,71 @@ def _run_job(
         payload.get("topic_label"),
     )
 
-    # 1. Insert the candidate row build_episode_script will find via
-    # _selected_candidate(today). Worker is single-threaded so this
-    # row WILL be the most-recently-selected when we call into
-    # build_episode_script next.
-    update_progress(db, job_id, "Setting up the build…")
-    today = date.today()
-    with db.connect() as conn:
-        conn.execute(
-            """
-            INSERT INTO crosscut_pair_candidates
-                (candidate_date, article_a_id, article_b_id,
-                 topic_label, connection_summary, connection_score,
-                 selected_at)
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """,
-            (
-                today.isoformat(),
-                int(payload["article_a_id"]),
-                int(payload["article_b_id"]),
-                str(payload.get("topic_label") or ""),
-                str(payload.get("why") or ""),
-                0.0,    # connection_score — not used on the on-demand path
-            ),
+    # Resumability checkpoint. If a prior attempt got as far as
+    # creating the edition row, payload.edition_id was stamped after
+    # step 2. On the retry, skip steps 1-3 (candidate insert + LLM
+    # proposal + user_id stamp — none of which are idempotent) and go
+    # straight into TTS/convert/upload, all of which ARE idempotent
+    # per-piece and will pick up where the previous attempt left off.
+    checkpoint_edition_id = payload.get("edition_id")
+    if checkpoint_edition_id is not None:
+        edition_id = int(checkpoint_edition_id)
+        logger.info(
+            "episode_worker: job %d resuming from checkpoint — "
+            "edition %d already built, jumping to TTS",
+            job_id, edition_id,
         )
+        update_progress(db, job_id, "Resuming — audio still needed…")
+    else:
+        # 1. Insert the candidate row build_episode_script will find
+        # via _selected_candidate(today). Worker is single-threaded
+        # so this row WILL be the most-recently-selected when we call
+        # into build_episode_script next.
+        update_progress(db, job_id, "Setting up the build…")
+        today = date.today()
+        with db.connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO crosscut_pair_candidates
+                    (candidate_date, article_a_id, article_b_id,
+                     topic_label, connection_summary, connection_score,
+                     selected_at)
+                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """,
+                (
+                    today.isoformat(),
+                    int(payload["article_a_id"]),
+                    int(payload["article_b_id"]),
+                    str(payload.get("topic_label") or ""),
+                    str(payload.get("why") or ""),
+                    0.0,    # connection_score — not used on the on-demand path
+                ),
+            )
 
-    # 2. Build the episode script (intro / bridges / outro + persist
-    # the editions row + embed into crosscut_embeddings).
-    update_progress(db, job_id, "Writing the intro and bridges…")
-    build_stats = build_episode_script(config, db)
-    if build_stats.errors or not build_stats.edition_id:
-        raise RuntimeError(
-            f"build_episode_script reported errors: {build_stats!r}"
-        )
-    edition_id = int(build_stats.edition_id)
-    logger.info("episode_worker: job %d built edition %d", job_id, edition_id)
+        # 2. Build the episode script (intro / bridges / outro +
+        # persist the editions row + embed into crosscut_embeddings).
+        update_progress(db, job_id, "Writing the intro and bridges…")
+        build_stats = build_episode_script(config, db)
+        if build_stats.errors or not build_stats.edition_id:
+            raise RuntimeError(
+                f"build_episode_script reported errors: {build_stats!r}"
+            )
+        edition_id = int(build_stats.edition_id)
+        logger.info("episode_worker: job %d built edition %d", job_id, edition_id)
 
-    # 3. Stamp the requester's user_id so the episode shows up on
-    # /listener-created (rather than /today / /crosscuts which filter
-    # to user_id IS NULL).
-    with db.connect() as conn:
-        conn.execute(
-            "UPDATE editions SET user_id = ? WHERE id = ?",
-            (requester_user_id, edition_id),
-        )
+        # 3. Stamp the requester's user_id so the episode shows up on
+        # /listener-created (rather than /today / /crosscuts which
+        # filter to user_id IS NULL).
+        with db.connect() as conn:
+            conn.execute(
+                "UPDATE editions SET user_id = ? WHERE id = ?",
+                (requester_user_id, edition_id),
+            )
+
+        # Stamp the checkpoint. From here on, a Render OOM restart
+        # will resume from step 4 (TTS) rather than re-running the
+        # LLM proposal + edition creation.
+        stamp_edition_id(db, job_id, edition_id)
 
     # 4. Run TTS — this is the long-pole step (~15 min for a normal
     # crosscut at the configured chunk size). The TTS path produces a
