@@ -45,6 +45,7 @@ import logging
 
 from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from starlette.concurrency import run_in_threadpool
 
 from aarva.server.app import app
 from aarva.server.templates import templates
@@ -88,7 +89,15 @@ async def api_candidates(request: Request) -> HTMLResponse:
     llm_client = request.app.state.llm_client
 
     try:
-        candidates = propose_candidates(
+        # propose_candidates does an embedding round-trip + a Gemini
+        # LLM proposal call + DB scan; can easily take 10-30s in
+        # aggregate. Running that inline in an async handler would
+        # block the FastAPI event loop, starving /health polls and
+        # letting Render's 5s health-check timeout kill the instance
+        # mid-request. Bounce to the threadpool so the event loop
+        # stays responsive.
+        candidates = await run_in_threadpool(
+            propose_candidates,
             db=db,
             embedding_client=embedding_client,
             llm_client=llm_client,
