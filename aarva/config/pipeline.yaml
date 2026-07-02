@@ -160,15 +160,21 @@ consolidation:
 # Embedding backend (used by Stage 1.5 + crosscut embeddings + the
 # /create candidate flow).
 #
-# Production default is `gemini` with auth_mode 'api_key' — matches
-# the LLM block's auth model below, runs on any compute without a GCP
-# service-account key on the box, no PyTorch on the server (Render
-# Starter's 512 MB cap OOM'd when BGE+PyTorch loaded into memory on
-# first prompt — see decision log 2026-06-30).
+# Production default is `gemini` with auth_mode 'adc' — matches the
+# LLM block's auth model below (same GCP project, same ADC path), no
+# PyTorch on the server (Render Starter's 512 MB cap OOM'd when
+# BGE+PyTorch loaded into memory on first prompt — see decision log
+# 2026-06-30). Two reasons ADC is the mandated path (mirroring the
+# LLM block):
+#   1. gibran.ai's data-residency requirement.
+#   2. Vertex bypasses AI Studio's per-project spending caps.
+#
+# 2026-06-30 note: briefly flipped to 'api_key' as a workaround, then
+# reverted the same day. See the llm.auth_mode comment above.
 #
 # Options:
 #   gemini:    Gemini Embedding (gemini-embedding-001) via google-genai.
-#              auth_mode='api_key' hits AI Studio; 'adc' hits Vertex AI.
+#              auth_mode='adc' hits Vertex AI; 'api_key' hits AI Studio.
 #              Same model + task_type + output_dimensionality in both
 #              modes, so vectors are interchangeable — flipping doesn't
 #              require a re-embed. Cost is fractions of a cent per call.
@@ -183,7 +189,7 @@ consolidation:
 #              embedding traffic on Gemini.
 embedding:
   provider: gemini
-  auth_mode: api_key
+  auth_mode: adc
 
   # Gemini-specific config.
   # Model: 'gemini-embedding-001' is the current text default (per
@@ -194,11 +200,11 @@ embedding:
   model: gemini-embedding-001
   output_dimensionality: 768
 
-  # GCP project + region — only consulted when auth_mode is 'adc' (kept
-  # so flipping back is one YAML edit, no re-population). The api_key
-  # path ignores both. Project mirrors the LLM block's gcp_project for
-  # consistency; 'us-central1' is the broadest Vertex AI region for
-  # embedding models (the LLM block's 'global' isn't valid for embeds).
+  # GCP project + region. Consulted when auth_mode is 'adc' (production
+  # default). The api_key fallback ignores both. Project mirrors the
+  # LLM block's gcp_project; 'us-central1' is the broadest Vertex AI
+  # region for embedding models (the LLM block's 'global' isn't valid
+  # for embeds).
   gcp_project: gen-lang-client-0889802137
   gcp_location: us-central1
 
@@ -368,30 +374,29 @@ llm:
   rpm: 30
   #
   # ─── Auth ─────────────────────────────────────────────────────────────
-  # Production default: 'api_key'. Reads
-  # AARVA_GEMINI_API_KEY / GEMINI_API_KEY / GOOGLE_API_KEY and hits AI
-  # Studio's generativelanguage.googleapis.com endpoint. Works on any
-  # compute without GCP credentials — important on Render, which isn't
-  # a GCP environment and would need a service-account key file to use
-  # ADC.
+  # Production default: 'adc'. Uses Application Default Credentials
+  # from ~/.config/gcloud/application_default_credentials.json (on the
+  # laptop, set up via `gcloud auth application-default login`) or an
+  # attached service-account key file on Render (see docs/deploy.md).
+  # Hits Vertex AI under the named gcp_project. Billing and quotas
+  # are tracked at the project level, not per-key. Two reasons this is
+  # the mandated path per the 2026-06-13 decision:
+  #   1. gibran.ai's data-residency requirement — Vertex on the EU/US
+  #      data plane has stricter guarantees than AI Studio.
+  #   2. Vertex bypasses AI Studio's per-project spending caps, which
+  #      the daily pipeline volume would otherwise hit.
   #
-  # The 2026-06-13 policy that mandated ADC/Vertex was reconsidered on
-  # 2026-06-30. Aarva is on the paid AI Studio tier, whose terms do
-  # not train on submitted prompts, so the data-governance constraint
-  # the policy was protecting is satisfied by the api_key path too.
-  # That removed the main reason to keep ADC on Render, where it was
-  # forcing us to provision and rotate a GCP service-account key.
+  # 2026-06-30 note: this was briefly flipped to 'api_key' as a
+  # workaround for Render lacking ADC, then reverted the same day
+  # once the spending-cap risk was re-surfaced. The proper fix is a
+  # GCP service-account key mounted on Render as a Secret File — see
+  # docs/deploy.md for the runbook.
   #
-  # Alternative: 'adc'. Uses Application Default Credentials from
-  # ~/.config/gcloud/application_default_credentials.json (set up via
-  # `gcloud auth application-default login`) or an attached service
-  # account, and hits Vertex AI under the named gcp_project. Still
-  # functional — kept as a one-line flip for cases where the paid-tier
-  # AI Studio terms aren't sufficient (e.g. regulated data classes
-  # that need Vertex's tighter region pinning).
-  auth_mode: api_key
-  # Consulted only when auth_mode is 'adc'. Left populated so flipping
-  # back is a single YAML edit, not a re-population.
+  # Fallback: 'api_key'. Hits AI Studio's generativelanguage.googleapis
+  # endpoint and reads AARVA_GEMINI_API_KEY / GEMINI_API_KEY /
+  # GOOGLE_API_KEY. Kept as a one-line YAML flip for local
+  # experiments or emergency use; not the production path.
+  auth_mode: adc
   gcp_project: gen-lang-client-0889802137
   # 'global' is the multi-region Vertex endpoint. Empirically the only
   # location for this project that serves Gemini 3 Flash Preview
