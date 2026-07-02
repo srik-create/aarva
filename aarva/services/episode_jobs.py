@@ -273,6 +273,43 @@ def update_progress(
         )
 
 
+def stamp_edition_id(
+    db: Database,
+    job_id: int,
+    edition_id: int,
+) -> None:
+    """Persist `edition_id` inside the job's payload_json.
+
+    This is the checkpoint that makes worker retries resumable: once
+    build_episode_script has created the editions row + edition_pieces
+    rows, we stamp the id here. On a Render OOM restart the worker
+    resets the job back to 'pending' and re-runs it; _run_job reads
+    payload.edition_id and, if it's set, skips straight to TTS (which
+    is already idempotent per-piece via audio_url) rather than
+    duplicating the LLM proposal + edition creation.
+
+    Small race window between edition creation and this stamp; if the
+    process dies inside that window a retry can produce one duplicate
+    edition. Accepted at v1 — the alternative (bundling stamp into
+    build_episode_script's own transaction) would tightly couple the
+    stage to the worker's persistence model."""
+    with db.connect() as conn:
+        row = conn.execute(
+            "SELECT payload_json FROM jobs WHERE id = ?", (int(job_id),),
+        ).fetchone()
+        if not row:
+            return
+        try:
+            payload = json.loads(row["payload_json"]) or {}
+        except (ValueError, TypeError):
+            payload = {}
+        payload["edition_id"] = int(edition_id)
+        conn.execute(
+            "UPDATE jobs SET payload_json = ? WHERE id = ?",
+            (json.dumps(payload), int(job_id)),
+        )
+
+
 # ─── Lookup + recovery ────────────────────────────────────────────────────
 
 def get_job(db: Database, job_id: int) -> Optional[dict[str, Any]]:
