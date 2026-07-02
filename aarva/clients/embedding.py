@@ -291,6 +291,12 @@ class GeminiEmbeddingClient(EmbeddingClient):
     DEFAULT_LOCATION = "us-central1"
     DEFAULT_TASK_TYPE = "RETRIEVAL_DOCUMENT"
     DEFAULT_AUTH_MODE = "api_key"
+    # Vertex AI's embed endpoint caps requests at 2048 instances per
+    # call (400 INVALID_ARGUMENT above that). AI Studio's ceiling is
+    # usually equal or lower depending on model. 2000 leaves a small
+    # buffer under the Vertex limit and works for both auth paths, so
+    # callers don't need to know about the API-level cap.
+    MAX_BATCH_SIZE = 2000
 
     def __init__(
         self,
@@ -388,21 +394,43 @@ class GeminiEmbeddingClient(EmbeddingClient):
         if not text_list:
             return np.zeros((0, self.output_dim), dtype=np.float32)
 
-        # The SDK accepts either a single string or a list under
-        # `contents`. We always pass a list so the return shape is
-        # uniform across single / batch calls.
-        result = self._client.models.embed_content(
-            model=self.model_name,
-            contents=text_list,
-            config=types.EmbedContentConfig(
-                task_type=effective_task,
-                output_dimensionality=self.output_dim,
-            ),
-        )
-        vectors = np.array(
-            [e.values for e in result.embeddings],
-            dtype=np.float32,
-        )
+        # Chunk to respect the API's per-call cap (Vertex: 2048).
+        # Anything at or under MAX_BATCH_SIZE goes through as a single
+        # call — byte-identical to the pre-chunking behaviour so a
+        # stage passing 30 candidates doesn't pay any extra request
+        # overhead. Only large backfills (e.g. Stage 1.5 straggler
+        # sweeps or the one-shot re-embed script) hit the multi-call
+        # path. Vectors from each chunk are concatenated in input
+        # order.
+        batch_vecs: list[np.ndarray] = []
+        for start in range(0, len(text_list), self.MAX_BATCH_SIZE):
+            chunk = text_list[start : start + self.MAX_BATCH_SIZE]
+            # The SDK accepts either a single string or a list under
+            # `contents`. We always pass a list so the return shape is
+            # uniform across single / batch calls.
+            result = self._client.models.embed_content(
+                model=self.model_name,
+                contents=chunk,
+                config=types.EmbedContentConfig(
+                    task_type=effective_task,
+                    output_dimensionality=self.output_dim,
+                ),
+            )
+            batch_vecs.append(np.array(
+                [e.values for e in result.embeddings],
+                dtype=np.float32,
+            ))
+            if len(text_list) > self.MAX_BATCH_SIZE:
+                logger.info(
+                    "GeminiEmbeddingClient: embedded chunk %d/%d "
+                    "(%d items, cumulative %d)",
+                    (start // self.MAX_BATCH_SIZE) + 1,
+                    (len(text_list) + self.MAX_BATCH_SIZE - 1) // self.MAX_BATCH_SIZE,
+                    len(chunk),
+                    start + len(chunk),
+                )
+
+        vectors = np.concatenate(batch_vecs, axis=0) if len(batch_vecs) > 1 else batch_vecs[0]
 
         # Matryoshka truncation requires client-side L2-renormalisation
         # so cosine similarity remains a dot product. Defensive even at
