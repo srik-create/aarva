@@ -13,7 +13,7 @@
 # residential connection is reliable (boto3-style multipart, retries),
 # and R2 → Render is the fast backbone path.
 #
-# Required env vars (loaded from ~/.aarva.env by run_daily.sh):
+# Required env vars (auto-loaded from ~/.aarva.env — see below):
 #   AARVA_RENDER_SYNC_TOKEN     — bearer token agreed with the server
 #   AARVA_R2_ACCESS_KEY_ID      — R2 API key
 #   AARVA_R2_SECRET_ACCESS_KEY  — R2 API secret
@@ -39,6 +39,16 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Load secrets when invoked standalone. When called from run_daily.sh
+# the vars are already exported into this script's env; sourcing again
+# is idempotent. Mirrors the pattern in scripts/finalize_edition.sh
+# so both scripts work identically whether they're run from cron, the
+# launchd wrapper, or a bare interactive shell.
+if [ -f "$HOME/.aarva.env" ]; then
+    # shellcheck disable=SC1091
+    source "$HOME/.aarva.env"
+fi
 
 DB_PATH="${AARVA_DB_PATH:-aarva/data/aarva.db}"
 SYNC_URL="${AARVA_RENDER_SYNC_URL:-https://aarva.app/admin/sync-db}"
