@@ -52,6 +52,64 @@
     </section>
   {% endif %}
 
+  {# Bonus pieces for the day being shown — rendered above the JTBD
+     groups so they sit as clearly editorial-additional. Section
+     omitted entirely when there are no bonuses. #}
+  {% if bonus_pieces %}
+    <section class="mb-12">
+      <h2 class="editorial text-xs uppercase tracking-widest text-cream-light mb-5 font-medium">
+        Bonus today
+      </h2>
+      <div class="space-y-5">
+        {% for piece in bonus_pieces %}
+          <article class="bg-paper p-6 rounded-2xl text-ink">
+            <p class="text-xs text-ink-light uppercase tracking-wide">
+              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
+            </p>
+            <h3 class="editorial text-2xl font-semibold leading-snug mt-1 text-ink">
+              <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
+            </h3>
+            {% if piece.byline %}
+              <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
+            {% endif %}
+            {% if piece.hook %}
+              <p class="hook text-ink mt-4 text-lg leading-relaxed">{{ piece.hook }}</p>
+            {% endif %}
+            {# Compact player — same shape as the JTBD-group cards
+               below. data-track-* attributes feed the shared player
+               in base.html. #}
+            <div class="mt-5" data-player
+                 data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+                 data-track-title="{{ piece.title | title_case }}"
+                 data-track-link="/article/{{ piece.article_id }}">
+              <div class="flex items-center gap-4">
+                <button type="button" aria-label="Play"
+                        class="shrink-0 w-14 h-14 rounded-full bg-night text-paper flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                        data-play-button>
+                  <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                </button>
+                <div class="flex-1">
+                  <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                    <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+                  </div>
+                  <p class="text-xs text-ink-light mt-2">
+                    <span data-current-time>0:00</span>
+                    <span class="mx-1">/</span>
+                    <span data-total-time>{{ piece.duration_seconds | duration }}</span>
+                    {% if piece.narrator_voice %}
+                      <span class="mx-1">·</span> Narrator {{ piece.narrator_voice }}
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
   {% for group in grouped_pieces %}
     <section class="mb-12">
       <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.header_color }} mb-5 font-medium">

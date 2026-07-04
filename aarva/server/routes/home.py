@@ -20,6 +20,7 @@ from aarva.server.app import app
 from aarva.server.jtbd_meta import JTBD_INFO
 from aarva.server.templates import templates
 from aarva.services.queries import (
+    load_bonus_pieces_with_audio,
     load_crosscut_episodes,
     load_daily_pieces_with_audio,
 )
@@ -103,11 +104,29 @@ async def today(request: Request) -> HTMLResponse:
         None,
     )
 
+    # Bonus episodes whose edition_date is today's daily-edition date.
+    # Rendered as a compact section between the crosscut card (above)
+    # and the JTBD-grouped daily pieces (below). Empty list -> the
+    # template skips the whole section, so days without a bonus look
+    # exactly as before this change.
+    try:
+        edition_dt = date.fromisoformat(edition_date_str)
+    except ValueError:
+        edition_dt = date.today()
+    todays_bonuses = load_bonus_pieces_with_audio(db, since_date=edition_dt)
+    # since_date is a floor; if the operator published bonuses for a
+    # later date they'd sneak in — filter to strict equality on the
+    # daily edition's date so /today matches the day being shown.
+    todays_bonuses = [
+        b for b in todays_bonuses if str(b["edition_date"]) == edition_date_str
+    ]
+
     return templates.TemplateResponse(
         request, "home.html",
         {
             "edition_date": edition_date_str,
             "grouped_pieces": grouped,
             "crosscut": todays_crosscut,
+            "bonus_pieces": todays_bonuses,
         },
     )
