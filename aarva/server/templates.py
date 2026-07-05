@@ -6,6 +6,7 @@ instead of constructing it per-module.
 """
 from __future__ import annotations
 
+import html
 from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
@@ -70,6 +71,14 @@ def _title_case(s: str | None) -> str:
     """
     if not s:
         return s or ""
+    # Decode HTML entities (e.g. Vox titles arrive as
+    # "Shouldn&#8217;t Keep..." from the source RSS). Jinja's auto-
+    # escape would otherwise turn the leading & into &amp; and the
+    # browser would render "&#8217;" verbatim. Unescape ONCE here so
+    # 'shouldn&#8217;t' becomes 'shouldn’t' before we case-fold
+    # it; Jinja then escapes the Unicode apostrophe correctly (or
+    # leaves it alone; either way it renders as ').
+    s = html.unescape(s)
     words = s.split()
     if not words:
         return s
