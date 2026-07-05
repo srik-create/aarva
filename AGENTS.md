@@ -75,6 +75,16 @@ Last updated: 2026-06-29
    results, say so explicitly rather than picking the most likely
    pattern silently.
 
+   **Partial-signal trap.** When an error message, doc excerpt, or
+   log line names a number, an API label, or a UI string, don't take
+   the first number/label you see as authoritative — follow the link
+   the message provides (or a docs URL it cites) all the way to the
+   source, and code against THAT. The 2026-06-30 Vertex embed cap
+   bit us twice in one day this way: first error said "2048", the
+   model-specific docs said 250, and coding to 2048 wasted a full
+   deploy cycle. If a signal is partial, either verify or say so
+   explicitly before writing code against it.
+
 6a. **When writing an operator runbook** — setup steps, dashboard
    navigation, DNS configs, API-key creation, env-var lists, anything
    the user will follow click-by-click on a third-party site —
@@ -207,15 +217,29 @@ Last updated: 2026-06-29
     tracked. Mark in_progress before starting, completed when truly
     done.
 
-17a. **`docs/roadmap.md` is the persistent project tracker.** TaskList
-    resets between sessions; `docs/roadmap.md` doesn't. At the start
-    of any session, read it. When a deferred item gets done, when a
-    phase completes, or when something new gets deferred — update
-    `docs/roadmap.md` in the same commit/PR. The doc should never lag
-    reality by more than one commit. Surface relevant deferred items
-    proactively when the user starts adjacent work
-    (e.g., "before we add search, the deferred crosscut-embeddings
-    item should land first — still that order?").
+17a. **`docs/roadmap.md` is the persistent project tracker — keep it
+    fresh.** TaskList resets between sessions; `docs/roadmap.md`
+    doesn't. At the start of any session, read it. The doc MUST get
+    updated in the SAME PR as any change that:
+
+    - lands a deferred item (move to "Recently completed", drop from
+      "Deferred");
+    - defers something new (add to "Deferred" with a trigger clause);
+    - changes a Phase Plan status column;
+    - makes a decision worth logging (add a row to "Decisions made");
+    - completes or supersedes work that "In progress" or "Recently
+      completed" describes.
+
+    A PR that lands any of the above WITHOUT touching roadmap.md is
+    malformed — bounce it back to yourself and add the roadmap edit
+    before requesting user sign-off (see rule 20). The doc drifting
+    even one session out of sync is what happened 2026-06-29 →
+    2026-07-04 and the "make sure it never gets stale again"
+    reprimand that followed. Don't repeat it.
+
+    Also: surface relevant deferred items proactively when the user
+    starts adjacent work (e.g., "before we add search, the deferred
+    crosscut-embeddings item should land first — still that order?").
 
 17b. **`docs/project_brief.md` is the persistent context.** It
     captures what Aarva is, the architecture in one paragraph,
@@ -232,9 +256,14 @@ Last updated: 2026-06-29
 20. **Never commit or push without explicit user sign-off.** At the
     end of a coherent change (one feature, one refactor, one bugfix):
 
-    a) Summarise the diff in chat — what changed, which files, why.
-    b) Propose the commit subject + body.
-    c) Wait for the user to say "commit" (or override the proposal).
+    a) Verify roadmap freshness (rule 17a). If the change lands a
+       deferred item, changes a Phase Plan status, makes a decision
+       worth logging, or defers something new — did you edit
+       `docs/roadmap.md` in this same set of changes? If not, do
+       that now before the sign-off request.
+    b) Summarise the diff in chat — what changed, which files, why.
+    c) Propose the commit subject + body.
+    d) Wait for the user to say "commit" (or override the proposal).
        Only then run `git add` + `git commit`.
 
     Same applies to `git push`: never push without explicit sign-off,
