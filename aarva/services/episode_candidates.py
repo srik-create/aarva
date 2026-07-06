@@ -135,6 +135,7 @@ def _load_crosscut_vectors(
 
 def _existing_matches(
     db: Database,
+    listener_db: Database,
     prompt_vec: np.ndarray,
     model_name: str,
     *,
@@ -142,35 +143,45 @@ def _existing_matches(
     n_max: int,
 ) -> list[Candidate]:
     """Find existing crosscuts whose best vector beats `floor` against
-    the prompt. Returns up to n_max candidates, highest-score first."""
+    the prompt (across BOTH the main DB and the listener DB — see
+    aarva/listener_db.py). Returns up to n_max candidates, highest-
+    score first.
+
+    Edition ids are independent AUTOINCREMENT sequences per DB file
+    (the listener DB's is seeded to start at 1,000,000 specifically to
+    avoid collisions, but nothing stops a match from either source) —
+    every scored entry below carries its source DB alongside the id so
+    hydration always queries the right one, rather than merging into a
+    single {edition_id: ...} dict that could conflate two unrelated
+    episodes that happen to share a number."""
     if n_max <= 0:
         return []
 
-    by_edition = _load_crosscut_vectors(db, model_name)
-    if not by_edition:
-        return []
+    scored: list[tuple[Database, int, float]] = []
+    for source_db in (db, listener_db):
+        by_edition = _load_crosscut_vectors(source_db, model_name)
+        # For each edition, take the max similarity across its sources
+        # (pairing_summary, article_mean). Best-of avoids penalising
+        # episodes whose pairing text was sparse — the article_mean
+        # still carries signal there.
+        for edition_id, sources in by_edition.items():
+            best = max(float(prompt_vec @ v) for v in sources.values())
+            if best >= floor:
+                scored.append((source_db, edition_id, best))
 
-    # For each edition, take the max similarity across its sources
-    # (pairing_summary, article_mean). Best-of avoids penalising
-    # episodes whose pairing text was sparse — the article_mean still
-    # carries signal there.
-    scored: list[tuple[int, float]] = []
-    for edition_id, sources in by_edition.items():
-        best = max(float(prompt_vec @ v) for v in sources.values())
-        if best >= floor:
-            scored.append((edition_id, best))
-    scored.sort(key=lambda t: t[1], reverse=True)
+    scored.sort(key=lambda t: t[2], reverse=True)
     scored = scored[:n_max]
 
     if not scored:
         return []
 
-    # Hydrate metadata for the matched editions in one query.
-    from aarva.services.queries import load_crosscut_episodes
+    # Hydrate metadata for the matched editions.
+    from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
     candidates: list[Candidate] = []
-    for edition_id, score in scored:
-        rows = load_crosscut_episodes(db, edition_id=edition_id)
+    for source_db, edition_id, score in scored:
+        loader = load_crosscut_episodes if source_db is db else load_listener_episodes
+        rows = loader(source_db, edition_id=edition_id)
         if not rows:
             continue
         cc = rows[0]
@@ -416,6 +427,7 @@ def _propose_new_pairings(
 
 def propose_candidates(
     db: Database,
+    listener_db: Database,
     embedding_client: EmbeddingClient,
     llm_client: LLMClient,
     prompt: str,
@@ -428,7 +440,10 @@ def propose_candidates(
 
     Mix of existing crosscut matches (kind='existing') and Gemini-
     proposed new pairings (kind='new'). Existing matches fill slots
-    first; remaining slots are filled by the LLM proposal pass."""
+    first; remaining slots are filled by the LLM proposal pass.
+
+    listener_db: episodes built on-demand by other listeners are
+    searchable too — see aarva/listener_db.py and _existing_matches."""
     prompt = (prompt or "").strip()
     if not prompt:
         return []
@@ -446,7 +461,7 @@ def propose_candidates(
 
     # 1) existing matches
     existing = _existing_matches(
-        db, prompt_vec, embedding_client.name,
+        db, listener_db, prompt_vec, embedding_client.name,
         floor=existing_floor, n_max=n,
     )
     logger.info("episode_candidates: %d existing match(es) above floor", len(existing))
@@ -457,10 +472,12 @@ def propose_candidates(
 
     # 2) new pairings — exclude articles already in the existing matches
     exclude_ids: set[int] = set()
-    from aarva.services.queries import load_crosscut_episodes
+    from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
     for cand in existing:
         assert cand.edition_id is not None
         rows = load_crosscut_episodes(db, edition_id=cand.edition_id)
+        if not rows:
+            rows = load_listener_episodes(listener_db, edition_id=cand.edition_id)
         if rows:
             r = rows[0]
             if r.get("article_a_id"):

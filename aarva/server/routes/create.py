@@ -85,6 +85,7 @@ async def api_candidates(request: Request) -> HTMLResponse:
         return HTMLResponse("", status_code=400)
 
     db = request.app.state.db
+    listener_db = request.app.state.listener_db
     embedding_client = request.app.state.embedding_client
     llm_client = request.app.state.llm_client
 
@@ -99,6 +100,7 @@ async def api_candidates(request: Request) -> HTMLResponse:
         candidates = await run_in_threadpool(
             propose_candidates,
             db=db,
+            listener_db=listener_db,
             embedding_client=embedding_client,
             llm_client=llm_client,
             prompt=q,
