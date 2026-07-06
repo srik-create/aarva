@@ -104,27 +104,46 @@ def embed_crosscut_episode(
     db: Database,
     client: EmbeddingClient,
     edition_id: int,
+    *,
+    crosscut: Optional[dict] = None,
+    articles_db: Optional[Database] = None,
 ) -> EmbedStats:
     """Compute and persist both embedding variants for one crosscut.
+
+    `crosscut_embeddings` is written to `db` — for the on-demand
+    /create flow this is the listener DB, which has no `articles`
+    table to join against for the default lookup below. Two ways
+    around that:
+
+      - crosscut: pass the already-known text fields (topic_label,
+        intro_text, bridge_between, outro_text, article_a_id,
+        article_b_id) to skip the internal load entirely. The /create
+        worker already has all of these in memory right after
+        generating them — no need to read them back.
+      - articles_db: the source articles' own embeddings always live
+        in the main DB regardless of which DB `db` is — defaults to
+        `db` (the pre-split, same-DB behaviour) when omitted.
 
     Returns per-call stats. Errors are logged + counted, not raised —
     callers iterating many episodes shouldn't abort on a single
     bad row."""
-    # Imported here (not at module top) to avoid a circular import:
-    # queries.py -> db.py -> indirectly this module via stage_crosscut.
-    from aarva.services.queries import load_crosscut_episodes
-
     stats = EmbedStats()
+    articles_db = articles_db if articles_db is not None else db
 
-    rows = load_crosscut_episodes(db, edition_id=edition_id)
-    if not rows:
-        logger.warning(
-            "embed_crosscut_episode: no crosscut found for edition_id=%d",
-            edition_id,
-        )
-        stats.errors += 1
-        return stats
-    crosscut = rows[0]
+    if crosscut is None:
+        # Imported here (not at module top) to avoid a circular import:
+        # queries.py -> db.py -> indirectly this module via stage_crosscut.
+        from aarva.services.queries import load_crosscut_episodes
+
+        rows = load_crosscut_episodes(db, edition_id=edition_id)
+        if not rows:
+            logger.warning(
+                "embed_crosscut_episode: no crosscut found for edition_id=%d",
+                edition_id,
+            )
+            stats.errors += 1
+            return stats
+        crosscut = rows[0]
 
     # ── Pairing-summary embedding ───────────────────────────────────
     pairing_text = _build_pairing_summary(crosscut)
@@ -152,8 +171,8 @@ def embed_crosscut_episode(
         stats.skipped_no_text += 1
 
     # ── Article-mean embedding ──────────────────────────────────────
-    vec_a = _load_article_embedding(db, crosscut["article_a_id"], client.name)
-    vec_b = _load_article_embedding(db, crosscut["article_b_id"], client.name)
+    vec_a = _load_article_embedding(articles_db, crosscut["article_a_id"], client.name)
+    vec_b = _load_article_embedding(articles_db, crosscut["article_b_id"], client.name)
     if vec_a is not None and vec_b is not None:
         mean = (vec_a + vec_b) / 2.0
         # Re-normalise so cosine similarity stays a dot product.

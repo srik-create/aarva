@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse
 
 from aarva.server.app import app
 from aarva.server.templates import templates
-from aarva.services.queries import load_crosscut_episodes
+from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
 
 @app.get("/crosscuts", response_class=HTMLResponse)
@@ -32,9 +32,20 @@ async def crosscuts_list(request: Request) -> HTMLResponse:
 @app.get("/crosscut/{edition_id}", response_class=HTMLResponse)
 async def crosscut_detail(request: Request, edition_id: int) -> HTMLResponse:
     """One crosscut episode page. 404 if the edition isn't a published
-    crosscut with audio."""
+    crosscut with audio.
+
+    Tries the main DB first (the editorial catalog + any pre-split
+    listener episodes), then the listener DB (everything built since
+    the 2026-07-06 split — see aarva/listener_db.py). Edition ids are
+    independent per-DB sequences, so this is a real ambiguity in
+    principle, but in practice ids collide only when both DBs happen
+    to have a row at that id — main-DB editorial content is checked
+    first and always wins that case."""
     db = request.app.state.db
+    listener_db = request.app.state.listener_db
     rows = load_crosscut_episodes(db, edition_id=edition_id)
+    if not rows:
+        rows = load_listener_episodes(listener_db, edition_id=edition_id)
     if not rows:
         raise HTTPException(status_code=404, detail="Crosscut not found")
     return templates.TemplateResponse(

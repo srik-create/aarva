@@ -22,6 +22,7 @@ from fastapi.staticfiles import StaticFiles
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
+from aarva.listener_db import ListenerDatabase
 from aarva.server.config import load_server_config
 
 logger = logging.getLogger(__name__)
@@ -50,19 +51,27 @@ async def lifespan(app: FastAPI):
     db_path = Path(server_cfg.db_path).expanduser().resolve()
     db = Database(str(db_path))
 
+    # Separate file for listener-built episodes — never touched by
+    # scripts/sync_db_to_render.sh's atomic-replace of db_path above.
+    # See aarva/listener_db.py for why.
+    listener_db_path = Path(server_cfg.listener_db_path).expanduser().resolve()
+    listener_db = ListenerDatabase(str(listener_db_path))
+
     logging.basicConfig(
         level=getattr(logging, server_cfg.log_level, logging.INFO),
         format="%(asctime)s  %(levelname)s  %(name)s  %(message)s",
         datefmt="%H:%M:%S",
     )
     logger.info(
-        "Aarva server starting — host=%s port=%d db=%s public=%s",
-        server_cfg.host, server_cfg.port, db_path, server_cfg.public_url,
+        "Aarva server starting — host=%s port=%d db=%s listener_db=%s public=%s",
+        server_cfg.host, server_cfg.port, db_path, listener_db_path,
+        server_cfg.public_url,
     )
 
     app.state.server_cfg = server_cfg
     app.state.pipeline_cfg = pipeline_cfg
     app.state.db = db
+    app.state.listener_db = listener_db
 
     # Embedding + LLM clients are built once at startup and reused by
     # the route handlers (in particular the episode-candidate flow,
@@ -82,7 +91,7 @@ async def lifespan(app: FastAPI):
     # concurrent build, FIFO. Stuck-job recovery runs at startup
     # inside start_worker(). See aarva/services/episode_worker.py.
     from aarva.services.episode_worker import start_worker
-    app.state.episode_worker = start_worker(db, pipeline_cfg)
+    app.state.episode_worker = start_worker(db, listener_db, pipeline_cfg)
 
     yield
 

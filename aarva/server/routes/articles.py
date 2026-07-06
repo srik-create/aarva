@@ -47,6 +47,33 @@ async def article_detail(request: Request, article_id: int) -> HTMLResponse:
         """, (article_id,)).fetchone()
 
     if not row:
+        # Not in the main DB's edition_pieces — this happens for
+        # articles that have only ever been used in a listener-built
+        # episode (common: on-demand builds often pull articles that
+        # never made the daily cut). Those editions/edition_pieces
+        # live in the listener DB instead (see aarva/listener_db.py),
+        # which denormalizes title/publication/byline since it has no
+        # `articles` table to join. hook/contextualisation/
+        # canonical_url/word_count/published_date/jtbd-* aren't
+        # available there — article.html already renders fine without
+        # them (all guarded with {% if %}).
+        listener_db = request.app.state.listener_db
+        with listener_db.connect() as conn:
+            row = conn.execute("""
+                SELECT ep.article_id AS id, ep.article_title AS title,
+                       ep.article_byline AS byline,
+                       ep.article_publication AS publication_name,
+                       ep.show_notes, ep.audio_url, ep.duration_seconds,
+                       ep.narrator_voice, e.edition_date, e.edition_type
+                  FROM edition_pieces ep
+                  JOIN editions e ON e.id = ep.edition_id
+                 WHERE ep.article_id = ?
+                   AND ep.audio_url IS NOT NULL AND ep.audio_url != ''
+                 ORDER BY e.edition_date DESC, e.id DESC
+                 LIMIT 1
+            """, (article_id,)).fetchone()
+
+    if not row:
         raise HTTPException(status_code=404, detail="Article not found")
 
     piece = dict(row)

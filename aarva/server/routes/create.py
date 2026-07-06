@@ -53,7 +53,7 @@ from aarva.services.episode_candidates import propose_candidates
 from aarva.services.episode_jobs import (
     BuildQuotaExceeded, enqueue_build_job, get_job,
 )
-from aarva.services.queries import load_crosscut_episodes
+from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
 logger = logging.getLogger(__name__)
 
@@ -202,13 +202,25 @@ async def build_status(request: Request, job_id: int) -> HTMLResponse:
 @app.get("/listener-created", response_class=HTMLResponse)
 async def listener_created(request: Request) -> HTMLResponse:
     """List of all listener-generated crosscut episodes, newest first.
-    Filters editions to user_id IS NOT NULL via
-    `load_crosscut_episodes(user_generated_only=True)`."""
+
+    Merges two sources: episodes built before the 2026-07-06
+    listener-DB split (still sitting in the main DB, user_id IS NOT
+    NULL) and everything built since (in the listener DB — see
+    aarva/listener_db.py). New builds only ever land in the listener
+    DB going forward; the main-DB query exists so pre-split episodes
+    that survived don't just disappear from this page."""
     db = request.app.state.db
-    crosscuts = load_crosscut_episodes(
+    listener_db = request.app.state.listener_db
+    legacy = load_crosscut_episodes(
         db,
         include_user_id_null=False,
         user_generated_only=True,
+    )
+    current = load_listener_episodes(listener_db)
+    crosscuts = sorted(
+        legacy + current,
+        key=lambda c: (c["edition_date"], c["edition_id"]),
+        reverse=True,
     )
     return templates.TemplateResponse(
         request, "listener_created.html",
