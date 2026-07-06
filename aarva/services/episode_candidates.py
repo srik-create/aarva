@@ -6,8 +6,15 @@ episode on anything"). Submitting a prompt calls
 
   1. Existing crosscut episodes whose stored embedding (either
      `pairing_summary` or `article_mean` in `crosscut_embeddings`)
-     scores above a similarity threshold against the prompt. Shown to
-     the listener as "Listen now" — no build required.
+     scores above a similarity threshold against the prompt. Searched
+     across both the main DB and the listener DB (aarva/listener_db.py)
+     so one listener's on-demand build is discoverable by another's
+     matching prompt. The prompt is also classified (see
+     prompt_classifier.py) so a behind-the-news / future-gazing
+     prompt only matches episodes built in the last
+     `search.max_age_days_news` days — an old episode about a stale
+     story is a bad match even on topic. Shown to the listener as
+     "Listen now" — no build required.
 
   2. New pairings proposed by Gemini from the top ~30 articles
      closest to the prompt in the vector space. Excludes articles
@@ -29,6 +36,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from typing import Optional
 
 import numpy as np
@@ -36,6 +44,7 @@ import numpy as np
 from aarva.clients.embedding import EmbeddingClient
 from aarva.clients.llm import LLMClient
 from aarva.db import Database
+from aarva.services.prompt_classifier import classify_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -109,23 +118,35 @@ class Candidate:
 # ─── Existing-match lookup ───────────────────────────────────────────────
 
 def _load_crosscut_vectors(
-    db: Database, model_name: str,
+    db: Database, model_name: str, *, min_edition_date: Optional[str] = None,
 ) -> dict[int, dict[str, np.ndarray]]:
     """Return {edition_id: {source: vector}} for every crosscut embedded
     with the current model. Both 'pairing_summary' and 'article_mean'
     are loaded so the caller can score against whichever sits higher.
 
     Old-model rows are intentionally filtered out — they live in a
-    different vector space and would produce garbage similarities."""
+    different vector space and would produce garbage similarities.
+
+    min_edition_date: news-y prompts (see prompt_classifier.py) only
+    want recent episodes — filtering here (before scoring/truncation)
+    rather than post-hoc on the top-n_max results, so a recent match
+    ranked below n_max old ones still surfaces."""
+    where = ["ce.embedding_model = ?"]
+    params: list = [model_name]
+    if min_edition_date is not None:
+        where.append("e.edition_date >= ?")
+        params.append(min_edition_date)
+
     out: dict[int, dict[str, np.ndarray]] = {}
     with db.connect() as conn:
         rows = conn.execute(
-            """
-            SELECT edition_id, source, embedding
-              FROM crosscut_embeddings
-             WHERE embedding_model = ?
+            f"""
+            SELECT ce.edition_id, ce.source, ce.embedding
+              FROM crosscut_embeddings ce
+              JOIN editions e ON e.id = ce.edition_id
+             WHERE {' AND '.join(where)}
             """,
-            (model_name,),
+            params,
         ).fetchall()
     for r in rows:
         vec = np.frombuffer(r["embedding"], dtype=np.float32)
@@ -141,6 +162,7 @@ def _existing_matches(
     *,
     floor: float,
     n_max: int,
+    min_edition_date: Optional[str] = None,
 ) -> list[Candidate]:
     """Find existing crosscuts whose best vector beats `floor` against
     the prompt (across BOTH the main DB and the listener DB — see
@@ -159,7 +181,9 @@ def _existing_matches(
 
     scored: list[tuple[Database, int, float]] = []
     for source_db in (db, listener_db):
-        by_edition = _load_crosscut_vectors(source_db, model_name)
+        by_edition = _load_crosscut_vectors(
+            source_db, model_name, min_edition_date=min_edition_date,
+        )
         # For each edition, take the max similarity across its sources
         # (pairing_summary, article_mean). Best-of avoids penalising
         # episodes whose pairing text was sparse — the article_mean
@@ -435,6 +459,7 @@ def propose_candidates(
     n: int = 3,
     existing_floor: float = DEFAULT_EXISTING_MATCH_FLOOR,
     pool_size: int = DEFAULT_ARTICLE_POOL_SIZE,
+    max_age_days_news: int = 6,
 ) -> list[Candidate]:
     """Return up to `n` episode candidates for a listener prompt.
 
@@ -443,7 +468,13 @@ def propose_candidates(
     first; remaining slots are filled by the LLM proposal pass.
 
     listener_db: episodes built on-demand by other listeners are
-    searchable too — see aarva/listener_db.py and _existing_matches."""
+    searchable too — see aarva/listener_db.py and _existing_matches.
+
+    max_age_days_news: a prompt classified as behind_the_news or
+    future_gazing (see prompt_classifier.py) only matches existing
+    episodes built within this many days — an old episode about a
+    stale news story is a bad match even if the topic is similar.
+    Evergreen prompts get no date filter."""
     prompt = (prompt or "").strip()
     if not prompt:
         return []
@@ -459,10 +490,21 @@ def propose_candidates(
         [prompt], task_type="RETRIEVAL_QUERY",
     )[0]
 
+    category = classify_prompt(prompt, llm_client)
+    min_edition_date: Optional[str] = None
+    if category in ("behind_the_news", "future_gazing"):
+        min_edition_date = (
+            date.today() - timedelta(days=max_age_days_news)
+        ).isoformat()
+    logger.info(
+        "episode_candidates: prompt classified as %r (min_edition_date=%s)",
+        category, min_edition_date,
+    )
+
     # 1) existing matches
     existing = _existing_matches(
         db, listener_db, prompt_vec, embedding_client.name,
-        floor=existing_floor, n_max=n,
+        floor=existing_floor, n_max=n, min_edition_date=min_edition_date,
     )
     logger.info("episode_candidates: %d existing match(es) above floor", len(existing))
 

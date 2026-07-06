@@ -88,6 +88,11 @@ async def api_candidates(request: Request) -> HTMLResponse:
     listener_db = request.app.state.listener_db
     embedding_client = request.app.state.embedding_client
     llm_client = request.app.state.llm_client
+    max_age_days_news = int(
+        request.app.state.pipeline_cfg.raw.get("search", {}).get(
+            "max_age_days_news", 6,
+        )
+    )
 
     try:
         # propose_candidates does an embedding round-trip + a Gemini
@@ -105,6 +110,7 @@ async def api_candidates(request: Request) -> HTMLResponse:
             llm_client=llm_client,
             prompt=q,
             n=3,
+            max_age_days_news=max_age_days_news,
         )
     except Exception as e:
         logger.exception("api_candidates: propose_candidates crashed: %s", e)
