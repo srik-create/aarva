@@ -14,25 +14,20 @@ what's in flight, what was deferred and why.
 Web app Phase 2 (episode creation) is live on aarva.app. Phase 3 in
 progress: TTS + worker resilience shipped, ffmpeg + auth + embedding
 migrations done, Independence-Day bonus flow used end-to-end,
-iPhone player nav fixed via htmx partial navigation. Two known
-deferred threads remain: listener-DB split (data isolation), Stage
-10 loud failure (reliability). Daily pipeline runs on operator's
-laptop; audio on R2 (audio.aarva.app); RSS+HTML on GitHub Pages.
+iPhone player nav fixed via htmx partial navigation, listener-DB
+split landed (PR pending review). One known deferred thread remains:
+Stage 10 loud failure (reliability). Daily pipeline runs on
+operator's laptop; audio on R2 (audio.aarva.app); RSS+HTML on
+GitHub Pages.
 
 ---
 
 ## In progress
 
-Nothing actively in flight this instant. Two items queued for the
-next session (see `docs/session_plan_listener_db_split.md` for the
-full brief on both):
+Nothing actively in flight this instant. One item queued for the
+next session:
 
-1. **Listener-created DB split** — build worker on Render writes
-   listener episodes to a separate SQLite file that the daily-DB
-   sync doesn't overwrite. Includes prompt-classifier + 6-day gate
-   for news-y prompts. Design decisions locked; implementation
-   pending. 3-commit PR.
-2. **Stage 10 loud failure** — `aarva/daily.py` L365 catches R2
+1. **Stage 10 loud failure** — `aarva/daily.py` L365 catches R2
    upload failures and only logs a warning, so RSS can ship
    pointing at unreachable MP3s (happened 2026-07-03). Decide
    whether to exit non-zero + skip RSS write.
@@ -73,8 +68,8 @@ full brief on both):
 | Phase | Scope | Status |
 |---|---|---|
 | **1. Foundation** | FastAPI skeleton, daily / edition / article browsing, design system, browse-by-category + publication, marketing landing, deploy infrastructure | Shipped. Live on aarva.app. |
-| **2. Episode creation on demand** | Header prompt input on every page; candidate page proposing up to 3 episodes (existing matches + Gemini-proposed pairings); pick → email-collection → in-process worker → status page → email-when-ready. Built episodes re-enter the catalog at `/listener-created`. | Shipped 2026-06-29 (PR #38). Hardening ongoing — worker resilience shipped 2026-07-02; listener-DB split queued. |
-| **3. Polish + extras** | Mobile fine-tuning, logo, copywriting pass, Resend wiring, worker resilience, listener-DB isolation, iPhone player nav | In progress. Resend wired (PR #40). Worker resilience shipped (PR #49). iPhone player nav shipped 2026-07-06 (htmx partial nav). Listener-DB split queued. Logo + copy remain open-ended. |
+| **2. Episode creation on demand** | Header prompt input on every page; candidate page proposing up to 3 episodes (existing matches + Gemini-proposed pairings); pick → email-collection → in-process worker → status page → email-when-ready. Built episodes re-enter the catalog at `/listener-created`. | Shipped 2026-06-29 (PR #38). Hardening ongoing — worker resilience shipped 2026-07-02; listener-DB split shipped 2026-07-06. |
+| **3. Polish + extras** | Mobile fine-tuning, logo, copywriting pass, Resend wiring, worker resilience, listener-DB isolation, iPhone player nav | In progress. Resend wired (PR #40). Worker resilience shipped (PR #49). iPhone player nav + listener-DB split both shipped 2026-07-06. Logo + copy remain open-ended. |
 
 Phase 2's initial ship exposed several hardening gaps that Phase 3
 is picking up in flight — see the "Recently completed" section for
@@ -109,6 +104,34 @@ Most recent first.
   Playwright pass: audio kept playing across a nav click, mini-bar
   persisted, a play button on the freshly-navigated-to page worked,
   mobile drawer auto-closes on nav-link tap.
+- **Listener-created episodes split into a separate DB** (branch
+  `listener-db-split`, PR pending). Root cause: `sync_db_to_render.sh`
+  atomic-replaces the whole main DB from the laptop's daily snapshot,
+  silently wiping listener-built episodes created on Render between
+  syncs (2026-07-03: 3 of 4 lost). New `ListenerDatabase`
+  (`aarva/listener_db.py`) holds just `editions` / `edition_pieces` /
+  `crosscut_embeddings`, with article title/publication/byline
+  denormalized onto `edition_pieces` since it has no `articles` table
+  — lives at a separate path the sync script never touches. Three
+  commits: (1) worker routes on-demand builds there end to end
+  (script-gen → TTS → MP3 conversion → R2 upload), `/listener-created`
+  + `/crosscut/<id>` read both DBs, `/article/<id>` falls back to the
+  listener DB too (discovered mid-build: articles only ever used in a
+  listener episode would otherwise 404 there) — also seeds the
+  listener DB's edition-id counter at 1,000,000 so it can't collide
+  with the main DB's; (2) `/create`'s existing-match search now scores
+  against both DBs, tagging each match with its source throughout
+  (verified against a deliberate id collision in a synthetic test —
+  never merges into a single `{edition_id: ...}` dict, which would
+  silently conflate two unrelated episodes); (3) new
+  `prompt_classifier.py` classifies the prompt (behind_the_news /
+  future_gazing / evergreen) via the existing Gemini `LLMClient`, and
+  a 6-day age gate (`search.max_age_days_news` in pipeline.yaml,
+  mirroring Stage 7's `lens_card_behind`/`lens_card_future`
+  `max_age_days=6` — verified in `stage_7_assemble.py` rather than
+  taken on faith) applies only to news-shaped prompts. Verification
+  (real /create build + sync-script check) still to run before PR
+  sign-off.
 
 ### 2026-07-04
 
@@ -233,8 +256,8 @@ decision log.
 | Embeddings: `gemini-embedding-001` at 768-dim Matryoshka | Same shape as prior BGE storage; keeps DB blob layout intact. | Re-embed script exists for any future model change. |
 | SQLite as primary DB | Single-file, no ops. | Migrate to Postgres ~2 days of work if scale demands. |
 | Daily pipeline runs on operator's laptop | Explicit control; the pipeline isn't time-sensitive enough for automation to justify. | `scripts/app.aarva.daily.plist` exists as a starting point if scheduled runs are ever wanted. |
-| Listener episodes: split-DB (queued 2026-07-04) | Sync overwrites Render DB, wiping listener episodes built between syncs. Split file on Render's persistent disk that sync never touches. Denormalize article title/pub/byline onto edition_pieces at build time so no cross-DB joins. | Split file is on disk; can be merged back into main DB if we ever want. |
-| Prompt classification via Gemini for search age gate (queued 2026-07-04) | News-y prompts shouldn't match old listener episodes; evergreen prompts should. One small Gemini call at /create time. | Config gate + one file (`prompt_classifier.py`) to remove. |
+| Listener episodes: split-DB (shipped 2026-07-06) | Sync overwrites Render DB, wiping listener episodes built between syncs. Split file on Render's persistent disk that sync never touches. Denormalize article title/pub/byline onto edition_pieces at build time so no cross-DB joins. Listener DB's edition-id AUTOINCREMENT seeded to 1,000,000 to avoid colliding with the main DB's ids (both start at 1 independently). | Split file is on disk; can be merged back into main DB if we ever want. |
+| Prompt classification via Gemini for search age gate (shipped 2026-07-06) | News-y prompts shouldn't match old listener episodes; evergreen prompts should. One small Gemini call at /create time, reusing the existing LLMClient interface. Falls back to 'evergreen' (no filter) on any classifier failure — degrades to "search everything" rather than hiding valid matches. | Config gate + one file (`prompt_classifier.py`) to remove. |
 | htmx (2.0.10, pinned CDN) for partial navigation, over a hand-rolled fetch+DOM-swap (2026-07-06) | User picked the library option: battle-tested history/back-button/script-re-execution handling vs. custom code for the same edge cases. One `<script>` tag, same CDN pattern already used for Tailwind. | Swap-out is a base.html-only change; no server-side coupling beyond serving full pages as already done. |
 
 ---

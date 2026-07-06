@@ -900,12 +900,27 @@ def _persist_episode(
     outro: str,
     passage_a: str,
     passage_b: str,
+    *,
+    target_db: Optional[Database] = None,
 ) -> int:
     """Create the editions row + 2 edition_pieces rows for the crosscut
     episode. Returns the new edition_id. Both pieces start at
     review_status='proposed' so the user's Phase 6 review can catch
-    anything that misses the mark."""
-    with db.connect() as conn:
+    anything that misses the mark.
+
+    target_db: when set (the on-demand /create flow), the editions +
+    edition_pieces rows are written here instead of `db` — see
+    aarva/listener_db.py. That file has no `articles` table, so
+    edition_pieces also gets the article title/publication/byline
+    denormalized from `cand` (already joined from the main DB by
+    `_selected_candidate`) instead of relying on a join. `articles`
+    status updates always go against `db` (the main DB) regardless,
+    since `articles` never moves — and the candidate-link update is
+    skipped for target_db writes, since crosscut_pair_candidates.edition_id
+    would otherwise point at an id in the wrong database's `editions`
+    table (nothing reads that link for the on-demand flow anyway)."""
+    write_db = target_db if target_db is not None else db
+    with write_db.connect() as conn:
         # Editions row.
         cur = conn.execute("""
             INSERT INTO editions
@@ -916,39 +931,60 @@ def _persist_episode(
 
         # Article A — first piece. bridge_text is the article-intro
         # ("here's how she puts it") that precedes the read-aloud
-        # passage in the audio. We store the passage in `excerpt` of
-        # edition_pieces? Actually edition_pieces has no excerpt column.
-        # The passages will live in the existing show_notes column,
-        # which we're repurposing for crosscut to hold the read-aloud
-        # passage. Stage 9 reads show_notes for crosscut pieces and
-        # treats it as the article body to narrate.
-        conn.execute("""
-            INSERT INTO edition_pieces
-                (edition_id, article_id, slot, position,
-                 bridge_text, show_notes, review_status)
-            VALUES (?, ?, 'crosscut_piece_a', 0, ?, ?, 'proposed')
-        """, (edition_id, int(cand["article_a_id"]), bridge_a, passage_a))
+        # passage in the audio. The passage lives in the existing
+        # show_notes column, repurposed for crosscut to hold the
+        # read-aloud passage. Stage 9 reads show_notes for crosscut
+        # pieces and treats it as the article body to narrate.
+        if target_db is not None:
+            conn.execute("""
+                INSERT INTO edition_pieces
+                    (edition_id, article_id, slot, position,
+                     bridge_text, show_notes, review_status,
+                     article_title, article_publication, article_byline)
+                VALUES (?, ?, 'crosscut_piece_a', 0, ?, ?, 'proposed', ?, ?, ?)
+            """, (edition_id, int(cand["article_a_id"]), bridge_a, passage_a,
+                  cand.get("title_a"), cand.get("pub_a"), cand.get("byline_a")))
+            conn.execute("""
+                INSERT INTO edition_pieces
+                    (edition_id, article_id, slot, position,
+                     bridge_text, show_notes, review_status,
+                     article_title, article_publication, article_byline)
+                VALUES (?, ?, 'crosscut_piece_b', 1, ?, ?, 'proposed', ?, ?, ?)
+            """, (edition_id, int(cand["article_b_id"]), bridge_between, passage_b,
+                  cand.get("title_b"), cand.get("pub_b"), cand.get("byline_b")))
+        else:
+            conn.execute("""
+                INSERT INTO edition_pieces
+                    (edition_id, article_id, slot, position,
+                     bridge_text, show_notes, review_status)
+                VALUES (?, ?, 'crosscut_piece_a', 0, ?, ?, 'proposed')
+            """, (edition_id, int(cand["article_a_id"]), bridge_a, passage_a))
+            conn.execute("""
+                INSERT INTO edition_pieces
+                    (edition_id, article_id, slot, position,
+                     bridge_text, show_notes, review_status)
+                VALUES (?, ?, 'crosscut_piece_b', 1, ?, ?, 'proposed')
+            """, (edition_id, int(cand["article_b_id"]), bridge_between, passage_b))
+
+    # articles.status always lives in the main DB, regardless of which
+    # DB the edition itself landed in.
+    with db.connect() as conn:
         conn.execute(
             "UPDATE articles SET status = 'in_edition' WHERE id = ?",
             (int(cand["article_a_id"]),),
         )
-
-        conn.execute("""
-            INSERT INTO edition_pieces
-                (edition_id, article_id, slot, position,
-                 bridge_text, show_notes, review_status)
-            VALUES (?, ?, 'crosscut_piece_b', 1, ?, ?, 'proposed')
-        """, (edition_id, int(cand["article_b_id"]), bridge_between, passage_b))
         conn.execute(
             "UPDATE articles SET status = 'in_edition' WHERE id = ?",
             (int(cand["article_b_id"]),),
         )
-
-        # Link the candidate to the built edition.
-        conn.execute(
-            "UPDATE crosscut_pair_candidates SET edition_id = ? WHERE id = ?",
-            (edition_id, int(cand["id"])),
-        )
+        if target_db is None:
+            # Link the candidate to the built edition. Only meaningful
+            # when the edition landed in the same DB as the candidate
+            # row (the daily pipeline flow) — see target_db docstring.
+            conn.execute(
+                "UPDATE crosscut_pair_candidates SET edition_id = ? WHERE id = ?",
+                (edition_id, int(cand["id"])),
+            )
 
     return edition_id
 
@@ -958,11 +994,15 @@ def build_episode_script(
     db: Database,
     *,
     llm: Optional[LLMClient] = None,
+    target_db: Optional[Database] = None,
 ) -> CrosscutBuildStats:
     """Generate intro / bridge / outro / key passages for today's
     user-selected crosscut pair and persist the episode.
 
     llm: pass an existing client to avoid rebuilding (DI).
+    target_db: passed straight through to `_persist_episode` — set by
+    the on-demand /create worker to route the built episode into the
+    listener DB instead of the main DB.
     """
     stats = CrosscutBuildStats()
     today = date.today()
@@ -1086,6 +1126,7 @@ def build_episode_script(
         db, today, cand,
         intro=intro, bridge_a=bridge_a, bridge_between=bridge_between,
         outro=outro, passage_a=passage_a, passage_b=passage_b,
+        target_db=target_db,
     )
     logger.info(
         "Crosscut build: edition #%d created. Next step: review the "
@@ -1107,7 +1148,26 @@ def build_episode_script(
         from aarva.clients.embedding import build_embedding_client
         from aarva.services.crosscut_embeddings import embed_crosscut_episode
         emb_client = build_embedding_client(config.raw.get("embedding", {}))
-        emb_stats = embed_crosscut_episode(db, emb_client, stats.edition_id)
+        # target_db writes: the crosscut row we just built lives in
+        # target_db (no articles table there), but the source articles'
+        # own embeddings only exist in `db` (the main DB) — pass both
+        # so embed_crosscut_episode reads/writes the right one of each.
+        # Skip the extra DB round-trip: we already have every field
+        # embed_crosscut_episode needs to build the pairing-summary
+        # text sitting in local variables from the generation above.
+        emb_stats = embed_crosscut_episode(
+            target_db if target_db is not None else db,
+            emb_client, stats.edition_id,
+            crosscut={
+                "topic_label": cand.get("topic_label"),
+                "intro_text": intro,
+                "bridge_between": bridge_between,
+                "outro_text": outro,
+                "article_a_id": int(cand["article_a_id"]),
+                "article_b_id": int(cand["article_b_id"]),
+            } if target_db is not None else None,
+            articles_db=db,
+        )
         logger.info(
             "Crosscut build: embedded edition #%d into %s space "
             "(pairing_summary=%d, article_mean=%d, errors=%d)",
@@ -1330,7 +1390,12 @@ class CrosscutTTSStats:
 def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[dict]:
     """Pull the edition row + both pieces with their bridge and passage
     texts. Returns a dict suitable for the TTS assembly, or None if
-    the edition isn't a built crosscut."""
+    the edition isn't a built crosscut.
+
+    Deliberately doesn't join articles/publications (title/byline/
+    publication_name aren't used by the TTS assembly below) — this
+    keeps the function working unmodified against the listener DB,
+    which has no `articles` table (see aarva/listener_db.py)."""
     with db.connect() as conn:
         e = conn.execute("""
             SELECT id, edition_date, edition_type, topic_label,
@@ -1343,12 +1408,8 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
             return None
         pieces = conn.execute("""
             SELECT ep.article_id, ep.position, ep.slot,
-                   ep.bridge_text, ep.show_notes AS passage,
-                   a.title, a.byline,
-                   p.name AS publication_name
+                   ep.bridge_text, ep.show_notes AS passage
               FROM edition_pieces ep
-              JOIN articles a ON a.id = ep.article_id
-              JOIN publications p ON p.id = a.publication_id
              WHERE ep.edition_id = ?
              ORDER BY ep.position
         """, (edition_id,)).fetchall()

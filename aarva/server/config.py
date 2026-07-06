@@ -15,6 +15,15 @@ Env vars consumed:
   AARVA_DB_PATH              — SQLite DB path (default aarva/data/aarva.db).
                                On Render with persistent disk attached,
                                this would be /data/aarva.db.
+  AARVA_LISTENER_DB_PATH     — SQLite DB path for listener-built
+                               episodes (default
+                               aarva/data/aarva-listener.db). Kept
+                               separate from AARVA_DB_PATH so
+                               scripts/sync_db_to_render.sh's atomic-
+                               replace of the main DB never wipes
+                               episodes built on Render between syncs.
+                               On Render this would be
+                               /data/aarva-listener.db.
   AARVA_LOG_LEVEL            — INFO (default) | DEBUG | WARNING
   AARVA_SERVER_PUBLIC_URL    — public-facing URL base, used for
                                canonical links + RSS feed_link
@@ -32,6 +41,7 @@ class ServerConfig:
     host: str
     port: int
     db_path: str
+    listener_db_path: str
     log_level: str
     public_url: str
 
@@ -49,6 +59,9 @@ def load_server_config() -> ServerConfig:
     host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "8000"))
     db_path = os.environ.get("AARVA_DB_PATH", "aarva/data/aarva.db")
+    listener_db_path = os.environ.get(
+        "AARVA_LISTENER_DB_PATH", "aarva/data/aarva-listener.db",
+    )
     log_level = os.environ.get("AARVA_LOG_LEVEL", "INFO").upper()
     public_url = os.environ.get(
         "AARVA_SERVER_PUBLIC_URL",
@@ -58,6 +71,7 @@ def load_server_config() -> ServerConfig:
         host=host,
         port=port,
         db_path=db_path,
+        listener_db_path=listener_db_path,
         log_level=log_level,
         public_url=public_url.rstrip("/"),
     )

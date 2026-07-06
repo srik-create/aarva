@@ -187,6 +187,16 @@ consolidation:
 #   openai:    OpenAI embeddings API. Available but not the default —
 #              standing preference is to keep all non-coding LLM /
 #              embedding traffic on Gemini.
+# ─── Web app: /create episode search ────────────────────────────────────
+search:
+  # A prompt classified as behind_the_news or future_gazing (see
+  # aarva/services/prompt_classifier.py) only matches existing
+  # episodes built within this many days — mirrors Stage 7's
+  # lens_card_behind / lens_card_future max_age_days. Evergreen
+  # prompts get no date filter. Added 2026-07-06 with the listener-DB
+  # split (docs/session_plan_listener_db_split.md).
+  max_age_days_news: 6
+
 embedding:
   provider: gemini
   auth_mode: adc

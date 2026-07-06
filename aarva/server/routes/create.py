@@ -53,7 +53,7 @@ from aarva.services.episode_candidates import propose_candidates
 from aarva.services.episode_jobs import (
     BuildQuotaExceeded, enqueue_build_job, get_job,
 )
-from aarva.services.queries import load_crosscut_episodes
+from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,14 @@ async def api_candidates(request: Request) -> HTMLResponse:
         return HTMLResponse("", status_code=400)
 
     db = request.app.state.db
+    listener_db = request.app.state.listener_db
     embedding_client = request.app.state.embedding_client
     llm_client = request.app.state.llm_client
+    max_age_days_news = int(
+        request.app.state.pipeline_cfg.raw.get("search", {}).get(
+            "max_age_days_news", 6,
+        )
+    )
 
     try:
         # propose_candidates does an embedding round-trip + a Gemini
@@ -99,10 +105,12 @@ async def api_candidates(request: Request) -> HTMLResponse:
         candidates = await run_in_threadpool(
             propose_candidates,
             db=db,
+            listener_db=listener_db,
             embedding_client=embedding_client,
             llm_client=llm_client,
             prompt=q,
             n=3,
+            max_age_days_news=max_age_days_news,
         )
     except Exception as e:
         logger.exception("api_candidates: propose_candidates crashed: %s", e)
@@ -202,13 +210,25 @@ async def build_status(request: Request, job_id: int) -> HTMLResponse:
 @app.get("/listener-created", response_class=HTMLResponse)
 async def listener_created(request: Request) -> HTMLResponse:
     """List of all listener-generated crosscut episodes, newest first.
-    Filters editions to user_id IS NOT NULL via
-    `load_crosscut_episodes(user_generated_only=True)`."""
+
+    Merges two sources: episodes built before the 2026-07-06
+    listener-DB split (still sitting in the main DB, user_id IS NOT
+    NULL) and everything built since (in the listener DB — see
+    aarva/listener_db.py). New builds only ever land in the listener
+    DB going forward; the main-DB query exists so pre-split episodes
+    that survived don't just disappear from this page."""
     db = request.app.state.db
-    crosscuts = load_crosscut_episodes(
+    listener_db = request.app.state.listener_db
+    legacy = load_crosscut_episodes(
         db,
         include_user_id_null=False,
         user_generated_only=True,
+    )
+    current = load_listener_episodes(listener_db)
+    crosscuts = sorted(
+        legacy + current,
+        key=lambda c: (c["edition_date"], c["edition_id"]),
+        reverse=True,
     )
     return templates.TemplateResponse(
         request, "listener_created.html",

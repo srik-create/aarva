@@ -53,6 +53,7 @@ from typing import Optional
 
 from aarva.config import PipelineConfig
 from aarva.db import Database
+from aarva.listener_db import ListenerDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,9 @@ class WorkerHandle:
             self.thread.join(timeout)
 
 
-def start_worker(db: Database, config: PipelineConfig) -> WorkerHandle:
+def start_worker(
+    db: Database, listener_db: ListenerDatabase, config: PipelineConfig,
+) -> WorkerHandle:
     """Spawn the daemon thread and reset any stuck jobs from a previous
     process. Idempotent if called multiple times only in the sense that
     each call spawns another thread — callers should hold one handle."""
@@ -89,7 +92,7 @@ def start_worker(db: Database, config: PipelineConfig) -> WorkerHandle:
     stop_event = threading.Event()
     thread = threading.Thread(
         target=_worker_loop,
-        args=(db, config, stop_event),
+        args=(db, listener_db, config, stop_event),
         daemon=True,
         name="aarva-episode-worker",
     )
@@ -100,6 +103,7 @@ def start_worker(db: Database, config: PipelineConfig) -> WorkerHandle:
 
 def _worker_loop(
     db: Database,
+    listener_db: ListenerDatabase,
     config: PipelineConfig,
     stop_event: threading.Event,
 ) -> None:
@@ -123,7 +127,7 @@ def _worker_loop(
 
         job_id = job["id"]
         try:
-            _run_job(db, config, job)
+            _run_job(db, listener_db, config, job)
         except Exception as e:
             logger.exception("episode_worker: job %d crashed: %s", job_id, e)
             try:
@@ -134,6 +138,7 @@ def _worker_loop(
 
 def _run_job(
     db: Database,
+    listener_db: ListenerDatabase,
     config: PipelineConfig,
     job: dict,
 ) -> None:
@@ -204,8 +209,11 @@ def _run_job(
 
         # 2. Build the episode script (intro / bridges / outro +
         # persist the editions row + embed into crosscut_embeddings).
+        # target_db routes the editions/edition_pieces/crosscut_embeddings
+        # writes to the listener DB instead of the main DB — see
+        # aarva/listener_db.py for why.
         update_progress(db, job_id, "Writing the intro and bridges…")
-        build_stats = build_episode_script(config, db)
+        build_stats = build_episode_script(config, db, target_db=listener_db)
         if build_stats.errors or not build_stats.edition_id:
             raise RuntimeError(
                 f"build_episode_script reported errors: {build_stats!r}"
@@ -213,10 +221,13 @@ def _run_job(
         edition_id = int(build_stats.edition_id)
         logger.info("episode_worker: job %d built edition %d", job_id, edition_id)
 
-        # 3. Stamp the requester's user_id so the episode shows up on
-        # /listener-created (rather than /today / /crosscuts which
-        # filter to user_id IS NULL).
-        with db.connect() as conn:
+        # 3. Stamp the requester's user_id. Every row in the listener DB
+        # belongs to some listener, but the worker only learns which one
+        # after the build — this fills it in. (Unlike the main DB, this
+        # isn't used to distinguish listener from pipeline editions —
+        # the listener DB holds only listener editions — but the column
+        # is still useful for per-user displays later.)
+        with listener_db.connect() as conn:
             conn.execute(
                 "UPDATE editions SET user_id = ? WHERE id = ?",
                 (requester_user_id, edition_id),
@@ -230,8 +241,10 @@ def _run_job(
     # 4. Run TTS — this is the long-pole step (~15 min for a normal
     # crosscut at the configured chunk size). The TTS path produces a
     # WAV per piece and writes audio_url onto the edition_pieces rows.
+    # Reads/writes only editions + edition_pieces (no articles join),
+    # so it works identically against the listener DB.
     update_progress(db, job_id, "Rendering the audio (~15 min)…")
-    tts_stats = synthesize_crosscut_episode(config, db, edition_id=edition_id)
+    tts_stats = synthesize_crosscut_episode(config, listener_db, edition_id=edition_id)
     if tts_stats.errors:
         raise RuntimeError(
             f"synthesize_crosscut_episode reported errors: {tts_stats!r}"
@@ -244,12 +257,12 @@ def _run_job(
     # already-converted MP3s and already-uploaded R2 keys are skipped.
     update_progress(db, job_id, "Converting to MP3 and uploading…")
     from aarva.output import audio_converter, r2_uploader
-    conv_stats = audio_converter.convert_all_for_publish(config, db)
+    conv_stats = audio_converter.convert_all_for_publish(config, listener_db)
     logger.info(
         "episode_worker: job %d conversion stats: %r",
         job_id, conv_stats,
     )
-    upload_stats = r2_uploader.upload_all_pending(config, db)
+    upload_stats = r2_uploader.upload_all_pending(config, listener_db)
     logger.info(
         "episode_worker: job %d R2 upload stats: %r",
         job_id, upload_stats,

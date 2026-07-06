@@ -3,6 +3,13 @@
 Written 2026-07-03 at the end of a Cowork-mode session; work planned
 for the first Claude Code session (2026-07-04+).
 
+**Status: shipped 2026-07-06** on branch `listener-db-split` (3
+commits, as scoped below, plus a small standalone AUTOINCREMENT-
+collision fix discovered during Commit 2, and an `/article/<id>`
+fallback discovered during Commit 1 — see `docs/roadmap.md`'s
+"Recently completed" entry for the full account). Kept here as the
+historical design record.
+
 ## Problem being solved
 
 The `/create` build worker on Render inserts `editions` rows (plus

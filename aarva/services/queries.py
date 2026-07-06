@@ -223,3 +223,53 @@ def load_crosscut_episodes(
     """
     with db.connect() as conn:
         return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def load_listener_episodes(
+    db: Database,
+    *,
+    edition_id: Optional[int] = None,
+) -> list[dict[str, Any]]:
+    """Crosscut episodes from the listener DB (see aarva/listener_db.py),
+    flattened into the same row shape as `load_crosscut_episodes` so
+    templates (`listener_created.html`, `crosscut.html`) don't need to
+    care which DB an episode came from.
+
+    Title/publication/byline come from edition_pieces' denormalized
+    columns instead of a join — the listener DB has no `articles` or
+    `publications` tables. `url_a`/`url_b` (the source article's own
+    URL, used for the optional "Read on <publication>" link) aren't
+    denormalized and are simply absent here; the templates already
+    guard on them being present."""
+    where: list[str] = ["ep_a.audio_url IS NOT NULL AND ep_a.audio_url != ''"]
+    params: list[Any] = []
+    if edition_id is not None:
+        where.append("e.id = ?")
+        params.append(edition_id)
+    where.append("ep_a.flagged_at IS NULL")
+
+    sql = f"""
+        SELECT e.id AS edition_id, e.edition_date, e.published_date,
+               e.topic_label, e.intro_text, e.outro_text, e.user_id,
+               ep_a.audio_url, ep_a.duration_seconds,
+               ep_a.narrator_voice,
+               ep_a.article_id AS article_a_id,
+               ep_a.bridge_text AS bridge_a,
+               ep_a.article_title AS title_a,
+               ep_a.article_byline AS byline_a,
+               ep_a.article_publication AS pub_a,
+               ep_b.article_id AS article_b_id,
+               ep_b.bridge_text AS bridge_between,
+               ep_b.article_title AS title_b,
+               ep_b.article_byline AS byline_b,
+               ep_b.article_publication AS pub_b
+          FROM editions e
+          JOIN edition_pieces ep_a
+            ON ep_a.edition_id = e.id AND ep_a.position = 0
+          JOIN edition_pieces ep_b
+            ON ep_b.edition_id = e.id AND ep_b.position = 1
+         WHERE {' AND '.join(where)}
+         ORDER BY e.edition_date DESC, e.id DESC
+    """
+    with db.connect() as conn:
+        return [dict(r) for r in conn.execute(sql, params).fetchall()]
