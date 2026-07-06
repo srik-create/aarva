@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Monday, 06 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-06</div>
+      <div class="edition-meta">2 pieces · Crosscut · Monday, 06 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · narrative and moral clarity</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/crosscut_0065.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>22 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A sudden reversal in foreign policy leaves a nation staring at the void where its principles used to be. Writing in late June, Tom Nichols tracks the disorientation following a recent shift in Iranian relations, describing a transactional approach that trades a consistent national story for immediate, hollow gains. On that same day, Simon Garnett reflected on the legacy of Slavenka Drakulić, a writer who documented the small, human realities that survive even when entire political systems collapse. There is a striking friction between these two perspectives, both of which look back from an imagined future to find a moral anchor in the debris. It’s a look at what stays steady when the big narratives finally break.</p>
+        <article class='piece'>
+<p class='hook'>Writing late last month, Tom Nichols follows the dizzying reversal of the administration’s conflict with Iran. The shift from promising total regime change to offering reparations has unfolded so quickly. Notice how Nichols compares these geopolitical swings to a rejected television script, full of plot twists that no sensible showrunner would ever buy. It’s an observation of what happens to a country’s credibility when the official story changes faster than the public can keep up.</p>
+<h2 class='title'>The Whiplash of Trump’s Iran Capitulation</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Tom Nichols</span></p>
+<p class='source'><a href='https://www.theatlantic.com/ideas/2026/06/trump-iran-foreign-policy/687683/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Tom Nichols leaves the listener with the image of a foreign policy that feels like a canceled television show—a series of &quot;oddball plot devices&quot; that never add up to a coherent moral story. When the reasons for war shift from regime change to the &quot;will of God&quot; in a single afternoon, the very idea of a national narrative starts to dissolve. It’s a chaotic, top-down view where the script is written by whim.
+
+Notice how Simon Garnett, writing from a speculative 2026, approaches this same breakdown of narrative from the opposite direction. While Nichols tracks the whiplash of a leader’s shifting justifications, Garnett suggests that moral clarity doesn&#x27;t come from a better scriptwriter. It comes from the ground up. Where Nichols sees a &quot;buffet&quot; of explanations, Slavenka Drakulić finds truth in the &quot;hard, cold floor&quot; of a hospital ward or the specific names of the dead. The interesting thing is that both writers are staring at the same void where a stable political story used to be. Nichols watches the grand narrative fail because it’s transactional and hollow; Garnett points to a thinker who abandoned grand narratives entirely to focus on the human details that survive the collapse. It turns the focus from the loud, incoherent promises of a president to the quiet, meticulous reality of those living through the aftermath.</p>
+        <article class='piece'>
+
+<h2 class='title'>A moral compass: Slavenka Drakulić (1949–2026)</h2>
+<p class='byline'><span class='publication'>Eurozine</span><span class='sep'>·</span><span>Simon Garnett</span></p>
+<p class='source'><a href='https://www.eurozine.com/a-moral-compass-slavenka-drakulic-1949-2026/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=a-moral-compass-slavenka-drakulic-1949-2026' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Viewing the present from a speculative future makes the whiplash of transactional politics feel like little more than static. There’s a specific weariness in watching a nation trade its values for a momentary advantage, leaving no clear story behind. Yet, the human details—a shared meal or a writer’s careful observation—have a way of surviving even when the big political structures fall apart. These fragments become the only reliable guides left. If the grand narratives no longer offer a path forward, which small, everyday truths are actually worth holding onto?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Monday, 06 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-06</div>
+      <div class="edition-meta">6 pieces · Monday, 06 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Can a person of faith argue for military AI while still defending the sanctity of life?</p>
+        <h2 class="title">A Catholic Security Scholar’s Case for Responsible Military AI</h2>
+        <p class="byline">
+          <span class="publication">War on the Rocks</span>
+          <span class='sep'>·</span><span>Craig Douglas Albert</span>
+        </p>
+        <p class="contextualisation">Writing on 6 July 2026, Craig Douglas Albert examines the friction between a new papal encyclical and the competing demands of global defense. The Vatican’s critique of military AI poses a stark moral challenge: can a technology designed for efficiency ever respect the sanctity of human life? The piece argues that instead of a total retreat from innovation, the path forward requires enforceable, international guardrails. It frames the debate as a struggle to keep human judgment present in the kill chain, rather than a simple choice between technology and ethics.</p>
+        <p class='show-notes'>An argument for reconciling Catholic doctrine with the strategic integration of artificial intelligence in modern warfare. It weighs the moral imperatives of the papal encyclical Magnifica Humanitas against the requirements of global security, proposing a framework that rejects fully autonomous weapons in favor of rigorous, legally binding guardrails. It concludes by outlining specific policy recommendations for maintaining meaningful human control and accountability throughout the military kill chain.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_6346.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>19 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://warontherocks.com/a-catholic-security-scholars-case-for-responsible-military-ai/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">How does a historian find the voices of the past within the records meant to silence them?</p>
+        <h2 class="title">‘My questions were affected by fiction’: Carlo Ginzburg (1939-2026), pioneer in microhistory</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Naveen Kishore</span>
+        </p>
+        <p class="contextualisation">The piece, published on 28 June 2026, serves as a final window into the mind of Carlo Ginzburg, the historian who famously turned the scholarly gaze toward the small and the anomalous. In this 2019 conversation, the focus stays on the tension between the stories people tell about themselves and the evidence left behind in the archives. It treats history not as a static record, but as a persistent dialogue—one where the smallest details, like a fingerprint or a comma, become a necessary defense against the erosion of truth.</p>
+        <p class='show-notes'>Italian historian Carlo Ginzburg outlines the development of microhistory and the limitations of identity as an analytical category. He details his method of reading archival evidence against the grain to recover marginalized voices, drawing on his research into sixteenth-century witchcraft trials. His analysis examines the tension between historical proof and narrative fiction, arguing for the necessity of proof in an era of misinformation.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_5113.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>51 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1093696/my-questions-were-affected-by-fiction-carlo-ginzburg-1939-2026-pioneer-in-microhistory?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">If the price of peace is a civil war, who does the diplomacy actually serve?</p>
+        <h2 class="title">Marco Rubio’s Dangerous Diplomacy in Lebanon</h2>
+        <p class="byline">
+          <span class="publication">The American Prospect</span>
+          <span class='sep'>·</span><span>Nathan Thompson</span>
+        </p>
+        <p class="contextualisation">A 3 July 2026 piece from The American Prospect examines the friction between the White House’s public pursuit of peace and the diplomatic terms being set by Marco Rubio in Lebanon. The piece frames the Trilateral Framework not as a simple ceasefire, but as a document that effectively asks the Lebanese government to risk civil war by disarming Hezbollah on Israel&#x27;s behalf. It moves past the primary headlines of the war to observe the quieter concessions that might determine whether the region finds stability or just another kind of volatility.</p>
+        <p class='show-notes'>An analysis of the Trilateral Framework for Lebanon led by Secretary of State Marco Rubio and its departure from the terms of the U.S.-Iran ceasefire memorandum. The agreement requires Hezbollah’s disarmament and the establishment of Israeli security zones, moves that have sparked political instability within Lebanon. It also details bipartisan support for training the Lebanese Armed Forces to confront non-state groups, a strategy critics warn could trigger a civil war.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_6111.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://prospect.org/2026/07/03/marco-rubios-dangerous-diplomacy-in-lebanon/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">Can the elegant abstraction of a floating currency survive the stubborn cost of daily life?</p>
+        <h2 class="title">Why India Cannot Let the Rupee Float</h2>
+        <p class="byline">
+          <span class="publication">The Diplomat</span>
+          <span class='sep'>·</span><span>Deepanshu Mohan</span>
+        </p>
+        <p class="contextualisation">Writing on 2 June 2026, The Diplomat examines the gap between macroeconomic theory and the reality of the Indian rupee. While textbooks suggest a floating currency naturally balances the scales, the actual experience for most households involves rising fuel costs and food inflation. The piece observes that for an economy dependent on essential imports, the exchange rate functions less like a financial indicator and more like a tool for social stability. It asks what happens when a market mechanism becomes a regressive tax on the poor.</p>
+        <p class='show-notes'>An examination of the structural factors preventing India from adopting a fully market-determined exchange rate. Reliance on essential imports translates currency depreciation into immediate domestic inflation, disproportionately affecting low-income households and informal workers. The analysis evaluates the Reserve Bank of India’s intervention strategies and explains why global demand, rather than currency value, remains the primary driver of Indian export growth.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_1148.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://thediplomat.com/2026/06/why-india-cannot-let-the-rupee-float/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+
+      <article class="piece">
+        <p class="hook">Can a legal cornerstone hold when the political parties have traded places on presidential power?</p>
+        <h2 class="title">Looking Back at Humphrey’s Executor</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>Michael Dreeben</span>
+        </p>
+        <p class="contextualisation">Writing on 21 June 2026, the piece examines a curious reversal in American law. While the current Supreme Court seems set on expanding presidential control over the government, the 1935 case that originally blocked that power was once loathed by the left and championed by the right. The essay looks past the immediate legal headlines to ask how a unanimous consensus on government stability dissolved into partisan friction, suggesting that the current debate over executive authority is built on a history that few people now remember.</p>
+        <p class='show-notes'>An examination of Humphrey’s Executor, the 1935 Supreme Court ruling that established the independence of federal regulatory agencies by limiting presidential removal power. It traces the inversion of ideological support for the decision since the New Deal, contrasting the original unanimous consensus with contemporary efforts to advance unitary executive theory. The analysis situates current legal challenges to the administrative state within the historical evolution of the balance of power between the branches.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_3726.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>15 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/143674/humphreys-executor-history/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=humphreys-executor-history' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">How do two people who spent decades trying to outlast each other learn to survive together?</p>
+        <h2 class="title">‘The Final Set’ Tells The Story Of Tennis’ Greatest Rivalry Becoming A Friendship</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Owen Lewis</span>
+        </p>
+        <p class="contextualisation">Published on 3 July 2026, the piece considers the rare intimacy found in the new Netflix documentary about Martina Navratilova and Chris Evert. It observes how a rivalry defined by eighty matches and decades of public friction eventually softened into a bond reinforced by shared health crises. While the film captures a bluntness missing from modern sports media, the writing also notes a significant silence regarding Navratilova’s recent, more polarizing activism. It weighs the cost of leaving a legacy only partially examined for the sake of a clean narrative.</p>
+        <p class='show-notes'>An appraisal of the Netflix documentary The Final Set, which traces the fifty-year rivalry and friendship between tennis icons Martina Navratilova and Chris Evert. The analysis examines the film’s use of archival footage to contrast their public personas and details their recent, parallel battles with cancer. It also critiques the production’s narrow scope, specifically the decision to omit Navratilova’s controversial contemporary activism regarding transgender athletes.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-06/article_6230.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/the-final-set-tells-the-story-of-tennis-greatest-rivalry-becoming-a-friendship' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
