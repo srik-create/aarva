@@ -109,6 +109,14 @@
 
   <link rel="alternate" type="application/rss+xml" title="Aarva podcast feed" href="https://srik-create.github.io/aarva/feed.xml" />
 
+  {# ─── htmx: partial navigation ──────────────────────────────────── #}
+  {# Boosts same-domain links/forms to swap only #main-content instead
+     of a full page reload, so the persistent audio element + mini-bar
+     below survive navigation instead of pausing (iPhone player nav
+     fix). Pinned version + SRI hash per htmx.org/docs/#installing,
+     verified against htmx.org docs on 2026-07-06. #}
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V" crossorigin="anonymous"></script>
+
   {# ─── PWA: Add to Home Screen ───────────────────────────────────── #}
   {# Manifest covers Android / Chromium installs. apple-touch-icon +
      apple-mobile-web-app-* meta tags handle iOS Safari ("Add to Home
@@ -121,7 +129,9 @@
   <meta name="apple-mobile-web-app-title" content="Aarva">
   <meta name="theme-color" content="#1A1410">
 </head>
-<body class="bg-night text-cream-text antialiased">
+<body class="bg-night text-cream-text antialiased"
+      hx-boost="true" hx-target="#main-content" hx-select="#main-content"
+      hx-swap="innerHTML" hx-push-url="true">
   <header data-site-header class="border-b border-night-border bg-night-soft">
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
       <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
@@ -212,10 +222,16 @@
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !drawer.classList.contains('hidden')) close();
       });
+      // Tapping a nav link partially-navigates (htmx boost) rather than
+      // reloading the page, so the drawer would otherwise stay open on
+      // top of the new page — close it immediately on tap.
+      drawer.addEventListener('click', function(e) {
+        if (e.target.closest('a')) close();
+      });
     })();
   </script>
 
-  <main class="max-w-3xl mx-auto px-5 py-10">
+  <main id="main-content" class="max-w-3xl mx-auto px-5 py-10">
     {# Back arrow on every page except the landing. Mobile-friendly
        44px tap target. Uses history.back() when possible, falls back
        to / for /today (so you can return to the landing) and /today
@@ -224,7 +240,7 @@
       {% set back_fallback = '/' if request.url.path == '/today' else '/today' %}
       <a href="{{ back_fallback }}"
          onclick="if (window.history.length > 1) { window.history.back(); return false; }"
-         aria-label="Back"
+         aria-label="Back" hx-boost="false"
          class="-ml-2 mb-6 inline-flex items-center justify-center w-11 h-11 rounded-full text-cream-light hover:text-cream-text hover:bg-night-soft transition-colors">
         <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true">
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -716,30 +732,46 @@
       });
 
       // ─── In-page [data-player] wiring ────────────────────────────
-      document.querySelectorAll('[data-player]').forEach(function(player) {
-        const btn        = player.querySelector('[data-play-button]');
-        const trackSrc   = player.dataset.trackSrc;
-        const trackTitle = player.dataset.trackTitle || '';
-        const trackLink  = player.dataset.trackLink || '';
-        if (!btn || !trackSrc) return;
+      // Wrapped in a function because htmx partial-navigation replaces
+      // #main-content's innerHTML on every nav — the [data-player]
+      // blocks on the new page are fresh DOM nodes with no listeners
+      // yet, so this must re-run after every swap (see htmx:afterSwap
+      // below), not just once at initial page load.
+      function wireDataPlayers() {
+        document.querySelectorAll('[data-player]').forEach(function(player) {
+          const btn        = player.querySelector('[data-play-button]');
+          const trackSrc   = player.dataset.trackSrc;
+          const trackTitle = player.dataset.trackTitle || '';
+          const trackLink  = player.dataset.trackLink || '';
+          if (!btn || !trackSrc) return;
 
-        btn.addEventListener('click', function() {
-          playTrack(trackSrc, trackTitle, trackLink);
-        });
-
-        const track = player.querySelector('[data-progress-track]');
-        if (track) {
-          track.addEventListener('click', function(e) {
-            // Only allow scrubbing on the in-page UI if it matches the
-            // current track — non-current tracks should be played
-            // from the start via the button, not scrubbed blindly.
-            if (trackSrc !== current.src || !audio.duration) return;
-            const rect = track.getBoundingClientRect();
-            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-            audio.currentTime = audio.duration * ratio;
-            saveState();
+          btn.addEventListener('click', function() {
+            playTrack(trackSrc, trackTitle, trackLink);
           });
-        }
+
+          const track = player.querySelector('[data-progress-track]');
+          if (track) {
+            track.addEventListener('click', function(e) {
+              // Only allow scrubbing on the in-page UI if it matches the
+              // current track — non-current tracks should be played
+              // from the start via the button, not scrubbed blindly.
+              if (trackSrc !== current.src || !audio.duration) return;
+              const rect = track.getBoundingClientRect();
+              const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+              audio.currentTime = audio.duration * ratio;
+              saveState();
+            });
+          }
+        });
+      }
+      wireDataPlayers();
+
+      // Re-wire + re-sync play/pause icons after every htmx swap so a
+      // freshly-navigated-to page's [data-player] blocks work and
+      // correctly reflect whatever's currently playing.
+      document.body.addEventListener('htmx:afterSwap', function() {
+        wireDataPlayers();
+        updateUI();
       });
 
       // Final save on nav. pagehide covers iOS Safari which doesn't

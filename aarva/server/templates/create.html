@@ -22,7 +22,7 @@
      LLM composes pairings. JS replaces this container's content with
      the rendered fragment. If JS is disabled / the fetch fails the
      loading message stays + the error path swaps in a refresh hint. #}
-  <div data-candidates-container>
+  <div data-candidates-container data-prompt="{{ prompt }}">
     <div class="p-6 bg-peach rounded-2xl text-ink">
       <div class="flex items-center gap-4">
         <div class="shrink-0 w-7 h-7 rounded-full border-2 border-ink/20 border-t-ink animate-spin"></div>
@@ -37,8 +37,11 @@
   <script>
     (function() {
       const container = document.querySelector('[data-candidates-container]');
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get('q') || '';
+      // Read from the server-rendered attribute rather than
+      // window.location.search — under htmx partial navigation this
+      // script re-runs on every swap into /create, and relying on the
+      // browser URL would race against exactly when htmx updates it.
+      const q = (container && container.dataset.prompt) || '';
       if (!q || !container) return;
 
       fetch('/api/candidates?q=' + encodeURIComponent(q), {
@@ -50,6 +53,10 @@
         })
         .then(function(html) {
           container.innerHTML = html;
+          // This content was injected via a plain fetch, not htmx's own
+          // AJAX mechanism, so htmx won't know to scan it for hx-* /
+          // inherited hx-boost — process it explicitly.
+          if (window.htmx) window.htmx.process(container);
         })
         .catch(function(err) {
           console.error('candidate fetch failed:', err);

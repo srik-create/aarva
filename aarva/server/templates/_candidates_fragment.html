@@ -50,7 +50,13 @@
               Listen now
             </a>
           {% else %}
-            <form action="/create/build" method="post" class="flex flex-col sm:flex-row gap-3 sm:items-center">
+            {# hx-boost="false": this POSTs then 303-redirects to
+               /build/<job_id>, and htmx's history-URL handling for a
+               boosted request that gets redirected isn't documented —
+               not worth the risk on the app's core conversion action,
+               especially since build_status.html's own polling already
+               does a full page reload every 7s regardless. #}
+            <form action="/create/build" method="post" hx-boost="false" class="flex flex-col sm:flex-row gap-3 sm:items-center">
               <input type="hidden" name="prompt" value="{{ prompt }}">
               <input type="hidden" name="article_a_id" value="{{ c.article_a_id }}">
               <input type="hidden" name="article_b_id" value="{{ c.article_b_id }}">
