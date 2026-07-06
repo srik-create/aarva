@@ -95,3 +95,19 @@ class ListenerDatabase(Database):
     def _init_schema(self) -> None:
         with self._connect() as conn:
             conn.executescript(LISTENER_SCHEMA_SQL)
+            # Seed AUTOINCREMENT for `editions` far above the main
+            # DB's id range. Both files' counters start at 1
+            # independently — without this, the very first few
+            # listener episodes would collide with existing main-DB
+            # edition ids, and /crosscut/<id> (which tries the main
+            # DB first) would silently show the wrong episode for
+            # that id. `WHERE NOT EXISTS` makes this a one-time seed:
+            # harmless to re-run on an already-seeded file (schema
+            # init runs on every server startup).
+            conn.execute("""
+                INSERT INTO sqlite_sequence (name, seq)
+                SELECT 'editions', 1000000
+                 WHERE NOT EXISTS (
+                    SELECT 1 FROM sqlite_sequence WHERE name = 'editions'
+                 )
+            """)
