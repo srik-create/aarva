@@ -241,6 +241,17 @@ approach as a stopgap.
 
 ### Thread B — Task #18: Stage 10 loud failure
 
+**Status: shipped 2026-07-06.** Went further than the 4 options
+below: the user asked whether the R2 step could be made to fail less
+often in the first place, not just handled better once it fails.
+Landed as (a) `r2_uploader.check_r2_connectivity()` at the very start
+of a full/`--stage 10` run — a real credentials+connectivity check,
+not just an env-var presence check — plus (b) 3 automatic retries
+(60s apart) on the upload step itself, mirroring what manually
+re-running `--stage 10` used to accomplish. Only if every retry still
+fails does it fall through to option (1) below. See
+`docs/roadmap.md`'s 2026-07-06 entry for the full account.
+
 Stage 10 currently catches `except Exception` around the R2 upload
 step in `aarva/daily.py` L365 and only logs a warning. On
 2026-07-03 this caused a silent gap: `AARVA_R2_ACCESS_KEY_ID`

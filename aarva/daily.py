@@ -164,6 +164,25 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             sys.exit(1)
         return
 
+    # Fail fast on R2 misconfiguration/unreachability — before any of
+    # the other 9 stages spend time and money, not after. R2 upload
+    # itself doesn't happen until Stage 10; without this check, a bad
+    # credential only surfaces there (see 2026-07-03 incident notes on
+    # r2_uploader.check_r2_connectivity). Only relevant to a full run
+    # or an explicit Stage 10 run — the crosscut-only paths above
+    # returned already, and other single-stage runs (--stage 1, etc.)
+    # never touch R2.
+    if stage is None or stage == 10:
+        try:
+            r2_uploader.check_r2_connectivity(config)
+        except Exception as e:
+            log.error(
+                "R2 connectivity check failed — fix before running the "
+                "daily pipeline (R2 upload happens at Stage 10, the very "
+                "end, so this would otherwise waste the whole run): %s", e,
+            )
+            sys.exit(1)
+
     # Stage 1 — Ingestion
     if stage is None or stage == 1:
         log.info("Stage 1 — Ingestion starting")
@@ -353,19 +372,25 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             # .mp3) and BEFORE RSS generation (so the <enclosure> URLs
             # in feed.xml are immediately valid when the feed publishes).
             # No-ops cleanly when tts.r2.enabled is false / unset.
-            try:
-                us = r2_uploader.upload_all_pending(config, db)
-                if us.uploaded or us.errors:
-                    log.info(
-                        "Stage 10 R2 — %d uploaded, %d already in bucket, "
-                        "%d source-missing, %d errors",
-                        us.uploaded, us.skipped_already_present,
-                        us.skipped_source_missing, us.errors,
-                    )
-            except Exception as e:
-                log.warning(
-                    "R2 upload step failed: %s — RSS will still publish "
-                    "but audio URLs may 404 until R2 catches up.", e,
+            #
+            # Retries (mirrors what re-running --stage 10 by hand used
+            # to accomplish) rather than swallowing the failure — a bad
+            # credential is already caught earlier by
+            # check_r2_connectivity above, so a failure reaching here
+            # is the rarer transient case (network blip, R2 having a
+            # bad moment). If every retry still fails, this re-raises
+            # into the outer try/except below, which stops BEFORE the
+            # RSS write further down — a stale-but-correct feed beats
+            # one that ships pointing at unreachable audio (2026-07-03
+            # incident: RSS shipped, Apple/YouTube/aarva.app all 404'd
+            # until a manual re-run).
+            us = r2_uploader.upload_all_pending_with_retries(config, db)
+            if us.uploaded or us.errors:
+                log.info(
+                    "Stage 10 R2 — %d uploaded, %d already in bucket, "
+                    "%d source-missing, %d errors",
+                    us.uploaded, us.skipped_already_present,
+                    us.skipped_source_missing, us.errors,
                 )
 
             # 2. Render the most recent DAILY edition's HTML.

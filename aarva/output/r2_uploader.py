@@ -48,6 +48,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -113,6 +114,18 @@ class R2Uploader:
             "R2Uploader ready — endpoint=%s, bucket=%s",
             self.endpoint_url, self.bucket,
         )
+
+    def check_connectivity(self) -> None:
+        """Raise if these credentials can't actually reach the bucket.
+
+        `head_bucket` is the cheapest real round-trip that exercises
+        both auth and network — a single request, no body transfer.
+        Building the boto3 client (in `_load`) never fails on its own
+        (bad credentials only surface on the first real API call), so
+        this is the only way to catch a bad/missing/expired credential
+        or an unreachable endpoint before Stage 10 gets there."""
+        self._load()
+        self._client.head_bucket(Bucket=self.bucket)
 
     def key_exists(self, key: str) -> bool:
         """True iff a file with this key is already in the bucket.
@@ -214,6 +227,67 @@ def build_uploader_from_config(config: PipelineConfig) -> Optional[R2Uploader]:
         secret_access_key=secret_access_key,
         public_url_base=public_url_base,
     )
+
+
+def check_r2_connectivity(config: PipelineConfig) -> None:
+    """Fail fast if R2 is enabled but misconfigured or unreachable.
+
+    Meant to run once at the very start of a daily pipeline invocation
+    (see aarva/daily.py) — R2 upload itself doesn't happen until
+    Stage 10, the very end, so a bad/missing credential would
+    otherwise only surface after 9 stages of ingestion/scoring/TTS
+    work (and cost) have already run. This is exactly what happened
+    2026-07-03: AARVA_R2_ACCESS_KEY_ID wasn't in the shell env, the
+    failure only surfaced at Stage 10, and by then it was silently
+    swallowed (see upload_all_pending_with_retries for the other half
+    of that fix).
+
+    Raises (ConfigError for missing config/credentials, or whatever
+    the R2 client raises for an unreachable endpoint / rejected
+    credentials) on any problem. No-ops if R2 is disabled in config."""
+    uploader = build_uploader_from_config(config)
+    if uploader is None:
+        return   # R2 disabled; nothing to check
+    uploader.check_connectivity()
+
+
+def upload_all_pending_with_retries(
+    config: PipelineConfig,
+    db: Database,
+    *,
+    max_attempts: int = 3,
+    retry_delay_seconds: float = 60.0,
+) -> UploadStats:
+    """Like `upload_all_pending`, but retries the whole call on a hard
+    failure (the ConfigError / connectivity-error class that
+    `check_r2_connectivity` is meant to catch before this point ever
+    runs — this handles the rarer transient case: a network blip, R2
+    having a bad moment). Mirrors what re-running `--stage 10` by hand
+    used to accomplish; `upload_all_pending` is idempotent (already-
+    uploaded files are skipped via a HEAD check), so a retry after
+    partial progress just picks up where it left off.
+
+    Per-file upload errors (one bad file among many) already don't
+    raise — see `upload_all_pending`'s inner try/except — so retrying
+    here is specifically for failures that abort the whole batch.
+
+    Raises the last exception if every attempt fails, so the caller
+    (Stage 10) can stop before writing the RSS feed rather than
+    publishing it pointing at audio that was never actually uploaded."""
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return upload_all_pending(config, db)
+        except Exception as e:
+            last_error = e
+            logger.warning(
+                "R2 upload attempt %d/%d failed: %s",
+                attempt, max_attempts, e,
+            )
+            if attempt < max_attempts:
+                time.sleep(retry_delay_seconds)
+    assert last_error is not None
+    raise last_error
 
 
 def upload_all_pending(
