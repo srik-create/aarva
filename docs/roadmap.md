@@ -15,22 +15,17 @@ Web app Phase 2 (episode creation) is live on aarva.app. Phase 3 in
 progress: TTS + worker resilience shipped, ffmpeg + auth + embedding
 migrations done, Independence-Day bonus flow used end-to-end,
 iPhone player nav fixed via htmx partial navigation, listener-DB
-split landed (PR pending review). One known deferred thread remains:
-Stage 10 loud failure (reliability). Daily pipeline runs on
-operator's laptop; audio on R2 (audio.aarva.app); RSS+HTML on
+split landed, Stage 10 R2-failure resilience landed. All three
+threads from the 2026-07-04 session plan are now shipped — no
+actively deferred reliability/UX threads remain. Daily pipeline runs
+on operator's laptop; audio on R2 (audio.aarva.app); RSS+HTML on
 GitHub Pages.
 
 ---
 
 ## In progress
 
-Nothing actively in flight this instant. One item queued for the
-next session:
-
-1. **Stage 10 loud failure** — `aarva/daily.py` L365 catches R2
-   upload failures and only logs a warning, so RSS can ship
-   pointing at unreachable MP3s (happened 2026-07-03). Decide
-   whether to exit non-zero + skip RSS write.
+Nothing actively in flight.
 
 ---
 
@@ -83,6 +78,29 @@ Most recent first.
 
 ### 2026-07-06
 
+- **Stage 10 R2-upload failure now caught early + retried instead of
+  silently swallowed (Thread B from the session plan).** Root cause
+  of the 2026-07-03 incident: a missing R2 credential only surfaced
+  deep inside Stage 10 (the very last stage), and the failure was
+  logged as a warning and swallowed — RSS shipped anyway, pointing at
+  audio that was never uploaded, until a manual re-run. Two-part fix,
+  refined with the user beyond the session plan's original "what
+  should Stage 10 do on failure" framing: (1) a new
+  `r2_uploader.check_r2_connectivity()` runs once at the very start of
+  any full or `--stage 10` run — a real `head_bucket` round-trip, not
+  just an env-var presence check — so a bad/missing credential is
+  caught immediately, before 9 stages of ingestion/scoring/TTS work
+  happen; (2) `upload_all_pending_with_retries()` retries the upload
+  itself up to 3 times (60s apart) for the rarer case that clears the
+  early check but still fails transiently (a network blip, R2 having
+  a bad moment) — mirroring what re-running `--stage 10` by hand used
+  to accomplish. If every retry still fails, the exception now
+  propagates instead of being swallowed, which naturally skips the
+  RSS write for that run (stale-but-correct feed) and exits non-zero.
+  Verified with mocked unit tests (retry-then-succeed, retry-
+  exhaustion, connectivity-check across disabled/missing-creds/
+  unreachable, and the early-check gating for `--stage 10` /full runs
+  vs. unrelated single-stage runs) — no real R2 calls made.
 - **iPhone player pause-on-navigation fixed via htmx partial
   navigation (Thread A from the session plan).** Root cause: every
   `<a>` click was a full page load, tearing down the shared `<audio>`
@@ -259,6 +277,7 @@ decision log.
 | Listener episodes: split-DB (shipped 2026-07-06) | Sync overwrites Render DB, wiping listener episodes built between syncs. Split file on Render's persistent disk that sync never touches. Denormalize article title/pub/byline onto edition_pieces at build time so no cross-DB joins. Listener DB's edition-id AUTOINCREMENT seeded to 1,000,000 to avoid colliding with the main DB's ids (both start at 1 independently). | Split file is on disk; can be merged back into main DB if we ever want. |
 | Prompt classification via Gemini for search age gate (shipped 2026-07-06) | News-y prompts shouldn't match old listener episodes; evergreen prompts should. One small Gemini call at /create time, reusing the existing LLMClient interface. Falls back to 'evergreen' (no filter) on any classifier failure — degrades to "search everything" rather than hiding valid matches. | Config gate + one file (`prompt_classifier.py`) to remove. |
 | htmx (2.0.10, pinned CDN) for partial navigation, over a hand-rolled fetch+DOM-swap (2026-07-06) | User picked the library option: battle-tested history/back-button/script-re-execution handling vs. custom code for the same edge cases. One `<script>` tag, same CDN pattern already used for Tailwind. | Swap-out is a base.html-only change; no server-side coupling beyond serving full pages as already done. |
+| Stage 10 R2 failure: stop before RSS write (not "publish anyway, fail loudly") (2026-07-06) | User's call after weighing it: a stale-but-correct feed beats a fresh one pointing at unreachable audio. Superseded by an early connectivity check + 3× retry (60s apart) that make this path rare in practice — most failures (bad/missing creds) are now caught before Stage 1 even starts, not just handled better once they reach Stage 10. | Retry count/delay are Python defaults in `upload_all_pending_with_retries`, not YAML — easy one-line change if tuning is ever needed. |
 
 ---
 
