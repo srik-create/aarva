@@ -23,6 +23,8 @@ cross-database join.
 """
 from __future__ import annotations
 
+import sqlite3
+
 from aarva.db import Database
 
 LISTENER_SCHEMA_SQL = """
@@ -37,6 +39,11 @@ CREATE TABLE IF NOT EXISTS editions (
     intro_text      TEXT,
     outro_text      TEXT,
     topic_label     TEXT,
+    -- Content-quality Section 2/3 (2026-07-11) — see
+    -- docs/session_plan_content_quality.md. Mirrors the same two
+    -- columns added to the main DB's editions table.
+    subhead_hook       TEXT,
+    originating_prompt TEXT,
     -- NULL only for the brief window between build_episode_script's
     -- INSERT and episode_worker's stamp of the requester's user_id
     -- right after — every row is stamped before the build completes.
@@ -95,6 +102,21 @@ class ListenerDatabase(Database):
     def _init_schema(self) -> None:
         with self._connect() as conn:
             conn.executescript(LISTENER_SCHEMA_SQL)
+            # Column-add migrations for a listener DB file that
+            # already existed before a given column was added to
+            # LISTENER_SCHEMA_SQL above — `CREATE TABLE IF NOT EXISTS`
+            # only applies to brand-new files, so an already-
+            # provisioned file (this now exists for real on Render's
+            # persistent disk since the render.yaml fix) needs the
+            # same idempotent ALTER-list pattern aarva/db.py uses.
+            for migration in (
+                "ALTER TABLE editions ADD COLUMN subhead_hook TEXT",
+                "ALTER TABLE editions ADD COLUMN originating_prompt TEXT",
+            ):
+                try:
+                    conn.execute(migration)
+                except sqlite3.OperationalError:
+                    pass
             # Seed AUTOINCREMENT for `editions` far above the main
             # DB's id range. Both files' counters start at 1
             # independently — without this, the very first few

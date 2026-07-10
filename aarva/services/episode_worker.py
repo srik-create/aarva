@@ -211,9 +211,14 @@ def _run_job(
         # persist the editions row + embed into crosscut_embeddings).
         # target_db routes the editions/edition_pieces/crosscut_embeddings
         # writes to the listener DB instead of the main DB — see
-        # aarva/listener_db.py for why.
+        # aarva/listener_db.py for why. originating_prompt (content-
+        # quality Section 3) lets the intro + subhead_hook prompts
+        # acknowledge what the listener actually searched for.
         update_progress(db, job_id, "Writing the intro and bridges…")
-        build_stats = build_episode_script(config, db, target_db=listener_db)
+        build_stats = build_episode_script(
+            config, db, target_db=listener_db,
+            originating_prompt=str(payload.get("prompt") or "").strip() or None,
+        )
         if build_stats.errors or not build_stats.edition_id:
             raise RuntimeError(
                 f"build_episode_script reported errors: {build_stats!r}"

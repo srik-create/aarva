@@ -28,12 +28,15 @@ GitHub Pages.
 1. **Content-quality + share + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections; five are ready to implement, one (outro music) is
-   blocked on an external audio asset. **Section 1 (voice standard)
-   shipped 2026-07-11** — see "Recently completed" below. The
-   ephemeral-disk fix Sections 2-4 depended on has also shipped
-   (2026-07-11), so nothing blocks them now. Next up: Section 2
-   (crosscut sub-headings) + Section 3 (search-aware crosscuts)
-   bundled together per the spec's sequencing recommendation.
+   blocked on an external audio asset. **Sections 1-3 shipped
+   2026-07-11** — see "Recently completed" below. Only 2 of 30
+   existing crosscuts have been backfilled with `subhead_hook` so
+   far (a deliberate small sample, not the full batch — user chose
+   to defer the full backfill; `scripts/backfill_subhead_hooks.py`
+   is idempotent and safe to run anytime for the rest). Next up:
+   Section 4 (show search prompt on `/listener-created`, small,
+   depends on Section 3's `originating_prompt` column) or Section 5
+   (share functionality, self-contained).
 
 ---
 
@@ -83,6 +86,42 @@ the sequence.
 ## Recently completed (2026-06-29 → 2026-07-11)
 
 Most recent first.
+
+- **Content-quality Sections 2+3 — crosscut sub-headings + search-
+  aware crosscuts.** Bundled per the spec's sequencing recommendation
+  since both add columns to `editions` on both DBs.
+  - **Section 2:** new `subhead_hook TEXT` column (main `db.py` via
+    the existing legacy-ALTER mechanism; `listener_db.py` needed a
+    parallel ALTER-based migration added, since `CREATE TABLE IF NOT
+    EXISTS` alone doesn't add columns to an already-provisioned file —
+    a real listener DB now exists on Render since the ephemeral-disk
+    fix). New `_SUBHEAD_HOOK_PROMPT` in `stage_crosscut.py`, generated
+    alongside intro/bridges/outro in `build_episode_script` for both
+    daily and listener builds; non-blocking on failure (falls back to
+    the old `title_a × title_b` display, per spec). `scripts/
+    backfill_subhead_hooks.py` (idempotent, main-DB only — no listener-
+    DB episode has ever been built yet, and the historical
+    angle/connection context this prompt needs only lives in the main
+    DB's `crosscut_pair_candidates` anyway). Rendered on `/crosscuts`,
+    `/crosscut/<id>`, and `/listener-created` (the last wasn't
+    explicitly listed in the spec but shares the identical card
+    markup, so left inconsistent it would have looked like a bug).
+  - **Section 3:** new `originating_prompt TEXT` column (same
+    treatment). `episode_worker.py` threads `payload.prompt` into
+    `build_episode_script`; when set, both the intro and
+    `subhead_hook` prompts get an explicit instruction to acknowledge
+    it (e.g. "You asked about X — here are two pieces..."). Also
+    strengthened `episode_candidates.py`'s `_PROPOSAL_PROMPT` so
+    `topic_label` explicitly references the prompt's frame — the spec
+    attributed this to `stage_crosscut.py`, but on-demand topic_label
+    is actually fixed earlier, at candidate-proposal time.
+  - Verified: backfilled 2 real crosscuts as a quality sample (full
+    30-episode backfill deferred by user choice, script is idempotent
+    and safe to run later); confirmed rendering + the "no blank slot"
+    fallback on the live local dev server; a read-only script
+    generated intro + subhead_hook for the same real crosscut with and
+    without a simulated listener search, confirming the
+    acknowledgment only appears when a prompt is present.
 
 ### 2026-07-11
 
@@ -339,6 +378,7 @@ decision log.
 | htmx (2.0.10, pinned CDN) for partial navigation, over a hand-rolled fetch+DOM-swap (2026-07-06) | User picked the library option: battle-tested history/back-button/script-re-execution handling vs. custom code for the same edge cases. One `<script>` tag, same CDN pattern already used for Tailwind. | Swap-out is a base.html-only change; no server-side coupling beyond serving full pages as already done. |
 | Stage 10 R2 failure: stop before RSS write (not "publish anyway, fail loudly") (2026-07-06) | User's call after weighing it: a stale-but-correct feed beats a fresh one pointing at unreachable audio. Superseded by an early connectivity check + 3× retry (60s apart) that make this path rare in practice — most failures (bad/missing creds) are now caught before Stage 1 even starts, not just handled better once they reach Stage 10. | Retry count/delay are Python defaults in `upload_all_pending_with_retries`, not YAML — easy one-line change if tuning is ever needed. |
 | Listener-facing voice standard: smart-generalist / J.K.-Rowling-adult register, not philosophy-reader register (2026-07-11) | User + Cowork locked this in `docs/session_plan_content_quality.md` §1 as the anchor for the whole content-quality pass. Verified against 3 real articles + 2 real crosscuts (read-only, no DB writes) before rollout; user confirmed the calibration. | Prompt-only change (`prompts.yaml`, `stage_crosscut.py`, `episode_candidates.py`) — revert the added sections to roll back; no schema/data impact. |
+| subhead_hook backfill: 2-episode sample now, full 30-episode batch deferred (2026-07-11) | User's call — no urgency, script is idempotent and cheap (text-only Gemini calls) to re-run anytime. | Run `python scripts/backfill_subhead_hooks.py` (no `--since` filter) whenever; skips rows already backfilled. |
 
 ---
 

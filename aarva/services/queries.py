@@ -197,6 +197,7 @@ def load_crosscut_episodes(
     sql = f"""
         SELECT e.id AS edition_id, e.edition_date, e.published_date,
                e.topic_label, e.intro_text, e.outro_text,
+               e.subhead_hook, e.originating_prompt,
                ep_a.audio_url, ep_a.duration_seconds,
                ep_a.narrator_voice,
                ep_a.article_id AS article_a_id,
@@ -251,6 +252,7 @@ def load_listener_episodes(
     sql = f"""
         SELECT e.id AS edition_id, e.edition_date, e.published_date,
                e.topic_label, e.intro_text, e.outro_text, e.user_id,
+               e.subhead_hook, e.originating_prompt,
                ep_a.audio_url, ep_a.duration_seconds,
                ep_a.narrator_voice,
                ep_a.article_id AS article_a_id,

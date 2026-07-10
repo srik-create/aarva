@@ -6,6 +6,18 @@
     <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">
       {{ (crosscut.topic_label or "Two angles") | title_case }}
     </h1>
+    {# Content-quality Section 2: subhead_hook is the primary
+       sub-heading when set; title_a x title_b demotes to secondary
+       metadata underneath. NULL subhead_hook (older crosscuts) falls
+       back cleanly — no blank slot. #}
+    {% if crosscut.subhead_hook %}
+      <p class="text-ink-light mt-3 text-lg leading-relaxed">{{ crosscut.subhead_hook }}</p>
+    {% endif %}
+    <p class="text-sm text-ink-light mt-2 leading-relaxed">
+      <em class="editorial">{{ crosscut.title_a | title_case }}</em>
+      <span class="text-ink-light mx-1">×</span>
+      <em class="editorial">{{ crosscut.title_b | title_case }}</em>
+    </p>
     {% if crosscut.edition_date %}
       <p class="text-sm text-ink-light mt-2">Published {{ crosscut.edition_date }}</p>
     {% endif %}

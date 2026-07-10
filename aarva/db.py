@@ -417,6 +417,15 @@ class Database:
                 "ADD COLUMN superseded_at DATETIME",
                 "ALTER TABLE editions ADD COLUMN user_id INTEGER "
                 "REFERENCES users(id) ON DELETE SET NULL",
+                # Content-quality Section 2/3 (2026-07-11) — see
+                # docs/session_plan_content_quality.md. subhead_hook:
+                # listener-facing one-sentence sub-heading, replacing
+                # the plain "title_a x title_b" byline on crosscut
+                # cards. originating_prompt: the listener's /create
+                # search string for on-demand crosscuts; NULL for
+                # daily-pipeline crosscuts.
+                "ALTER TABLE editions ADD COLUMN subhead_hook TEXT",
+                "ALTER TABLE editions ADD COLUMN originating_prompt TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:
