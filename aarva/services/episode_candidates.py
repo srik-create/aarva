@@ -259,6 +259,9 @@ Bad pairings:
 - One profound piece + one filler piece chosen just to fill the slot.
 - Pairings that only loosely relate to the listener's prompt — better to return FEWER candidates than to dilute.
 
+VOICE (docs/session_plan_content_quality.md §1 — locked, all listener-facing copy targets this standard)
+Target reader: any smart generalist, including someone who isn't a college graduate — not someone who reads philosophy for fun. Think J.K. Rowling writing for adults. Before finalizing "why", check it against all of: would this land with a curious 18-year-old with no college background? Read aloud in one breath per sentence — does any sentence trip? Does it open on a concrete image (a person, place, object, act) rather than an abstract noun ("resonance", "framework", "phenomenon")? Are there words a 12-year-old wouldn't know?
+
 OUTPUT
 Return JSON ONLY — no prose, no markdown fences. A single object with one key:
 {
@@ -266,8 +269,8 @@ Return JSON ONLY — no prose, no markdown fences. A single object with one key:
     {
       "article_a_id": <int from pool>,
       "article_b_id": <int from pool, different from a>,
-      "topic_label":  "<short editorial label — 4–8 words, no quotes>",
-      "why":          "<a 4–5 sentence paragraph (~80–120 words) describing the proposed episode to the listener. Cover three things: (1) what each piece argues or describes; (2) how the two connect — the angle that makes pairing them worthwhile; (3) the authors by name (always — they're in the pool data) and one short phrase of relevant expertise IF you can confidently identify them from prior knowledge (otherwise leave the expertise claim out — do NOT invent credentials). Plain language. NO first person ('I/we/us/our'). NO LLM-tell vocabulary: delve, delves, navigate, tapestry, robust, fascinating, intricate, multifaceted, paramount, crucial, landscape (as metaphor), realm, embark, unpack, resonates with.>"
+      "topic_label":  "<short editorial label — 4–8 words, no quotes. Plain words a listener would use, not a category name — 'new angles on the iran war' not 'geopolitical reframing'.>",
+      "why":          "<a 4–5 sentence paragraph (~80–120 words) describing the proposed episode to the listener. Cover three things: (1) what each piece argues or describes; (2) how the two connect — the angle that makes pairing them worthwhile; (3) the authors by name (always — they're in the pool data) and one short phrase of relevant expertise IF you can confidently identify them from prior knowledge (otherwise leave the expertise claim out — do NOT invent credentials). Plain language per the VOICE section above. NO first person ('I/we/us/our'). NO LLM-tell vocabulary: delve, delves, navigate, tapestry, robust, fascinating, intricate, multifaceted, paramount, crucial, landscape (as metaphor), realm, embark, unpack, resonates with, resonance, juxtaposition, interrogates, grapples with, the discourse, the fabric of, the essence of, what it means to be.>"
     }
   ]
 }

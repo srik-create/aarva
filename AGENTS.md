@@ -160,17 +160,38 @@ Last updated: 2026-06-29
       intricate; intricacies; myriad; robust; leveraging; fascinating;
       crucial; landscape (as metaphor); embark; unpack; resonates
       with; lies at the heart of; multifaceted; holistic;
-      ever-evolving; paramount; testament to; speaks volumes.
+      ever-evolving; paramount; testament to; speaks volumes;
+      resonance; juxtaposition; interrogates; grapples with; the
+      discourse; the fabric of; the essence of; what it means to be.
     - Phrases: "in the realm of"; "in today's world"; "at its core";
       "in essence"; "it's important to note"; "deep dive"; "rich
       tapestry"; "complex interplay"; "delicate balance"; "in a world
       where"; "now more than ever".
     - Patterns: triadic lists as default rhythm; the "not X, but Y"
       pattern repeated; em-dash overuse (>2 per paragraph); "moreover"
-      / "furthermore" as transition crutches.
+      / "furthermore" as transition crutches; sentences opening "This
+      piece / this episode examines / argues / traces / grapples
+      with…" (cut it — active verb instead).
 
     When adding new prompts, copy the HUMAN VOICE block from an
     existing prompt to keep enforcement consistent.
+
+9c. **Target a smart generalist, not a philosophy reader.** All
+    listener-facing copy — hooks (Stage 8a), why-now
+    contextualisations (Stage 8b), show notes (Stage 8c), crosscut
+    intros / bridges / outros / topic labels, and the "why" text
+    shown on `/create` candidate cards — MUST target the voice
+    standard locked in `docs/session_plan_content_quality.md` §1
+    (added 2026-07-11). In short: think J.K. Rowling writing for
+    adults, not Salman Rushdie or V.S. Naipaul. Before finalizing any
+    such copy, check it against the doc's 5 voice tests — landable by
+    a curious 18-year-old with no college background; reads aloud in
+    one breath per sentence; opens on a concrete image, not an
+    abstract noun; no sentence starts "This piece examines/argues/
+    traces…"; no word a 12-year-old wouldn't know. Any new prompt
+    that produces listener-facing copy inherits this standard —
+    reference §1 in the prompt's own comment, same convention as 9b's
+    HUMAN VOICE block.
 
 ## Aarva domain rules
 

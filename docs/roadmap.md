@@ -45,10 +45,13 @@ GitHub Pages.
 2. **Content-quality + share + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections; five are ready to implement, one (outro music) is
-   blocked on an external audio asset. Sequencing + voice
-   standard locked in the spec. Depends on item 1 (the
-   ephemeral-disk fix) landing first so the schema additions in
-   Sections 2-4 land cleanly on both the main and listener DBs.
+   blocked on an external audio asset. **Section 1 (voice standard)
+   shipped 2026-07-11** — see "Recently completed" below. Sections
+   2-4 still depend on item 1 (the ephemeral-disk fix) landing first
+   so the schema additions land cleanly on both the main and
+   listener DBs. Next up: Section 2 (crosscut sub-headings) +
+   Section 3 (search-aware crosscuts) bundled together per the
+   spec's sequencing recommendation.
 
 ---
 
@@ -95,9 +98,45 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-06)
+## Recently completed (2026-06-29 → 2026-07-11)
 
 Most recent first.
+
+### 2026-07-11
+
+- **Content-quality Section 1 — smart-generalist voice standard
+  shipped.** Spec at `docs/session_plan_content_quality.md` §1: target
+  reader is any smart generalist (J.K. Rowling-adult register, not
+  Salman Rushdie), 5 voice tests (concrete image first, reads aloud in
+  one breath, no "This piece examines…" construction, no word a
+  12-year-old wouldn't know, would land with a curious 18-year-old
+  with no college background). Added to every listener-facing-copy
+  prompt: Stage 8a (hook), 8b (contextualisation), 8c (show notes,
+  which previously had no HUMAN VOICE guardrails at all) in
+  `aarva/config/prompts.yaml`; the shared `_HUMAN_VOICE_RULES` block
+  in `aarva/stages/stage_crosscut.py` (propagates to intro / bridge_a
+  / bridge_between / outro) plus the pair-detection prompt that
+  generates `topic_label` + `connection_summary`; and
+  `episode_candidates.py`'s `_PROPOSAL_PROMPT` — the actual location
+  of the "why-listen" text shown on `/create` candidate cards (the
+  spec attributed this to `stage_crosscut.py`; corrected during
+  implementation, not punted back as a spec gap since the intent was
+  unambiguous). Also fixed two pre-existing bugs found in passing: the
+  pair-detection prompt's own JSON-schema comment told the model to
+  write `connection_summary` in "first-person Aarva voice" directly
+  contradicting the very next line's "NEVER use first person"; and a
+  stale code comment above `_HUMAN_VOICE_RULES` describing an old,
+  since-reversed first-person voice direction. Verified with a
+  read-only script (no DB writes) that regenerated hooks/context/
+  show-notes for 3 real articles and intro/outro for 2 real crosscuts
+  — including the exact Bare Skin × Zurbarán pairing the spec used as
+  its calibration example — and diffed old vs new; user reviewed the
+  samples and confirmed the calibration. Consistent, systematic
+  improvement found across every sample: old prompts leaned on an "An
+  examination of… / A history of… / The piece examines…" abstract
+  opener that the new standard eliminates everywhere. `AGENTS.md`
+  gained rule 9c referencing the spec as the standing standard for any
+  future listener-facing prompt.
 
 ### 2026-07-06
 
@@ -301,6 +340,7 @@ decision log.
 | Prompt classification via Gemini for search age gate (shipped 2026-07-06) | News-y prompts shouldn't match old listener episodes; evergreen prompts should. One small Gemini call at /create time, reusing the existing LLMClient interface. Falls back to 'evergreen' (no filter) on any classifier failure — degrades to "search everything" rather than hiding valid matches. | Config gate + one file (`prompt_classifier.py`) to remove. |
 | htmx (2.0.10, pinned CDN) for partial navigation, over a hand-rolled fetch+DOM-swap (2026-07-06) | User picked the library option: battle-tested history/back-button/script-re-execution handling vs. custom code for the same edge cases. One `<script>` tag, same CDN pattern already used for Tailwind. | Swap-out is a base.html-only change; no server-side coupling beyond serving full pages as already done. |
 | Stage 10 R2 failure: stop before RSS write (not "publish anyway, fail loudly") (2026-07-06) | User's call after weighing it: a stale-but-correct feed beats a fresh one pointing at unreachable audio. Superseded by an early connectivity check + 3× retry (60s apart) that make this path rare in practice — most failures (bad/missing creds) are now caught before Stage 1 even starts, not just handled better once they reach Stage 10. | Retry count/delay are Python defaults in `upload_all_pending_with_retries`, not YAML — easy one-line change if tuning is ever needed. |
+| Listener-facing voice standard: smart-generalist / J.K.-Rowling-adult register, not philosophy-reader register (2026-07-11) | User + Cowork locked this in `docs/session_plan_content_quality.md` §1 as the anchor for the whole content-quality pass. Verified against 3 real articles + 2 real crosscuts (read-only, no DB writes) before rollout; user confirmed the calibration. | Prompt-only change (`prompts.yaml`, `stage_crosscut.py`, `episode_candidates.py`) — revert the added sections to roll back; no schema/data impact. |
 
 ---
 

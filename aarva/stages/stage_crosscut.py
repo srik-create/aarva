@@ -382,21 +382,32 @@ OUTPUT — a single JSON object with these exact keys:
   "angle_a":         "<one short sentence naming A's angle / starting point>",
   "angle_b":         "<one short sentence naming B's angle / starting point>",
   "topic_label":     "<2-4 word topic for episode title, lowercase, no punctuation>",
-  "connection_summary": "<one editorial sentence in first-person Aarva voice — what struck you about putting these together>",
+  "connection_summary": "<one editorial sentence — what's interesting about putting these together>",
   "score": <integer 0-10>
 }
 
-Aarva voice for connection_summary: reflective, curious, open-minded.
-**NEVER use first person** (no "I", "we", "us", "our") — Aarva is a
-curatorial voice, not a personality. Use observations:
+topic_label: this becomes the episode's title (shown on /crosscuts,
+the episode page, and /listener-created), so it has to mean something
+to a listener who hasn't read either article — not an internal
+shorthand. Plain, concrete words a smart generalist would use, not a
+category label. "iran war new angles" not "geopolitical reframing";
+"remembering pictures" not "visual memory retention".
+
+Aarva voice for connection_summary: reflective, curious, open-minded,
+third-person (never "I", "we", "us", "our" — Aarva is a curatorial
+voice, not a personality). Smart-generalist register per
+docs/session_plan_content_quality.md §1 — concrete image over
+abstract noun, plain verbs, no jargon. Use observations:
   - "What's interesting is that both writers reach for X, but for
      very different reasons."
   - "These two pieces share an assumption that's rarely questioned."
   - "Read together, the pieces surface a tension neither addresses
      head-on."
 Avoid: "both writers raise important points", "this debate is critical
-now more than ever", any pundit-style synthesis, any "I"/"we" framing.
+now more than ever", any pundit-style synthesis, any "I"/"we" framing,
+and the forbidden words/phrases below.
 
+[[HUMAN_VOICE]]
 Output ONLY the JSON object. No preamble, no explanation, no markdown
 code fence.
 """
@@ -514,9 +525,11 @@ def _persist_candidate(
 #   - outro_text (~80 words) landing the takeaway
 #   - key passages per article (2-3 paragraphs that load-bear the angle)
 #
-# Voice direction: first-person Aarva voice — personal, curious,
-# participant, playful. Self-reflecting framing ("I find it interesting
-# that...") rather than authoritative summarising.
+# Voice direction: third-person curatorial voice — reflective, curious,
+# open, never first-person (see AGENTS.md rule 9a). Smart-generalist
+# register per docs/session_plan_content_quality.md §1 — this stale
+# comment previously said "first-person Aarva voice", which the actual
+# prompts below have always contradicted.
 
 
 _HUMAN_VOICE_RULES = """\
@@ -534,7 +547,9 @@ FORBIDDEN WORDS (these are dead giveaways):
   crucial; pivotal (as filler); landscape (as metaphor); embark;
   unpack / unpacking (as a synonym for explain); resonates with;
   lies at the heart of; multifaceted; holistic; ever-evolving;
-  paramount; testament to; speaks volumes.
+  paramount; testament to; speaks volumes; resonance; juxtaposition;
+  interrogates; grapples with; the discourse; the fabric of; the
+  essence of; what it means to be.
 
 FORBIDDEN PHRASES:
   "in the realm of"; "in today's world"; "at its core"; "in essence";
@@ -552,6 +567,30 @@ PATTERNS TO AVOID:
   — Opening with the topic noun-phrase as the subject ("Migration is
     one of the defining questions of our time"). Start with something
     specific from the article instead.
+  — Sentences that start "This piece / this episode examines / argues
+    / traces / grapples with…". Cut the construction — use an active
+    verb a person would actually say.
+
+═══════════════════════════════════════════════════════════════════════
+TARGET READER (docs/session_plan_content_quality.md §1 — locked, all
+listener-facing copy targets this standard)
+═══════════════════════════════════════════════════════════════════════
+
+Any smart generalist, including someone who isn't a college graduate —
+not someone who reads philosophy for fun. Think J.K. Rowling writing
+for adults, not Salman Rushdie or V.S. Naipaul: warm, specific, easy
+to follow, occasionally pointed. No philosophical density, no
+hedging, no abstract nouns where a concrete image works.
+
+Before finalizing, check against every one of these:
+  — Would this land with a curious 18-year-old with no college
+    background? If not, simplify.
+  — Read it aloud in one breath — does any sentence trip? Break it.
+  — Is there a concrete image in the first sentence — a person, a
+    place, an object, an act? If it opens on an abstract noun
+    ("resonance", "framework", "phenomenon"), rewrite.
+  — Are there words a 12-year-old wouldn't know? Swap them or
+    introduce them naturally.
 
 WRITE THE WAY AN ESSAYIST WRITES FOR THE EAR:
   Contractions ("it's", "doesn't"). Short sentences mixed with longer
@@ -813,7 +852,7 @@ Output just the paragraph. No preamble. No quotation marks. No labels.
 """
 
 
-# Inject the shared anti-LLM-language rules into each of the four
+# Inject the shared anti-LLM-language rules into each of the five
 # editorial prompts. Done at module load so the rendered prompt is one
 # string; the rules block can be edited in one place (above) and every
 # section voice automatically picks it up.
@@ -821,6 +860,7 @@ _INTRO_PROMPT           = _INTRO_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_
 _BRIDGE_PROMPT_A        = _BRIDGE_PROMPT_A.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 _BRIDGE_PROMPT_BETWEEN  = _BRIDGE_PROMPT_BETWEEN.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 _OUTRO_PROMPT           = _OUTRO_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
+_CROSSCUT_EVAL_PROMPT   = _CROSSCUT_EVAL_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 
 
 @dataclass
