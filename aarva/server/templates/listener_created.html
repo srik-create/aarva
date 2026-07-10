@@ -62,4 +62,46 @@
   {% else %}
     <p class="text-cream-muted">No listener-created episodes yet. Try the prompt input at the top of any page to make the first one.</p>
   {% endif %}
+
+  {# Recovered episodes: audio survived a deployment bug, but the
+     title/pairing/script didn't — see aarva/server/routes/create.py
+     for the full story. No edition_id, so no detail-page link and no
+     title_a x title_b (there's no real pairing data to show). #}
+  {% if recovered_episodes %}
+    <div class="mt-12">
+      <p class="text-xs text-cream-muted uppercase tracking-widest mb-4">Recovered</p>
+      <div class="space-y-5">
+        {% for rec in recovered_episodes %}
+          <section class="p-6 bg-peach/60 border border-ink/10 rounded-2xl text-ink">
+            <p class="text-xs text-peach-dark uppercase tracking-widest font-semibold">{{ rec.edition_date }}</p>
+            <h2 class="editorial text-xl font-semibold mt-2 leading-snug">{{ rec.topic_label }}</h2>
+            <p class="text-sm text-ink-light mt-2 leading-relaxed">{{ rec.note }}</p>
+            <div class="mt-5" data-player
+                 data-track-src="{{ rec.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+                 data-track-title="{{ rec.topic_label }}"
+                 data-track-link="/listener-created">
+              <div class="flex items-center gap-4">
+                <button type="button" aria-label="Play"
+                        class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                        data-play-button>
+                  <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                </button>
+                <div class="flex-1">
+                  <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                    <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+                  </div>
+                  <p class="text-xs text-ink-light mt-2">
+                    <span data-current-time>0:00</span>
+                    <span class="mx-1">/</span>
+                    <span data-total-time></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

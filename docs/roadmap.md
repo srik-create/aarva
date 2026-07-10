@@ -29,14 +29,12 @@ GitHub Pages.
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections; five are ready to implement, one (outro music) is
    blocked on an external audio asset. **Sections 1-3 shipped
-   2026-07-11** — see "Recently completed" below. Only 2 of 30
-   existing crosscuts have been backfilled with `subhead_hook` so
-   far (a deliberate small sample, not the full batch — user chose
-   to defer the full backfill; `scripts/backfill_subhead_hooks.py`
-   is idempotent and safe to run anytime for the rest). Next up:
-   Section 4 (show search prompt on `/listener-created`, small,
-   depends on Section 3's `originating_prompt` column) or Section 5
-   (share functionality, self-contained).
+   2026-07-11** — see "Recently completed" below. All 30 existing
+   crosscuts now have `subhead_hook` backfilled (ran on the laptop;
+   goes live on the next daily-pipeline sync). Next up: Section 4
+   (show search prompt on `/listener-created`, small, depends on
+   Section 3's `originating_prompt` column) or Section 5 (share
+   functionality, self-contained).
 
 ---
 
@@ -87,6 +85,25 @@ the sequence.
 
 Most recent first.
 
+- **2 more listener-created episodes discovered lost, added back as
+  "Recovered" entries on `/listener-created`.** Same root cause as
+  the 2026-07-03 incident, different bug: these 2 finished (audio
+  rendered + uploaded — `crosscut_1000001.mp3` / `crosscut_1000002.mp3`
+  in R2) between the 2026-07-06 listener-DB split and the 2026-07-11
+  render.yaml fix, so they landed on Render's ephemeral disk and were
+  wiped by a later redeploy before the fix could save them. Discovered
+  by checking R2 for orphaned audio at the listener-DB's 1,000,000+ id
+  offset. Unlike the original 3, the user chose to surface these
+  rather than leave them orphaned: `aarva/server/routes/create.py`
+  carries a small hardcoded `RECOVERED_EPISODES` list (no DB row to
+  drive this — there's nothing to query, the metadata is genuinely
+  gone) rendered as a distinct, clearly-labeled "Recovered" section on
+  `/listener-created` — no detail-page link or title_a × title_b since
+  there's no real pairing data, just the surviving audio + an honest
+  note about what happened. Also ran the full `subhead_hook` backfill
+  for all remaining 28 crosscuts (had only sampled 2 before) — 0
+  errors; goes live on the next daily-pipeline sync along with
+  today's new content.
 - **Content-quality Sections 2+3 — crosscut sub-headings + search-
   aware crosscuts.** Bundled per the spec's sequencing recommendation
   since both add columns to `editions` on both DBs.

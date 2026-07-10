@@ -58,6 +58,44 @@ from aarva.services.queries import load_crosscut_episodes, load_listener_episode
 logger = logging.getLogger(__name__)
 
 
+# ─── Recovered episodes ───────────────────────────────────────────────────
+#
+# Two listener-built episodes finished successfully (audio rendered +
+# uploaded) between the 2026-07-06 listener-DB split and the
+# 2026-07-11 render.yaml persistent-disk fix — during that window the
+# listener DB lived on Render's ephemeral disk, so a later redeploy
+# wiped their editions/edition_pieces rows before they could be
+# synced anywhere. The raw audio survived in R2; the topic, article
+# pairing, and script did not. Manually curated (there's no DB row to
+# drive this — nothing to query), per user decision 2026-07-11 not to
+# just let the audio sit unreferenced. See docs/roadmap.md.
+#
+# If this list ever grows past a couple of entries, move it to a
+# small data file — a Python constant is fine for two.
+RECOVERED_EPISODES = [
+    {
+        "edition_date": "2026-07-06",
+        "topic_label": "Recovered episode — built 2026-07-06",
+        "note": (
+            "This episode's audio survived a deployment bug that "
+            "wiped its title, article pairing, and script before a "
+            "fix landed on 2026-07-11 — only the finished audio "
+            "could be recovered."
+        ),
+        "audio_url": "output/audio/2026-07-06/crosscut_1000001.mp3",
+    },
+    {
+        "edition_date": "2026-07-07",
+        "topic_label": "Recovered episode — built 2026-07-07",
+        "note": (
+            "Same deployment bug as the 2026-07-06 recovery above — "
+            "only the finished audio could be recovered."
+        ),
+        "audio_url": "output/audio/2026-07-07/crosscut_1000002.mp3",
+    },
+]
+
+
 # ─── Candidate page ──────────────────────────────────────────────────────
 
 @app.get("/create", response_class=HTMLResponse)
@@ -232,5 +270,5 @@ async def listener_created(request: Request) -> HTMLResponse:
     )
     return templates.TemplateResponse(
         request, "listener_created.html",
-        {"crosscuts": crosscuts},
+        {"crosscuts": crosscuts, "recovered_episodes": RECOVERED_EPISODES},
     )
