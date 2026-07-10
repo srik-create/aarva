@@ -629,7 +629,7 @@ LENGTH & VOICE
   "writing in March…", "a 2021 piece that…", "from earlier this year".
   If both pieces are similarly recent and the date doesn't add much,
   skip — don't force it.
-
+{{ prompt_acknowledgment }}
 ═══════════════════════════════════════════════════════════════════════
 DON'T
 ═══════════════════════════════════════════════════════════════════════
@@ -666,6 +666,41 @@ OUTPUT
 ═══════════════════════════════════════════════════════════════════════
 
 Output just the paragraph. No preamble. No quotation marks. No labels.
+"""
+
+
+_SUBHEAD_HOOK_PROMPT = """\
+Write the SUB-HEADING HOOK for a Crosscut episode — content-quality
+Section 2 (docs/session_plan_content_quality.md §2). This is a single
+listener-facing sentence shown under the episode's topic-label title
+on the browse page and the episode page, replacing what used to be a
+plain "Title A × Title B" byline.
+
+═══════════════════════════════════════════════════════════════════════
+LENGTH & VOICE
+═══════════════════════════════════════════════════════════════════════
+
+— One sentence, 20–40 words.
+— Poses a listener question, or names the shared insight the pairing
+  offers. Do NOT restate either article's title.
+— **NEVER use first person** ("I", "we", "us", "our").
+{{ prompt_acknowledgment }}
+[[HUMAN_VOICE]]
+═══════════════════════════════════════════════════════════════════════
+PAIR
+═══════════════════════════════════════════════════════════════════════
+
+Topic:            {{ topic_label }}
+Shared question:  {{ shared_question }}
+Angle A:           {{ angle_a }}
+Angle B:           {{ angle_b }}
+Connection:        {{ connection_summary }}
+
+═══════════════════════════════════════════════════════════════════════
+OUTPUT
+═══════════════════════════════════════════════════════════════════════
+
+Output just the one sentence. No preamble. No quotation marks. No labels.
 """
 
 
@@ -852,7 +887,7 @@ Output just the paragraph. No preamble. No quotation marks. No labels.
 """
 
 
-# Inject the shared anti-LLM-language rules into each of the five
+# Inject the shared anti-LLM-language rules into each of the six
 # editorial prompts. Done at module load so the rendered prompt is one
 # string; the rules block can be edited in one place (above) and every
 # section voice automatically picks it up.
@@ -861,6 +896,7 @@ _BRIDGE_PROMPT_A        = _BRIDGE_PROMPT_A.replace("[[HUMAN_VOICE]]", _HUMAN_VOI
 _BRIDGE_PROMPT_BETWEEN  = _BRIDGE_PROMPT_BETWEEN.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 _OUTRO_PROMPT           = _OUTRO_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 _CROSSCUT_EVAL_PROMPT   = _CROSSCUT_EVAL_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
+_SUBHEAD_HOOK_PROMPT    = _SUBHEAD_HOOK_PROMPT.replace("[[HUMAN_VOICE]]", _HUMAN_VOICE_RULES)
 
 
 @dataclass
@@ -942,6 +978,8 @@ def _persist_episode(
     passage_b: str,
     *,
     target_db: Optional[Database] = None,
+    subhead_hook: Optional[str] = None,
+    originating_prompt: Optional[str] = None,
 ) -> int:
     """Create the editions row + 2 edition_pieces rows for the crosscut
     episode. Returns the new edition_id. Both pieces start at
@@ -958,15 +996,21 @@ def _persist_episode(
     since `articles` never moves — and the candidate-link update is
     skipped for target_db writes, since crosscut_pair_candidates.edition_id
     would otherwise point at an id in the wrong database's `editions`
-    table (nothing reads that link for the on-demand flow anyway)."""
+    table (nothing reads that link for the on-demand flow anyway).
+
+    subhead_hook / originating_prompt: content-quality Sections 2/3 —
+    see docs/session_plan_content_quality.md. Both NULL for daily-
+    pipeline crosscuts."""
     write_db = target_db if target_db is not None else db
     with write_db.connect() as conn:
         # Editions row.
         cur = conn.execute("""
             INSERT INTO editions
-                (edition_date, edition_type, topic_label, intro_text, outro_text)
-            VALUES (?, 'crosscut', ?, ?, ?)
-        """, (today.isoformat(), cand.get("topic_label"), intro, outro))
+                (edition_date, edition_type, topic_label, intro_text,
+                 outro_text, subhead_hook, originating_prompt)
+            VALUES (?, 'crosscut', ?, ?, ?, ?, ?)
+        """, (today.isoformat(), cand.get("topic_label"), intro, outro,
+              subhead_hook, originating_prompt))
         edition_id = int(cur.lastrowid)
 
         # Article A — first piece. bridge_text is the article-intro
@@ -1035,6 +1079,7 @@ def build_episode_script(
     *,
     llm: Optional[LLMClient] = None,
     target_db: Optional[Database] = None,
+    originating_prompt: Optional[str] = None,
 ) -> CrosscutBuildStats:
     """Generate intro / bridge / outro / key passages for today's
     user-selected crosscut pair and persist the episode.
@@ -1043,6 +1088,10 @@ def build_episode_script(
     target_db: passed straight through to `_persist_episode` — set by
     the on-demand /create worker to route the built episode into the
     listener DB instead of the main DB.
+    originating_prompt: content-quality Section 3 — the listener's
+    /create search string, when this build came from an on-demand
+    request. None for daily-pipeline crosscuts. When set, the intro
+    and subhead_hook prompts are told to acknowledge it.
     """
     stats = CrosscutBuildStats()
     today = date.today()
@@ -1093,10 +1142,49 @@ def build_episode_script(
         excerpt_b=excerpt_b,
     )
 
+    # Content-quality Section 3: when this build came from a listener's
+    # /create search, tell the intro + subhead_hook prompts to
+    # acknowledge it. Computed once here (rather than baked into
+    # common_kwargs) since the intro and subhead prompts each need
+    # their own phrasing of the same instruction.
+    intro_prompt_ack = ""
+    subhead_prompt_ack = ""
+    if originating_prompt:
+        intro_prompt_ack = (
+            "\n— **This episode was built from a listener's search: "
+            f'"{originating_prompt}"**. The OPENING SENTENCE should '
+            "acknowledge what they asked about before introducing the "
+            "pairing — e.g. \"You asked about X — here are two pieces "
+            "that come at it from different angles.\" Paraphrase "
+            "naturally rather than quoting the search verbatim if it "
+            "reads awkwardly aloud; keep the frame, not the exact words.\n"
+        )
+        subhead_prompt_ack = (
+            "\n═══════════════════════════════════════════════════════"
+            f'════════════\nLISTENER\'S SEARCH\n'
+            "═══════════════════════════════════════════════════════"
+            "════════════\n\n"
+            f'This episode was built from a listener\'s search: "{originating_prompt}"\n'
+            "Tie the hook back to what they asked about — it should "
+            "read as engaging their question, not just describing the "
+            "pairing in the abstract.\n"
+        )
+
     logger.info("Crosscut build: generating intro…")
-    intro = _generate_text(llm, _INTRO_PROMPT, temperature=0.7, **common_kwargs)
+    intro = _generate_text(
+        llm, _INTRO_PROMPT, temperature=0.7,
+        prompt_acknowledgment=intro_prompt_ack, **common_kwargs,
+    )
     if intro:
         stats.intro_generated = True
+
+    logger.info("Crosscut build: generating sub-heading hook…")
+    subhead_hook = _generate_text(
+        llm, _SUBHEAD_HOOK_PROMPT, temperature=0.6,
+        prompt_acknowledgment=subhead_prompt_ack, **common_kwargs,
+    )
+    if isinstance(subhead_hook, str):
+        subhead_hook = subhead_hook.strip()
 
     logger.info("Crosscut build: generating bridge A (intro to piece A)…")
     bridge_a = _generate_text(
@@ -1162,11 +1250,22 @@ def build_episode_script(
         stats.errors += 1
         return stats
 
+    # subhead_hook is a display enhancement, not core content — a
+    # failure here shouldn't block the episode (templates fall back
+    # to "title_a x title_b" cleanly when it's NULL, per Section 2).
+    if not subhead_hook:
+        logger.warning(
+            "Crosscut build: subhead_hook generation failed or empty — "
+            "episode will fall back to 'title_a x title_b' display."
+        )
+        subhead_hook = None
+
     stats.edition_id = _persist_episode(
         db, today, cand,
         intro=intro, bridge_a=bridge_a, bridge_between=bridge_between,
         outro=outro, passage_a=passage_a, passage_b=passage_b,
         target_db=target_db,
+        subhead_hook=subhead_hook, originating_prompt=originating_prompt,
     )
     logger.info(
         "Crosscut build: edition #%d created. Next step: review the "

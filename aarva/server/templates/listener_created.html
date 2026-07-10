@@ -17,7 +17,14 @@
           <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">
             <a href="/crosscut/{{ crosscut.edition_id }}" class="hover:opacity-70 transition-opacity">{{ (crosscut.topic_label or "Two angles") | title_case }}</a>
           </h2>
-          <p class="text-sm text-ink-light mt-3 leading-relaxed">
+          {# Content-quality Section 2: subhead_hook is the primary
+             sub-heading when set; title_a x title_b demotes to
+             secondary metadata underneath. NULL subhead_hook (older
+             episodes) falls back cleanly — no blank slot. #}
+          {% if crosscut.subhead_hook %}
+            <p class="text-ink mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
+          {% endif %}
+          <p class="text-sm text-ink-light mt-2 leading-relaxed">
             <em class="editorial">{{ crosscut.title_a | title_case }}</em>
             <span class="text-ink-light mx-1">×</span>
             <em class="editorial">{{ crosscut.title_b | title_case }}</em>
