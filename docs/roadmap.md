@@ -85,6 +85,24 @@ the sequence.
 
 Most recent first.
 
+- **Lost-episode diagnostic now runs automatically on every sync,
+  not manually.** Ran the diagnostic below by hand right after it
+  deployed — came back empty (0 lost episodes found), meaning the
+  jobs-table evidence for the 2 episodes lost in the ephemeral-disk
+  incident was already gone (most likely overwritten by a sync that
+  ran sometime between the losses and now), so their real article
+  pairing couldn't be recovered after all — the "Recovered" generic
+  entries stay as-is. That miss is exactly why relying on someone
+  remembering to check before syncing wasn't good enough:
+  `admin_sync_db` now calls the same check (extracted into a shared
+  `_find_lost_episodes` helper) automatically, before the atomic
+  replace overwrites the jobs table — every sync, no reminder needed.
+  Findings ride along in the sync response as `lost_episodes_found`
+  and get logged loudly server-side; `scripts/sync_db_to_render.sh`
+  parses the response and prints an unmissable warning banner in the
+  operator's terminal if anything turns up, instead of leaving it
+  buried in a JSON blob. The `GET` endpoint stays for on-demand/
+  between-sync checks.
 - **Listener-DB resilience: loud startup check + R2 backup + a
   diagnostic for lost episodes.** Prompted by the 2 more losses noted
   below — two bugs have now wiped listener episodes via two different

@@ -137,3 +137,30 @@ fi
 echo "[sync] OK — server response:"
 cat "$RESPONSE_FILE"
 echo ""
+
+# The server checks for lost listener episodes (jobs whose build
+# finished but whose editions/edition_pieces rows are already gone —
+# see aarva/server/routes/admin.py::_find_lost_episodes) BEFORE this
+# sync overwrites its jobs table, since that's the last moment this
+# evidence exists. Surface it here instead of leaving it buried in the
+# JSON above — this is the whole point of running the check
+# automatically rather than relying on someone remembering to check
+# first (which is exactly what happened 2026-07-11: a discovery only
+# worked because a sync hadn't happened yet).
+LOST_COUNT="$(python3 -c "
+import json, sys
+try:
+    data = json.load(open('$RESPONSE_FILE'))
+    print(len(data.get('lost_episodes_found') or []))
+except Exception:
+    print(0)
+" 2>/dev/null || echo 0)"
+if [ "${LOST_COUNT:-0}" -gt 0 ] 2>/dev/null; then
+    echo "############################################################"
+    echo "# WARNING: $LOST_COUNT listener episode(s) found whose audio finished"
+    echo "# but whose editions row is gone (see 'lost_episodes_found' above"
+    echo "# for the original article ids / topic / requester email — this"
+    echo "# sync is about to overwrite the only place that data existed)."
+    echo "# Decide now whether to reconstruct them before continuing."
+    echo "############################################################"
+fi
