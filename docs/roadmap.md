@@ -25,30 +25,11 @@ GitHub Pages.
 
 ## In progress
 
-1. **BUG — listener DB is on ephemeral disk on Render.** The
-   listener-DB split (PR #55) landed the code correctly, but
-   `render.yaml` was never updated to set `AARVA_LISTENER_DB_PATH`.
-   `aarva/server/config.py` falls back to the relative default
-   `aarva/data/aarva-listener.db`, which resolves to
-   `/app/aarva/data/aarva-listener.db` inside the container — i.e.
-   the ephemeral filesystem, NOT the persistent disk at `/data`.
-   Every Render redeploy wipes the file, taking every listener
-   episode built since the previous deploy with it.
-   **Fix:** one line in `render.yaml` — add
-   `AARVA_LISTENER_DB_PATH: /data/aarva-listener.db` next to the
-   existing `AARVA_DB_PATH` env var. Commit, push, merge, deploy.
-   Listener episodes lost in the interim are unrecoverable from
-   the DB; R2 audio may survive but is unreachable via the site.
-   **Trigger: immediate — this is why the listener-created bug
-   the user thought was fixed keeps resurfacing.**
-
-2. **Content-quality + share + listener-transparency pass.**
+1. **Content-quality + share + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections; five are ready to implement, one (outro music) is
    blocked on an external audio asset. Sequencing + voice
-   standard locked in the spec. Depends on item 1 (the
-   ephemeral-disk fix) landing first so the schema additions in
-   Sections 2-4 land cleanly on both the main and listener DBs.
+   standard locked in the spec. Starting with Section 1.
 
 ---
 
@@ -95,9 +76,28 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-06)
+## Recently completed (2026-06-29 → 2026-07-11)
 
 Most recent first.
+
+### 2026-07-11
+
+- **Fixed: listener DB was on Render's ephemeral disk, not the
+  persistent one.** The listener-DB split (PR #55, shipped
+  2026-07-06) added `AARVA_LISTENER_DB_PATH` support in code, but
+  `render.yaml` was never updated to actually set it — so the path
+  fell back to the code default, which resolves inside the
+  container's ephemeral filesystem rather than the `/data` disk.
+  Every redeploy since 2026-07-06 (autoDeploy is on for every push to
+  `main` — which includes the iPhone-nav and Stage-10 PRs that landed
+  after the split) wiped any listener episode built since the
+  previous deploy. Confirmed via the live `/listener-created` page
+  before fixing: only the one pre-existing 2026-06-29 episode was
+  showing. Fix: added `AARVA_LISTENER_DB_PATH: /data/aarva-listener.db`
+  to `render.yaml`, mirroring the existing `AARVA_DB_PATH` entry.
+  Episodes lost in the interim are unrecoverable from the DB (R2 audio
+  may survive, per the same recovery-limits established for the
+  2026-07-03 incident, but isn't linked from anywhere on the site).
 
 ### 2026-07-06
 
