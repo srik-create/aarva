@@ -309,3 +309,12 @@ def _run_job(
         "episode_worker: job %d completed → edition %d (audio_url path set)",
         job_id, edition_id,
     )
+
+    # 7. Back up the listener DB to R2. The listener DB has no other
+    # backup — nothing syncs it anywhere, unlike the main DB. Two
+    # separate bugs have already wiped listener episodes this way;
+    # this gives every build a redundant copy independent of Render's
+    # disk entirely. Non-fatal: failure here doesn't affect the build
+    # the listener is waiting on.
+    from aarva.services.listener_db_backup import backup_listener_db_to_r2
+    backup_listener_db_to_r2(config, listener_db.path)

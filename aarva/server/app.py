@@ -68,6 +68,35 @@ async def lifespan(app: FastAPI):
         server_cfg.public_url,
     )
 
+    # Fail loud (not loud-and-crash — the rest of the site works fine
+    # without the listener DB) if the listener DB isn't on the same
+    # disk as the main DB. Checking "same directory as db_path" rather
+    # than hardcoding a path like /data keeps this portable across
+    # hosts — db_path is already known-good (it's been correctly on
+    # the persistent disk since day one), so requiring listener_db_path
+    # to be a sibling file is a self-verifying invariant instead of an
+    # assumption about Render's mount layout specifically.
+    #
+    # This is exactly the class of bug that silently lost listener
+    # episodes for 5 days (2026-07-06 -> 2026-07-11): AARVA_LISTENER_DB_PATH
+    # was never added to render.yaml, so it fell back to a relative
+    # default that resolved inside the container's ephemeral
+    # filesystem. A loud log here means the NEXT time a required env
+    # var gets forgotten, it's caught within minutes of the first
+    # deploy, not days later when someone asks why an episode vanished.
+    if server_cfg.is_production and listener_db_path.parent != db_path.parent:
+        logger.error(
+            "=" * 70 + "\n"
+            "CRITICAL: listener DB is NOT alongside the main DB — it "
+            "will NOT survive a redeploy.\n"
+            f"  main DB:      {db_path}  (dir: {db_path.parent})\n"
+            f"  listener DB:  {listener_db_path}  (dir: {listener_db_path.parent})\n"
+            "Fix AARVA_LISTENER_DB_PATH so it points at a file in the "
+            "SAME directory as AARVA_DB_PATH (the persistent disk "
+            "mount) — see aarva/listener_db.py and render.yaml.\n"
+            + "=" * 70
+        )
+
     app.state.server_cfg = server_cfg
     app.state.pipeline_cfg = pipeline_cfg
     app.state.db = db

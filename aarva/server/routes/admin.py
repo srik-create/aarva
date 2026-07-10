@@ -232,3 +232,90 @@ async def admin_sync_db(request: Request) -> JSONResponse:
         if staging.exists():
             staging.unlink(missing_ok=True)
         raise HTTPException(status_code=500, detail=f"sync failed: {e}") from e
+
+
+@app.get("/admin/diagnose-lost-episodes")
+async def admin_diagnose_lost_episodes(request: Request) -> JSONResponse:
+    """Find listener-built episodes whose editions/edition_pieces rows
+    are gone but whose build-job record survived — evidence of exactly
+    the class of bug that hit twice already (2026-07-03 sync overwrite,
+    2026-07-06→11 ephemeral disk): both wiped the listener DB, but the
+    `jobs` table lives in the *main* DB, which neither bug touched.
+
+    A completed build_crosscut job's `result_json.edition_id` should
+    exist in one of the two DBs' `editions` tables. If it doesn't, the
+    episode was lost after finishing — but the job's `payload_json`
+    still has the real article ids, topic label, requester email, etc,
+    letting a lost episode be reconstructed with real data instead of
+    a generic placeholder.
+
+    Request:
+      GET /admin/diagnose-lost-episodes
+      Authorization: Bearer <AARVA_RENDER_SYNC_TOKEN>
+
+    Response (200):
+      {"status": "ok", "count": <int>, "lost_episodes": [...]}
+    """
+    _check_token(request)
+
+    db = request.app.state.db
+    listener_db = request.app.state.listener_db
+
+    with db.connect() as conn:
+        job_rows = conn.execute("""
+            SELECT id, payload_json, result_json, created_at, finished_at
+              FROM jobs
+             WHERE kind = 'build_crosscut' AND status = 'completed'
+        """).fetchall()
+
+    lost: list[dict] = []
+    for row in job_rows:
+        try:
+            payload = json.loads(row["payload_json"] or "{}")
+            result = json.loads(row["result_json"] or "{}")
+        except (TypeError, ValueError):
+            continue
+        edition_id = result.get("edition_id")
+        if edition_id is None:
+            continue
+
+        with db.connect() as conn:
+            exists_main = conn.execute(
+                "SELECT 1 FROM editions WHERE id = ?", (edition_id,)
+            ).fetchone() is not None
+        with listener_db.connect() as lconn:
+            exists_listener = lconn.execute(
+                "SELECT 1 FROM editions WHERE id = ?", (edition_id,)
+            ).fetchone() is not None
+        if exists_main or exists_listener:
+            continue  # this one's fine — not lost
+
+        entry: dict = {
+            "job_id": row["id"],
+            "edition_id": edition_id,
+            "created_at": row["created_at"],
+            "finished_at": row["finished_at"],
+            "topic_label": payload.get("topic_label"),
+            "why": payload.get("why"),
+            "prompt": payload.get("prompt"),
+            "requester_email": payload.get("requester_email"),
+        }
+        for payload_key, out_key in (
+            ("article_a_id", "article_a"), ("article_b_id", "article_b"),
+        ):
+            article_id = payload.get(payload_key)
+            entry[out_key] = None
+            if article_id is None:
+                continue
+            with db.connect() as conn:
+                arow = conn.execute("""
+                    SELECT a.id, a.title, a.byline, a.canonical_url,
+                           p.name AS publication
+                      FROM articles a
+                      JOIN publications p ON p.id = a.publication_id
+                     WHERE a.id = ?
+                """, (article_id,)).fetchone()
+            entry[out_key] = dict(arow) if arow else {"id": article_id, "note": "article not found"}
+        lost.append(entry)
+
+    return JSONResponse({"status": "ok", "count": len(lost), "lost_episodes": lost})
