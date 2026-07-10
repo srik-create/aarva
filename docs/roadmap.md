@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-06
+**Last updated:** 2026-07-11
 
 ---
 
@@ -25,7 +25,48 @@ GitHub Pages.
 
 ## In progress
 
-Nothing actively in flight.
+1. **BUG — listener DB is on ephemeral disk on Render.** The
+   listener-DB split (PR #55) landed the code correctly, but
+   `render.yaml` was never updated to set `AARVA_LISTENER_DB_PATH`.
+   `aarva/server/config.py` falls back to the relative default
+   `aarva/data/aarva-listener.db`, which resolves to
+   `/app/aarva/data/aarva-listener.db` inside the container — i.e.
+   the ephemeral filesystem, NOT the persistent disk at `/data`.
+   Every Render redeploy wipes the file, taking every listener
+   episode built since the previous deploy with it.
+   **Fix:** one line in `render.yaml` — add
+   `AARVA_LISTENER_DB_PATH: /data/aarva-listener.db` next to the
+   existing `AARVA_DB_PATH` env var. Commit, push, merge, deploy.
+   Listener episodes lost in the interim are unrecoverable from
+   the DB; R2 audio may survive but is unreachable via the site.
+   **Trigger: immediate — this is why the listener-created bug
+   the user thought was fixed keeps resurfacing.**
+
+2. **Content-quality + share + listener-transparency pass**
+   (spec to be written by Cowork; work by Claude Code):
+   - **Language simplification.** All commentary + subtitles
+     rewritten to plain "smart generalist" voice — accessible to
+     anyone, not just people who read philosophy for fun. Target:
+     J.K.-Rowling-plain, question-first where it fits, no jargon.
+     Applies to Stage 8a hooks, Stage 8b contextualisation, all
+     crosscut prompts (intro/bridge/outro), crosscut topic labels.
+   - **Better crosscut sub-headings.** Current subhead is just
+     `title_a × title_b`, which surfaces nothing about the
+     connection. Add a listener-facing one-sentence hook that
+     draws out the resonance + the "why listen".
+   - **Search-created crosscuts reflect the search prompt.** When
+     a listener builds a crosscut from a search, the topic label +
+     commentary should acknowledge the prompt directly. Right now
+     the prompt is silently discarded after candidate selection.
+   - **Show search query on /listener-created listings** so
+     visitors can see what someone else asked for.
+   - **Share functionality** on article + crosscut pages. Web
+     Share API on mobile, "Copy link" fallback, OG + Twitter Card
+     meta for good previews in messaging apps + timelines.
+   - **Outro music (parked for now).** Small santoor + vocalised
+     "Aarva" appended to every episode. Waiting on audio asset;
+     ffmpeg concat will be a small Stage 10 addition once asset
+     lands.
 
 ---
 
