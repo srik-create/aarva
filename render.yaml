@@ -23,6 +23,17 @@ services:
       # deploys.
       - key: AARVA_DB_PATH
         value: /data/aarva.db
+      # Same persistent disk, separate file — listener-built episodes
+      # (see aarva/listener_db.py). Without this, aarva/server/config.py
+      # falls back to the relative default (aarva/data/aarva-listener.db),
+      # which resolves inside the container's ephemeral filesystem, NOT
+      # this disk — every redeploy would then wipe every listener
+      # episode built since the previous deploy. Discovered 2026-07-11:
+      # this env var was never added when the listener-DB split (PR #55)
+      # shipped 2026-07-06, so that exact loss had been happening on
+      # every deploy since.
+      - key: AARVA_LISTENER_DB_PATH
+        value: /data/aarva-listener.db
       - key: AARVA_LOG_LEVEL
         value: INFO
       # Update once Cloudflare DNS points aarva.app at this service.
