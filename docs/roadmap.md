@@ -85,6 +85,35 @@ the sequence.
 
 Most recent first.
 
+- **Listener-DB resilience: loud startup check + R2 backup + a
+  diagnostic for lost episodes.** Prompted by the 2 more losses noted
+  below — two bugs have now wiped listener episodes via two different
+  mechanisms, so point fixes for each weren't enough.
+  - `aarva/server/app.py` now checks at startup (production only)
+    that `AARVA_LISTENER_DB_PATH` and `AARVA_DB_PATH` resolve to the
+    same directory — a self-verifying invariant (main DB's directory
+    is already known-good) rather than hardcoding Render's `/data`
+    mount specifically, so it's portable to another host. Logs a
+    loud, unmissable error if they diverge; doesn't crash the app
+    (the rest of the site works fine without the listener DB). This
+    is exactly the check that would have caught the render.yaml
+    omission within minutes instead of 5 days.
+  - New `aarva/services/listener_db_backup.py`, called from
+    `episode_worker.py` right after every successful build: gzips the
+    current listener DB and uploads it to R2, dated by day. The
+    listener DB previously had zero backup of any kind — nothing
+    syncs it anywhere, unlike the main DB. Restore is manual (no
+    restore endpoint — documented in the module docstring); this is a
+    last-resort safety net, not live failover.
+  - New `GET /admin/diagnose-lost-episodes` (bearer-token protected,
+    same pattern as `/admin/sync-db`): finds completed
+    `build_crosscut` jobs whose stamped edition doesn't exist in
+    either DB. The `jobs` table lives in the main DB, which neither
+    incident's bug touched, so a lost episode's original article ids,
+    topic label, and requester email can potentially still be pulled
+    from its job record — kept as a permanent diagnostic, not removed
+    after one use, since the same signal would be useful if this ever
+    happens a third time.
 - **2 more listener-created episodes discovered lost, added back as
   "Recovered" entries on `/listener-created`.** Same root cause as
   the 2026-07-03 incident, different bug: these 2 finished (audio
