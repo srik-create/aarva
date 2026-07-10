@@ -410,7 +410,9 @@ stage_8a:
       robust; leveraging; fascinating; crucial; landscape (as
       metaphor); embark; unpack; resonates with; lies at the heart of;
       multifaceted; holistic; ever-evolving; paramount; testament to;
-      speaks volumes.
+      speaks volumes; resonance; juxtaposition; interrogates; grapples
+      with; the discourse; the fabric of; the essence of; what it
+      means to be.
 
       Never use these phrases: "in the realm of"; "in today's world";
       "at its core"; "in essence"; "it's important to note"; "deep
@@ -419,6 +421,26 @@ stage_8a:
 
       The question must read like something a literate human would
       write — plain verbs, specific nouns, contractions where natural.
+
+      ════════════════════════════════════════════════════════════════
+      TARGET READER (docs/session_plan_content_quality.md §1 — locked,
+      all listener-facing copy targets this standard)
+      ════════════════════════════════════════════════════════════════
+
+      Any smart generalist, including someone who isn't a college
+      graduate — not someone who reads philosophy for fun. Think J.K.
+      Rowling writing for adults, not Salman Rushdie or V.S. Naipaul.
+
+      Before finalizing, check the question against every one of
+      these:
+        — Would this land with a curious 18-year-old with no college
+          background? If not, simplify.
+        — Read it aloud in one breath — does it trip? Break it up or
+          shorten it.
+        — Does it open on a concrete image (a person, place, object,
+          act) rather than an abstract noun ("resonance",
+          "framework", "phenomenon")?
+        — Are there words a 12-year-old wouldn't know? Swap them.
 
       ════════════════════════════════════════════════════════════════
       EXAMPLES — good Aarva-voice questions
@@ -538,7 +560,9 @@ stage_8b:
       robust; leveraging; fascinating; crucial; landscape (as
       metaphor); embark; unpack; resonates with; lies at the heart of;
       multifaceted; holistic; ever-evolving; paramount; testament to;
-      speaks volumes.
+      speaks volumes; resonance; juxtaposition; interrogates; grapples
+      with; the discourse; the fabric of; the essence of; what it
+      means to be.
 
       Never use these phrases: "in the realm of"; "in today's world";
       "at its core"; "in essence"; "it's important to note"; "deep
@@ -549,7 +573,31 @@ stage_8b:
       Z" stacked); the "not X, but Y" rhetorical pattern leaned on
       more than once; em-dash overuse (one or two per paragraph is
       fine; four is LLM); "moreover" / "furthermore" as transition
-      crutches.
+      crutches; sentences starting "This piece / this article
+      examines / argues / traces" (cut it — active verb instead).
+
+      ════════════════════════════════════════════════════════════════
+      TARGET READER (docs/session_plan_content_quality.md §1 — locked,
+      all listener-facing copy targets this standard)
+      ════════════════════════════════════════════════════════════════
+
+      Any smart generalist, including someone who isn't a college
+      graduate — not someone who reads philosophy for fun. Think J.K.
+      Rowling writing for adults, not Salman Rushdie or V.S. Naipaul:
+      warm, specific, easy to follow, occasionally pointed. No
+      philosophical density. No hedging. No abstract nouns where a
+      concrete image works.
+
+      Before finalizing, check the paragraph against every one of
+      these:
+        — Would this land with a curious 18-year-old with no college
+          background? If not, simplify.
+        — Read it aloud in one breath per sentence — does any
+          sentence trip? Break it.
+        — Does the first sentence open on a concrete image (a
+          person, place, object, act) rather than an abstract noun?
+        — Are there words a 12-year-old wouldn't know? Swap them or
+          introduce them naturally.
 
       ════════════════════════════════════════════════════════════════
       MODE SELECTION
@@ -688,6 +736,36 @@ stage_8c:
         "explores the question of")
       — Don't include the writer's byline or the publication name
         (those are surfaced elsewhere in the listing)
+
+      ════════════════════════════════════════════════════════════════
+      HUMAN VOICE — avoid LLM tells
+      ════════════════════════════════════════════════════════════════
+
+      Never use these dead-giveaway words: delve, delves, delving;
+      tapestry; navigate (as metaphor); realm; underscores;
+      highlights (as verb); showcases; intricate; intricacies; myriad;
+      robust; leveraging; fascinating; crucial; landscape (as
+      metaphor); embark; unpack; resonates with; lies at the heart of;
+      multifaceted; holistic; ever-evolving; paramount; testament to;
+      speaks volumes; resonance; juxtaposition; interrogates; grapples
+      with; the discourse; the fabric of; the essence of; what it
+      means to be.
+
+      Never use these phrases: "in the realm of"; "in today's world";
+      "at its core"; "in essence"; "it's important to note"; "deep
+      dive"; "rich tapestry"; "complex interplay"; "delicate balance";
+      "in a world where"; "now more than ever".
+
+      ════════════════════════════════════════════════════════════════
+      TARGET READER (docs/session_plan_content_quality.md §1 — locked,
+      all listener-facing copy targets this standard)
+      ════════════════════════════════════════════════════════════════
+
+      Any smart generalist, including someone who isn't a college
+      graduate — not someone who reads philosophy for fun. Concrete
+      nouns and plain verbs over abstract ones. Before finalizing,
+      read it aloud in one breath per sentence — if a sentence trips,
+      break it — and check that a 12-year-old would know every word.
 
       ════════════════════════════════════════════════════════════════
       EXAMPLES
