@@ -23,6 +23,13 @@ output:
   # output still works for inspecting the web page in a browser.
   public_url_base: https://srik-create.github.io/aarva
 
+  # The interactive web app (FastAPI, on Render) — DISTINCT from
+  # public_url_base above, which is the static GitHub Pages HTML/RSS
+  # site. This is the URL podcast descriptions point listeners back
+  # to (2026-07-12), so they can find /create, /listener-created,
+  # etc. — features that only exist on this app, not on GH Pages.
+  aarva_app_url: https://aarva.app
+
   # Podcast channel metadata (shown in podcast apps when listeners subscribe).
   feed_title: Aarva
   # Block-literal (|) preserves the line breaks the user wrote.

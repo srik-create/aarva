@@ -72,6 +72,23 @@ def _xml_esc(s: Optional[str]) -> str:
     return html.escape(s or "", quote=True)
 
 
+def _aarva_app_reference_html(aarva_app_url: str) -> str:
+    """HTML line pointing listeners at the interactive web app.
+
+    aarva_app_url is the FastAPI app on Render (aarva.app) — distinct
+    from output.public_url_base (the static GitHub Pages HTML/RSS
+    site) used elsewhere in this module for item <link> targets.
+    Podcast apps (Apple/Spotify/YouTube) only show the static feed, so
+    this is how listeners there discover /create, /listener-created,
+    etc.
+    """
+    display = aarva_app_url.split("://", 1)[-1]
+    return (
+        f'For more features and details, visit '
+        f'<a href="{_xml_esc(aarva_app_url)}/">{_xml_esc(display)}</a>'
+    )
+
+
 def _format_rfc822(dt: datetime) -> str:
     """RSS pubDate format: RFC 822."""
     if dt.tzinfo is None:
@@ -192,7 +209,8 @@ def _audio_byte_length(audio_url: str, package_root: Path) -> int:
 
 
 def _item_xml(piece: dict, public_url_base: str, package_root: Path,
-              feed_image: str = "", audio_url_base: str = "") -> str:
+              feed_image: str = "", audio_url_base: str = "",
+              aarva_app_url: str = "") -> str:
     audio_url = _audio_full_url(
         piece["audio_url"],
         audio_url_base or public_url_base,
@@ -229,6 +247,8 @@ def _item_xml(piece: dict, public_url_base: str, package_root: Path,
             f'Read at source: <a href="{_xml_esc(piece["canonical_url"])}">'
             f'{_xml_esc(piece["publication_name"] or piece["canonical_url"])}</a>'
         )
+    if aarva_app_url:
+        description_parts.append(_aarva_app_reference_html(aarva_app_url))
     description = "<br/><br/>".join(description_parts)
 
     item_title = piece.get("title") or "Untitled"
@@ -271,7 +291,8 @@ def _item_xml(piece: dict, public_url_base: str, package_root: Path,
 
 
 def _crosscut_item_xml(cc: dict, public_url_base: str, package_root: Path,
-                       feed_image: str = "", audio_url_base: str = "") -> str:
+                       feed_image: str = "", audio_url_base: str = "",
+                       aarva_app_url: str = "") -> str:
     """Render ONE RSS item for a crosscut episode (not two — both
     pieces share the same audio file and represent a single listening
     unit)."""
@@ -318,6 +339,8 @@ def _crosscut_item_xml(cc: dict, public_url_base: str, package_root: Path,
         )
     if sources:
         desc_parts.append("Sources:<br/>" + "<br/>".join(sources))
+    if aarva_app_url:
+        desc_parts.append(_aarva_app_reference_html(aarva_app_url))
     description = "<br/><br/>".join(desc_parts)
 
     # Per-item link — point at the crosscut HTML page (rendered by
@@ -380,11 +403,25 @@ def generate_feed(
 ) -> FeedStats:
     output_cfg = config.raw.get("output", {}) or {}
     public_url_base = output_cfg.get("public_url_base", "file:///")
+    # DISTINCT from public_url_base (the static GH Pages HTML/RSS
+    # site) — this is the interactive web app, where /create,
+    # /listener-created, etc. actually live. See
+    # _aarva_app_reference_html()'s docstring for why podcast
+    # descriptions point here instead.
+    aarva_app_url = output_cfg.get("aarva_app_url", "https://aarva.app").rstrip("/")
     feed_title = output_cfg.get("feed_title", "Aarva")
     feed_description = output_cfg.get(
         "feed_description",
         "The world as your classroom, the finest journalism as your "
         "curriculum. Written by humans. Narrated by AI.",
+    )
+    # Channel-level <description>/<itunes:summary> are XML-escaped
+    # plain text (not CDATA-wrapped like per-item descriptions), so
+    # this is a plain-text line, not the <br/><br/>+<a> HTML used
+    # per-item below.
+    feed_description = (
+        feed_description.rstrip()
+        + f"\n\nFor more features and details, visit {aarva_app_url}/"
     )
     feed_author = output_cfg.get("feed_author", "Aarva")
     feed_email = output_cfg.get("feed_email", "aarva@example.com")
@@ -429,12 +466,12 @@ def generate_feed(
     items_xml = "\n".join(
         _crosscut_item_xml(
             item, public_url_base, package_root, feed_image,
-            audio_url_base=audio_url_base,
+            audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
         )
         if item["_kind"] == "crosscut"
         else _item_xml(
             item, public_url_base, package_root, feed_image,
-            audio_url_base=audio_url_base,
+            audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
         )
         for item in combined
     )
