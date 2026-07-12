@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-11
+**Last updated:** 2026-07-12
 
 ---
 
@@ -35,6 +35,51 @@ GitHub Pages.
    (show search prompt on `/listener-created`, small, depends on
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
+
+2. **BUG — `/today`'s crosscut card missed the subhead_hook update.**
+   Sections 2-3 of the content-quality pass updated
+   `crosscuts_list.html`, `crosscut.html` (detail), and
+   `listener_created.html` to show `subhead_hook` as the primary
+   sub-heading with `title_a × title_b` demoted to smaller
+   secondary metadata. `home.html` (which renders `/today`'s
+   "TODAY'S CROSSCUT" card) was overlooked and still uses the old
+   `title_a × title_b` as the only sub-heading. Result: yesterday's
+   crosscut ("Human Limits and Extremes") shows the new plain-voice
+   hook on `/crosscuts` but the old flat titles on `/today`.
+   **Fix:** mirror the `{% if crosscut.subhead_hook %} ... {% else %}
+   ... {% endif %}` pattern from `crosscuts_list.html` (~L22-33)
+   into `home.html` around L18-20, using the same styling weight as
+   the browse card. `load_crosscut_episodes` already returns
+   `subhead_hook`, so no query change. Small template-only PR.
+
+3. **NEW — reference aarva.app in every podcast description.** User
+   wants a line like "For more features and details, visit
+   https://aarva.app/" in the podcast description of every episode
+   so listeners on Apple / Spotify / YouTube find their way back to
+   the site. **Scope:**
+   - `aarva/output/rss_feed.py` — append the reference to both
+     the per-item `description` string (article items around L220-232
+     and crosscut items around L321). `itunes:summary` derives from
+     `description` via `_strip_html` so it inherits automatically.
+   - Also add to the channel-level description (there's a
+     `_channel_element` or similar builder function; ~top of
+     rss_feed.py).
+   - Format: HTML `<br/><br/>For more features and details, visit
+     <a href="https://aarva.app/">aarva.app</a>` — the double
+     `<br/>` matches the existing joiner pattern for
+     `description_parts`. Plain-text version on `<itunes:summary>`
+     ("For more features and details, visit https://aarva.app/") will
+     fall through the `_strip_html` step.
+   - **Do NOT** append to the article's on-app hook / show_notes /
+     contextualisation. Those are for on-site reading where the
+     link would be redundant.
+   - The URL should come from a constant (or from
+     `AARVA_SERVER_PUBLIC_URL` env var) rather than being hardcoded,
+     so a future domain change is one edit.
+   **Verification:** regenerate RSS via `python -m aarva.daily --stage 10`;
+   pull `aarva/output/feed.xml`; grep for `aarva.app` — expect one
+   occurrence per item plus one at the channel level. Podcast apps
+   see the new line on next feed poll.
 
 ---
 
