@@ -36,35 +36,6 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **NEW — reference aarva.app in every podcast description.** User
-   wants a line like "For more features and details, visit
-   https://aarva.app/" in the podcast description of every episode
-   so listeners on Apple / Spotify / YouTube find their way back to
-   the site. **Scope:**
-   - `aarva/output/rss_feed.py` — append the reference to both
-     the per-item `description` string (article items around L220-232
-     and crosscut items around L321). `itunes:summary` derives from
-     `description` via `_strip_html` so it inherits automatically.
-   - Also add to the channel-level description (there's a
-     `_channel_element` or similar builder function; ~top of
-     rss_feed.py).
-   - Format: HTML `<br/><br/>For more features and details, visit
-     <a href="https://aarva.app/">aarva.app</a>` — the double
-     `<br/>` matches the existing joiner pattern for
-     `description_parts`. Plain-text version on `<itunes:summary>`
-     ("For more features and details, visit https://aarva.app/") will
-     fall through the `_strip_html` step.
-   - **Do NOT** append to the article's on-app hook / show_notes /
-     contextualisation. Those are for on-site reading where the
-     link would be redundant.
-   - The URL should come from a constant (or from
-     `AARVA_SERVER_PUBLIC_URL` env var) rather than being hardcoded,
-     so a future domain change is one edit.
-   **Verification:** regenerate RSS via `python -m aarva.daily --stage 10`;
-   pull `aarva/output/feed.xml`; grep for `aarva.app` — expect one
-   occurrence per item plus one at the channel level. Podcast apps
-   see the new line on next feed poll.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -116,6 +87,35 @@ Most recent first.
 
 ### 2026-07-12
 
+- **Every podcast description now references aarva.app.** Apple/
+  Spotify/YouTube listeners only see the static RSS feed, with no way
+  back to the interactive site (`/create`, `/listener-created`,
+  search, etc.) — added "For more features and details, visit
+  aarva.app" to every episode. Spec deviation found mid-implementation:
+  `rss_feed.py`'s existing `public_url_base` variable resolves to
+  `https://srik-create.github.io/aarva` (the static GitHub Pages HTML/
+  RSS site), not `aarva.app` (the separate FastAPI web app on Render)
+  — reusing it would have linked listeners to the wrong site. Added a
+  new, distinct `output.aarva_app_url` key in `pipeline.yaml` instead
+  of the env-var approach the spec suggested, matching how
+  `public_url_base` itself is already configured there.
+  - Per-item `<description>`/`<content:encoded>` (CDATA, HTML) get
+    `<br/><br/>For more features and details, visit
+    <a href="https://aarva.app/">aarva.app</a>` appended, via a shared
+    `_aarva_app_reference_html()` helper — both article items
+    (`_item_xml`) and crosscut items (`_crosscut_item_xml`).
+    `itunes:summary` inherits it automatically through `_strip_html`.
+  - Channel-level `<description>`/`<itunes:summary>` are XML-escaped
+    plain text, not CDATA — so they get a plain-text line ("For more
+    features and details, visit https://aarva.app/") instead of HTML,
+    since `<br/>`/`<a>` tags there would render as literal text.
+  - Explicitly does not touch the on-app hook / show_notes /
+    contextualisation — those are for on-site reading, where the link
+    would be redundant.
+  - Verified by regenerating the real feed via
+    `python -m aarva.daily --stage 10` (235 items) and inspecting
+    `feed.xml` directly: correct HTML link in item CDATA, correct
+    plain-text line in the channel description and `itunes:summary`.
 - **Fixed: `/today`'s crosscut card missed the subhead_hook update.**
   `home.html` was overlooked when Sections 2-3 of the content-quality
   pass updated `crosscuts_list.html`, `crosscut.html`, and
