@@ -36,23 +36,7 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **BUG — `/today`'s crosscut card missed the subhead_hook update.**
-   Sections 2-3 of the content-quality pass updated
-   `crosscuts_list.html`, `crosscut.html` (detail), and
-   `listener_created.html` to show `subhead_hook` as the primary
-   sub-heading with `title_a × title_b` demoted to smaller
-   secondary metadata. `home.html` (which renders `/today`'s
-   "TODAY'S CROSSCUT" card) was overlooked and still uses the old
-   `title_a × title_b` as the only sub-heading. Result: yesterday's
-   crosscut ("Human Limits and Extremes") shows the new plain-voice
-   hook on `/crosscuts` but the old flat titles on `/today`.
-   **Fix:** mirror the `{% if crosscut.subhead_hook %} ... {% else %}
-   ... {% endif %}` pattern from `crosscuts_list.html` (~L22-33)
-   into `home.html` around L18-20, using the same styling weight as
-   the browse card. `load_crosscut_episodes` already returns
-   `subhead_hook`, so no query change. Small template-only PR.
-
-3. **NEW — reference aarva.app in every podcast description.** User
+2. **NEW — reference aarva.app in every podcast description.** User
    wants a line like "For more features and details, visit
    https://aarva.app/" in the podcast description of every episode
    so listeners on Apple / Spotify / YouTube find their way back to
@@ -126,9 +110,24 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-11)
+## Recently completed (2026-06-29 → 2026-07-12)
 
 Most recent first.
+
+### 2026-07-12
+
+- **Fixed: `/today`'s crosscut card missed the subhead_hook update.**
+  `home.html` was overlooked when Sections 2-3 of the content-quality
+  pass updated `crosscuts_list.html`, `crosscut.html`, and
+  `listener_created.html` to show `subhead_hook` as the primary sub-
+  heading — it kept showing the old `title_a × title_b` flat-titles
+  format only. Confirmed live before fixing (today's crosscut showed
+  the two full article titles mashed together with `×`) and after
+  (shows the plain-voice hook, titles demoted to secondary metadata,
+  matching the other three pages). `load_crosscut_episodes` already
+  returned `subhead_hook` — template-only fix, no query change.
+
+### 2026-07-11
 
 - **Lost-episode diagnostic now runs automatically on every sync,
   not manually.** Ran the diagnostic below by hand right after it
@@ -231,8 +230,6 @@ Most recent first.
     generated intro + subhead_hook for the same real crosscut with and
     without a simulated listener search, confirming the
     acknowledgment only appears when a prompt is present.
-
-### 2026-07-11
 
 - **Content-quality Section 1 — smart-generalist voice standard
   shipped.** Spec at `docs/session_plan_content_quality.md` §1: target
