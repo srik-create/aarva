@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Monday, 13 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-13</div>
+      <div class="edition-meta">2 pieces · Crosscut · Monday, 13 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · valuing skilled labor</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-13/crosscut_0079.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>35 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>In classrooms across England this month, a cold bit of math is forcing a choice between a fair wage and a full staff. Writing for The Independent on July 2nd, Ellie Ng reports on a government plan that asks schools to fund teacher raises by cutting other positions. It treats teaching as a logistical problem. What’s striking is how this connects to a July 6th essay by Joshua Habgood-Coote. He explores the history of &quot;skill nostalgia,&quot; suggesting that a love for handmade things is actually a protest against being treated like a machine. Seen together, this school budget struggle looks like an older fight to keep human work from becoming just another line on a spreadsheet.</p>
+        <article class='piece'>
+<p class='hook'>Eight thousand school staff members could lose their jobs to pay for their own colleagues&#x27; raises. Writing for The Independent earlier this month, Ellie Ng looks at why teachers in England are threatening to strike over a 3.5 percent pay increase. What’s worth listening for is how the math breaks down in a single constituency like Makerfield, where dozens of schools are being forced to find nearly a million pounds in their already stretched budgets.</p>
+<h2 class='title'>Teachers in England could strike after schools told they must fund pay rises</h2>
+<p class='byline'><span class='publication'>The Independent</span><span class='sep'>·</span><span>Ellie Ng</span></p>
+<p class='source'><a href='https://www.independent.co.uk/news/uk/home-news/teachers-pay-rise-strike-scale-neu-b3007333.html' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>The image of 8,300 teachers and support staff disappearing from English classrooms just to balance a ledger leaves a heavy question about what, exactly, is being bought and sold in a school budget. Ng shows a moment where the work of educating children is treated as an interchangeable expense—a line on a spreadsheet that can be trimmed to make the math work. But look at Joshua Habgood-Coote’s history of skill nostalgia and a different pattern emerges. He traces the loss of the 18th-century silk weavers’ flower gardens as they were pulled into factories, suggesting that the modern craving for handmade goods is actually a protest against being treated like a machine. Read alongside the teacher strike, this nostalgia looks less like a hobbyist’s whim and more like a defensive crouch. If Ng shows the struggle to fund a profession, Habgood-Coote shows the older, deeper fear of losing the craft of work entirely. The two pieces suggest that whether it’s a weaver losing his Monday recreation or a teacher losing a classroom assistant, the underlying fight is the same: a resistance to the idea that human skill is just another input to be optimized.</p>
+        <article class='piece'>
+
+<h2 class='title'>Skill nostalgia</h2>
+<p class='byline'><span class='publication'>Aeon</span><span class='sep'>·</span><span>Joshua Habgood-Coote</span></p>
+<p class='source'><a href='https://aeon.co/essays/the-radical-reasons-why-you-dream-of-making-things-by-hand' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A classroom in Birmingham or a dusty woodshop from a century ago both hold the same tension. It’s the friction between the person doing the work and the ledger trying to simplify it. When a teacher is forced to trade a colleague for a paycheck, the job stops being a calling and starts looking like a factory floor. What’s left to sit with is the stubborn refusal to be treated like a line item. If a job is eventually stripped down to its cheapest parts, what is left to sustain the person holding the chalk or the chisel?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
