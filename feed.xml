@@ -6,7 +6,7 @@
      xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
     <title>Aarva</title>
-    <link>https://srik-create.github.io/aarva</link>
+    <link>https://aarva.app</link>
     <description>The world as your classroom, the finest journalism as your curriculum.
 
 Written by humans. Narrated by AI.
@@ -27,10 +27,11 @@ Every day, you get a selection of handpicked articles from across a spectrum of 
 You also get one edition of &quot;Crosscuts&quot; every day, where you get two potentially diverse-seeming articles but with an interesting, even surprising connection. It is intended to show how we can spot connections and patterns in surprising ways.
 
 This is journalism that delights, educates and expands our minds. Not the anxiety-inducing cycle of breaking news.
-</itunes:summary>
+
+For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Mon, 13 Jul 2026 12:19:25 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 13 Jul 2026 12:59:31 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -42,7 +43,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
     <itunes:category text="Education"><itunes:category text="Self-Improvement"/></itunes:category>
     <itunes:explicit>false</itunes:explicit>
     <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
-    <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://srik-create.github.io/aarva</link></image>
+    <image><url>https://srik-create.github.io/aarva/cover.png</url><title>Aarva</title><link>https://aarva.app</link></image>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
