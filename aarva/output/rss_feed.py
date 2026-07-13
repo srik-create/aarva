@@ -425,10 +425,22 @@ def generate_feed(
     )
     feed_author = output_cfg.get("feed_author", "Aarva")
     feed_email = output_cfg.get("feed_email", "aarva@example.com")
-    feed_link = output_cfg.get("feed_link", public_url_base)
+    # "Show website" in Apple Podcasts / Spotify — the interactive app,
+    # not the static GH Pages host that serves feed.xml itself
+    # (feed_self_url below stays on public_url_base for that reason).
+    feed_link = output_cfg.get("feed_link", aarva_app_url)
     feed_image = output_cfg.get("feed_image", "")
     # Optional knobs with sensible defaults — overridable in pipeline.yaml.
+    # feed_summary is configured as its own explicit block in
+    # pipeline.yaml (kept in sync with feed_description by hand), so it
+    # does NOT inherit feed_description's aarva_app_url line above —
+    # append it here too rather than assuming the fallback covers it.
     feed_summary = output_cfg.get("feed_summary", feed_description)
+    if aarva_app_url and aarva_app_url not in feed_summary:
+        feed_summary = (
+            feed_summary.rstrip()
+            + f"\n\nFor more features and details, visit {aarva_app_url}/"
+        )
     feed_copyright = output_cfg.get(
         "feed_copyright",
         f"© {datetime.now().year} {feed_author}",

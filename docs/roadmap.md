@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-12
+**Last updated:** 2026-07-13
 
 ---
 
@@ -81,9 +81,38 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-12)
+## Recently completed (2026-06-29 → 2026-07-13)
 
 Most recent first.
+
+### 2026-07-13
+
+- **Fixed: Apple Podcasts "Show website" still pointed at the old
+  GitHub Pages URL; channel `itunes:summary` was silently missing the
+  aarva.app reference too.** User caught the "Show website" field
+  live in Apple Podcasts settings still showing
+  `https://srik-create.github.io/aarva` after the 2026-07-12 change.
+  Root cause: that field is the channel-level `<link>` (config key
+  `feed_link` in `pipeline.yaml`), a completely separate value from
+  the per-item descriptions touched yesterday — it was still
+  hardcoded to the GH Pages URL. Changed `feed_link` to
+  `https://aarva.app` and changed its code fallback default (when
+  unset) from `public_url_base` to `aarva_app_url` so this doesn't
+  regress if the explicit config value is ever removed. Separately
+  discovered while re-verifying: yesterday's claim that
+  `itunes:summary` would "inherit automatically" from
+  `feed_description` was wrong — `pipeline.yaml` sets `feed_summary`
+  as its own explicit block (kept in sync with `feed_description` by
+  hand), so it never actually got the aarva.app line. Fixed by
+  appending the reference to `feed_summary` directly in
+  `generate_feed()`, independent of the `feed_description` fallback
+  chain. The feed's own hosting URL (`atom:link`, derived from
+  `public_url_base`) is correctly untouched — it must stay on GitHub
+  Pages since that's where `feed.xml` actually lives. Verified by
+  regenerating the real feed and checking all three fields directly:
+  channel `<link>` → `https://aarva.app`, channel `itunes:summary` →
+  now ends with the aarva.app line, `atom:link` → unchanged GH Pages
+  URL.
 
 ### 2026-07-12
 
@@ -115,7 +144,10 @@ Most recent first.
   - Verified by regenerating the real feed via
     `python -m aarva.daily --stage 10` (235 items) and inspecting
     `feed.xml` directly: correct HTML link in item CDATA, correct
-    plain-text line in the channel description and `itunes:summary`.
+    plain-text line in the channel `<description>`. (The channel
+    `itunes:summary` claim here was wrong — see the 2026-07-13 fix
+    below; `feed_summary` is its own explicit config block and didn't
+    inherit it after all.)
 - **Fixed: `/today`'s crosscut card missed the subhead_hook update.**
   `home.html` was overlooked when Sections 2-3 of the content-quality
   pass updated `crosscuts_list.html`, `crosscut.html`, and
