@@ -8,6 +8,41 @@ Read this doc + `docs/roadmap.md` + `AGENTS.md` before starting.
 
 ---
 
+## UPDATE 2026-07-14 (later same day) — root cause confirmed
+
+Section 1's diagnostic logs were shipped and Probes A + B were run
+for real (locally — a real `/create`-equivalent job, a real `kill -9`
+mid-TTS, a real reset-and-resume) rather than waiting on a production
+OOM. Result, in terms of this doc's own hypotheses:
+
+- **H1 (stamp doesn't commit) — FALSIFIED.** `stamp_edition_id` fired
+  with `rows_affected=1` right after edition creation.
+- **H2 (OOM before stamp) — not the mechanism here**; the stamp
+  happens well before TTS starts, so timing isn't the issue.
+- **H3 (resume branch leaks into setup) — FALSIFIED.** On resume,
+  the log showed `checkpoint_edition_id` read correctly and the
+  RESUMING branch fired with zero LLM-proposal or edition-creation
+  calls — steps 1-3 are genuinely skipped.
+- **H4 (per-piece idempotency check is broken) — REFRAMED.** There
+  is no such check to be broken. `synthesize_crosscut_episode`
+  always re-synthesizes all 6 sections from scratch and only
+  persists `audio_url` once, at the very end. This is the actual
+  root cause: resume correctly skips steps 1-3, but step 4 (TTS)
+  restarts from section 1 every time regardless of prior progress.
+  That's what reads to the listener as "the whole thing starts
+  over."
+
+**Consequence for this doc's Section 2:** treat H4's fix description
+as superseded — the real fix is adding per-section
+skip-if-already-synthesized logic to `synthesize_crosscut_episode`
+(track progress per-section, e.g. by checking which sections already
+have rendered audio before re-synthesizing), not "fixing a broken
+check." That work — plus Section 3 (why the OOM happens at all) — is
+deferred to a separate session; see `docs/roadmap.md`'s
+"Recently completed" 2026-07-14 entry for the full verified detail.
+
+---
+
 ## Context — what we know
 
 The listener-facing symptom (reported 2026-07-14):
