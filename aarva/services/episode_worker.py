@@ -167,23 +167,38 @@ def _run_job(
         job_id, payload.get("article_a_id"), payload.get("article_b_id"),
         payload.get("topic_label"),
     )
+    logger.info(
+        "_run_job: job %d starting — payload keys=%s, checkpoint_edition_id=%s",
+        job_id, sorted(payload.keys()), payload.get("edition_id"),
+    )
 
     # Resumability checkpoint. If a prior attempt got as far as
     # creating the edition row, payload.edition_id was stamped after
     # step 2. On the retry, skip steps 1-3 (candidate insert + LLM
     # proposal + user_id stamp — none of which are idempotent) and go
-    # straight into TTS/convert/upload, all of which ARE idempotent
-    # per-piece and will pick up where the previous attempt left off.
+    # straight into TTS/convert/upload. NOTE (2026-07-14 investigation):
+    # TTS itself is NOT actually idempotent per-section despite the
+    # comment that used to be here — synthesize_crosscut_episode
+    # resynthesizes all sections from scratch on every call and only
+    # writes audio_url once at the very end. See
+    # docs/session_plan_worker_resumability.md — that's the real
+    # reason a resumed build still looks like it "restarts from the
+    # beginning" even though steps 1-3 correctly get skipped here.
     checkpoint_edition_id = payload.get("edition_id")
     if checkpoint_edition_id is not None:
         edition_id = int(checkpoint_edition_id)
         logger.info(
-            "episode_worker: job %d resuming from checkpoint — "
-            "edition %d already built, jumping to TTS",
+            "_run_job: job %d RESUMING via checkpoint at edition %d — "
+            "skipping steps 1-3",
             job_id, edition_id,
         )
         update_progress(db, job_id, "Resuming — audio still needed…")
     else:
+        logger.info(
+            "_run_job: job %d starting FROM SCRATCH (no checkpoint) — "
+            "running steps 1-3",
+            job_id,
+        )
         # 1. Insert the candidate row build_episode_script will find
         # via _selected_candidate(today). Worker is single-threaded
         # so this row WILL be the most-recently-selected when we call

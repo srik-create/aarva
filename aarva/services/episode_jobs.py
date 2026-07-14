@@ -307,9 +307,13 @@ def stamp_edition_id(
         except (ValueError, TypeError):
             payload = {}
         payload["edition_id"] = int(edition_id)
-        conn.execute(
+        cur = conn.execute(
             "UPDATE jobs SET payload_json = ? WHERE id = ?",
             (json.dumps(payload), int(job_id)),
+        )
+        logger.info(
+            "stamp_edition_id: job %d stamped edition_id=%d (rows_affected=%d)",
+            job_id, edition_id, cur.rowcount,
         )
 
 

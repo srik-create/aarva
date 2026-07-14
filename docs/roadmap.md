@@ -36,31 +36,34 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **Worker resumability + OOM investigation.** Full spec at
-   `docs/session_plan_worker_resumability.md`. Two related but
-   distinct problems:
-   - **Resumability doesn't actually resume.** PR #49 shipped a
-     checkpoint-based resume, but 2026-07-14 shows retries running
-     the whole build from step 1 again rather than jumping to TTS.
-     Something isn't sticking: either the checkpoint isn't
-     durably committed to the DB, or the OOM hits BEFORE the
-     checkpoint is written, or the resume path itself has a leak.
-     Spec calls for a diagnostic-first approach: ship targeted
-     logs on the four suspect code paths, wait for the next OOM,
-     read the log, then fix the specific broken piece.
-   - **OOM keeps happening despite streaming-TTS fix.** PR #49's
-     streaming TTS cut ~85 MB from the wav-combine step, but the
-     container still gets SIGKILLed mid-build. Needs per-step RSS
-     profiling to find the current top consumer (likely article
-     full-text loads or LLM prompt buffers). Small memory-diet PR
-     expected once profiling is in.
-
-   Session ordering per spec: (1) ship diagnostics first, (2) wait
-   for next OOM to isolate the resumability bug, (3) fix that,
-   (4) then attack the underlying OOM as a separate memory-diet
-   pass. Related but not identical to the resumption-threshold bug
-   fixed 2026-07-14 (PR #70) — that made recovery faster; this
-   pass makes recovery actually work AND makes OOMs rare.
+2. **Worker resumability root cause CONFIRMED 2026-07-14 — TTS has
+   no per-section resumability (never built, not "broken").** Full
+   spec + diagnostic plan at
+   `docs/session_plan_worker_resumability.md`; see "Recently
+   completed" below for the full verified findings. Diagnostic logs
+   shipped and Probes A + B run locally (real Gemini calls, a real
+   simulated crash) rather than waiting for a production OOM. Result:
+   the spec's H1/H2/H3 hypotheses are all falsified — the checkpoint
+   correctly stamps, commits, and is correctly read on resume, and
+   the resume branch correctly skips straight to TTS with no leaked
+   setup calls. The actual cause: `synthesize_crosscut_episode`
+   (`aarva/stages/stage_crosscut.py`) was never built with per-section
+   resumability — it always re-synthesizes all 6 TTS sections (intro,
+   both bridges, both article passages, outro) from scratch and only
+   writes `audio_url` once at the very end. A resumed build correctly
+   skips the (expensive) LLM-proposal + edition-creation steps, but
+   restarts TTS from section 1 every time — which is what reads to
+   the listener as "the whole thing starts over."
+   **Next up:** add per-section skip-if-already-synthesized logic to
+   `synthesize_crosscut_episode` (a real feature addition, not a bug
+   fix) — deferred to a separate session given the larger scope.
+   The OOM-frequency question (why the container keeps getting
+   SIGKILLed at all, separate from how well it recovers) is still
+   open — Section 3 of the spec (per-step RSS profiling) remains
+   unstarted. Related but not identical to the resumption-threshold
+   bug fixed 2026-07-14 (PR #70) — that made recovery start
+   immediately instead of after 30 minutes; this item is about making
+   a resumed build actually skip the work it already did.
 
 ---
 
@@ -113,6 +116,52 @@ Most recent first.
 
 ### 2026-07-14
 
+- **Worker-resumability root cause found: TTS was never built with
+  per-section resumability.** Per `docs/session_plan_worker_resumability.md`'s
+  diagnostic-first plan: shipped 4 targeted `logger.info` lines
+  (`stamp_edition_id`'s commit + rows-affected;  `_run_job`'s
+  checkpoint read at top; the RESUMING branch; the FROM-SCRATCH
+  branch) — no functional changes, `aarva/services/episode_jobs.py`
+  + `aarva/services/episode_worker.py`. Then ran both probes for
+  real rather than waiting for a production OOM:
+  - **Probe A** (does the checkpoint stamp persist?): queued a real
+    `/create`-equivalent job locally (`enqueue_build_job` direct
+    call, two real in-edition articles), ran it through
+    `_run_job`, watched the log. `stamp_edition_id` fired with
+    `rows_affected=1` right after edition creation — the stamp
+    commits correctly. **H1 and H2 falsified.**
+  - **Probe B** (does resume actually resume?): `kill -9`'d the
+    running process mid-TTS (during `passage_a` synthesis, after
+    `intro` + `bridge_a` had already completed), confirmed the job
+    was left `running` with the checkpoint intact
+    (`edition_id=1000001`), called the new `reset_all_running_jobs`
+    (PR #70) to simulate the worker-startup recovery, then reran the
+    job. Log showed `checkpoint_edition_id=1000001` correctly read,
+    and "RESUMING via checkpoint... skipping steps 1-3" fired
+    correctly — no LLM-proposal or edition-creation calls happened
+    on the second run. **H3 falsified: the resume branch itself is
+    correct.** But TTS immediately logged "synthesizing intro" again
+    — the exact section that had already finished before the kill.
+  - **Root cause confirmed:** `synthesize_crosscut_episode`
+    (`aarva/stages/stage_crosscut.py:1564`) was never built with
+    per-section resumability — H4 isn't a "broken" check, there is
+    no check. It always synthesizes all 6 sections (intro, both
+    bridges, both passages, outro) in one pass and writes
+    `audio_url` only once at the very end, after everything
+    succeeds. A resumed build genuinely does skip the expensive
+    LLM-proposal + edition-creation steps (steps 1-3) — but restarts
+    TTS (step 4) from section 1 regardless of how much prior
+    progress existed, which is what reads to a listener as "starts
+    over from the beginning." This corrects a stale assumption baked
+    into both `episode_worker.py`'s own comment ("TTS... already
+    idempotent per-piece via audio_url" — it wasn't) and the spec's
+    H4 hypothesis (assumed a broken check; there was no check).
+  - Test job + edition + audio + user rows cleaned up from both the
+    main and listener DBs afterward — no leftover test data.
+  - **Deferred to a separate session** (bigger scope than a log-and-
+    probe pass): adding the actual per-section skip-if-already-done
+    logic to `synthesize_crosscut_episode`, and Section 3 (why the
+    OOM happens at all — per-step RSS profiling, still unstarted).
 - **Fixed: worker resumption threshold made orphaned `/create` jobs
   invisible for 30 minutes after a crash.** `reset_stuck_jobs`
   (`aarva/services/episode_jobs.py`) only reclaimed `running` jobs
