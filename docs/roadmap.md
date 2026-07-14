@@ -36,28 +36,31 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **Recurrent OOM on Render during /create builds despite the
-   streaming-TTS fix.** PR #49's streaming TTS cut ~85 MB from
-   the wav-combine step, but 2026-07-14 shows the container still
-   getting SIGKILLed by Render mid-build (OOM). Other memory-heavy
-   contributors during `build_episode_script` + `synthesize_
-   crosscut_episode` that we haven't audited: LLM client + prompt
-   buffers, full-text loads of the two source articles, the
-   crosscut_embeddings vector reads for the search-index write-back,
-   and whatever the google-genai SDK holds per open connection.
-   **Investigate:** run `/create` locally against a memory profiler
-   (memray, tracemalloc, or a simple `psutil.Process().memory_info()`
-   snapshot at each worker step-boundary). Identify the top three
-   allocations by RSS delta. Likely fixes will be one or more of:
-   don't load `full_text` when only `excerpt` is used;
-   free LLM prompt strings after each stage; process source
-   articles sequentially instead of both-in-memory. Not a
-   one-line fix; expect a small PR of targeted memory diet
-   changes. Related to (but distinct from) the worker resumption-
-   threshold bug fixed 2026-07-14 (see "Recently completed") — that
-   fix makes an OOM crash's aftermath less painful (orphaned jobs
-   recover immediately instead of sitting stuck for 30 min); this
-   item is about stopping the OOM from happening at all.
+2. **Worker resumability + OOM investigation.** Full spec at
+   `docs/session_plan_worker_resumability.md`. Two related but
+   distinct problems:
+   - **Resumability doesn't actually resume.** PR #49 shipped a
+     checkpoint-based resume, but 2026-07-14 shows retries running
+     the whole build from step 1 again rather than jumping to TTS.
+     Something isn't sticking: either the checkpoint isn't
+     durably committed to the DB, or the OOM hits BEFORE the
+     checkpoint is written, or the resume path itself has a leak.
+     Spec calls for a diagnostic-first approach: ship targeted
+     logs on the four suspect code paths, wait for the next OOM,
+     read the log, then fix the specific broken piece.
+   - **OOM keeps happening despite streaming-TTS fix.** PR #49's
+     streaming TTS cut ~85 MB from the wav-combine step, but the
+     container still gets SIGKILLed mid-build. Needs per-step RSS
+     profiling to find the current top consumer (likely article
+     full-text loads or LLM prompt buffers). Small memory-diet PR
+     expected once profiling is in.
+
+   Session ordering per spec: (1) ship diagnostics first, (2) wait
+   for next OOM to isolate the resumability bug, (3) fix that,
+   (4) then attack the underlying OOM as a separate memory-diet
+   pass. Related but not identical to the resumption-threshold bug
+   fixed 2026-07-14 (PR #70) — that made recovery faster; this
+   pass makes recovery actually work AND makes OOMs rare.
 
 ---
 
