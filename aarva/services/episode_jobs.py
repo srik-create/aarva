@@ -7,9 +7,12 @@ Lifecycle:
   pending  →  running  →  completed | failed
   pending  →  cancelled  (manual operator override)
 
-Stuck-job recovery: a job that's been `running` longer than 30 min is
-almost certainly orphaned by a process restart; `reset_stuck_jobs()`
-flips it back to `pending` so a later worker iteration picks it up.
+Stuck-job recovery: any job still `running` at worker startup is by
+definition orphaned by a process restart (no rolling-deploy overlap on
+Render Starter) — `reset_all_running_jobs()` flips all of them back to
+`pending` unconditionally so a later worker iteration picks them up.
+`reset_stuck_jobs()` (time-windowed) remains as an operator escape
+hatch for manual/admin use.
 
 The payload JSON shape for a build_crosscut job:
 
@@ -342,9 +345,11 @@ def get_job(db: Database, job_id: int) -> Optional[dict[str, Any]]:
 
 
 def reset_stuck_jobs(db: Database, *, older_than_minutes: int = 30) -> int:
-    """Reset any `running` build_crosscut jobs older than the window
-    back to `pending`. Called at worker startup so a crashed process
-    doesn't leave jobs wedged forever. Returns the count reset."""
+    """Reset `running` build_crosscut jobs older than the window back
+    to `pending`. Operator escape hatch for manual/admin use with a
+    custom threshold — the worker itself calls `reset_all_running_jobs`
+    at startup instead (see its docstring for why). Returns the count
+    reset."""
     with db.connect() as conn:
         cur = conn.execute(
             f"""
@@ -363,6 +368,36 @@ def reset_stuck_jobs(db: Database, *, older_than_minutes: int = 30) -> int:
     if count:
         logger.warning(
             "episode_jobs: reset %d stuck running job(s) at startup",
+            count,
+        )
+    return int(count)
+
+
+def reset_all_running_jobs(db: Database) -> int:
+    """Reset ALL `running` build_crosscut jobs back to `pending`,
+    unconditionally — no time threshold. Called at worker startup: by
+    definition there is no active worker at that point, so any
+    `running` job must be orphaned from a crashed prior process (Render
+    Starter tears down the old instance before starting the new one —
+    no rolling-deploy overlap to race against). Waiting out a time
+    window before recovering these just leaves the listener staring at
+    a stuck build. Returns the count reset."""
+    with db.connect() as conn:
+        cur = conn.execute(
+            """
+            UPDATE jobs
+               SET status = 'pending',
+                   started_at = NULL,
+                   progress = 'recovered after worker restart'
+             WHERE kind = ?
+               AND status = 'running'
+            """,
+            (JOB_KIND,),
+        )
+        count = cur.rowcount or 0
+    if count:
+        logger.warning(
+            "episode_jobs: reset %d running job(s) at worker startup",
             count,
         )
     return int(count)

@@ -36,30 +36,7 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **BUG — worker resumption threshold is too long (30 min).**
-   `reset_stuck_jobs` in `aarva/services/episode_jobs.py` L344
-   defaults to `older_than_minutes: int = 30`. On worker startup
-   (`aarva/services/episode_worker.py` L88) it's called with that
-   default. Consequence: when a Render OOM kills the process
-   mid-build, the job stays in `running` status; the new worker
-   comes up seconds later, but `reset_stuck_jobs` only moves jobs
-   back to `pending` if they've been running >30 minutes. So the
-   orphaned job sits invisible for 30 minutes before it can be
-   claimed again, and the user gives up and re-triggers. Observed
-   2026-07-14 14:59:24 during a /create build.
-   **Fix:** on worker startup, reset ALL `running` jobs to
-   `pending` unconditionally. Rationale: at process-startup time
-   there is by definition no active worker; any `running` job
-   MUST be orphaned from a crashed prior process. Render Starter
-   does no rolling-deploy overlap (old instance is torn down
-   before new one starts), so no race concern. Simplest
-   implementation: keep `reset_stuck_jobs` for its
-   `--older-than` operator escape hatch, add a separate
-   `reset_all_running_jobs()` helper (or pass `older_than_minutes=0`
-   from the worker), call the new helper from `_start_worker`.
-   Small, high-value change.
-
-3. **Recurrent OOM on Render during /create builds despite the
+2. **Recurrent OOM on Render during /create builds despite the
    streaming-TTS fix.** PR #49's streaming TTS cut ~85 MB from
    the wav-combine step, but 2026-07-14 shows the container still
    getting SIGKILLed by Render mid-build (OOM). Other memory-heavy
@@ -76,9 +53,11 @@ GitHub Pages.
    free LLM prompt strings after each stage; process source
    articles sequentially instead of both-in-memory. Not a
    one-line fix; expect a small PR of targeted memory diet
-   changes. Related to (but distinct from) the resumption-
-   threshold bug in item 2 — fixing 2 makes the failure less
-   painful, fixing 3 makes it stop happening.
+   changes. Related to (but distinct from) the worker resumption-
+   threshold bug fixed 2026-07-14 (see "Recently completed") — that
+   fix makes an OOM crash's aftermath less painful (orphaned jobs
+   recover immediately instead of sitting stuck for 30 min); this
+   item is about stopping the OOM from happening at all.
 
 ---
 
@@ -125,9 +104,31 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-13)
+## Recently completed (2026-06-29 → 2026-07-14)
 
 Most recent first.
+
+### 2026-07-14
+
+- **Fixed: worker resumption threshold made orphaned `/create` jobs
+  invisible for 30 minutes after a crash.** `reset_stuck_jobs`
+  (`aarva/services/episode_jobs.py`) only reclaimed `running` jobs
+  older than a 30-minute window, called with that default at worker
+  startup (`aarva/services/episode_worker.py`). When Render OOM-kills
+  the process mid-build, the orphaned job sat in `running` status
+  invisible to the freshly-restarted worker for up to 30 minutes —
+  observed live 2026-07-14 during a `/create` build, where the user
+  gave up and re-triggered rather than wait. Fix: added
+  `reset_all_running_jobs()`, which resets every `running` job back
+  to `pending` unconditionally, no time threshold — at worker-startup
+  time there is by definition no active worker, so a `running` job
+  can only be orphaned (Render Starter has no rolling-deploy overlap
+  to race against). `start_worker` now calls this instead of
+  `reset_stuck_jobs`; the time-windowed original is kept as-is for
+  future manual/admin use. Verified against a real SQLite jobs table:
+  a 1-minute-old `running` row was left untouched by
+  `reset_stuck_jobs`'s 30-minute default but correctly reset to
+  `pending` by the new function.
 
 ### 2026-07-13
 
