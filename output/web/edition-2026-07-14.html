@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Tuesday, 14 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-14</div>
+      <div class="edition-meta">6 pieces · Tuesday, 14 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Does a house with a yard and a car offer something a city apartment cannot?</p>
+        <h2 class="title">The American suburbs are better than you think</h2>
+        <p class="byline">
+          <span class="publication">Noahpinion</span>
+          <span class='sep'>·</span><span>Noah Smith</span>
+        </p>
+        <p class="contextualisation">Noah Smith looks at the white picket fences and strip malls of the American suburbs with a rare sense of balance. Writing on 13 July 2026, Smith pushes back against the common idea that life outside the city is a lonely, car-choked mistake. Instead, the data suggests that these sprawling neighborhoods often offer shorter commutes and more social connection than many people might assume. It’s an invitation to stop treating urban planning as a constant war and to see why a big house and a driveway still hold such a powerful pull for so many families.</p>
+        <p class='show-notes'>Common criticisms of suburban life are weighed against data on commute times, loneliness, and family needs. Economic studies and social surveys suggest why many people move away from city centers as they age. The findings support a planning approach that values both dense cities and suburban neighborhoods instead of treating them as competing models.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_7789.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>18 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.noahpinion.blog/p/the-american-suburbs-are-better-than' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">What happens when a doctor has to prove their own face and voice are real?</p>
+        <h2 class="title">Opinion: It looks like your doctor and talks like your doctor. But it’s not your doctor</h2>
+        <p class="byline">
+          <span class="publication">STAT News</span>
+          <span class='sep'>·</span><span>Henry Bair</span>
+        </p>
+        <p class="contextualisation">A patient walks into a clinic holding a phone that shows her doctor pitching a fake supplement, but the doctor never filmed the clip. Writing on 14 July 2026, Henry Bair looks past simple online misinformation to the more unsettling reality of medical deepfakes. The concern isn&#x27;t just about deceptive ads, but how synthetic voices and images might soon tamper with patient records or even clinical trials. It asks what happens to healthcare when the basic cues of trust—a familiar face or a professional tone—can be manufactured by anyone with a laptop.</p>
+        <p class='show-notes'>The rise of deepfakes and synthetic media allows for the impersonation of doctors, the faking of medical records, and the creation of false research data. These tools undermine trust in digital healthcare and require new systems for verifying medical information. Proposed safety measures include secure communication channels and tamper-evident records to protect patients and doctors from digital forgery.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_7906.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.statnews.com/2026/07/14/deepfakes-ai-generated-medicine-misinformation-regulation-video/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">How can two neighbors work together if they can’t agree on who the criminals are?</p>
+        <h2 class="title">A U.S.-Mexico Impasse Will Test How Far the Trump Administration Will Go to Fight Drug Trade</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Tim Golden</span>
+        </p>
+        <p class="contextualisation">A governor in Sinaloa now finds himself at the center of a diplomatic firestorm between Washington and Mexico City. A 13 July 2026 report follows a standoff over whether Mexico will hand over its own officials to face drug corruption charges in a New York court. While President Claudia Sheinbaum has helped shut down labs and capture bosses, drawing a line at her own political allies creates a sharp new friction. The situation tests whether the U.S. government will prioritize regional stability or push for a total clean-out of the systems that have long protected the cartels.</p>
+        <p class='show-notes'>A standoff between the United States and Mexico over the arrest of high-ranking officials charged with drug corruption. While President Claudia Sheinbaum has cooperated on catching traffickers, she refuses to hand over political allies named in U.S. court documents. Interviews with sources in both countries detail the Trump administration’s efforts to target the politicians accused of protecting the drug trade.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_7718.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>14 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/us-mexico-drug-trade-sheinbaum' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">How can two neighbors trade silk and sugar for two thousand years and still feel like strangers?</p>
+        <h2 class="title">Why China Never Captured the Indian Imagination</h2>
+        <p class="byline">
+          <span class="publication">The Diplomat</span>
+          <span class='sep'>·</span><span>Akhilesh Pillalamarri</span>
+        </p>
+        <p class="contextualisation">Silk bundles and Buddhist scrolls have crossed the Himalayas for two millennia, yet a curious intellectual silence persists between the world’s two most populous nations. In this piece from 28 May 2026, China appears as a neighbor that is rarely studied or understood, despite being India’s largest trading partner. Unlike the familiar, heated rivalry with Pakistan, China remains a cultural ghost in the Indian mind. The logic moves past border disputes to ask why two giants can share a fence for centuries without ever really speaking the same language.</p>
+        <p class='show-notes'>An analysis of the cultural distance between India and China, tracing why Indians show little curiosity about Chinese history or philosophy despite their border tensions. It examines the one-way spread of Buddhism in ancient times and modern barriers like translation difficulties to explain why China remains a blind spot compared to other countries.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_0680.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://thediplomat.com/2026/05/why-china-never-captured-the-indian-imagination/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">Why is it so easy to sit on the sidelines when history is moving right past?</p>
+        <h2 class="title">How Not to Rise to the Occasion</h2>
+        <p class="byline">
+          <span class="publication">The Hedgehog Review</span>
+          <span class='sep'>·</span><span>Aaron Timms</span>
+        </p>
+        <p class="contextualisation">The search for historical heroes often misses the people who simply watch from the balcony while the world changes. This look at Italian cinema, published on 8 July 2026, skips the revolutionaries to find the cowards and the distracted observers. These films show that during times of massive change, most people are more preoccupied with their own small desires—money, sex, or comfort—than with the fate of their country. It is an observation that feels particularly pointed now, suggesting that the most honest way to understand a political crisis is to watch the people who refuse to join it.</p>
+        <p class='show-notes'>An examination of Italian historical films by directors such as Bernardo Bertolucci, Luchino Visconti, and Federico Fellini. These works show major political shifts through the personal failures, sexual distractions, and cowardice of their characters rather than through traditional heroism. It traces a recurring theme of inaction, where the smallness of human desire often outweighs the demands of history.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_7756.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>11 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://hedgehogreview.com/web-features/thr/posts/how-not-to-rise-to-the-occasion' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">When a stomach bug finally finds the fame it worked for, what does it do for an encore?</p>
+        <h2 class="title">I’m Cyclosporiasis, the Explosive Diarrhea Parasite, and I’m Pivoting to Music</h2>
+        <p class="byline">
+          <span class="publication">McSweeney&#x27;s Internet Tendency</span>
+          <span class='sep'>·</span><span>Jess Keefe</span>
+        </p>
+        <p class="contextualisation">Health alerts usually stick to dry lists of symptoms and grocery store recalls. In this satire from 13 July 2026, a stomach parasite gets a guitar and a desperate need for a career change. The story turns a miserable infection into a parody of the modern celebrity pivot. By treating a public health scare like a press tour for a new album, the piece finds a strange, gross comedy in how everyone—even a single-celled organism—is looking for their big break.</p>
+        <p class='show-notes'>A satirical first-person account of the parasite Cyclosporiasis and its attempt to launch a music career following a series of national outbreaks. The narrator describes the effort required to cause a public health crisis and details plans to record an album for its human hosts.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-14/article_7920.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>5 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.mcsweeneys.net/articles/im-cyclosporiasis-the-explosive-diarrhea-parasite-and-im-pivoting-to-music' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
