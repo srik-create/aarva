@@ -36,11 +36,13 @@ Operational properties:
   - Worker crash on one job logs + marks the job failed; the loop
     keeps going. The next iteration is unaffected.
   - Process restart: any jobs left in `running` get reset back to
-    `pending` at startup via `reset_stuck_jobs()`. Acceptable
-    duplication-of-work risk: building twice produces two editions
-    pointing at the same article pair, which clutters but doesn't
-    corrupt. Tighten with a stale-running-but-not-too-stale window
-    if it bites.
+    `pending` unconditionally at startup via
+    `reset_all_running_jobs()` — there's no active worker at that
+    point, so a `running` job can only be orphaned, not legitimately
+    in-progress (Render Starter has no rolling-deploy overlap).
+    Acceptable duplication-of-work risk: building twice produces two
+    editions pointing at the same article pair, which clutters but
+    doesn't corrupt.
 """
 from __future__ import annotations
 
@@ -83,9 +85,9 @@ def start_worker(
     """Spawn the daemon thread and reset any stuck jobs from a previous
     process. Idempotent if called multiple times only in the sense that
     each call spawns another thread — callers should hold one handle."""
-    from aarva.services.episode_jobs import reset_stuck_jobs
+    from aarva.services.episode_jobs import reset_all_running_jobs
 
-    n_reset = reset_stuck_jobs(db)
+    n_reset = reset_all_running_jobs(db)
     if n_reset:
         logger.info("episode_worker: reset %d stuck job(s) on startup", n_reset)
 
