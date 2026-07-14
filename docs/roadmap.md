@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-13
+**Last updated:** 2026-07-14
 
 ---
 
@@ -35,6 +35,50 @@ GitHub Pages.
    (show search prompt on `/listener-created`, small, depends on
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
+
+2. **BUG — worker resumption threshold is too long (30 min).**
+   `reset_stuck_jobs` in `aarva/services/episode_jobs.py` L344
+   defaults to `older_than_minutes: int = 30`. On worker startup
+   (`aarva/services/episode_worker.py` L88) it's called with that
+   default. Consequence: when a Render OOM kills the process
+   mid-build, the job stays in `running` status; the new worker
+   comes up seconds later, but `reset_stuck_jobs` only moves jobs
+   back to `pending` if they've been running >30 minutes. So the
+   orphaned job sits invisible for 30 minutes before it can be
+   claimed again, and the user gives up and re-triggers. Observed
+   2026-07-14 14:59:24 during a /create build.
+   **Fix:** on worker startup, reset ALL `running` jobs to
+   `pending` unconditionally. Rationale: at process-startup time
+   there is by definition no active worker; any `running` job
+   MUST be orphaned from a crashed prior process. Render Starter
+   does no rolling-deploy overlap (old instance is torn down
+   before new one starts), so no race concern. Simplest
+   implementation: keep `reset_stuck_jobs` for its
+   `--older-than` operator escape hatch, add a separate
+   `reset_all_running_jobs()` helper (or pass `older_than_minutes=0`
+   from the worker), call the new helper from `_start_worker`.
+   Small, high-value change.
+
+3. **Recurrent OOM on Render during /create builds despite the
+   streaming-TTS fix.** PR #49's streaming TTS cut ~85 MB from
+   the wav-combine step, but 2026-07-14 shows the container still
+   getting SIGKILLed by Render mid-build (OOM). Other memory-heavy
+   contributors during `build_episode_script` + `synthesize_
+   crosscut_episode` that we haven't audited: LLM client + prompt
+   buffers, full-text loads of the two source articles, the
+   crosscut_embeddings vector reads for the search-index write-back,
+   and whatever the google-genai SDK holds per open connection.
+   **Investigate:** run `/create` locally against a memory profiler
+   (memray, tracemalloc, or a simple `psutil.Process().memory_info()`
+   snapshot at each worker step-boundary). Identify the top three
+   allocations by RSS delta. Likely fixes will be one or more of:
+   don't load `full_text` when only `excerpt` is used;
+   free LLM prompt strings after each stage; process source
+   articles sequentially instead of both-in-memory. Not a
+   one-line fix; expect a small PR of targeted memory diet
+   changes. Related to (but distinct from) the resumption-
+   threshold bug in item 2 — fixing 2 makes the failure less
+   painful, fixing 3 makes it stop happening.
 
 ---
 
