@@ -36,34 +36,18 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **Worker resumability root cause CONFIRMED 2026-07-14 — TTS has
-   no per-section resumability (never built, not "broken").** Full
-   spec + diagnostic plan at
-   `docs/session_plan_worker_resumability.md`; see "Recently
-   completed" below for the full verified findings. Diagnostic logs
-   shipped and Probes A + B run locally (real Gemini calls, a real
-   simulated crash) rather than waiting for a production OOM. Result:
-   the spec's H1/H2/H3 hypotheses are all falsified — the checkpoint
-   correctly stamps, commits, and is correctly read on resume, and
-   the resume branch correctly skips straight to TTS with no leaked
-   setup calls. The actual cause: `synthesize_crosscut_episode`
-   (`aarva/stages/stage_crosscut.py`) was never built with per-section
-   resumability — it always re-synthesizes all 6 TTS sections (intro,
-   both bridges, both article passages, outro) from scratch and only
-   writes `audio_url` once at the very end. A resumed build correctly
-   skips the (expensive) LLM-proposal + edition-creation steps, but
-   restarts TTS from section 1 every time — which is what reads to
-   the listener as "the whole thing starts over."
-   **Next up:** add per-section skip-if-already-synthesized logic to
-   `synthesize_crosscut_episode` (a real feature addition, not a bug
-   fix) — deferred to a separate session given the larger scope.
-   The OOM-frequency question (why the container keeps getting
-   SIGKILLed at all, separate from how well it recovers) is still
-   open — Section 3 of the spec (per-step RSS profiling) remains
-   unstarted. Related but not identical to the resumption-threshold
-   bug fixed 2026-07-14 (PR #70) — that made recovery start
-   immediately instead of after 30 minutes; this item is about making
-   a resumed build actually skip the work it already did.
+2. **OOM-frequency investigation (Section 3 of
+   `docs/session_plan_worker_resumability.md`) — still open.**
+   Separate from resumability (fixed 2026-07-14 — see "Recently
+   completed"): why does the Render container keep getting SIGKILLed
+   during `/create` builds at all, despite PR #49's streaming-TTS
+   fix? Needs per-step RSS profiling (`psutil.Process().memory_info()`
+   snapshots at each worker step-boundary) to find the current top
+   memory consumer — likely candidates per the spec: full article-text
+   loads, LLM prompt buffers, or the `google-genai` SDK holding
+   per-connection state across the multiple LLM/TTS clients built
+   during one job. Expect a small memory-diet PR once profiling is
+   in, not a rewrite.
 
 ---
 
@@ -116,6 +100,42 @@ Most recent first.
 
 ### 2026-07-14
 
+- **Fixed: worker resumability — TTS now skips already-synthesized
+  sections on resume.** Follow-up to the same-day root-cause finding
+  below. Added a per-section scratch directory
+  (`aarva/output/audio/<date>/_tts_scratch_<edition_id>/`) to
+  `synthesize_crosscut_episode`: each of the 6 TTS sections (intro,
+  both bridges, both article passages, outro) is now moved into this
+  directory via an atomic `shutil.move` only after `tts.synthesize`
+  fully succeeds — so a crash mid-synthesize can never leave a
+  partial file that gets mistaken for "done." Before synthesizing
+  each section, the function checks whether its scratch file already
+  exists and skips straight to reading it if so, instead of calling
+  the TTS API again. The scratch directory is deleted once the
+  combined audio is written and `audio_url` is durably persisted —
+  it's only needed mid-flight. New `CrosscutTTSStats.sections_skipped`
+  field and a `TTS piece ... → SKIPPING (already done)` /
+  `SYNTHESIZING` log line (the log 5 the original spec called for,
+  now meaningful since the check it wants to instrument actually
+  exists).
+  - **Verified against a real crash-and-resume**, not just read-through:
+    queued a real job (two real in-edition articles, one deliberately
+    long — 63,766 chars — so TTS would take a while), let `intro` and
+    `bridge_a` finish, `kill -9`'d the process mid-`passage_a` (a
+    38-chunk section), confirmed `intro.wav` + `bridge_a.wav` were
+    persisted to the scratch dir but `passage_a` wasn't, ran
+    `reset_all_running_jobs` (PR #70) to simulate the worker-startup
+    recovery, and reran the job. Log showed `intro` and `bridge_a`
+    both **SKIPPING (already done)**, `passage_a` correctly
+    **SYNTHESIZING** from where it left off — no wasted re-synthesis
+    of the two already-finished sections.
+  - Test job/edition/user rows and scratch-dir audio cleaned up from
+    both DBs afterward.
+  - Out of scope for this fix (unchanged from before): a full retry
+    of an edition whose TTS already fully succeeded still redoes all
+    synthesis, since the scratch dir is deleted after success — not a
+    regression, this gap predates this fix and isn't part of the
+    resumability spec.
 - **Worker-resumability root cause found: TTS was never built with
   per-section resumability.** Per `docs/session_plan_worker_resumability.md`'s
   diagnostic-first plan: shipped 4 targeted `logger.info` lines

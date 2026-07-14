@@ -41,6 +41,17 @@ check." That work — plus Section 3 (why the OOM happens at all) — is
 deferred to a separate session; see `docs/roadmap.md`'s
 "Recently completed" 2026-07-14 entry for the full verified detail.
 
+**FIXED, same day.** Per-section resumability shipped: a scratch
+directory per edition holds each section's WAV as soon as it's
+synthesized (moved in atomically, so a crash mid-synthesize can't
+leave a half-written file), and the function skips straight to
+reading a section's file if it's already there instead of calling TTS
+again. Verified against a real crash-and-resume (not just a read-
+through) — see `docs/roadmap.md`'s "Recently completed" 2026-07-14
+entry, first bullet, for the full detail. Section 1 (resumability) of
+this doc is DONE. Section 3 (why the OOM happens at all) remains open
+— see `docs/roadmap.md`'s "In progress" list.
+
 ---
 
 ## Context — what we know

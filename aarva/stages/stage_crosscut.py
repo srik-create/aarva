@@ -1521,6 +1521,7 @@ CROSSCUT_INTER_SECTION_PAUSE_MS = 600
 class CrosscutTTSStats:
     edition_id: Optional[int] = None
     sections_synthesized: int = 0
+    sections_skipped: int = 0
     total_audio_seconds: float = 0.0
     output_path: Optional[str] = None
     errors: int = 0
@@ -1574,6 +1575,7 @@ def synthesize_crosscut_episode(
     tts: pass an existing client to avoid rebuilding (DI).
     """
     import os
+    import shutil
     import tempfile
     import wave
     from pathlib import Path as _Path
@@ -1640,39 +1642,67 @@ def synthesize_crosscut_episode(
     audio_dir = config.audio_dir / edition_date.isoformat()
     audio_dir.mkdir(parents=True, exist_ok=True)
 
-    # Synthesize each section to a temp WAV, then concatenate the PCM
-    # samples with inter-section silence.
+    # Per-section scratch dir. Lets a resumed build (after a Render
+    # OOM mid-TTS) skip sections a prior attempt already finished
+    # instead of re-synthesizing all 6 from scratch — see
+    # docs/session_plan_worker_resumability.md's 2026-07-14 finding.
+    # A section's WAV only lands here via an atomic move after
+    # tts.synthesize fully succeeds, so a crash mid-synthesize can
+    # never leave a partial file that gets mistaken for "already
+    # done". Removed once the combined output is written below.
+    scratch_dir = audio_dir / f"_tts_scratch_{edition_id}"
+    scratch_dir.mkdir(parents=True, exist_ok=True)
+
+    # Synthesize each section (or reuse one already on disk from a
+    # prior attempt), then concatenate the PCM samples with
+    # inter-section silence.
     section_pcms: list[bytes] = []
     sample_rate: Optional[int] = None
     sample_width: Optional[int] = None
     channels: Optional[int] = None
 
     for name, voice, text in sections:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-            tmp_path = tmp.name
-        try:
-            logger.info("Crosscut TTS: synthesizing %s (~%d chars, voice=%s)",
-                        name, len(text), voice)
+        section_path = scratch_dir / f"{name}.wav"
+        already_done = section_path.exists()
+        logger.info(
+            "TTS piece %s (edition #%d) → %s",
+            name, edition_id,
+            "SKIPPING (already done)" if already_done else "SYNTHESIZING",
+        )
+        if already_done:
+            stats.sections_skipped += 1
+        else:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                tmp_path = tmp.name
             try:
-                result = tts.synthesize(text, _Path(tmp_path), voice_id=voice)
-            except Exception as ex:
-                stats.errors += 1
-                logger.warning("Crosscut TTS: section %s failed: %s", name, ex)
-                continue
-            # Read the WAV that the client wrote and extract its PCM samples.
-            with wave.open(str(result.output_path), "rb") as wf:
-                if sample_rate is None:
-                    sample_rate  = wf.getframerate()
-                    sample_width = wf.getsampwidth()
-                    channels     = wf.getnchannels()
-                section_pcms.append(wf.readframes(wf.getnframes()))
-            stats.sections_synthesized += 1
-            stats.total_audio_seconds += result.duration_seconds
-        finally:
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
+                logger.info("Crosscut TTS: synthesizing %s (~%d chars, voice=%s)",
+                            name, len(text), voice)
+                try:
+                    result = tts.synthesize(text, _Path(tmp_path), voice_id=voice)
+                except Exception as ex:
+                    stats.errors += 1
+                    logger.warning("Crosscut TTS: section %s failed: %s", name, ex)
+                    continue
+                # Move (not copy) into the scratch dir — atomic on the
+                # same filesystem, so a crash mid-synthesize never
+                # leaves a partial file at section_path.
+                shutil.move(str(result.output_path), str(section_path))
+                stats.sections_synthesized += 1
+                stats.total_audio_seconds += result.duration_seconds
+            finally:
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
+
+        # Read the WAV — freshly synthesized or reused from a prior
+        # attempt, same either way — and extract its PCM samples.
+        with wave.open(str(section_path), "rb") as wf:
+            if sample_rate is None:
+                sample_rate  = wf.getframerate()
+                sample_width = wf.getsampwidth()
+                channels     = wf.getnchannels()
+            section_pcms.append(wf.readframes(wf.getnframes()))
 
     if not section_pcms or sample_rate is None:
         logger.error("Crosscut TTS: no sections produced audio for edition #%d",
@@ -1722,10 +1752,17 @@ def synthesize_crosscut_episode(
              WHERE edition_id = ?
         """, (edition_id,))
 
+    # Combined output is written and audio_url is durably persisted —
+    # the per-section scratch files have served their purpose (letting
+    # a crash-and-resume skip finished sections) and are no longer
+    # needed.
+    shutil.rmtree(scratch_dir, ignore_errors=True)
+
     mins, secs = divmod(int(duration), 60)
     logger.info(
-        "Crosscut TTS: edition #%d → %s  (%dm %ds, %d sections, %d errors)",
+        "Crosscut TTS: edition #%d → %s  (%dm %ds, %d synthesized, "
+        "%d resumed-from-cache, %d errors)",
         edition_id, audio_url, mins, secs,
-        stats.sections_synthesized, stats.errors,
+        stats.sections_synthesized, stats.sections_skipped, stats.errors,
     )
     return stats
