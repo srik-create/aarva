@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-14
+**Last updated:** 2026-07-15
 
 ---
 
@@ -36,7 +36,26 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **OOM-frequency investigation (Section 3 of
+2. **BUG — `jobs` table wiped by every laptop→Render DB sync.**
+   Full spec at `docs/session_plan_jobs_to_listener_db.md`. Same
+   bug class as the 2026-07-06 listener-episodes-disappearing
+   problem: `jobs` lives in `/data/aarva.db` which
+   `scripts/sync_db_to_render.sh` atomic-replaces on every sync,
+   silently wiping any /create job rows Render has written since
+   the previous sync. Observed 2026-07-15 when a listener's build
+   was orphaned mid-TTS after an OOM restart — the worker's
+   `reset_all_running_jobs` on startup found zero rows to
+   recover because the sync 22 minutes earlier had wiped them all.
+   Diagnostic evidence documented in the session plan.
+   **Fix:** move `jobs` table to the existing
+   `/data/aarva-listener.db` (which sync never touches — same
+   pattern as listener episodes). Small single-PR change:
+   schema copy, function-signature updates in `episode_jobs.py`
+   and its callers, drop the old CREATE TABLE from `aarva/db.py`.
+   No data migration needed. Full spec has the file list and
+   verification steps.
+
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -47,7 +66,9 @@ GitHub Pages.
    loads, LLM prompt buffers, or the `google-genai` SDK holding
    per-connection state across the multiple LLM/TTS clients built
    during one job. Expect a small memory-diet PR once profiling is
-   in, not a rewrite.
+   in, not a rewrite. Ordering: item 2 first — a broken jobs
+   table makes debugging OOMs harder because half the diagnostic
+   evidence gets wiped by the daily sync.
 
 ---
 
