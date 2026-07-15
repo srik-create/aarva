@@ -52,11 +52,11 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-3. **Users persistence + crosscut divergent-view tier + region-
-   specific crosscut piece voices.** Full spec at
-   `docs/session_plan_users_and_crosscut_upgrades.md`. Three
-   orthogonal enhancements requested 2026-07-15, packaged into
-   one spec but shippable as three independent PRs:
+3. **Users persistence + region-specific crosscut piece voices.**
+   Full spec at `docs/session_plan_users_and_crosscut_upgrades.md`
+   (Section 2, divergent-view tier, shipped 2026-07-15 — see
+   "Recently completed"). Two remaining orthogonal enhancements,
+   each its own PR:
    - **Section 1 — Users persistence.** Same sync-wipes-data bug
      class as the jobs table (fixed 2026-07-15). Move `users` and
      `user_sessions` from main DB to listener DB so listener
@@ -65,15 +65,6 @@ GitHub Pages.
      have that as a database of users." Plumbing already captures
      — this fixes durability. Small structural PR, precedented by
      the jobs move.
-   - **Section 2 — Crosscut divergent-view tier.** Layer a new
-     stance-classification step above the current pair-selection
-     logic: prefer pairs that argue different sides of the same
-     question over pairs that offer different angles on the same
-     topic. Extra Gemini call per candidate (~$0.03/build total,
-     acceptable). 60/40 mix in the longlist when divergent pairs
-     exist; fallback to current logic when they don't. Editorial
-     voice unchanged — intros/bridges/outros still leave the
-     listener with a question, never a verdict.
    - **Section 3 — Region-specific voices for crosscut pieces.**
      Currently daily articles get country-based accent steering
      (via publications.yaml's `country:` tag + Stage 9's
@@ -83,11 +74,6 @@ GitHub Pages.
      Intro/bridges/outro stay in neutral Aarva editorial voice.
      Almost mechanical — the accent-steer plumbing already
      exists.
-
-   Recommended order per the spec: Section 1 first (closes out
-   the sync-wipe bug class before it bites a third table),
-   Section 2 second (larger editorial impact), Section 3 last
-   (smallest of the three). Each can ship as its own PR.
 
 ---
 
@@ -140,6 +126,60 @@ Most recent first.
 
 ### 2026-07-15
 
+- **Crosscut divergent-view tier.** Section 2 of
+  `docs/session_plan_users_and_crosscut_upgrades.md`: prefer pairs
+  that argue opposing views on the same question over pairs that
+  merely offer complementary angles, when a genuine opposing-views
+  pairing exists. Editorial voice unchanged — intro/bridge/outro
+  still leave the listener with a question, never a verdict.
+  - **Spec inconsistency found before implementing:** the spec
+    described one specific pipeline shape (pre-score top-30 →
+    stance-classify → connection-eval → 60/40 mix) but its own
+    verification steps all tested via `/create`, which runs on a
+    completely different mechanism (`episode_candidates.py`'s single
+    Gemini call that both picks a pairing and writes its rationale
+    in one shot — no separate per-pair pre-score/eval stages to hook
+    a classifier into). Flagged this to the user rather than
+    guessing which surface was meant; decided to build both, with
+    different mechanisms suited to each:
+    - **Daily pipeline** (`aarva/stages/stage_crosscut.py::detect_pair_candidates`)
+      — implemented as specced. New `_classify_pair_stance` classifies
+      each of the top-30 pre-scored pairs (separate LLM call,
+      defaults to `DIFFERENT_ANGLES` on any error/ambiguity — the
+      safer fallback since that tier already works). Both stance
+      buckets get the existing connection-eval; longlist assembly
+      takes top 6 divergent + top 4 current-logic when divergent
+      pairs exist (shared per-article appearance-cap walk across
+      both buckets so an article can't double-appear), all
+      current-logic otherwise.
+    - **`/create`** (`aarva/services/episode_candidates.py`) — a
+      genuinely lighter mechanism, not the same pipeline transplanted:
+      since there's no per-pair loop to hook into, and `/create` is on
+      the listener's live latency path (unlike the offline daily
+      pipeline), the stance preference is baked directly into the
+      existing single proposal prompt — it's asked to prefer
+      opposing-views pairings when they exist and self-tag each
+      returned pairing's stance, with no added LLM call or latency.
+  - Both surfaces log the same tier-mix lines the spec asked for:
+    `"crosscut pair-select: divergent tier found N pairs, filled
+    longlist X/Y (divergent/current-logic)"` or `"...no divergent
+    pairs found, using current-logic only"`.
+  - **Verified for real:** directly tested `_classify_pair_stance`
+    against a known opposing-views pair and a known complementary-
+    angles pair (correctly conservative — defaulted to
+    `DIFFERENT_ANGLES` on a genuinely borderline case rather than
+    forcing a disagreement); ran `/create`'s proposal end-to-end for
+    real prompts ("is carbon capture a real climate solution or a
+    fossil fuel industry excuse" → 2 of 3 pairings tagged
+    `OPPOSING_VIEWS` with rationale that actually reads as opposing;
+    an evergreen nature-writing prompt → still found 1 divergent
+    pairing, log line correct either way). Did **not** run the full
+    60-call daily-pipeline `detect_pair_candidates` end-to-end
+    (~10+ min, real API cost) — it's a straightforward integration of
+    two independently-verified pieces (the classifier, and the
+    identical mixing/logging logic proven via the `/create` path), so
+    a full run wasn't judged worth the added cost. Worth a first live
+    run before fully trusting the daily-pipeline path in production.
 - **Fixed: `jobs` table wiped by every laptop→Render DB sync.** Per
   `docs/session_plan_jobs_to_listener_db.md`. Same bug class as the
   2026-07-06 listener-episode loss, hitting a different table: `jobs`

@@ -105,6 +105,29 @@ required.
 
 ## Section 2 — Crosscut divergent-view tier
 
+### DONE 2026-07-15
+
+Shipped for both surfaces, plus a real spec inconsistency found before
+implementing — see `docs/roadmap.md`'s 2026-07-15 "Recently completed"
+entry for full detail:
+
+The spec's architecture (pre-score → stance-classify → connection-eval
+→ 60/40 mix) matches `stage_crosscut.py`'s daily-pipeline longlist
+generation, but every verification step described testing via
+`/create`, which runs on a completely different single-shot mechanism
+with no per-pair pipeline to hook into. Flagged this rather than
+guessing; user chose to build both, each with the mechanism suited to
+it — the daily pipeline gets the specced pipeline exactly; `/create`
+gets a lighter version (the preference baked into its existing single
+proposal prompt, no added LLM call) since it's on the listener's live
+latency path.
+
+Verified `_classify_pair_stance` directly (known opposing-views pair,
+known complementary-angles pair) and `/create`'s full proposal path
+for real. Did not run the full 60-call daily-pipeline path end-to-end
+(cost/time) — worth a first live check before fully trusting it in
+production.
+
 ### Goal
 
 Current crosscut pair selection scores pairs by topical similarity
