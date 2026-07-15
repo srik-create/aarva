@@ -15,9 +15,16 @@ This stage does Phase 2 of the Crosscut pipeline:
      fingerprint dimensions) for the divergence signal.
   3. Exclude pairs whose topic was used in any of the last N crosscut
      episodes (anti-repetition).
-  4. Take top ~30 by structural divergence → Gemini connection-eval to
-     get a one-sentence rationale + 0-10 quality score.
-  5. Persist the top 10 by quality score to crosscut_pair_candidates.
+  4. Take top ~30 by structural divergence. Each of those 30 gets a
+     stance classification (OPPOSING_VIEWS vs. DIFFERENT_ANGLES — see
+     docs/session_plan_users_and_crosscut_upgrades.md Section 2, added
+     2026-07-15) and the existing Gemini connection-eval (one-sentence
+     rationale + 0-10 quality score).
+  5. Persist the top 10 to crosscut_pair_candidates: 60/40 divergent/
+     current-logic when divergent (OPPOSING_VIEWS) pairs exist, all
+     current-logic otherwise. Editorial voice is unchanged either way
+     — this only changes which pairs get selected, never how the
+     eventual intro/bridge/outro frame them.
   6. The longlist CLI then displays these for user selection.
 
 The selection itself (user picks 1 of 10) lives in aarva/crosscut.py.
@@ -89,6 +96,8 @@ class CrosscutPairStats:
     pairs_eval_called: int = 0
     pairs_persisted: int = 0
     skipped_for_topic_recency: int = 0
+    pairs_stance_classified: int = 0
+    pairs_divergent_found: int = 0
 
 
 # ─── Article loading ──────────────────────────────────────────────────────
@@ -463,6 +472,90 @@ def _eval_pair_via_llm(
     except Exception as e:
         logger.warning("Crosscut eval LLM call failed: %s", e)
         return None
+
+
+# ─── Divergent-view tier (2026-07-15) ─────────────────────────────────────
+#
+# Layered ABOVE the connection-eval above, not a replacement for it. See
+# docs/session_plan_users_and_crosscut_upgrades.md Section 2: prefer pairs
+# that argue opposing sides of the same question over pairs that merely
+# offer complementary angles, when such pairs exist in the pool. Editorial
+# voice is unchanged either way — this only affects which pairs get
+# selected, not how the eventual intro/bridge/outro are written.
+
+_STANCE_CLASSIFY_PROMPT = """\
+You classify pairs of journalism articles by their relationship.
+
+Return ONE label:
+
+- OPPOSING_VIEWS: The two articles argue different sides of the SAME
+  question. Not just different angles or different subjects — the two
+  authors would meaningfully disagree if they met. Example: one piece
+  arguing carbon capture is essential to hit climate targets; another
+  arguing it's a fossil-fuel-industry greenwash. Same question,
+  opposing conclusions.
+- DIFFERENT_ANGLES: The articles are about the same topic but come at
+  it from complementary or non-overlapping angles — they'd nod at each
+  other, not argue. Example: one piece on the economics of AI training;
+  another on its cultural impact. Same topic, different lenses.
+
+When in doubt, prefer DIFFERENT_ANGLES — only label OPPOSING_VIEWS when
+the disagreement is clear and would survive the two authors meeting
+in person.
+
+═══════════════════════════════════════════════════════════════════════
+PIECE A — {{ pub_a }}
+Title: {{ title_a }}
+{{ excerpt_a }}
+
+═══════════════════════════════════════════════════════════════════════
+PIECE B — {{ pub_b }}
+Title: {{ title_b }}
+{{ excerpt_b }}
+
+═══════════════════════════════════════════════════════════════════════
+OUTPUT — a single JSON object with exactly one key:
+
+{"stance": "OPPOSING_VIEWS" | "DIFFERENT_ANGLES"}
+
+Output ONLY the JSON object. No prose, no markdown code fence.
+"""
+
+
+def _classify_pair_stance(
+    llm: LLMClient,
+    a: _CrosscutArticle,
+    b: _CrosscutArticle,
+) -> str:
+    """Classify whether a pair argues opposing views on the same
+    question, or merely offers different angles on the same topic.
+
+    Defaults to DIFFERENT_ANGLES on any parse error or unexpected
+    response — the safer fallback, since that's the tier that already
+    works well today; a misfire here should silently degrade to
+    today's behavior, not wrongly promote a weak pair into the
+    divergent tier.
+
+    Excerpt clipped to 1,500 chars (vs. _eval_pair_via_llm's 25k) —
+    enough to convey an argument's shape for a binary classification,
+    not the full nuance a quality/rationale judgment needs."""
+    _MAX_EXCERPT = 1500
+    excerpt_a = (a.full_text or a.excerpt or "")[:_MAX_EXCERPT]
+    excerpt_b = (b.full_text or b.excerpt or "")[:_MAX_EXCERPT]
+    prompt = _render(
+        _STANCE_CLASSIFY_PROMPT,
+        pub_a=a.publication_name, title_a=a.title, excerpt_a=excerpt_a,
+        pub_b=b.publication_name, title_b=b.title, excerpt_b=excerpt_b,
+    )
+    try:
+        result = llm.complete(prompt, expect_json=True, temperature=0.2)
+        if not isinstance(result, dict):
+            return "DIFFERENT_ANGLES"
+        stance = str(result.get("stance", "")).strip().upper()
+        return "OPPOSING_VIEWS" if stance == "OPPOSING_VIEWS" else "DIFFERENT_ANGLES"
+    except Exception as e:
+        logger.warning("Crosscut stance classification failed: %s", e)
+        return "DIFFERENT_ANGLES"
 
 
 # ─── Persistence ──────────────────────────────────────────────────────────
@@ -1436,8 +1529,16 @@ def detect_pair_candidates(
             superseded,
         )
 
-    evals: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float]] = []
+    # Divergent-view tier (2026-07-15): classify each top-30 pair's
+    # stance BEFORE the connection-eval so both buckets get evaluated
+    # identically below. See docs/session_plan_users_and_crosscut_
+    # upgrades.md Section 2 — this only changes which pairs get
+    # selected, not how they're scored.
+    divergent_evals: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float]] = []
+    current_logic_evals: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float]] = []
     for combined, div, a, b in to_eval:
+        stance = _classify_pair_stance(llm, a, b)
+        stats.pairs_stance_classified += 1
         result = _eval_pair_via_llm(llm, a, b)
         stats.pairs_eval_called += 1
         if not result:
@@ -1451,36 +1552,72 @@ def detect_pair_candidates(
         if int(result.get("score") or 0) < 4:
             # Below quality floor; skip persisting low-scored pairs.
             continue
-        evals.append((result, a, b, float(div)))
+        entry = (result, a, b, float(div))
+        if stance == "OPPOSING_VIEWS":
+            divergent_evals.append(entry)
+        else:
+            current_logic_evals.append(entry)
 
-    # Sort by LLM score (desc).
-    evals.sort(key=lambda r: r[0].get("score") or 0, reverse=True)
+    # Sort each bucket by LLM score (desc) independently — the stance
+    # tag decides which bucket a pair is in; the quality score decides
+    # its order within that bucket.
+    divergent_evals.sort(key=lambda r: r[0].get("score") or 0, reverse=True)
+    current_logic_evals.sort(key=lambda r: r[0].get("score") or 0, reverse=True)
+    stats.pairs_divergent_found = len(divergent_evals)
 
     # Apply per-article appearance cap to diversify the longlist. Without
     # this, a few high-rigour articles dominate the longlist by pairing
-    # with everything topically adjacent. We walk the sorted list and
-    # admit pairs only while both articles are under the appearance cap.
+    # with everything topically adjacent. We walk each bucket's sorted
+    # list in priority order and admit pairs only while both articles
+    # are under the appearance cap — the same `appearances` dict is
+    # shared across both admit passes so an article picked in the
+    # divergent tier can't also fill a current-logic slot.
     appearances: dict[int, int] = {}
     keep: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float]] = []
-    for result, a, b, div in evals:
-        if (appearances.get(a.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE
-                or appearances.get(b.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE):
-            continue
-        keep.append((result, a, b, div))
-        appearances[a.id] = appearances.get(a.id, 0) + 1
-        appearances[b.id] = appearances.get(b.id, 0) + 1
-        if len(keep) >= longlist_size:
-            break
+
+    def _admit(entries, quota: int) -> int:
+        admitted = 0
+        for result, a, b, div in entries:
+            if admitted >= quota:
+                break
+            if (appearances.get(a.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE
+                    or appearances.get(b.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE):
+                continue
+            keep.append((result, a, b, div))
+            appearances[a.id] = appearances.get(a.id, 0) + 1
+            appearances[b.id] = appearances.get(b.id, 0) + 1
+            admitted += 1
+        return admitted
+
+    if divergent_evals:
+        # 60/40 split in favour of divergent pairs. If fewer divergent
+        # pairs exist than the 60% target, take all of them and fill
+        # the rest from current-logic (never force a shortfall).
+        target_divergent = round(longlist_size * 0.6)
+        n_divergent = _admit(divergent_evals, min(target_divergent, len(divergent_evals)))
+        n_current = _admit(current_logic_evals, longlist_size - n_divergent)
+        logger.info(
+            "crosscut pair-select: divergent tier found %d pairs, "
+            "filled longlist %d/%d (divergent/current-logic)",
+            len(divergent_evals), n_divergent, n_current,
+        )
+    else:
+        logger.info(
+            "crosscut pair-select: no divergent pairs found, using "
+            "current-logic only"
+        )
+        _admit(current_logic_evals, longlist_size)
 
     for result, a, b, div in keep:
         _persist_candidate(db, today, a, b, result, div)
         stats.pairs_persisted += 1
 
     logger.info(
-        "Crosscut: persisted %d candidates (eval'd %d, skipped %d for "
-        "topic recency, filtered <4 score)",
+        "Crosscut: persisted %d candidates (eval'd %d, stance-"
+        "classified %d, skipped %d for topic recency, filtered <4 "
+        "score)",
         stats.pairs_persisted, stats.pairs_eval_called,
-        stats.skipped_for_topic_recency,
+        stats.pairs_stance_classified, stats.skipped_for_topic_recency,
     )
     return stats
 

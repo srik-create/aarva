@@ -3,6 +3,10 @@
 Stored as rows in user_actions. The feed service consumes these to
 filter / personalise what each user sees. Phase B will use the same
 table for taste-centroid updates.
+
+Currently dead code — no route or CLI calls into this module. Note if
+reviving: `users` moved to the listener DB 2026-07-15; `user_id` here
+is the MAIN DB (unaffected — no FK either way).
 """
 from __future__ import annotations
 

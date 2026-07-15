@@ -20,7 +20,13 @@ episode on anything"). Submitting a prompt calls
      closest to the prompt in the vector space. Excludes articles
      already covered by step-1 matches to avoid showing the same
      pieces twice. Shown to the listener as "Create this episode" —
-     picking one queues a build job (see episode_jobs.py).
+     picking one queues a build job (see episode_jobs.py). Since
+     2026-07-15 (docs/session_plan_users_and_crosscut_upgrades.md
+     §2), the same proposal call prefers pairings that argue opposing
+     views on the same question over ones that merely offer
+     complementary angles, when a genuine opposing-views pairing
+     exists in the pool — self-tagged via `Candidate.stance` for
+     logging, never shown to the listener.
 
 Total candidates: capped at N (default 3). Existing matches fill
 slots first; new pairings fill the rest. If both stages fail to
@@ -113,6 +119,14 @@ class Candidate:
 
     # For sort stability + presentation
     score: float = 0.0              # higher = better match for prompt
+
+    # Filled when kind == 'new' (2026-07-15 — docs/session_plan_users_
+    # and_crosscut_upgrades.md §2): 'OPPOSING_VIEWS' or 'DIFFERENT_
+    # ANGLES', self-tagged by the same proposal LLM call. Logging/
+    # observability only per spec's non-goals — never rendered to the
+    # listener, candidate cards don't flag which tier a pairing came
+    # from.
+    stance: Optional[str] = None
 
 
 # ─── Existing-match lookup ───────────────────────────────────────────────
@@ -259,6 +273,9 @@ Bad pairings:
 - One profound piece + one filler piece chosen just to fill the slot.
 - Pairings that only loosely relate to the listener's prompt — better to return FEWER candidates than to dilute.
 
+STANCE PREFERENCE (2026-07-15 — docs/session_plan_users_and_crosscut_upgrades.md §2)
+Among the pairings you propose, PREFER ones where the two articles argue different sides of the SAME question — a real disagreement the two authors would have if they met — over pairings that merely offer complementary angles on the same topic. Only fall back to a same-angle pairing when no genuine opposing-views pairing exists in the pool worth proposing. Never force a disagreement that isn't really there — a strong complementary-angle pairing beats a manufactured one. Tag every pairing you return with which kind it is (see "stance" in OUTPUT below); this doesn't change how you write "why" — the episode voice stays the same either way, describing the connection without ever declaring a side "right".
+
 VOICE (docs/session_plan_content_quality.md §1 — locked, all listener-facing copy targets this standard)
 Target reader: any smart generalist, including someone who isn't a college graduate — not someone who reads philosophy for fun. Think J.K. Rowling writing for adults. Before finalizing "why", check it against all of: would this land with a curious 18-year-old with no college background? Read aloud in one breath per sentence — does any sentence trip? Does it open on a concrete image (a person, place, object, act) rather than an abstract noun ("resonance", "framework", "phenomenon")? Are there words a 12-year-old wouldn't know?
 
@@ -270,7 +287,8 @@ Return JSON ONLY — no prose, no markdown fences. A single object with one key:
       "article_a_id": <int from pool>,
       "article_b_id": <int from pool, different from a>,
       "topic_label":  "<short editorial label — 4–8 words, no quotes. Plain words a listener would use, not a category name — 'new angles on the iran war' not 'geopolitical reframing'. Reference the frame of the LISTENER PROMPT above rather than a generic topic name for the pairing — if the prompt asks about new perspectives on X, the label should read like an answer to that ('new angles on X'), not a neutral subject-matter tag.>",
-      "why":          "<a 4–5 sentence paragraph (~80–120 words) describing the proposed episode to the listener. Cover three things: (1) what each piece argues or describes; (2) how the two connect — the angle that makes pairing them worthwhile; (3) the authors by name (always — they're in the pool data) and one short phrase of relevant expertise IF you can confidently identify them from prior knowledge (otherwise leave the expertise claim out — do NOT invent credentials). Plain language per the VOICE section above. NO first person ('I/we/us/our'). NO LLM-tell vocabulary: delve, delves, navigate, tapestry, robust, fascinating, intricate, multifaceted, paramount, crucial, landscape (as metaphor), realm, embark, unpack, resonates with, resonance, juxtaposition, interrogates, grapples with, the discourse, the fabric of, the essence of, what it means to be.>"
+      "why":          "<a 4–5 sentence paragraph (~80–120 words) describing the proposed episode to the listener. Cover three things: (1) what each piece argues or describes; (2) how the two connect — the angle that makes pairing them worthwhile; (3) the authors by name (always — they're in the pool data) and one short phrase of relevant expertise IF you can confidently identify them from prior knowledge (otherwise leave the expertise claim out — do NOT invent credentials). Plain language per the VOICE section above. NO first person ('I/we/us/our'). NO LLM-tell vocabulary: delve, delves, navigate, tapestry, robust, fascinating, intricate, multifaceted, paramount, crucial, landscape (as metaphor), realm, embark, unpack, resonates with, resonance, juxtaposition, interrogates, grapples with, the discourse, the fabric of, the essence of, what it means to be.>",
+      "stance":       "<'OPPOSING_VIEWS' if the two articles argue different sides of the same question, otherwise 'DIFFERENT_ANGLES'>"
     }
   ]
 }
@@ -426,6 +444,8 @@ def _propose_new_pairings(
             why_text = why_text[:1197].rsplit(" ", 1)[0] + "…"
         if not why_text:
             why_text = "Two pieces in conversation."
+        stance_raw = str(p.get("stance") or "").strip().upper()
+        stance = "OPPOSING_VIEWS" if stance_raw == "OPPOSING_VIEWS" else "DIFFERENT_ANGLES"
         out.append(Candidate(
             kind="new",
             topic_label=str(p.get("topic_label") or "").strip()[:80] or "Two angles",
@@ -444,9 +464,23 @@ def _propose_new_pairings(
             # Average of the two articles' prompt-similarities — pure
             # presentation-order metric, not used by the build flow.
             score=(a["score"] + b["score"]) / 2,
+            stance=stance,
         ))
         if len(out) >= n_needed:
             break
+
+    n_divergent = sum(1 for c in out if c.stance == "OPPOSING_VIEWS")
+    if n_divergent:
+        logger.info(
+            "crosscut pair-select: divergent tier found %d pairs, "
+            "filled longlist %d/%d (divergent/current-logic)",
+            n_divergent, n_divergent, len(out) - n_divergent,
+        )
+    else:
+        logger.info(
+            "crosscut pair-select: no divergent pairs found, using "
+            "current-logic only"
+        )
     return out
 
 

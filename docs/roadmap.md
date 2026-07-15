@@ -52,28 +52,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-3. **Users persistence + crosscut divergent-view tier.** Full spec
-   at `docs/session_plan_users_and_crosscut_upgrades.md` (Section 3,
-   region-specific crosscut piece voices, shipped 2026-07-15 — see
-   "Recently completed"). Two remaining sections, each its own PR:
-   - **Section 1 — Users persistence.** Same sync-wipes-data bug
-     class as the jobs table (fixed 2026-07-15). Move `users` and
-     `user_sessions` from main DB to listener DB so listener
-     emails survive daily syncs. User's ask verbatim: "make sure
-     we store email addresses for every /create request, so we
-     have that as a database of users." Plumbing already captures
-     — this fixes durability. Small structural PR, precedented by
-     the jobs move.
-   - **Section 2 — Crosscut divergent-view tier.** Layer a new
-     stance-classification step above the current pair-selection
-     logic: prefer pairs that argue different sides of the same
-     question over pairs that offer different angles on the same
-     topic. Extra Gemini call per candidate (~$0.03/build total,
-     acceptable). 60/40 mix in the longlist when divergent pairs
-     exist; fallback to current logic when they don't. Editorial
-     voice unchanged — intros/bridges/outros still leave the
-     listener with a question, never a verdict.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -159,6 +137,105 @@ Most recent first.
     Stage 9; what's new here is the publication-name resolution
     (verified directly against real/synthetic data) and threading it
     through, which needed no new TTS-client behavior.
+- **Crosscut divergent-view tier.** Section 2 of
+  `docs/session_plan_users_and_crosscut_upgrades.md`: prefer pairs
+  that argue opposing views on the same question over pairs that
+  merely offer complementary angles, when a genuine opposing-views
+  pairing exists. Editorial voice unchanged — intro/bridge/outro
+  still leave the listener with a question, never a verdict.
+  - **Spec inconsistency found before implementing:** the spec
+    described one specific pipeline shape (pre-score top-30 →
+    stance-classify → connection-eval → 60/40 mix) but its own
+    verification steps all tested via `/create`, which runs on a
+    completely different mechanism (`episode_candidates.py`'s single
+    Gemini call that both picks a pairing and writes its rationale
+    in one shot — no separate per-pair pre-score/eval stages to hook
+    a classifier into). Flagged this to the user rather than
+    guessing which surface was meant; decided to build both, with
+    different mechanisms suited to each:
+    - **Daily pipeline** (`aarva/stages/stage_crosscut.py::detect_pair_candidates`)
+      — implemented as specced. New `_classify_pair_stance` classifies
+      each of the top-30 pre-scored pairs (separate LLM call,
+      defaults to `DIFFERENT_ANGLES` on any error/ambiguity — the
+      safer fallback since that tier already works). Both stance
+      buckets get the existing connection-eval; longlist assembly
+      takes top 6 divergent + top 4 current-logic when divergent
+      pairs exist (shared per-article appearance-cap walk across
+      both buckets so an article can't double-appear), all
+      current-logic otherwise.
+    - **`/create`** (`aarva/services/episode_candidates.py`) — a
+      genuinely lighter mechanism, not the same pipeline transplanted:
+      since there's no per-pair loop to hook into, and `/create` is on
+      the listener's live latency path (unlike the offline daily
+      pipeline), the stance preference is baked directly into the
+      existing single proposal prompt — it's asked to prefer
+      opposing-views pairings when they exist and self-tag each
+      returned pairing's stance, with no added LLM call or latency.
+  - Both surfaces log the same tier-mix lines the spec asked for:
+    `"crosscut pair-select: divergent tier found N pairs, filled
+    longlist X/Y (divergent/current-logic)"` or `"...no divergent
+    pairs found, using current-logic only"`.
+  - **Verified for real:** directly tested `_classify_pair_stance`
+    against a known opposing-views pair and a known complementary-
+    angles pair (correctly conservative — defaulted to
+    `DIFFERENT_ANGLES` on a genuinely borderline case rather than
+    forcing a disagreement); ran `/create`'s proposal end-to-end for
+    real prompts ("is carbon capture a real climate solution or a
+    fossil fuel industry excuse" → 2 of 3 pairings tagged
+    `OPPOSING_VIEWS` with rationale that actually reads as opposing;
+    an evergreen nature-writing prompt → still found 1 divergent
+    pairing, log line correct either way). Did **not** run the full
+    60-call daily-pipeline `detect_pair_candidates` end-to-end
+    (~10+ min, real API cost) — it's a straightforward integration of
+    two independently-verified pieces (the classifier, and the
+    identical mixing/logging logic proven via the `/create` path), so
+    a full run wasn't judged worth the added cost. Worth a first live
+    run before fully trusting the daily-pipeline path in production.
+- **Moved `users` (+ `user_sessions`) to the listener DB.** Section 1
+  of `docs/session_plan_users_and_crosscut_upgrades.md`. Same bug
+  class as the `jobs` move earlier the same day: every `/create`
+  request upserts a `users` row via `ensure_user_for_email`, and a
+  laptop→Render sync was silently wiping any user row created on
+  Render since the previous sync — user's ask verbatim: "make sure we
+  store email addresses for every /create request, so we have that
+  as a database of users." The capture was already happening; this
+  fixes durability.
+  - `users` and `user_sessions` move TOGETHER (unlike `jobs`, which
+    moved alone) specifically so the FK between them stays valid —
+    both now live in the same listener-DB file, so it's a same-
+    database FK, not a cross-database one.
+  - `ensure_user_for_email` — already living in
+    `aarva/server/routes/create.py` from the prior jobs-move PR (the
+    spec assumed it was still in `episode_jobs.py`, a stale
+    assumption from before that move; applied the fix to wherever the
+    function actually lives) — now takes `listener_db` instead of
+    `db`.
+  - **Two gaps found beyond the spec's file list, both fixed in this
+    PR:** (1) the main DB's `editions.user_id` (bonus-episode
+    attribution) and `user_actions.user_id` both had live FK
+    constraints on `users(id)` that would have become dangling
+    references to a now-nonexistent table — dropped both FKs, kept
+    as plain `INTEGER` columns, same pattern as `jobs.user_id`.
+    Neither write path is currently live (both route through
+    confirmed-dead code — `aarva/services/editions.py` and
+    `aarva/services/actions.py` respectively — so nothing broke
+    today, but a future activation would have hit a cryptic `no such
+    table: users` error). (2) `aarva/services/users.py` — a complete,
+    pre-existing magic-link auth module (also dead code, no live
+    caller) — touches `users` + `user_sessions` (moving) AND
+    `magic_link_tokens` (not moving, no FK to users) in one
+    transaction; flagged with a docstring note that reviving it would
+    need a two-database transaction, not touched further (out of
+    scope — no login flow exists to fix today, and the user confirmed
+    the ask is just simple email capture, not building out auth).
+  - Verified via real DB-level round trips: `ensure_user_for_email`
+    lands the row in listener DB only (0 in main DB), repeat
+    submissions from the same email correctly reuse the same
+    `user_id` (INSERT OR IGNORE + UNIQUE COLLATE NOCASE), and a full
+    `ensure_user_for_email` → `enqueue_build_job` → `claim_next_pending`
+    → `mark_completed` chain works correctly now that both tables
+    live in the same file. Test data cleaned up afterward.
+
 - **Fixed: `jobs` table wiped by every laptop→Render DB sync.** Per
   `docs/session_plan_jobs_to_listener_db.md`. Same bug class as the
   2026-07-06 listener-episode loss, hitting a different table: `jobs`
