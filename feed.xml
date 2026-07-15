@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Tue, 14 Jul 2026 13:31:56 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Jul 2026 12:34:22 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,189 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: designing for humans</title>
+      <itunes:title>Crosscut: designing for humans</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-07-15.html</link>
+      <description><![CDATA[A person translating a poem about heartbreak does more than match synonyms; they draw on physical sensations. Writing on July 4th, Krupa Shandilya suggests that AI fails at this work because a machine lacks a body to feel the weight of a word or the sting of a memory. Something interesting emerges when this is set against a report from earlier this week about the Orion space capsule. For NASA, the human body is the central problem to solve, requiring massive heat shields to protect a pilot from the fire of re-entry. It’s worth pausing on how one field sees the body as the source of meaning, while another sees it as fragile cargo to be kept safe.<br/><br/><em>Krupa Shandilya, The Conversation, leaves the reader with the image of the poet Faiz Ahmed Faiz in a prison cell, writing lines that a computer can’t quite grasp because it doesn&#x27;t have skin to feel the cold or a heart to ache for home. The argument is that without a physical body to anchor it, a machine is just guessing at what a word like &quot;longing&quot; actually feels like. It’s a sharp reminder that for all the speed of a chatbot, it lacks the one thing that makes a poem land: a life lived in the flesh.
+
+But look at what happens when the goal isn&#x27;t to simulate a human, but to shield one. The next piece describes the Orion spacecraft, a vessel built for the sole purpose of keeping a body at a steady seventy degrees while the air outside turns into five-thousand-degree plasma. Where Shandilya sees the body as the thing a machine can never truly understand, these NASA engineers see the body as the very center of the work—a fragile, breathing requirement that dictates every bolt and trajectory. The interesting thing is how the two pieces talk to each other. One suggests the body is the limit of technology, while the other shows it as the entire point of it.</em><br/><br/>A pilot strapped into a seat feels the shake of a rocket. A poet feels the weight of a word in their throat. Both moments depend on having a body that can hurt, sweat, and breathe. Engineers build shields to protect skin from fire, yet a machine can&#x27;t understand a funeral because it has never shivered. What lingers is the thought that feeling is the only way to know. If a body is required to survive a launch and to carry a poem, how much of the world is closed off to anything without skin?<br/><br/>Sources:<br/><a href="https://scroll.in/article/1093855/the-art-of-literary-translation-exposes-the-limits-of-ai?utm_source=rss&amp;utm_medium=public">Scroll.in: The art of literary translation exposes the limits of AI</a><br/><a href="https://www.smithsonianmag.com/smithsonian-institution/artemis-1s-orion-spacecraft-withstood-the-heat-of-re-entry-in-a-critical-test-for-humans-return-to-the-moon-now-nasa-will-loan-the-historic-capsule-to-the-smithsonians-national-air-and-space-museum-180989094/">Smithsonian Magazine: Artemis 1&#x27;s Orion Spacecraft Withstood the Heat of Re-entry in a Critical Test for Humans&#x27; Return to the Moon. Now, NASA Will Loan the Historic Capsule to the Smithsonian&#x27;s National Air and Space Museum</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[A person translating a poem about heartbreak does more than match synonyms; they draw on physical sensations. Writing on July 4th, Krupa Shandilya suggests that AI fails at this work because a machine lacks a body to feel the weight of a word or the sting of a memory. Something interesting emerges when this is set against a report from earlier this week about the Orion space capsule. For NASA, the human body is the central problem to solve, requiring massive heat shields to protect a pilot from the fire of re-entry. It’s worth pausing on how one field sees the body as the source of meaning, while another sees it as fragile cargo to be kept safe.<br/><br/><em>Krupa Shandilya, The Conversation, leaves the reader with the image of the poet Faiz Ahmed Faiz in a prison cell, writing lines that a computer can’t quite grasp because it doesn&#x27;t have skin to feel the cold or a heart to ache for home. The argument is that without a physical body to anchor it, a machine is just guessing at what a word like &quot;longing&quot; actually feels like. It’s a sharp reminder that for all the speed of a chatbot, it lacks the one thing that makes a poem land: a life lived in the flesh.
+
+But look at what happens when the goal isn&#x27;t to simulate a human, but to shield one. The next piece describes the Orion spacecraft, a vessel built for the sole purpose of keeping a body at a steady seventy degrees while the air outside turns into five-thousand-degree plasma. Where Shandilya sees the body as the thing a machine can never truly understand, these NASA engineers see the body as the very center of the work—a fragile, breathing requirement that dictates every bolt and trajectory. The interesting thing is how the two pieces talk to each other. One suggests the body is the limit of technology, while the other shows it as the entire point of it.</em><br/><br/>A pilot strapped into a seat feels the shake of a rocket. A poet feels the weight of a word in their throat. Both moments depend on having a body that can hurt, sweat, and breathe. Engineers build shields to protect skin from fire, yet a machine can&#x27;t understand a funeral because it has never shivered. What lingers is the thought that feeling is the only way to know. If a body is required to survive a launch and to carry a poem, how much of the world is closed off to anything without skin?<br/><br/>Sources:<br/><a href="https://scroll.in/article/1093855/the-art-of-literary-translation-exposes-the-limits-of-ai?utm_source=rss&amp;utm_medium=public">Scroll.in: The art of literary translation exposes the limits of AI</a><br/><a href="https://www.smithsonianmag.com/smithsonian-institution/artemis-1s-orion-spacecraft-withstood-the-heat-of-re-entry-in-a-critical-test-for-humans-return-to-the-moon-now-nasa-will-loan-the-historic-capsule-to-the-smithsonians-national-air-and-space-museum-180989094/">Smithsonian Magazine: Artemis 1&#x27;s Orion Spacecraft Withstood the Heat of Re-entry in a Critical Test for Humans&#x27; Return to the Moon. Now, NASA Will Loan the Historic Capsule to the Smithsonian&#x27;s National Air and Space Museum</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>A person translating a poem about heartbreak does more than match synonyms; they draw on physical sensations. Writing on July 4th, Krupa Shandilya suggests that AI fails at this work because a machine lacks a body to feel the weight of a word or the sting of a memory. Something interesting emerges when this is set against a report from earlier this week about the Orion space capsule. For NASA, the human body is the central problem to solve, requiring massive heat shields to protect a pilot from the fire of re-entry. It’s worth pausing on how one field sees the body as the source of meaning, while another sees it as fragile cargo to be kept safe.
+
+Krupa Shandilya, The Conversation, leaves the reader with the image of the poet Faiz Ahmed Faiz in a prison cell, writing lines that a computer can’t quite grasp because it doesn&#x27;t have skin to feel the cold or a heart to ache for home. The argument is that without a physical body to anchor it, a machine is just guessing at what a word like &quot;longing&quot; actually feels like. It’s a sharp reminder that for all the speed of a chatbot, it lacks the one thing that makes a poem land: a life lived in the flesh.
+
+But look at what happens when the goal isn&#x27;t to simulate a human, but to shield one. The next piece describes the Orion spacecraft, a vessel built for the sole purpose of keeping a body at a steady seventy degrees while the air outside turns into five-thousand-degree plasma. Where Shandilya sees the body as the thing a machine can never truly understand, these NASA engineers see the body as the very center of the work—a fragile, breathing requirement that dictates every bolt and trajectory. The interesting thing is how the two pieces talk to each other. One suggests the body is the limit of technology, while the other shows it as the entire point of it.
+
+A pilot strapped into a seat feels the shake of a rocket. A poet feels the weight of a word in their throat. Both moments depend on having a body that can hurt, sweat, and breathe. Engineers build shields to protect skin from fire, yet a machine can&#x27;t understand a funeral because it has never shivered. What lingers is the thought that feeling is the only way to know. If a body is required to survive a launch and to carry a poem, how much of the world is closed off to anything without skin?
+
+Sources:
+Scroll.in: The art of literary translation exposes the limits of AI
+Smithsonian Magazine: Artemis 1&#x27;s Orion Spacecraft Withstood the Heat of Re-entry in a Critical Test for Humans&#x27; Return to the Moon. Now, NASA Will Loan the Historic Capsule to the Smithsonian&#x27;s National Air and Space Museum
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 11:31:18 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-83</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/crosscut_0083.mp3" length="8654829" type="audio/mpeg"/>
+      <itunes:duration>18:02</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · designing for humans</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Road to Space Runs through the Poles</title>
+      <itunes:title>The Road to Space Runs through the Poles</itunes:title>
+      <link>https://warontherocks.com/the-road-to-space-runs-through-the-poles/</link>
+      <description><![CDATA[<em>Why are there more satellite antennas on a frozen island with more polar bears than people?</em><br/><br/>Rebecca Pincus and David Marsh point to a cluster of islands a thousand kilometers from Norway where polar bears outnumber people. Their essay, published on 27 May 2026, shows how the future of satellite technology depends on these icy fringes of the map. While the world looks upward at rockets, a quiet strategic struggle is happening on the ground at the poles. The way nations manage the Arctic and Antarctic right now might be the only working model for keeping the peace in orbit tomorrow.<br/><br/>High-latitude ground stations and launch sites in the Arctic and Antarctic provide the primary infrastructure for satellites in polar orbits. Strategic competition between the United States, China, and Russia now centers on these regions and the dual-use technology they host. Existing polar governance models offer a potential template for new international agreements to manage the military and commercial use of outer space.<br/><br/>Read at source: <a href="https://warontherocks.com/the-road-to-space-runs-through-the-poles/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Why are there more satellite antennas on a frozen island with more polar bears than people?</em><br/><br/>Rebecca Pincus and David Marsh point to a cluster of islands a thousand kilometers from Norway where polar bears outnumber people. Their essay, published on 27 May 2026, shows how the future of satellite technology depends on these icy fringes of the map. While the world looks upward at rockets, a quiet strategic struggle is happening on the ground at the poles. The way nations manage the Arctic and Antarctic right now might be the only working model for keeping the peace in orbit tomorrow.<br/><br/>High-latitude ground stations and launch sites in the Arctic and Antarctic provide the primary infrastructure for satellites in polar orbits. Strategic competition between the United States, China, and Russia now centers on these regions and the dual-use technology they host. Existing polar governance models offer a potential template for new international agreements to manage the military and commercial use of outer space.<br/><br/>Read at source: <a href="https://warontherocks.com/the-road-to-space-runs-through-the-poles/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Why are there more satellite antennas on a frozen island with more polar bears than people?
+
+Rebecca Pincus and David Marsh point to a cluster of islands a thousand kilometers from Norway where polar bears outnumber people. Their essay, published on 27 May 2026, shows how the future of satellite technology depends on these icy fringes of the map. While the world looks upward at rockets, a quiet strategic struggle is happening on the ground at the poles. The way nations manage the Arctic and Antarctic right now might be the only working model for keeping the peace in orbit tomorrow.
+
+High-latitude ground stations and launch sites in the Arctic and Antarctic provide the primary infrastructure for satellites in polar orbits. Strategic competition between the United States, China, and Russia now centers on these regions and the dual-use technology they host. Existing polar governance models offer a potential template for new international agreements to manage the military and commercial use of outer space.
+
+Read at source: War on the Rocks
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-569</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_0569.mp3" length="8450349" type="audio/mpeg"/>
+      <itunes:duration>17:36</itunes:duration>
+      <itunes:author>David Marsh</itunes:author>
+      <itunes:subtitle>War on the Rocks</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Building a long-term base on the Moon will require extensive planning – a planetary geologist describes the considerations that go into it</title>
+      <itunes:title>Building a long-term base on the Moon will require extensive planning – a planetary geologist describes the considerations that go into it</itunes:title>
+      <link>https://theconversation.com/building-a-long-term-base-on-the-moon-will-require-extensive-planning-a-planetary-geologist-describes-the-considerations-that-go-into-it-285899</link>
+      <description><![CDATA[<em>How do you pick the right piece of ground for a permanent home on the Moon?</em><br/><br/>A flat patch of grey lunar dust might look like any other, but for a planetary geologist, it represents the foundation of a permanent human presence. Writing on 14 July 2026, the author looks past the spectacle of rocket launches to the quiet, difficult work of staying put. The shift from one-off trips to a long-term camp requires rethinking everything from finding water ice to mining minerals without a drop of liquid water. This perspective suggests the real value of the Moon isn&#x27;t just the destination, but the new ways of living it forces people to invent.<br/><br/>The technical planning required to build a permanent lunar base, from site selection to resource extraction. A planetary geologist explains the need for flat landing zones, constant power, and access to water ice for life support and fuel. The text also covers the potential for mining rare minerals and how developing systems that recycle all waste could benefit industries on Earth.<br/><br/>Read at source: <a href="https://theconversation.com/building-a-long-term-base-on-the-moon-will-require-extensive-planning-a-planetary-geologist-describes-the-considerations-that-go-into-it-285899">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How do you pick the right piece of ground for a permanent home on the Moon?</em><br/><br/>A flat patch of grey lunar dust might look like any other, but for a planetary geologist, it represents the foundation of a permanent human presence. Writing on 14 July 2026, the author looks past the spectacle of rocket launches to the quiet, difficult work of staying put. The shift from one-off trips to a long-term camp requires rethinking everything from finding water ice to mining minerals without a drop of liquid water. This perspective suggests the real value of the Moon isn&#x27;t just the destination, but the new ways of living it forces people to invent.<br/><br/>The technical planning required to build a permanent lunar base, from site selection to resource extraction. A planetary geologist explains the need for flat landing zones, constant power, and access to water ice for life support and fuel. The text also covers the potential for mining rare minerals and how developing systems that recycle all waste could benefit industries on Earth.<br/><br/>Read at source: <a href="https://theconversation.com/building-a-long-term-base-on-the-moon-will-require-extensive-planning-a-planetary-geologist-describes-the-considerations-that-go-into-it-285899">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How do you pick the right piece of ground for a permanent home on the Moon?
+
+A flat patch of grey lunar dust might look like any other, but for a planetary geologist, it represents the foundation of a permanent human presence. Writing on 14 July 2026, the author looks past the spectacle of rocket launches to the quiet, difficult work of staying put. The shift from one-off trips to a long-term camp requires rethinking everything from finding water ice to mining minerals without a drop of liquid water. This perspective suggests the real value of the Moon isn&#x27;t just the destination, but the new ways of living it forces people to invent.
+
+The technical planning required to build a permanent lunar base, from site selection to resource extraction. A planetary geologist explains the need for flat landing zones, constant power, and access to water ice for life support and fuel. The text also covers the potential for mining rare minerals and how developing systems that recycle all waste could benefit industries on Earth.
+
+Read at source: The Conversation
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-7975</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_7975.mp3" length="2856045" type="audio/mpeg"/>
+      <itunes:duration>05:57</itunes:duration>
+      <itunes:author>Clive Neal, Professor of Civil and Environmental Engineering and Earth Sciences, University of Notre Dame</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Farms aren’t nature</title>
+      <itunes:title>Farms aren’t nature</itunes:title>
+      <link>https://www.slowboring.com/p/farms-arent-nature</link>
+      <description><![CDATA[<em>If a farm is just another business, why is it treated like a forest?</em><br/><br/>The &quot;green&quot; in Britain’s green belts and the agricultural reserves of the American suburbs often consists of private farms and golf courses instead of wild woods. In this piece from 15 July 2026, mistaking agriculture for nature leads to a housing shortage and a misunderstanding of conservation. By treating every pasture as untouchable ground, policy ends up blocking homes for people while doing little to protect actual wildlife. The logic pushes past the visual charm of a red barn to ask what land is actually for.<br/><br/>Land-use policies in the United Kingdom and United States often treat farms as natural spaces to be protected from development. These protections restrict housing supply and drive up prices in regions like London and Maine, functioning as a barrier to new construction. The text argues that distinguishing between working farms and wilderness is necessary to support housing growth while protecting wildlife habitats.<br/><br/>Read at source: <a href="https://www.slowboring.com/p/farms-arent-nature">Slow Boring</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a farm is just another business, why is it treated like a forest?</em><br/><br/>The &quot;green&quot; in Britain’s green belts and the agricultural reserves of the American suburbs often consists of private farms and golf courses instead of wild woods. In this piece from 15 July 2026, mistaking agriculture for nature leads to a housing shortage and a misunderstanding of conservation. By treating every pasture as untouchable ground, policy ends up blocking homes for people while doing little to protect actual wildlife. The logic pushes past the visual charm of a red barn to ask what land is actually for.<br/><br/>Land-use policies in the United Kingdom and United States often treat farms as natural spaces to be protected from development. These protections restrict housing supply and drive up prices in regions like London and Maine, functioning as a barrier to new construction. The text argues that distinguishing between working farms and wilderness is necessary to support housing growth while protecting wildlife habitats.<br/><br/>Read at source: <a href="https://www.slowboring.com/p/farms-arent-nature">Slow Boring</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a farm is just another business, why is it treated like a forest?
+
+The &quot;green&quot; in Britain’s green belts and the agricultural reserves of the American suburbs often consists of private farms and golf courses instead of wild woods. In this piece from 15 July 2026, mistaking agriculture for nature leads to a housing shortage and a misunderstanding of conservation. By treating every pasture as untouchable ground, policy ends up blocking homes for people while doing little to protect actual wildlife. The logic pushes past the visual charm of a red barn to ask what land is actually for.
+
+Land-use policies in the United Kingdom and United States often treat farms as natural spaces to be protected from development. These protections restrict housing supply and drive up prices in regions like London and Maine, functioning as a barrier to new construction. The text argues that distinguishing between working farms and wilderness is necessary to support housing growth while protecting wildlife habitats.
+
+Read at source: Slow Boring
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-8018</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_8018.mp3" length="4980909" type="audio/mpeg"/>
+      <itunes:duration>10:23</itunes:duration>
+      <itunes:author>Matthew Yglesias</itunes:author>
+      <itunes:subtitle>Slow Boring</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>‘Famous Men’ And Ambitious Women</title>
+      <itunes:title>‘Famous Men’ And Ambitious Women</itunes:title>
+      <link>https://defector.com/famous-men-and-ambitious-women</link>
+      <description><![CDATA[<em>Does a young writer find her own story by following a famous man home?</em><br/><br/>The image of a young writer sitting under a famous professor’s desk to tie his shoes captures the uncomfortable power plays at the center of the piece, published on 14 July 2026. While the charismatic teacher is a staple of campus stories, the focus here is on the jagged hunger of a student trying to force her way into a closed world. It treats ambition not as a clean path, but as a series of messy trades where the line between being mentored and being used often disappears entirely.<br/><br/>Julie Buntin’s novel Famous Men follows a young writer who seeks out a famous poet in New York, believing he may be her father. The story tracks their relationship as it shifts between mentorship, employment, and a sexual affair, testing the limits of the woman&#x27;s ambition. It describes the moments where it is hard to tell who is in control, and the messy ways people use power to build a career in the arts.<br/><br/>Read at source: <a href="https://defector.com/famous-men-and-ambitious-women">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Does a young writer find her own story by following a famous man home?</em><br/><br/>The image of a young writer sitting under a famous professor’s desk to tie his shoes captures the uncomfortable power plays at the center of the piece, published on 14 July 2026. While the charismatic teacher is a staple of campus stories, the focus here is on the jagged hunger of a student trying to force her way into a closed world. It treats ambition not as a clean path, but as a series of messy trades where the line between being mentored and being used often disappears entirely.<br/><br/>Julie Buntin’s novel Famous Men follows a young writer who seeks out a famous poet in New York, believing he may be her father. The story tracks their relationship as it shifts between mentorship, employment, and a sexual affair, testing the limits of the woman&#x27;s ambition. It describes the moments where it is hard to tell who is in control, and the messy ways people use power to build a career in the arts.<br/><br/>Read at source: <a href="https://defector.com/famous-men-and-ambitious-women">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Does a young writer find her own story by following a famous man home?
+
+The image of a young writer sitting under a famous professor’s desk to tie his shoes captures the uncomfortable power plays at the center of the piece, published on 14 July 2026. While the charismatic teacher is a staple of campus stories, the focus here is on the jagged hunger of a student trying to force her way into a closed world. It treats ambition not as a clean path, but as a series of messy trades where the line between being mentored and being used often disappears entirely.
+
+Julie Buntin’s novel Famous Men follows a young writer who seeks out a famous poet in New York, believing he may be her father. The story tracks their relationship as it shifts between mentorship, employment, and a sexual affair, testing the limits of the woman&#x27;s ambition. It describes the moments where it is hard to tell who is in control, and the messy ways people use power to build a career in the arts.
+
+Read at source: Defector
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-8153</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_8153.mp3" length="5571309" type="audio/mpeg"/>
+      <itunes:duration>11:36</itunes:duration>
+      <itunes:author>Tajja Isen</itunes:author>
+      <itunes:subtitle>Defector</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>From the memoir: When Oscar Wilde’s daughter-in-law did ‘Oriental’ makeup for Qurratulain Hyder</title>
+      <itunes:title>From the memoir: When Oscar Wilde’s daughter-in-law did ‘Oriental’ makeup for Qurratulain Hyder</itunes:title>
+      <link>https://scroll.in/article/1093547/from-the-memoir-when-oscar-wildes-daughter-in-law-did-oriental-makeup-for-qurratulain-hyder?utm_source=rss&amp;utm_medium=public</link>
+      <description><![CDATA[<em>How does a young journalist end up with a face painted by Oscar Wilde’s daughter-in-law?</em><br/><br/>In this excerpt published on 15 July 2026, a young journalist stands in a Bond Street beauty parlor, watching Oscar Wilde’s daughter-in-law paint her face into a reddish-brown mask. The account captures the absurd friction of being a South Asian reporter in London during the 1953 coronation. Between assignments on mothballs and television appearances on &quot;Oriental&quot; sets, these pages preserve the strange roles people inhabited for an empire that was already fading.<br/><br/>An excerpt from a memoir about a young journalist’s experiences in London during the 1953 coronation of Queen Elizabeth II. She describes her work writing for a national daily’s fashion page and receiving a makeover from Oscar Wilde’s daughter-in-law. It concludes with observations on the presence of Indian and Pakistani soldiers in the coronation parade and the relationship between Britain and its former colonies.<br/><br/>Read at source: <a href="https://scroll.in/article/1093547/from-the-memoir-when-oscar-wildes-daughter-in-law-did-oriental-makeup-for-qurratulain-hyder?utm_source=rss&amp;utm_medium=public">Scroll.in</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How does a young journalist end up with a face painted by Oscar Wilde’s daughter-in-law?</em><br/><br/>In this excerpt published on 15 July 2026, a young journalist stands in a Bond Street beauty parlor, watching Oscar Wilde’s daughter-in-law paint her face into a reddish-brown mask. The account captures the absurd friction of being a South Asian reporter in London during the 1953 coronation. Between assignments on mothballs and television appearances on &quot;Oriental&quot; sets, these pages preserve the strange roles people inhabited for an empire that was already fading.<br/><br/>An excerpt from a memoir about a young journalist’s experiences in London during the 1953 coronation of Queen Elizabeth II. She describes her work writing for a national daily’s fashion page and receiving a makeover from Oscar Wilde’s daughter-in-law. It concludes with observations on the presence of Indian and Pakistani soldiers in the coronation parade and the relationship between Britain and its former colonies.<br/><br/>Read at source: <a href="https://scroll.in/article/1093547/from-the-memoir-when-oscar-wildes-daughter-in-law-did-oriental-makeup-for-qurratulain-hyder?utm_source=rss&amp;utm_medium=public">Scroll.in</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How does a young journalist end up with a face painted by Oscar Wilde’s daughter-in-law?
+
+In this excerpt published on 15 July 2026, a young journalist stands in a Bond Street beauty parlor, watching Oscar Wilde’s daughter-in-law paint her face into a reddish-brown mask. The account captures the absurd friction of being a South Asian reporter in London during the 1953 coronation. Between assignments on mothballs and television appearances on &quot;Oriental&quot; sets, these pages preserve the strange roles people inhabited for an empire that was already fading.
+
+An excerpt from a memoir about a young journalist’s experiences in London during the 1953 coronation of Queen Elizabeth II. She describes her work writing for a national daily’s fashion page and receiving a makeover from Oscar Wilde’s daughter-in-law. It concludes with observations on the presence of Indian and Pakistani soldiers in the coronation parade and the relationship between Britain and its former colonies.
+
+Read at source: Scroll.in
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-8062</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_8062.mp3" length="4417965" type="audio/mpeg"/>
+      <itunes:duration>09:12</itunes:duration>
+      <itunes:author>Qurratulain Hyder</itunes:author>
+      <itunes:subtitle>Scroll.in</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Punctuation: A Generational Divide</title>
+      <itunes:title>Punctuation: A Generational Divide</itunes:title>
+      <link>https://www.theatlantic.com/magazine/2026/08/punctuation-internet-texting-generational-divide/687632/?utm_source=feed</link>
+      <description><![CDATA[<em>Why does a period at the end of a text message feel like an insult?</em><br/><br/>A teenager explains to his mother that a period at the end of a text message is the digital version of a parent using a child’s full name. In The Atlantic on 14 July 2026, the history of these marks unfolds from the dots of the Library of Alexandria to the ironic stickers of today. Punctuation has shifted from a tool for clarity to a fast-moving language of emotional subtext. While the rules of the page remain fixed, the rules of the screen belong to whoever can command the most attention.<br/><br/>A history of punctuation from ancient pronunciation aids to modern digital messages, tracking the use of marks like the semicolon and dash in literature and law. It also describes the generational divide in texting, where periods and ellipses now convey irony or specific social cues rather than simple clarity.<br/><br/>Read at source: <a href="https://www.theatlantic.com/magazine/2026/08/punctuation-internet-texting-generational-divide/687632/?utm_source=feed">The Atlantic</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Why does a period at the end of a text message feel like an insult?</em><br/><br/>A teenager explains to his mother that a period at the end of a text message is the digital version of a parent using a child’s full name. In The Atlantic on 14 July 2026, the history of these marks unfolds from the dots of the Library of Alexandria to the ironic stickers of today. Punctuation has shifted from a tool for clarity to a fast-moving language of emotional subtext. While the rules of the page remain fixed, the rules of the screen belong to whoever can command the most attention.<br/><br/>A history of punctuation from ancient pronunciation aids to modern digital messages, tracking the use of marks like the semicolon and dash in literature and law. It also describes the generational divide in texting, where periods and ellipses now convey irony or specific social cues rather than simple clarity.<br/><br/>Read at source: <a href="https://www.theatlantic.com/magazine/2026/08/punctuation-internet-texting-generational-divide/687632/?utm_source=feed">The Atlantic</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Why does a period at the end of a text message feel like an insult?
+
+A teenager explains to his mother that a period at the end of a text message is the digital version of a parent using a child’s full name. In The Atlantic on 14 July 2026, the history of these marks unfolds from the dots of the Library of Alexandria to the ironic stickers of today. Punctuation has shifted from a tool for clarity to a fast-moving language of emotional subtext. While the rules of the page remain fixed, the rules of the screen belong to whoever can command the most attention.
+
+A history of punctuation from ancient pronunciation aids to modern digital messages, tracking the use of marks like the semicolon and dash in literature and law. It also describes the generational divide in texting, where periods and ellipses now convey irony or specific social cues rather than simple clarity.
+
+Read at source: The Atlantic
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 15 Jul 2026 10:46:22 +0000</pubDate>
+      <guid isPermaLink="false">aarva-82-8088</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-15/article_8088.mp3" length="5163501" type="audio/mpeg"/>
+      <itunes:duration>10:45</itunes:duration>
+      <itunes:author>Judith Shulevitz</itunes:author>
+      <itunes:subtitle>The Atlantic</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: protecting human voice</title>
       <itunes:title>Crosscut: protecting human voice</itunes:title>

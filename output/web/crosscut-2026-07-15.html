@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 15 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-15</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 15 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · designing for humans</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-15/crosscut_0083.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>18 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A person translating a poem about heartbreak does more than match synonyms; they draw on physical sensations. Writing on July 4th, Krupa Shandilya suggests that AI fails at this work because a machine lacks a body to feel the weight of a word or the sting of a memory. Something interesting emerges when this is set against a report from earlier this week about the Orion space capsule. For NASA, the human body is the central problem to solve, requiring massive heat shields to protect a pilot from the fire of re-entry. It’s worth pausing on how one field sees the body as the source of meaning, while another sees it as fragile cargo to be kept safe.</p>
+        <article class='piece'>
+<p class='hook'>A machine can process a legal document in seconds, but it stumbles when faced with the ache of a 1950s Urdu poem. Writing earlier this month, Krupa Shandilya, The Conversation looks at why AI fails to capture the &quot;unfulfilled longing&quot; found in the work of Faiz Ahmed Faiz. Notice how she uses a single 1953 poem about a secret meeting to show that true translation requires a body and a history.</p>
+<h2 class='title'>The art of literary translation exposes the limits of AI</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Krupa Shandilya, The Conversation</span></p>
+<p class='source'><a href='https://scroll.in/article/1093855/the-art-of-literary-translation-exposes-the-limits-of-ai?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Krupa Shandilya, The Conversation, leaves the reader with the image of the poet Faiz Ahmed Faiz in a prison cell, writing lines that a computer can’t quite grasp because it doesn&#x27;t have skin to feel the cold or a heart to ache for home. The argument is that without a physical body to anchor it, a machine is just guessing at what a word like &quot;longing&quot; actually feels like. It’s a sharp reminder that for all the speed of a chatbot, it lacks the one thing that makes a poem land: a life lived in the flesh.
+
+But look at what happens when the goal isn&#x27;t to simulate a human, but to shield one. The next piece describes the Orion spacecraft, a vessel built for the sole purpose of keeping a body at a steady seventy degrees while the air outside turns into five-thousand-degree plasma. Where Shandilya sees the body as the thing a machine can never truly understand, these NASA engineers see the body as the very center of the work—a fragile, breathing requirement that dictates every bolt and trajectory. The interesting thing is how the two pieces talk to each other. One suggests the body is the limit of technology, while the other shows it as the entire point of it.</p>
+        <article class='piece'>
+
+<h2 class='title'>Artemis 1&#x27;s Orion Spacecraft Withstood the Heat of Re-entry in a Critical Test for Humans&#x27; Return to the Moon. Now, NASA Will Loan the Historic Capsule to the Smithsonian&#x27;s National Air and Space Museum</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/smithsonian-institution/artemis-1s-orion-spacecraft-withstood-the-heat-of-re-entry-in-a-critical-test-for-humans-return-to-the-moon-now-nasa-will-loan-the-historic-capsule-to-the-smithsonians-national-air-and-space-museum-180989094/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A pilot strapped into a seat feels the shake of a rocket. A poet feels the weight of a word in their throat. Both moments depend on having a body that can hurt, sweat, and breathe. Engineers build shields to protect skin from fire, yet a machine can&#x27;t understand a funeral because it has never shivered. What lingers is the thought that feeling is the only way to know. If a body is required to survive a launch and to carry a poem, how much of the world is closed off to anything without skin?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
