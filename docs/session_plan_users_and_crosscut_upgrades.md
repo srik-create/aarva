@@ -250,6 +250,21 @@ seconds. Well under the Vertex AI RPM ceiling for the project.
 
 ## Section 3 — Region-specific voices for crosscut pieces
 
+### DONE 2026-07-15
+
+Shipped, plus one gap this spec didn't anticipate — see
+`docs/roadmap.md`'s 2026-07-15 "Recently completed" entry for full
+detail: `publication_name` was NOT already in the piece payload as
+assumed — `_load_crosscut_edition_for_tts` deliberately skipped that
+join so the same query worked against both DBs. Fixed by branching on
+DB type (listener DB has it denormalized already; main DB now joins
+articles/publications directly).
+
+Verified publication-name resolution directly against a real main-DB
+edition and a synthetic listener-DB row, both producing correct,
+distinct accents. Did not run a full real TTS synthesis — `extra_style`
+itself is already proven via Stage 9; nothing new there.
+
 ### Goal
 
 Daily-edition articles already use region-specific narrator

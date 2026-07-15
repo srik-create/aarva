@@ -52,11 +52,10 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-3. **Users persistence + crosscut divergent-view tier + region-
-   specific crosscut piece voices.** Full spec at
-   `docs/session_plan_users_and_crosscut_upgrades.md`. Three
-   orthogonal enhancements requested 2026-07-15, packaged into
-   one spec but shippable as three independent PRs:
+3. **Users persistence + crosscut divergent-view tier.** Full spec
+   at `docs/session_plan_users_and_crosscut_upgrades.md` (Section 3,
+   region-specific crosscut piece voices, shipped 2026-07-15 — see
+   "Recently completed"). Two remaining sections, each its own PR:
    - **Section 1 — Users persistence.** Same sync-wipes-data bug
      class as the jobs table (fixed 2026-07-15). Move `users` and
      `user_sessions` from main DB to listener DB so listener
@@ -74,20 +73,6 @@ GitHub Pages.
      exist; fallback to current logic when they don't. Editorial
      voice unchanged — intros/bridges/outros still leave the
      listener with a question, never a verdict.
-   - **Section 3 — Region-specific voices for crosscut pieces.**
-     Currently daily articles get country-based accent steering
-     (via publications.yaml's `country:` tag + Stage 9's
-     `_accent_prompt_for`), but crosscut piece_a and piece_b
-     narration uses fixed voices with no per-publication accent.
-     Wire the same mechanism into `synthesize_crosscut_episode`.
-     Intro/bridges/outro stay in neutral Aarva editorial voice.
-     Almost mechanical — the accent-steer plumbing already
-     exists.
-
-   Recommended order per the spec: Section 1 first (closes out
-   the sync-wipe bug class before it bites a third table),
-   Section 2 second (larger editorial impact), Section 3 last
-   (smallest of the three). Each can ship as its own PR.
 
 ---
 
@@ -140,6 +125,40 @@ Most recent first.
 
 ### 2026-07-15
 
+- **Region-specific voices for crosscut pieces.** Section 3 of
+  `docs/session_plan_users_and_crosscut_upgrades.md`. Daily articles
+  already get country-based accent steering (via publications.yaml's
+  `country:` tag + Stage 9's `_accent_prompt_for`) — crosscut
+  piece_a/piece_b narration now gets the same treatment.
+  Intro/bridges/outro stay in the neutral Aarva host voice, no steer.
+  - **Spec gap found before implementing:** the spec assumed
+    `publication_name` was "already in the payload[\"piece_a\"] /
+    payload[\"piece_b\"] dict" — it deliberately wasn't.
+    `_load_crosscut_edition_for_tts`'s own docstring said so: it
+    skips joining articles/publications specifically so the same
+    query works unmodified against the listener DB (no `articles`
+    table there). Fixed by branching on DB type: the listener DB
+    already denormalizes `article_publication` onto `edition_pieces`
+    (no join needed there); the main DB doesn't carry it on
+    `edition_pieces` at all, so that path now joins
+    `articles`/`publications` directly. Almost mechanical once this
+    was sorted, as the spec expected — just not quite as
+    already-wired as it assumed.
+  - Reuses `_accent_prompt_for` + `_build_publication_country_map`
+    from `aarva/stages/stage_9_tts.py` unchanged, threaded through
+    `synthesize_crosscut_episode`'s per-section `tts.synthesize(...)`
+    call via the existing `extra_style` parameter — only for the
+    `passage_a`/`passage_b` sections.
+  - **Verified for real:** a real main-DB crosscut edition
+    (Scroll.in + Smithsonian Magazine) correctly resolved to Indian
+    and neutral-American accents respectively via the new join path;
+    a synthetic listener-DB row (The Hindu + The Atlantic) correctly
+    resolved via the denormalized-column path to the same two
+    accents. Did not run a full real TTS synthesis for this PR —
+    `extra_style` is an already-proven mechanism in production via
+    Stage 9; what's new here is the publication-name resolution
+    (verified directly against real/synthetic data) and threading it
+    through, which needed no new TTS-client behavior.
 - **Fixed: `jobs` table wiped by every laptop→Render DB sync.** Per
   `docs/session_plan_jobs_to_listener_db.md`. Same bug class as the
   2026-07-06 listener-episode loss, hitting a different table: `jobs`
