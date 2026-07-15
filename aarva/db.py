@@ -339,33 +339,16 @@ CREATE INDEX IF NOT EXISTS idx_user_actions_user_action
     ON user_actions(user_id, action);
 
 
--- Background jobs — durable queue for long-running operations (TTS,
--- bonus-episode publish, retag passes). Polled by an in-process worker
--- thread today; cleanly maps to Celery/SQS/Lambda when we move to cloud.
---
--- status:
---   'pending'    — waiting to be picked up
---   'running'    — claimed by a worker
---   'completed'  — finished successfully (result_json populated)
---   'failed'     — finished with error (error_message populated)
---   'cancelled'  — operator cancelled before run
-CREATE TABLE IF NOT EXISTS jobs (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    kind            TEXT NOT NULL,
-    payload_json    TEXT NOT NULL,
-    status          TEXT NOT NULL DEFAULT 'pending'
-        CHECK (status IN ('pending', 'running', 'completed',
-                          'failed', 'cancelled')),
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    started_at      DATETIME,
-    finished_at     DATETIME,
-    result_json     TEXT,
-    error_message   TEXT,
-    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    progress        TEXT
-);
-CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
-CREATE INDEX IF NOT EXISTS idx_jobs_user ON jobs(user_id);
+-- NOTE (2026-07-15): the build_crosscut `jobs` table used to live
+-- here. Moved to aarva/listener_db.py's LISTENER_SCHEMA_SQL — this
+-- file is atomic-replaced by every scripts/sync_db_to_render.sh run,
+-- which was silently wiping Render-authored job rows (same bug class
+-- as the 2026-07-06 listener-episode loss). See
+-- docs/session_plan_jobs_to_listener_db.md. aarva/services/jobs.py
+-- (a separate, unrelated, unwired job-queue module — 'publish_bonus_
+-- article' / 'rerecord_crosscut' / 'pipeline_stage' kinds, no live
+-- caller anywhere) also targeted a table of this name; it remains
+-- dead code and would need its own migration if ever activated.
 """
 
 

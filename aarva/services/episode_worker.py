@@ -1,9 +1,10 @@
 """Background worker that builds on-demand crosscut episodes.
 
 Daemon thread spawned from `aarva.server.app`'s lifespan() at startup.
-Polls the existing `jobs` table for `kind='build_crosscut'` rows in
-`pending` state, claims them one at a time, and runs the full episode-
-build pipeline end-to-end:
+Polls the `jobs` table (in the listener DB — see aarva/listener_db.py
+and docs/session_plan_jobs_to_listener_db.md) for `kind='build_crosscut'`
+rows in `pending` state, claims them one at a time, and runs the full
+episode-build pipeline end-to-end:
 
   1. Insert a `crosscut_pair_candidates` row matching the listener's
      pick. The existing `build_episode_script` finds today's selected
@@ -87,7 +88,7 @@ def start_worker(
     each call spawns another thread — callers should hold one handle."""
     from aarva.services.episode_jobs import reset_all_running_jobs
 
-    n_reset = reset_all_running_jobs(db)
+    n_reset = reset_all_running_jobs(listener_db)
     if n_reset:
         logger.info("episode_worker: reset %d stuck job(s) on startup", n_reset)
 
@@ -116,7 +117,7 @@ def _worker_loop(
 
     while not stop_event.is_set():
         try:
-            job = claim_next_pending(db)
+            job = claim_next_pending(listener_db)
         except Exception as e:
             logger.exception("episode_worker: claim_next_pending crashed: %s", e)
             stop_event.wait(_POLL_SECONDS * 2)
@@ -133,7 +134,7 @@ def _worker_loop(
         except Exception as e:
             logger.exception("episode_worker: job %d crashed: %s", job_id, e)
             try:
-                mark_failed(db, job_id, f"{type(e).__name__}: {e}")
+                mark_failed(listener_db, job_id, f"{type(e).__name__}: {e}")
             except Exception as inner:
                 logger.error("episode_worker: also failed to mark_failed: %s", inner)
 
@@ -192,7 +193,7 @@ def _run_job(
             "skipping steps 1-3",
             job_id, edition_id,
         )
-        update_progress(db, job_id, "Resuming — audio still needed…")
+        update_progress(listener_db, job_id, "Resuming — audio still needed…")
     else:
         logger.info(
             "_run_job: job %d starting FROM SCRATCH (no checkpoint) — "
@@ -203,7 +204,7 @@ def _run_job(
         # via _selected_candidate(today). Worker is single-threaded
         # so this row WILL be the most-recently-selected when we call
         # into build_episode_script next.
-        update_progress(db, job_id, "Setting up the build…")
+        update_progress(listener_db, job_id, "Setting up the build…")
         today = date.today()
         with db.connect() as conn:
             conn.execute(
@@ -231,7 +232,7 @@ def _run_job(
         # aarva/listener_db.py for why. originating_prompt (content-
         # quality Section 3) lets the intro + subhead_hook prompts
         # acknowledge what the listener actually searched for.
-        update_progress(db, job_id, "Writing the intro and bridges…")
+        update_progress(listener_db, job_id, "Writing the intro and bridges…")
         build_stats = build_episode_script(
             config, db, target_db=listener_db,
             originating_prompt=str(payload.get("prompt") or "").strip() or None,
@@ -258,14 +259,14 @@ def _run_job(
         # Stamp the checkpoint. From here on, a Render OOM restart
         # will resume from step 4 (TTS) rather than re-running the
         # LLM proposal + edition creation.
-        stamp_edition_id(db, job_id, edition_id)
+        stamp_edition_id(listener_db, job_id, edition_id)
 
     # 4. Run TTS — this is the long-pole step (~15 min for a normal
     # crosscut at the configured chunk size). The TTS path produces a
     # WAV per piece and writes audio_url onto the edition_pieces rows.
     # Reads/writes only editions + edition_pieces (no articles join),
     # so it works identically against the listener DB.
-    update_progress(db, job_id, "Rendering the audio (~15 min)…")
+    update_progress(listener_db, job_id, "Rendering the audio (~15 min)…")
     tts_stats = synthesize_crosscut_episode(config, listener_db, edition_id=edition_id)
     if tts_stats.errors:
         raise RuntimeError(
@@ -277,7 +278,7 @@ def _run_job(
     # as Stage 10; for on-demand builds we do it inline here so the
     # episode is immediately listenable. Both calls are idempotent —
     # already-converted MP3s and already-uploaded R2 keys are skipped.
-    update_progress(db, job_id, "Converting to MP3 and uploading…")
+    update_progress(listener_db, job_id, "Converting to MP3 and uploading…")
     from aarva.output import audio_converter, r2_uploader
     conv_stats = audio_converter.convert_all_for_publish(config, listener_db)
     logger.info(
@@ -291,7 +292,7 @@ def _run_job(
     )
 
     # 5. Notify the listener (stub in dev — logs only).
-    update_progress(db, job_id, "Sending the notification…")
+    update_progress(listener_db, job_id, "Sending the notification…")
     public_url = (
         os.environ.get("AARVA_SERVER_PUBLIC_URL", "").rstrip("/")
         or "http://localhost:8000"
@@ -318,7 +319,7 @@ def _run_job(
         send_email(to=requester_email, subject=subject, html=html, text=text)
 
     # 6. Done.
-    mark_completed(db, job_id, {
+    mark_completed(listener_db, job_id, {
         "edition_id": edition_id,
         "episode_path": f"/crosscut/{edition_id}",
     })

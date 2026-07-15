@@ -22,9 +22,10 @@ Five endpoints make up the listener-facing creation flow:
   POST /create/build           Form submit from a candidate card.
                                Validates the picked article pair +
                                requester email, queues a
-                               build_crosscut job in the existing
-                               jobs table, redirects to the status
-                               page.
+                               build_crosscut job in the listener
+                               DB's jobs table (see
+                               aarva/listener_db.py), redirects to
+                               the status page.
 
   GET  /build/<job_id>         Status page for a queued / running /
                                completed build. Polls itself every
@@ -56,6 +57,40 @@ from aarva.services.episode_jobs import (
 from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
 logger = logging.getLogger(__name__)
+
+
+def ensure_user_for_email(db, email: str) -> int:
+    """Get or create a users row for `email`; return the user_id.
+
+    Lives here (not episode_jobs.py) since 2026-07-15's jobs-table
+    move to the listener DB — `users` stays in the main DB, and
+    episode_jobs.py is now purely listener-DB-facing. This is the only
+    caller that needs a user_id before enqueuing a build job.
+
+    No auth yet — the email is the entire identity for v1. A row is
+    created the first time a listener requests an episode; future
+    requests from the same email reuse it. Magic-link login lands
+    later (the schema is already there) and the same user_id will
+    apply."""
+    email = (email or "").strip().lower()
+    if not email:
+        raise ValueError("ensure_user_for_email: empty email")
+    with db.connect() as conn:
+        # INSERT OR IGNORE relies on the UNIQUE(email COLLATE NOCASE)
+        # constraint in the users table.
+        conn.execute(
+            "INSERT OR IGNORE INTO users (email) VALUES (?)",
+            (email,),
+        )
+        row = conn.execute(
+            "SELECT id FROM users WHERE email = ?",
+            (email,),
+        ).fetchone()
+    if not row:
+        # Shouldn't happen — INSERT OR IGNORE then SELECT is atomic
+        # within the same connection — but guard anyway.
+        raise RuntimeError(f"failed to upsert user for {email!r}")
+    return int(row["id"])
 
 
 # ─── Recovered episodes ───────────────────────────────────────────────────
@@ -195,15 +230,18 @@ async def create_build(request: Request):
         raise HTTPException(status_code=400, detail="topic_label is required.")
 
     db = request.app.state.db
+    listener_db = request.app.state.listener_db
     try:
+        user_id = ensure_user_for_email(db, email)
         job_id = enqueue_build_job(
-            db,
+            listener_db,
             prompt=prompt,
             article_a_id=article_a_id,
             article_b_id=article_b_id,
             topic_label=topic_label,
             why=why,
             requester_email=email,
+            user_id=user_id,
         )
     except BuildQuotaExceeded as e:
         # Listener has already used their slots for the last 24 hours.
@@ -227,8 +265,8 @@ async def create_build(request: Request):
 async def build_status(request: Request, job_id: int) -> HTMLResponse:
     """Status page for a queued build. Polls itself via a small JS
     refresh so the listener sees progress + the final listen link."""
-    db = request.app.state.db
-    job = get_job(db, job_id)
+    listener_db = request.app.state.listener_db
+    job = get_job(listener_db, job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Build not found")
 
