@@ -52,18 +52,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-3. **Region-specific voices for crosscut pieces.** Full spec at
-   `docs/session_plan_users_and_crosscut_upgrades.md` Section 3
-   (Section 1, users persistence, and Section 2, divergent-view
-   tier, both shipped 2026-07-15 — see "Recently completed").
-   Currently daily articles get country-based accent steering (via
-   publications.yaml's `country:` tag + Stage 9's
-   `_accent_prompt_for`), but crosscut piece_a and piece_b narration
-   uses fixed voices with no per-publication accent. Wire the same
-   mechanism into `synthesize_crosscut_episode`. Intro/bridges/outro
-   stay in neutral Aarva editorial voice. Almost mechanical — the
-   accent-steer plumbing already exists.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -115,6 +103,40 @@ Most recent first.
 
 ### 2026-07-15
 
+- **Region-specific voices for crosscut pieces.** Section 3 of
+  `docs/session_plan_users_and_crosscut_upgrades.md`. Daily articles
+  already get country-based accent steering (via publications.yaml's
+  `country:` tag + Stage 9's `_accent_prompt_for`) — crosscut
+  piece_a/piece_b narration now gets the same treatment.
+  Intro/bridges/outro stay in the neutral Aarva host voice, no steer.
+  - **Spec gap found before implementing:** the spec assumed
+    `publication_name` was "already in the payload[\"piece_a\"] /
+    payload[\"piece_b\"] dict" — it deliberately wasn't.
+    `_load_crosscut_edition_for_tts`'s own docstring said so: it
+    skips joining articles/publications specifically so the same
+    query works unmodified against the listener DB (no `articles`
+    table there). Fixed by branching on DB type: the listener DB
+    already denormalizes `article_publication` onto `edition_pieces`
+    (no join needed there); the main DB doesn't carry it on
+    `edition_pieces` at all, so that path now joins
+    `articles`/`publications` directly. Almost mechanical once this
+    was sorted, as the spec expected — just not quite as
+    already-wired as it assumed.
+  - Reuses `_accent_prompt_for` + `_build_publication_country_map`
+    from `aarva/stages/stage_9_tts.py` unchanged, threaded through
+    `synthesize_crosscut_episode`'s per-section `tts.synthesize(...)`
+    call via the existing `extra_style` parameter — only for the
+    `passage_a`/`passage_b` sections.
+  - **Verified for real:** a real main-DB crosscut edition
+    (Scroll.in + Smithsonian Magazine) correctly resolved to Indian
+    and neutral-American accents respectively via the new join path;
+    a synthetic listener-DB row (The Hindu + The Atlantic) correctly
+    resolved via the denormalized-column path to the same two
+    accents. Did not run a full real TTS synthesis for this PR —
+    `extra_style` is an already-proven mechanism in production via
+    Stage 9; what's new here is the publication-name resolution
+    (verified directly against real/synthetic data) and threading it
+    through, which needed no new TTS-client behavior.
 - **Crosscut divergent-view tier.** Section 2 of
   `docs/session_plan_users_and_crosscut_upgrades.md`: prefer pairs
   that argue opposing views on the same question over pairs that

@@ -1669,10 +1669,16 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
     texts. Returns a dict suitable for the TTS assembly, or None if
     the edition isn't a built crosscut.
 
-    Deliberately doesn't join articles/publications (title/byline/
-    publication_name aren't used by the TTS assembly below) — this
-    keeps the function working unmodified against the listener DB,
-    which has no `articles` table (see aarva/listener_db.py)."""
+    Also resolves each piece's source publication_name, for the
+    region-specific accent steer (2026-07-15 — docs/session_plan_
+    users_and_crosscut_upgrades.md §3). The two DBs this runs against
+    carry it differently: the listener DB denormalizes it onto
+    edition_pieces.article_publication (no articles table there — see
+    aarva/listener_db.py); the main DB doesn't carry it on
+    edition_pieces at all, so this joins articles/publications
+    directly there instead."""
+    from aarva.listener_db import ListenerDatabase
+    is_listener = isinstance(db, ListenerDatabase)
     with db.connect() as conn:
         e = conn.execute("""
             SELECT id, edition_date, edition_type, topic_label,
@@ -1683,13 +1689,26 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
         """, (edition_id,)).fetchone()
         if not e:
             return None
-        pieces = conn.execute("""
-            SELECT ep.article_id, ep.position, ep.slot,
-                   ep.bridge_text, ep.show_notes AS passage
-              FROM edition_pieces ep
-             WHERE ep.edition_id = ?
-             ORDER BY ep.position
-        """, (edition_id,)).fetchall()
+        if is_listener:
+            pieces = conn.execute("""
+                SELECT ep.article_id, ep.position, ep.slot,
+                       ep.bridge_text, ep.show_notes AS passage,
+                       ep.article_publication AS publication_name
+                  FROM edition_pieces ep
+                 WHERE ep.edition_id = ?
+                 ORDER BY ep.position
+            """, (edition_id,)).fetchall()
+        else:
+            pieces = conn.execute("""
+                SELECT ep.article_id, ep.position, ep.slot,
+                       ep.bridge_text, ep.show_notes AS passage,
+                       p.name AS publication_name
+                  FROM edition_pieces ep
+                  JOIN articles a ON a.id = ep.article_id
+                  JOIN publications p ON p.id = a.publication_id
+                 WHERE ep.edition_id = ?
+                 ORDER BY ep.position
+            """, (edition_id,)).fetchall()
     if len(pieces) != 2:
         return None
     return {
@@ -1755,15 +1774,33 @@ def synthesize_crosscut_episode(
     e = payload["edition"]
     a = payload["piece_a"]
     b = payload["piece_b"]
-    sections: list[tuple[str, str, str]] = [
-        ("intro",       host_voice, e.get("intro_text") or ""),
-        ("bridge_a",    host_voice, a.get("bridge_text") or ""),
-        ("passage_a",   voice_a,    a.get("passage") or ""),
-        ("bridge_btw",  host_voice, b.get("bridge_text") or ""),
-        ("passage_b",   voice_b,    b.get("passage") or ""),
-        ("outro",       host_voice, e.get("outro_text") or ""),
+
+    # Region-specific accent steer for the two article passages only
+    # (2026-07-15 — docs/session_plan_users_and_crosscut_upgrades.md
+    # §3). Reuses Stage 9's existing per-publication accent mechanism;
+    # intro/bridges/outro stay in the neutral host voice with no
+    # steer. None (no country tag on the publication) preserves
+    # today's behavior exactly.
+    from aarva.stages.stage_9_tts import (
+        _accent_prompt_for, _build_publication_country_map,
+    )
+    country_map = _build_publication_country_map()
+    accent_a = _accent_prompt_for(a, country_map)
+    accent_b = _accent_prompt_for(b, country_map)
+    if accent_a:
+        logger.info("Crosscut TTS: piece_a accent: %s", accent_a)
+    if accent_b:
+        logger.info("Crosscut TTS: piece_b accent: %s", accent_b)
+
+    sections: list[tuple[str, str, str, Optional[str]]] = [
+        ("intro",       host_voice, e.get("intro_text") or "",   None),
+        ("bridge_a",    host_voice, a.get("bridge_text") or "",  None),
+        ("passage_a",   voice_a,    a.get("passage") or "",      accent_a),
+        ("bridge_btw",  host_voice, b.get("bridge_text") or "",  None),
+        ("passage_b",   voice_b,    b.get("passage") or "",      accent_b),
+        ("outro",       host_voice, e.get("outro_text") or "",   None),
     ]
-    sections = [(n, v, t.strip()) for n, v, t in sections if t.strip()]
+    sections = [(n, v, t.strip(), style) for n, v, t, style in sections if t.strip()]
     if not sections:
         logger.warning("Crosscut TTS: no narratable content in edition #%d",
                        edition_id)
@@ -1798,7 +1835,7 @@ def synthesize_crosscut_episode(
     sample_width: Optional[int] = None
     channels: Optional[int] = None
 
-    for name, voice, text in sections:
+    for name, voice, text, extra_style in sections:
         section_path = scratch_dir / f"{name}.wav"
         already_done = section_path.exists()
         logger.info(
@@ -1812,10 +1849,16 @@ def synthesize_crosscut_episode(
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
                 tmp_path = tmp.name
             try:
-                logger.info("Crosscut TTS: synthesizing %s (~%d chars, voice=%s)",
-                            name, len(text), voice)
+                logger.info(
+                    "Crosscut TTS: synthesizing %s (~%d chars, voice=%s%s)",
+                    name, len(text), voice,
+                    f", accent={extra_style}" if extra_style else "",
+                )
                 try:
-                    result = tts.synthesize(text, _Path(tmp_path), voice_id=voice)
+                    result = tts.synthesize(
+                        text, _Path(tmp_path), voice_id=voice,
+                        extra_style=extra_style,
+                    )
                 except Exception as ex:
                     stats.errors += 1
                     logger.warning("Crosscut TTS: section %s failed: %s", name, ex)
