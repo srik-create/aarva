@@ -59,13 +59,19 @@ from aarva.services.queries import load_crosscut_episodes, load_listener_episode
 logger = logging.getLogger(__name__)
 
 
-def ensure_user_for_email(db, email: str) -> int:
+def ensure_user_for_email(listener_db, email: str) -> int:
     """Get or create a users row for `email`; return the user_id.
 
     Lives here (not episode_jobs.py) since 2026-07-15's jobs-table
-    move to the listener DB — `users` stays in the main DB, and
-    episode_jobs.py is now purely listener-DB-facing. This is the only
-    caller that needs a user_id before enqueuing a build job.
+    move to the listener DB — episode_jobs.py is purely listener-DB-
+    facing. This is the only caller that needs a user_id before
+    enqueuing a build job.
+
+    Takes `listener_db`, not `db`: `users` moved to the listener DB
+    the same day as jobs, same bug class (see
+    docs/session_plan_users_and_crosscut_upgrades.md Section 1) — a
+    laptop→Render sync was silently wiping any users row created on
+    Render since the previous sync.
 
     No auth yet — the email is the entire identity for v1. A row is
     created the first time a listener requests an episode; future
@@ -75,7 +81,7 @@ def ensure_user_for_email(db, email: str) -> int:
     email = (email or "").strip().lower()
     if not email:
         raise ValueError("ensure_user_for_email: empty email")
-    with db.connect() as conn:
+    with listener_db.connect() as conn:
         # INSERT OR IGNORE relies on the UNIQUE(email COLLATE NOCASE)
         # constraint in the users table.
         conn.execute(
@@ -229,10 +235,9 @@ async def create_build(request: Request):
     if not topic_label:
         raise HTTPException(status_code=400, detail="topic_label is required.")
 
-    db = request.app.state.db
     listener_db = request.app.state.listener_db
     try:
-        user_id = ensure_user_for_email(db, email)
+        user_id = ensure_user_for_email(listener_db, email)
         job_id = enqueue_build_job(
             listener_db,
             prompt=prompt,

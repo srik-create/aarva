@@ -119,8 +119,12 @@ CREATE TABLE IF NOT EXISTS editions (
     topic_label     TEXT,
     -- Per-user bonus episodes (Phase A web app). NULL = global
     -- (daily, crosscut, shared bonus). Set = private to that user
-    -- (their own ad-hoc picks via /api/v1/publish_article).
-    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL
+    -- (their own ad-hoc picks via /api/v1/publish_article — currently
+    -- dead code, see aarva/services/editions.py). No FK: `users`
+    -- moved to the listener DB 2026-07-15 (see
+    -- docs/session_plan_users_and_crosscut_upgrades.md) — integrity
+    -- is application-level, not DB-level, same as jobs.user_id.
+    user_id         INTEGER
 );
 -- NOTE: the composite UNIQUE index on (edition_date, edition_type) is
 -- created in _init_schema AFTER the ALTER TABLE migrations have added
@@ -266,36 +270,16 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
 -- still exists; users see (shared minus their dismissals) plus (their own
 -- bonus picks).
 
--- Users — the people consuming Aarva via the web app.
--- Auth is magic-link by default: a short-lived token is emailed when the
--- user requests login, and consumed on first click to mint a session.
-CREATE TABLE IF NOT EXISTS users (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    email           TEXT NOT NULL UNIQUE COLLATE NOCASE,
-    name            TEXT,
-    settings_json   TEXT DEFAULT '{}',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_login_at   DATETIME,
-    is_admin        INTEGER NOT NULL DEFAULT 0
-);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-
-
--- Sessions — persistent login tokens (cookie value). One row per active
--- session per device. Expire after `expires_at`; revoke by setting
--- revoked_at.
-CREATE TABLE IF NOT EXISTS user_sessions (
-    token           TEXT PRIMARY KEY,
-    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at      DATETIME NOT NULL,
-    revoked_at      DATETIME,
-    user_agent      TEXT,
-    ip              TEXT
-);
-CREATE INDEX IF NOT EXISTS idx_user_sessions_user ON user_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON user_sessions(expires_at);
-
+-- NOTE (2026-07-15): `users` and `user_sessions` used to live here.
+-- Moved to aarva/listener_db.py's LISTENER_SCHEMA_SQL — this file is
+-- atomic-replaced by every scripts/sync_db_to_render.sh run, which
+-- was silently wiping Render-authored user rows (same bug class as
+-- the jobs-table move earlier the same day). See
+-- docs/session_plan_users_and_crosscut_upgrades.md Section 1.
+-- `magic_link_tokens` below did NOT move (no FK to users, just an
+-- email string) — but `aarva/services/users.py`'s magic-link auth
+-- flow (currently dead code, no live caller) spans both files now;
+-- see that module's docstring.
 
 -- Magic-link tokens — single-use, short-lived. Consumed on first click,
 -- which mints a row in user_sessions.
@@ -313,7 +297,8 @@ CREATE INDEX IF NOT EXISTS idx_magic_links_expires ON magic_link_tokens(expires_
 
 -- User actions — every meaningful interaction a user has with an article.
 -- Drives the dismiss-from-feed feature today, and per-user taste centroids
--- + collaborative signals in Phase B.
+-- + collaborative signals in Phase B. Currently dead code — see
+-- aarva/services/actions.py's docstring.
 --
 -- action values:
 --   'dismissed'  — user removed this article from their feed (won't appear
@@ -325,7 +310,10 @@ CREATE INDEX IF NOT EXISTS idx_magic_links_expires ON magic_link_tokens(expires_
 --   'shared'     — shared the article to someone
 CREATE TABLE IF NOT EXISTS user_actions (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- No FK on user_id: `users` moved to the listener DB 2026-07-15
+    -- (see docs/session_plan_users_and_crosscut_upgrades.md) —
+    -- integrity is application-level, not DB-level.
+    user_id         INTEGER NOT NULL,
     article_id      INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
     action          TEXT NOT NULL
         CHECK (action IN ('dismissed', 'liked', 'disliked',
@@ -398,8 +386,10 @@ class Database:
                 "ALTER TABLE editions ADD COLUMN topic_label TEXT",
                 "ALTER TABLE crosscut_pair_candidates "
                 "ADD COLUMN superseded_at DATETIME",
-                "ALTER TABLE editions ADD COLUMN user_id INTEGER "
-                "REFERENCES users(id) ON DELETE SET NULL",
+                # No FK (users moved to the listener DB 2026-07-15) —
+                # kept here only for legacy DBs pre-dating that move;
+                # SCHEMA_SQL's fresh-create path above already omits it.
+                "ALTER TABLE editions ADD COLUMN user_id INTEGER",
                 # Content-quality Section 2/3 (2026-07-11) — see
                 # docs/session_plan_content_quality.md. subhead_hook:
                 # listener-facing one-sentence sub-heading, replacing
