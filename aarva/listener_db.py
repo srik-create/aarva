@@ -12,14 +12,20 @@ same persistent disk. Sync only ever touches the main DB's path, so
 it never touches this one. See
 docs/session_plan_listener_db_split.md for the full design.
 
-Deliberately narrow schema — just the three tables an on-demand
-crosscut episode needs: `editions`, `edition_pieces`, and
-`crosscut_embeddings`. No `articles` or `publications` tables here;
-those stay in the main DB (articles never move). `edition_pieces`
+Narrow schema — the tables an on-demand crosscut build needs:
+`editions`, `edition_pieces`, `crosscut_embeddings`, and (since
+2026-07-15) `jobs`. No `articles`, `publications`, or `users` tables
+here; those stay in the main DB (articles never move; users is a
+small accepted exception — see episode_jobs.py). `edition_pieces`
 carries three denormalized columns (article_title,
 article_publication, article_byline) captured at build time so
 `/listener-created` and `/crosscut/<id>` can render without a
 cross-database join.
+
+`jobs` moved here from `aarva/db.py` for the same reason the episode
+tables did: it's Render-authored data that a laptop→Render sync would
+otherwise silently wipe. See
+docs/session_plan_jobs_to_listener_db.md.
 """
 from __future__ import annotations
 
@@ -91,6 +97,42 @@ CREATE INDEX IF NOT EXISTS idx_listener_crosscut_embeddings_edition
     ON crosscut_embeddings(edition_id);
 CREATE INDEX IF NOT EXISTS idx_listener_crosscut_embeddings_model
     ON crosscut_embeddings(embedding_model);
+
+-- Moved here 2026-07-15 from aarva/db.py — the build_crosscut jobs
+-- queue (aarva/services/episode_jobs.py). Same bug class as the
+-- episodes above: this table used to live in the main DB, which
+-- scripts/sync_db_to_render.sh atomic-replaces on every laptop→Render
+-- sync, silently wiping any /create job rows written on Render since
+-- the previous sync. See docs/session_plan_jobs_to_listener_db.md.
+--
+-- No FK on user_id: `users` lives in the main DB, and SQLite doesn't
+-- support cross-database foreign keys. Same denormalized-reference
+-- pattern as edition_pieces.article_id above — integrity is
+-- application-level, not DB-level.
+--
+-- status:
+--   'pending'    — waiting to be picked up
+--   'running'    — claimed by a worker
+--   'completed'  — finished successfully (result_json populated)
+--   'failed'     — finished with error (error_message populated)
+--   'cancelled'  — operator cancelled before run
+CREATE TABLE IF NOT EXISTS jobs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind            TEXT NOT NULL,
+    payload_json    TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'running', 'completed',
+                          'failed', 'cancelled')),
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    started_at      DATETIME,
+    finished_at     DATETIME,
+    result_json     TEXT,
+    error_message   TEXT,
+    user_id         INTEGER,
+    progress        TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_user ON jobs(user_id);
 """
 
 

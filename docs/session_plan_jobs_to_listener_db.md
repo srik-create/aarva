@@ -8,6 +8,27 @@ Read this doc + `docs/roadmap.md` + `AGENTS.md` before starting.
 
 ---
 
+## DONE 2026-07-15
+
+Shipped as specced, plus two things this spec didn't anticipate —
+see `docs/roadmap.md`'s 2026-07-15 "Recently completed" entry for
+full detail:
+
+1. `aarva/server/routes/admin.py`'s `_find_lost_episodes` also
+   queried `FROM jobs` against the main DB and wasn't in this spec's
+   file list — would have broken every sync after this move. Fixed
+   in the same PR.
+2. `aarva/services/jobs.py` + `aarva/services/editions.py` are a
+   second, unrelated job-queue module targeting a same-named `jobs`
+   table — confirmed dead code (no live caller), left untouched.
+
+Verified via a real DB-level round trip (enqueue → claim → progress
+→ stamp → complete → get, plus the 24h quota check) rather than a
+full Gemini/TTS build — this was a structural refactor, not new
+logic, so the DB plumbing was the thing that needed proving.
+
+---
+
 ## Context — the bug this fixes
 
 Confirmed 2026-07-15 via Render Shell inspection. Full detail:

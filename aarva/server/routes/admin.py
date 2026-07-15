@@ -6,9 +6,11 @@ a gzipped SQLite snapshot the laptop has already uploaded to R2; the
 server fetches from R2 over the fast backbone (vs. the laptop
 uploading the body directly over a residential link, which can blow
 past Render's 100-second request timeout on the Starter plan). Every
-sync automatically checks for listener episodes about to lose their
-last recovery chance (see _find_lost_episodes) before overwriting the
-jobs table that holds it.
+sync runs the lost-episode diagnostic (see _find_lost_episodes) as a
+general safety check — its original rationale (jobs surviving in the
+main DB while the sync wiped editions in the listener DB) no longer
+applies since the 2026-07-15 jobs-table move put both in the same
+file, but it's cheap and still catches other loss scenarios.
 
 Tomorrow: any other operator-only hooks (force-deploy, cache flush,
 metrics scrape) live here too.
@@ -118,15 +120,19 @@ def _build_r2_client(pipeline_cfg):
 def _find_lost_episodes(db, listener_db) -> list[dict]:
     """Find completed build_crosscut jobs whose stamped edition doesn't
     exist in either DB — evidence of an episode whose editions/
-    edition_pieces rows are gone but whose job record (in the main DB)
-    survived. See admin_diagnose_lost_episodes for the full story.
+    edition_pieces rows are gone but whose job record survived. See
+    admin_diagnose_lost_episodes for the full story.
 
-    Shared by that endpoint and admin_sync_db, which runs this FIRST,
-    before touching the live DB — a sync overwrites the main DB's
-    `jobs` table with the laptop's version, which has no idea about
-    builds that happened directly on Render, so this evidence only
-    exists in the brief window before each sync."""
-    with db.connect() as conn:
+    UPDATED 2026-07-15: `jobs` moved to the listener DB (see
+    docs/session_plan_jobs_to_listener_db.md) — it used to live in the
+    main DB specifically so a sync (which atomic-replaces the main DB)
+    wouldn't wipe this evidence before it could be read. Now that jobs
+    and editions live in the same file, a sync can no longer wipe one
+    without the other — this check's original sync-timing rationale is
+    moot. Kept anyway as a general-purpose diagnostic (e.g. a listener-
+    DB restore from an R2 backup predating a completed build) — cheap
+    to run, still correct once pointed at the right file."""
+    with listener_db.connect() as conn:
         job_rows = conn.execute("""
             SELECT id, payload_json, result_json, created_at, finished_at
               FROM jobs
@@ -210,21 +216,20 @@ async def admin_sync_db(request: Request) -> JSONResponse:
     """
     _check_token(request)
 
-    # Check for lost listener episodes BEFORE the atomic replace below
-    # overwrites the main DB's `jobs` table with the laptop's version
-    # — that's the only window this evidence exists in (see
-    # _find_lost_episodes). Automatic per sync, not a manual step
-    # someone has to remember to run first (2026-07-11: this used to
-    # be exactly that, until a lost-episode discovery only worked
-    # because the operator hadn't synced yet).
+    # General safety check, run before every sync (2026-07-11: this
+    # used to be a manual step, until a lost-episode discovery only
+    # worked because the operator hadn't synced yet — see
+    # _find_lost_episodes). Since the 2026-07-15 jobs-table move, the
+    # sync no longer threatens this evidence directly (jobs and
+    # editions both live in the listener DB, untouched by this atomic
+    # replace of the main DB) — kept as a standing diagnostic anyway.
     lost_episodes = _find_lost_episodes(request.app.state.db, request.app.state.listener_db)
     if lost_episodes:
         logger.error(
             "=" * 70 + "\n"
-            f"WARNING: {len(lost_episodes)} listener episode(s) about to "
-            "lose their last chance at recovery — this sync is about to "
-            "overwrite the jobs table that still holds their original "
-            "article pairing. See the sync response for details.\n"
+            f"WARNING: {len(lost_episodes)} listener episode(s) found whose "
+            "audio finished but whose editions row is gone. See the sync "
+            "response for details.\n"
             + "=" * 70
         )
 
@@ -331,14 +336,18 @@ async def admin_sync_db(request: Request) -> JSONResponse:
 @app.get("/admin/diagnose-lost-episodes")
 async def admin_diagnose_lost_episodes(request: Request) -> JSONResponse:
     """Find listener-built episodes whose editions/edition_pieces rows
-    are gone but whose build-job record survived — evidence of exactly
-    the class of bug that hit twice already (2026-07-03 sync overwrite,
-    2026-07-06→11 ephemeral disk): both wiped the listener DB, but the
-    `jobs` table lives in the *main* DB, which neither bug touched.
+    are gone but whose build-job record survived — evidence of the
+    same class of bug that's hit three times now (2026-07-03 sync
+    overwrite, 2026-07-06→11 ephemeral disk, 2026-07-15 jobs-table
+    sync overwrite — the last one is what this check itself was
+    fixed for). As of 2026-07-15, `jobs` lives alongside `editions` in
+    the listener DB (see docs/session_plan_jobs_to_listener_db.md), so
+    this specific job-survives-but-editions-don't split can no longer
+    happen via a sync — kept as a general diagnostic regardless.
 
-    `admin_sync_db` now runs this same check automatically before every
-    sync (see _find_lost_episodes) — this endpoint is for checking
-    on-demand between syncs, or independent of one.
+    `admin_sync_db` runs this same check on every sync (see
+    _find_lost_episodes) — this endpoint is for checking on-demand
+    between syncs, or independent of one.
 
     Request:
       GET /admin/diagnose-lost-episodes

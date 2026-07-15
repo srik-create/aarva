@@ -36,26 +36,7 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **BUG — `jobs` table wiped by every laptop→Render DB sync.**
-   Full spec at `docs/session_plan_jobs_to_listener_db.md`. Same
-   bug class as the 2026-07-06 listener-episodes-disappearing
-   problem: `jobs` lives in `/data/aarva.db` which
-   `scripts/sync_db_to_render.sh` atomic-replaces on every sync,
-   silently wiping any /create job rows Render has written since
-   the previous sync. Observed 2026-07-15 when a listener's build
-   was orphaned mid-TTS after an OOM restart — the worker's
-   `reset_all_running_jobs` on startup found zero rows to
-   recover because the sync 22 minutes earlier had wiped them all.
-   Diagnostic evidence documented in the session plan.
-   **Fix:** move `jobs` table to the existing
-   `/data/aarva-listener.db` (which sync never touches — same
-   pattern as listener episodes). Small single-PR change:
-   schema copy, function-signature updates in `episode_jobs.py`
-   and its callers, drop the old CREATE TABLE from `aarva/db.py`.
-   No data migration needed. Full spec has the file list and
-   verification steps.
-
-3. **OOM-frequency investigation (Section 3 of
+2. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -66,9 +47,10 @@ GitHub Pages.
    loads, LLM prompt buffers, or the `google-genai` SDK holding
    per-connection state across the multiple LLM/TTS clients built
    during one job. Expect a small memory-diet PR once profiling is
-   in, not a rewrite. Ordering: item 2 first — a broken jobs
-   table makes debugging OOMs harder because half the diagnostic
-   evidence gets wiped by the daily sync.
+   in, not a rewrite. The `jobs`-table sync-wipe bug that made
+   diagnosing this harder is now fixed (2026-07-15 — see "Recently
+   completed"), so future OOM evidence should stay intact between
+   syncs.
 
 ---
 
@@ -115,9 +97,80 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-14)
+## Recently completed (2026-06-29 → 2026-07-15)
 
 Most recent first.
+
+### 2026-07-15
+
+- **Fixed: `jobs` table wiped by every laptop→Render DB sync.** Per
+  `docs/session_plan_jobs_to_listener_db.md`. Same bug class as the
+  2026-07-06 listener-episode loss, hitting a different table: `jobs`
+  lived in the main DB (`aarva/db.py`), which
+  `scripts/sync_db_to_render.sh` atomic-replaces on every sync,
+  silently wiping any `/create` job rows Render had written since the
+  previous sync. Confirmed live: a listener's build was orphaned
+  mid-TTS after an OOM restart because a sync 22 minutes earlier had
+  wiped the job row, so `reset_all_running_jobs` found nothing to
+  recover.
+  - Moved the `jobs` table into the listener DB (`aarva/listener_db.py`
+    — same file that already holds `editions`/`edition_pieces`/
+    `crosscut_embeddings`, which sync never touches), schema
+    unchanged except dropping the FK on `user_id` (SQLite has no
+    cross-database FKs — same denormalized-reference pattern already
+    used for `edition_pieces.article_id`). No data migration — the
+    single surviving main-DB job row (a stale 2026-06-29 completed
+    job) wasn't worth carrying over.
+  - `aarva/services/episode_jobs.py` is now purely listener-DB-facing
+    — every function takes `listener_db: ListenerDatabase`.
+    `ensure_user_for_email` (the one function that touches `users`,
+    which stays in the main DB) moved out to
+    `aarva/server/routes/create.py`, per the spec's recommended
+    shape: the caller resolves `user_id` before calling
+    `enqueue_build_job`, so `episode_jobs.py` never needs to touch
+    the main DB at all.
+  - `aarva/services/episode_worker.py`'s job-lifecycle calls
+    (`claim_next_pending`, `update_progress`, `stamp_edition_id`,
+    `mark_completed`, `mark_failed`, `reset_all_running_jobs`) now
+    target `listener_db`; `db` (main) is still used for the
+    non-job-related reads/writes in the same function
+    (`crosscut_pair_candidates` insert, `build_episode_script`'s
+    article/candidate reads).
+  - Removed the dead `jobs` CREATE TABLE from `aarva/db.py` (left the
+    already-existing main-DB `jobs` table itself in place — nothing
+    reads it anymore, not worth a cleanup migration per the spec).
+  - **Spec gap found and fixed on the same PR:** the spec's file list
+    didn't mention `aarva/server/routes/admin.py`, but its
+    `_find_lost_episodes` (used by both `/admin/sync-db` and
+    `/admin/diagnose-lost-episodes`) queried `FROM jobs` against the
+    *main* DB — after this move that table doesn't exist there
+    anymore, which would have thrown on every single sync. Fixed to
+    query `listener_db` instead. The check's original purpose (jobs
+    surviving in main DB while a sync wiped listener-DB editions) is
+    now moot — jobs and editions live in the same file, so a sync can
+    no longer wipe one without the other — but kept as a standing
+    diagnostic since it's cheap and still useful for other loss
+    scenarios (e.g. a listener-DB restore from an R2 backup).
+  - **Also discovered (not touched, out of scope):**
+    `aarva/services/jobs.py` + `aarva/services/editions.py` are a
+    second, entirely separate job-queue module (kinds
+    `publish_bonus_article` / `rerecord_crosscut` / `pipeline_stage`)
+    that also targets a table named `jobs` — confirmed via repo-wide
+    grep it's dead code with no live caller anywhere (no route, no
+    CLI, no `WorkerThread` ever instantiated). Unaffected by this
+    migration since nothing currently runs it; would need its own
+    migration if ever activated.
+  - Verified via a real DB-level round trip (no LLM calls needed —
+    this is a structural refactor, not new logic): `enqueue_build_job`
+    → confirmed row lands in listener DB only, not main DB →
+    `claim_next_pending` → `update_progress`/`stamp_edition_id` →
+    `mark_completed` → `get_job` all round-tripped correctly; the
+    24h build-quota check (`BuildQuotaExceeded`) correctly counted
+    against the listener DB and fired on the 3rd attempt. Confirmed
+    the listener DB schema now creates `jobs` on an already-
+    provisioned file (`CREATE TABLE IF NOT EXISTS` — no ALTER
+    migration needed since this is a brand-new table, not a new
+    column). Test data cleaned up from both DBs afterward.
 
 ### 2026-07-14
 
