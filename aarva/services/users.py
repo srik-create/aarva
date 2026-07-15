@@ -8,6 +8,11 @@ Auth model: magic-link only (no passwords). Caller flow:
   3. Browser stores the session token as an HttpOnly cookie. Every
      subsequent request calls `get_user_for_session(token)` → User dict
      or None.
+
+Currently dead code — no route wires up a login flow. Note if
+reviving: `users` + `user_sessions` moved to the listener DB
+2026-07-15 (`magic_link_tokens` stayed in the main DB), so
+`verify_magic_link` below would need both DBs, not just one `db.connect()`.
 """
 from __future__ import annotations
 

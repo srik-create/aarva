@@ -13,19 +13,19 @@ it never touches this one. See
 docs/session_plan_listener_db_split.md for the full design.
 
 Narrow schema — the tables an on-demand crosscut build needs:
-`editions`, `edition_pieces`, `crosscut_embeddings`, and (since
-2026-07-15) `jobs`. No `articles`, `publications`, or `users` tables
-here; those stay in the main DB (articles never move; users is a
-small accepted exception — see episode_jobs.py). `edition_pieces`
-carries three denormalized columns (article_title,
-article_publication, article_byline) captured at build time so
-`/listener-created` and `/crosscut/<id>` can render without a
-cross-database join.
+`editions`, `edition_pieces`, `crosscut_embeddings`, `jobs` (since
+2026-07-15), and `users` + `user_sessions` (also since 2026-07-15).
+No `articles`, `publications`, or `magic_link_tokens` tables here;
+those stay in the main DB. `edition_pieces` carries three
+denormalized columns (article_title, article_publication,
+article_byline) captured at build time so `/listener-created` and
+`/crosscut/<id>` can render without a cross-database join.
 
-`jobs` moved here from `aarva/db.py` for the same reason the episode
-tables did: it's Render-authored data that a laptop→Render sync would
-otherwise silently wipe. See
-docs/session_plan_jobs_to_listener_db.md.
+`jobs`, `users`, and `user_sessions` all moved here from `aarva/db.py`
+for the same reason the episode tables did: it's Render-authored data
+that a laptop→Render sync would otherwise silently wipe. See
+docs/session_plan_jobs_to_listener_db.md and
+docs/session_plan_users_and_crosscut_upgrades.md.
 """
 from __future__ import annotations
 
@@ -105,10 +105,12 @@ CREATE INDEX IF NOT EXISTS idx_listener_crosscut_embeddings_model
 -- sync, silently wiping any /create job rows written on Render since
 -- the previous sync. See docs/session_plan_jobs_to_listener_db.md.
 --
--- No FK on user_id: `users` lives in the main DB, and SQLite doesn't
--- support cross-database foreign keys. Same denormalized-reference
--- pattern as edition_pieces.article_id above — integrity is
--- application-level, not DB-level.
+-- No FK on user_id here: kept as a plain column rather than adding
+-- one back now that `users` lives in this same file (see Section 1 of
+-- docs/session_plan_users_and_crosscut_upgrades.md, 2026-07-15) — the
+-- "no FKs across the former listener/main split" rule stays even
+-- where it's now technically possible, for consistency with
+-- edition_pieces.article_id above (which still can't have one).
 --
 -- status:
 --   'pending'    — waiting to be picked up
@@ -133,6 +135,44 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
 CREATE INDEX IF NOT EXISTS idx_jobs_user ON jobs(user_id);
+
+-- Moved here 2026-07-15 from aarva/db.py, same bug class as jobs
+-- above: every /create request upserts a users row via
+-- ensure_user_for_email, and a laptop→Render sync would otherwise
+-- silently wipe any created since the previous sync — meaning a
+-- listener who submitted once and never returned was already gone.
+-- See docs/session_plan_users_and_crosscut_upgrades.md Section 1.
+--
+-- users + user_sessions move TOGETHER (unlike jobs/editions moving
+-- alone) specifically so the FK between them stays valid — both now
+-- live in the same file, so this is a same-database FK, not a
+-- cross-database one. `magic_link_tokens` (main DB, unmoved — no FK
+-- to users, just an email string) and `aarva/services/users.py`
+-- (currently dead code, no live caller) are NOT part of this move;
+-- see that module's docstring for what would need to change before
+-- it could ever be activated.
+CREATE TABLE IF NOT EXISTS users (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    email           TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    name            TEXT,
+    settings_json   TEXT DEFAULT '{}',
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login_at   DATETIME,
+    is_admin        INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_listener_users_email ON users(email);
+
+CREATE TABLE IF NOT EXISTS user_sessions (
+    token           TEXT PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at      DATETIME NOT NULL,
+    revoked_at      DATETIME,
+    user_agent      TEXT,
+    ip              TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_listener_user_sessions_user ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_listener_user_sessions_expires ON user_sessions(expires_at);
 """
 
 
