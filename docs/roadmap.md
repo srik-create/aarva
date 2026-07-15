@@ -52,19 +52,11 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-3. **Users persistence + crosscut divergent-view tier + region-
-   specific crosscut piece voices.** Full spec at
-   `docs/session_plan_users_and_crosscut_upgrades.md`. Three
-   orthogonal enhancements requested 2026-07-15, packaged into
-   one spec but shippable as three independent PRs:
-   - **Section 1 — Users persistence.** Same sync-wipes-data bug
-     class as the jobs table (fixed 2026-07-15). Move `users` and
-     `user_sessions` from main DB to listener DB so listener
-     emails survive daily syncs. User's ask verbatim: "make sure
-     we store email addresses for every /create request, so we
-     have that as a database of users." Plumbing already captures
-     — this fixes durability. Small structural PR, precedented by
-     the jobs move.
+3. **Crosscut divergent-view tier + region-specific crosscut piece
+   voices.** Full spec at
+   `docs/session_plan_users_and_crosscut_upgrades.md` (Sections 2-3
+   — Section 1, users persistence, shipped 2026-07-15, see "Recently
+   completed"). Two independent enhancements:
    - **Section 2 — Crosscut divergent-view tier.** Layer a new
      stance-classification step above the current pair-selection
      logic: prefer pairs that argue different sides of the same
@@ -84,10 +76,9 @@ GitHub Pages.
      Almost mechanical — the accent-steer plumbing already
      exists.
 
-   Recommended order per the spec: Section 1 first (closes out
-   the sync-wipe bug class before it bites a third table),
-   Section 2 second (larger editorial impact), Section 3 last
-   (smallest of the three). Each can ship as its own PR.
+   Recommended order per the spec: Section 2 next (larger editorial
+   impact), Section 3 last (smallest of the two). Each ships as its
+   own PR.
 
 ---
 
@@ -139,6 +130,51 @@ the sequence.
 Most recent first.
 
 ### 2026-07-15
+
+- **Moved `users` (+ `user_sessions`) to the listener DB.** Section 1
+  of `docs/session_plan_users_and_crosscut_upgrades.md`. Same bug
+  class as the `jobs` move earlier the same day: every `/create`
+  request upserts a `users` row via `ensure_user_for_email`, and a
+  laptop→Render sync was silently wiping any user row created on
+  Render since the previous sync — user's ask verbatim: "make sure we
+  store email addresses for every /create request, so we have that
+  as a database of users." The capture was already happening; this
+  fixes durability.
+  - `users` and `user_sessions` move TOGETHER (unlike `jobs`, which
+    moved alone) specifically so the FK between them stays valid —
+    both now live in the same listener-DB file, so it's a same-
+    database FK, not a cross-database one.
+  - `ensure_user_for_email` — already living in
+    `aarva/server/routes/create.py` from the prior jobs-move PR (the
+    spec assumed it was still in `episode_jobs.py`, a stale
+    assumption from before that move; applied the fix to wherever the
+    function actually lives) — now takes `listener_db` instead of
+    `db`.
+  - **Two gaps found beyond the spec's file list, both fixed in this
+    PR:** (1) the main DB's `editions.user_id` (bonus-episode
+    attribution) and `user_actions.user_id` both had live FK
+    constraints on `users(id)` that would have become dangling
+    references to a now-nonexistent table — dropped both FKs, kept
+    as plain `INTEGER` columns, same pattern as `jobs.user_id`.
+    Neither write path is currently live (both route through
+    confirmed-dead code — `aarva/services/editions.py` and
+    `aarva/services/actions.py` respectively — so nothing broke
+    today, but a future activation would have hit a cryptic `no such
+    table: users` error). (2) `aarva/services/users.py` — a complete,
+    pre-existing magic-link auth module (also dead code, no live
+    caller) — touches `users` + `user_sessions` (moving) AND
+    `magic_link_tokens` (not moving, no FK to users) in one
+    transaction; flagged with a docstring note that reviving it would
+    need a two-database transaction, not touched further (out of
+    scope — no login flow exists to fix today, and the user confirmed
+    the ask is just simple email capture, not building out auth).
+  - Verified via real DB-level round trips: `ensure_user_for_email`
+    lands the row in listener DB only (0 in main DB), repeat
+    submissions from the same email correctly reuse the same
+    `user_id` (INSERT OR IGNORE + UNIQUE COLLATE NOCASE), and a full
+    `ensure_user_for_email` → `enqueue_build_job` → `claim_next_pending`
+    → `mark_completed` chain works correctly now that both tables
+    live in the same file. Test data cleaned up afterward.
 
 - **Fixed: `jobs` table wiped by every laptop→Render DB sync.** Per
   `docs/session_plan_jobs_to_listener_db.md`. Same bug class as the

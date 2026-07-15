@@ -12,6 +12,36 @@ Read this doc + `docs/roadmap.md` + `AGENTS.md` before starting.
 
 ## Section 1 — Move `users` (and `user_sessions`) to listener DB
 
+### DONE 2026-07-15
+
+Shipped as specced, plus two gaps this spec didn't anticipate — see
+`docs/roadmap.md`'s 2026-07-15 "Recently completed" entry for full
+detail:
+
+1. The main DB's `editions.user_id` (bonus-episode attribution) and
+   `user_actions.user_id` both had live FKs on `users(id)` that would
+   have become dangling references — dropped both, same pattern as
+   `jobs.user_id`. Neither write path is live (both are dead code),
+   so nothing broke today, but this was worth fixing now rather than
+   leaving a landmine.
+2. `aarva/services/users.py` (a pre-existing, unwired magic-link auth
+   module) spans `users`/`user_sessions` (moving) and
+   `magic_link_tokens` (not moving) in one transaction — flagged with
+   a docstring note, not restructured, since it's dead code and no
+   login flow exists to fix today.
+
+This spec's file list also assumed `ensure_user_for_email` was still
+in `episode_jobs.py` — it had already moved to
+`aarva/server/routes/create.py` in the jobs-migration PR earlier the
+same day. Applied the fix there instead.
+
+Verified via real DB-level round trips (not a full `/create` build):
+`ensure_user_for_email` lands the row in listener DB only, repeat
+submissions from the same email reuse the same `user_id`, and the
+full `ensure_user_for_email` → `enqueue_build_job` → `claim_next_pending`
+→ `mark_completed` chain works end-to-end now that `users` and `jobs`
+share a file.
+
 ### Goal
 
 Every `/create` request currently upserts a `users` row via
