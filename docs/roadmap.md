@@ -52,6 +52,43 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+3. **Users persistence + crosscut divergent-view tier + region-
+   specific crosscut piece voices.** Full spec at
+   `docs/session_plan_users_and_crosscut_upgrades.md`. Three
+   orthogonal enhancements requested 2026-07-15, packaged into
+   one spec but shippable as three independent PRs:
+   - **Section 1 — Users persistence.** Same sync-wipes-data bug
+     class as the jobs table (fixed 2026-07-15). Move `users` and
+     `user_sessions` from main DB to listener DB so listener
+     emails survive daily syncs. User's ask verbatim: "make sure
+     we store email addresses for every /create request, so we
+     have that as a database of users." Plumbing already captures
+     — this fixes durability. Small structural PR, precedented by
+     the jobs move.
+   - **Section 2 — Crosscut divergent-view tier.** Layer a new
+     stance-classification step above the current pair-selection
+     logic: prefer pairs that argue different sides of the same
+     question over pairs that offer different angles on the same
+     topic. Extra Gemini call per candidate (~$0.03/build total,
+     acceptable). 60/40 mix in the longlist when divergent pairs
+     exist; fallback to current logic when they don't. Editorial
+     voice unchanged — intros/bridges/outros still leave the
+     listener with a question, never a verdict.
+   - **Section 3 — Region-specific voices for crosscut pieces.**
+     Currently daily articles get country-based accent steering
+     (via publications.yaml's `country:` tag + Stage 9's
+     `_accent_prompt_for`), but crosscut piece_a and piece_b
+     narration uses fixed voices with no per-publication accent.
+     Wire the same mechanism into `synthesize_crosscut_episode`.
+     Intro/bridges/outro stay in neutral Aarva editorial voice.
+     Almost mechanical — the accent-steer plumbing already
+     exists.
+
+   Recommended order per the spec: Section 1 first (closes out
+   the sync-wipe bug class before it bites a third table),
+   Section 2 second (larger editorial impact), Section 3 last
+   (smallest of the three). Each can ship as its own PR.
+
 ---
 
 ## Deferred — to return to (in priority order)
