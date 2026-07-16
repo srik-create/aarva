@@ -63,6 +63,21 @@ logger = logging.getLogger(__name__)
 # higher hides legitimate near-matches. Revisit when catalog grows.
 DEFAULT_EXISTING_MATCH_FLOOR = 0.65
 
+# Floor for the /create no-results fallback's near-miss suggestion
+# (2026-07-16 — docs/session_plan_search_suggestions.md Feature B).
+# The spec's proposed 0.45 was tested against the real catalog before
+# shipping and found to not filter anything in practice — even
+# keyboard-mashing gibberish ("asdf jkl qwerty zxcv", a bare digit
+# string) scored 0.6+ against unrelated articles, so "the closest
+# thing we have" would have shown up on nearly every no-results page,
+# often pointing at something unrelated. Reusing the same floor as
+# the primary existing-match tier means near-miss only ever suggests
+# something at the same quality bar the main flow already trusts.
+DEFAULT_NEAR_MISS_FLOOR = DEFAULT_EXISTING_MATCH_FLOOR
+
+# Near-miss results shown to the listener. 1-2 per spec; default 2.
+DEFAULT_NEAR_MISS_K = 2
+
 # Number of articles to feed Gemini as the candidate pool for new
 # pairings. The LLM picks pairs from this pool. Too small → forced
 # pairings; too large → token-cost blowup and dilution.
@@ -127,6 +142,19 @@ class Candidate:
     # listener, candidate cards don't flag which tier a pairing came
     # from.
     stance: Optional[str] = None
+
+
+@dataclass
+class NearMiss:
+    """A single "closest thing we have on the shelf" suggestion for
+    the /create no-results fallback (2026-07-16 —
+    docs/session_plan_search_suggestions.md Feature B). Deliberately
+    NOT a Candidate — this is a plain link, not something that can be
+    picked to queue a build or play immediately in the same way."""
+    kind: str          # 'crosscut' | 'article'
+    title: str
+    url: str            # /crosscut/<id> or /article/<id>
+    score: float
 
 
 # ─── Existing-match lookup ───────────────────────────────────────────────
@@ -245,6 +273,83 @@ def _existing_matches(
             score=score,
         ))
     return candidates
+
+
+# ─── Near-miss fallback (Feature B) ──────────────────────────────────────
+
+def find_near_miss(
+    db: Database,
+    listener_db: Database,
+    embedding_client: EmbeddingClient,
+    prompt: str,
+    *,
+    floor: float = DEFAULT_NEAR_MISS_FLOOR,
+    k: int = DEFAULT_NEAR_MISS_K,
+) -> list[NearMiss]:
+    """"Closest thing we have on the shelf" for the /create no-results
+    fallback (2026-07-16 — docs/session_plan_search_suggestions.md
+    Feature B). Only called when the normal flow (existing matches +
+    new pairings) returned nothing.
+
+    Searches BOTH existing crosscut episodes (same embedding space and
+    floor _existing_matches uses — see DEFAULT_NEAR_MISS_FLOOR for why
+    this isn't relaxed despite the spec's original suggestion) and
+    standalone articles, combines, returns up to `k` sorted by score.
+    Empty list if nothing clears the floor — caller skips the near-
+    miss section entirely in that case, per spec. No LLM call — pure
+    embedding lookup, same cost class as the existing-match tier."""
+    prompt = (prompt or "").strip()
+    if not prompt or k <= 0:
+        return []
+
+    prompt_vec = embedding_client.embed([prompt], task_type="RETRIEVAL_QUERY")[0]
+
+    hits: list[tuple[float, NearMiss]] = []
+
+    # Crosscut episodes (both DBs) — same source as _existing_matches.
+    from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
+    for source_db in (db, listener_db):
+        by_edition = _load_crosscut_vectors(source_db, embedding_client.name)
+        for edition_id, sources in by_edition.items():
+            best = max(float(prompt_vec @ v) for v in sources.values())
+            if best < floor:
+                continue
+            loader = load_crosscut_episodes if source_db is db else load_listener_episodes
+            rows = loader(source_db, edition_id=edition_id)
+            if not rows:
+                continue
+            cc = rows[0]
+            title = (cc.get("topic_label") or "Two angles").strip()
+            hits.append((best, NearMiss(
+                kind="crosscut", title=title,
+                url=f"/crosscut/{edition_id}", score=best,
+            )))
+
+    # Standalone articles — same embedding scan _load_article_pool
+    # uses, just filtered by the near-miss floor instead of top-N.
+    with db.connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT a.id, a.title, a.embedding
+              FROM articles a
+             WHERE a.embedding IS NOT NULL
+               AND a.embedding_model = ?
+               AND a.status IN ('scored', 'in_basket', 'in_edition')
+            """,
+            (embedding_client.name,),
+        ).fetchall()
+    for r in rows:
+        v = np.frombuffer(r["embedding"], dtype=np.float32)
+        sim = float(prompt_vec @ v)
+        if sim < floor:
+            continue
+        hits.append((sim, NearMiss(
+            kind="article", title=r["title"] or "",
+            url=f"/article/{r['id']}", score=sim,
+        )))
+
+    hits.sort(key=lambda t: t[0], reverse=True)
+    return [nm for _, nm in hits[:k]]
 
 
 # ─── New-pairing proposal via Gemini ─────────────────────────────────────

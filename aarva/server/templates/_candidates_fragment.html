@@ -79,13 +79,35 @@
     {% endfor %}
   </div>
 {% else %}
+  {# No-results fallback (2026-07-16 — docs/session_plan_search_
+     suggestions.md Feature B). near_miss (0-2 crosscut/article hits
+     at a relaxed similarity floor) is only present when the route
+     looked for one, i.e. when candidates came back empty — see
+     aarva/server/routes/create.py::api_candidates. PROMPT_SUGGESTIONS
+     is a Jinja global (aarva/server/templates.py), same 6 examples
+     Feature A's focus dropdown uses. Chips here submit directly
+     (real <a> links to /create?q=...), unlike Feature A's pre-fill-
+     only behaviour — a listener who already got zero results is
+     better served by just trying the next thing. #}
   <div class="p-6 bg-night-soft border border-night-border rounded-2xl">
-    <p class="text-cream-light">
-      Nothing matched closely enough to suggest. Try something like
-      <a href="/create?q=how+belief+forms" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">"how belief forms"</a>,
-      <a href="/create?q=the+future+of+work" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">"the future of work"</a>,
-      or
-      <a href="/create?q=quietly+thoughtful+nature+writing" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">"quietly thoughtful nature writing"</a>.
-    </p>
+    {% if near_miss %}
+      <p class="text-cream-light">The closest thing we have to what you asked is:</p>
+      <ul class="mt-2 space-y-1">
+        {% for nm in near_miss %}
+          <li>
+            <a href="{{ nm.url }}" class="text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text">{{ nm.title | title_case }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <p class="text-cream-light {% if near_miss %}mt-5{% endif %}">Or try one of these:</p>
+    <div class="mt-2 flex flex-wrap gap-2">
+      {% for example in PROMPT_SUGGESTIONS %}
+        <a href="/create?q={{ example | urlencode }}"
+           class="px-3 py-1.5 bg-night-border rounded-full text-sm text-cream-light hover:text-cream-text hover:bg-night transition-colors">
+          {{ example }}
+        </a>
+      {% endfor %}
+    </div>
   </div>
 {% endif %}

@@ -50,7 +50,7 @@ from starlette.concurrency import run_in_threadpool
 
 from aarva.server.app import app
 from aarva.server.templates import templates
-from aarva.services.episode_candidates import propose_candidates
+from aarva.services.episode_candidates import find_near_miss, propose_candidates
 from aarva.services.episode_jobs import (
     BuildQuotaExceeded, enqueue_build_job, get_job,
 )
@@ -195,9 +195,23 @@ async def api_candidates(request: Request) -> HTMLResponse:
         logger.exception("api_candidates: propose_candidates crashed: %s", e)
         candidates = []
 
+    # No-results fallback (2026-07-16 — docs/session_plan_search_
+    # suggestions.md Feature B): only worth the extra lookup when the
+    # normal flow found nothing. PROMPT_SUGGESTIONS itself needs no
+    # context wiring — it's a Jinja global (see templates.py).
+    near_miss = []
+    if not candidates:
+        try:
+            near_miss = await run_in_threadpool(
+                find_near_miss, db, listener_db, embedding_client, q,
+            )
+        except Exception as e:
+            logger.exception("api_candidates: find_near_miss crashed: %s", e)
+            near_miss = []
+
     return templates.TemplateResponse(
         request, "_candidates_fragment.html",
-        {"prompt": q, "candidates": candidates},
+        {"prompt": q, "candidates": candidates, "near_miss": near_miss},
     )
 
 
