@@ -35,6 +35,19 @@ This spec covers both.
 
 ## Feature A — Dropdown on focus (when the box is empty)
 
+### DONE 2026-07-16
+
+Shipped as specced. The 6 examples live in a new shared constant
+(`aarva/services/prompt_suggestions.py`), registered as a Jinja
+global so `base.html` (every page) and Feature B can both read it
+without duplication.
+
+Verified with a real headless-browser run (Playwright, installed
+locally for this) against a live local server — every verification
+bullet in this section passed directly, not just inferred from the
+server-rendered HTML. See `docs/roadmap.md`'s 2026-07-16 "Recently
+completed" entry for the full list of what was checked.
+
 ### Goal
 
 When a listener clicks into the prompt input and it's empty, show

@@ -11,6 +11,8 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
+from aarva.services.prompt_suggestions import PROMPT_SUGGESTIONS
+
 
 _TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 templates = Jinja2Templates(directory=str(_TEMPLATES_DIR))
@@ -172,3 +174,9 @@ templates.env.filters["publication_slug"] = _publication_slug
 templates.env.filters["card_color"] = _card_color
 templates.env.filters["jtbd_label"] = _jtbd_label
 templates.env.filters["duration_minutes"] = _duration_minutes
+
+# Globals — available in every template without each route needing to
+# pass them explicitly. PROMPT_SUGGESTIONS is used by the header
+# dropdown (every page, via base.html) and the /create no-results
+# fallback — see aarva/services/prompt_suggestions.py.
+templates.env.globals["PROMPT_SUGGESTIONS"] = PROMPT_SUGGESTIONS

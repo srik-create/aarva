@@ -35,19 +35,16 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-4. **Search suggestions — dropdown on focus + no-results fallback.**
-   Full spec at `docs/session_plan_search_suggestions.md`. Two
-   related enhancements to the header prompt input. Feature A:
-   on focus into an empty prompt, show a dropdown of 6 example
-   prompts spanning different registers (topic, feeling,
-   juxtaposition, question, opinion, vibe) — clicking pre-fills
-   the input. Feature B: when `/create` returns no candidates,
-   fallback shows (a) a semantic near-miss link if any catalog
-   entry hits at ≥0.45 similarity, and (b) the same 6 example
-   prompts as clickable chips. Both static-cost, no LLM calls.
-   Independent of Section 5.
+2. **Search suggestions — no-results fallback.** Full spec at
+   `docs/session_plan_search_suggestions.md` Feature B (Feature A,
+   the focus dropdown, shipped 2026-07-16 — see "Recently
+   completed"). When `/create` returns no candidates, fallback
+   shows (a) a semantic near-miss link if any catalog entry hits at
+   ≥0.45 similarity, and (b) the same 6 example prompts (now a
+   shared constant, `aarva/services/prompt_suggestions.py`) as
+   clickable chips. Static-cost, no LLM calls.
 
-2. **OOM-frequency investigation (Section 3 of
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -113,6 +110,34 @@ the sequence.
 Most recent first.
 
 ### 2026-07-16
+
+- **Search suggestions — focus dropdown (Feature A).** Full spec at
+  `docs/session_plan_search_suggestions.md`. Focusing the header
+  prompt input (every page — it lives in `base.html`, outside
+  `#main-content`) while it's empty now shows a dropdown of 6
+  example prompts spanning different registers (topic, feeling,
+  juxtaposition, question, opinion, vibe) — clicking one pre-fills
+  the input (does not auto-submit) so the listener can still edit.
+  Typing, clicking outside, or Escape all dismiss it. A prompt
+  already in the box (e.g. reloading `/create?q=...`) means no
+  dropdown on focus.
+  - The 6 examples live in one new shared constant
+    (`aarva/services/prompt_suggestions.py`, `PROMPT_SUGGESTIONS`)
+    registered as a Jinja global in `aarva/server/templates.py` —
+    per the spec's DRY requirement, ready for Feature B (no-results
+    fallback) to reuse without duplicating the list.
+  - New `aarva/server/static/prompt-suggestions.js` — same show/
+    hide/click-outside/Escape idiom already used by the PWA-install
+    modal and nav drawer elsewhere in `base.html`, not a new pattern.
+  - **Verified for real, not just server-rendered structure:**
+    installed Playwright locally and drove a real headless Chromium
+    against a running local server, exercising every one of the
+    spec's verification bullets directly — focus-empty shows the
+    dropdown with 6 examples; clicking one pre-fills with cursor at
+    the end and closes the dropdown; typing closes it; clicking
+    outside closes it; Escape closes it; reloading `/create?q=...`
+    (stale text already in the box) does NOT show the dropdown on
+    focus. All passed.
 
 - **Share functionality (Section 5) + share-analytics proxy.** Full
   spec at `docs/session_plan_content_quality.md` §5. Listeners can
