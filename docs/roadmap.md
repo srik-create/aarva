@@ -36,7 +36,29 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **OOM-frequency investigation (Section 3 of
+2. **Small add — mark divergent-tier candidates in the reviewer
+   CLI.** The 2026-07-15 divergent-view tier ships with in-memory
+   bucketing but no visible signal to the reviewer at longlist-
+   selection time. User asked 2026-07-15 to make it visible so
+   they can factor the tier into their pick.
+   **Fix:**
+   - Add `stance TEXT` column to `crosscut_pair_candidates`
+     (main DB — this table lives there, not in the listener DB).
+     Values: `'OPPOSING_VIEWS'`, `'DIFFERENT_ANGLES'`, `NULL` for
+     legacy rows.
+   - Populate `stance` in `_persist_candidate` (~L594 of
+     `aarva/stages/stage_crosscut.py`) by threading the
+     `_classify_pair_stance` result through from the caller
+     (already computed during pair-detection, just currently
+     discarded after bucketing).
+   - In `aarva/crosscut.py` review CLI: add a small `[divergent]`
+     tag next to the topic label for rows where
+     `stance = 'OPPOSING_VIEWS'`. Rows with `DIFFERENT_ANGLES`
+     or NULL get no tag — divergent is the visually-distinguished
+     thing, not the other way around.
+   No listener-facing surface changes. Small single-PR change.
+
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
