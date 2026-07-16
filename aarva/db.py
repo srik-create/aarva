@@ -206,7 +206,13 @@ CREATE TABLE IF NOT EXISTS crosscut_pair_candidates (
     -- intra-day re-runs of detect (the require-fresh filter depends
     -- on this; without it, _clear_today_candidates would wipe the
     -- signal every time it fires).
-    superseded_at        DATETIME
+    superseded_at        DATETIME,
+    -- Divergent-view tier (2026-07-15) — see
+    -- docs/session_plan_users_and_crosscut_upgrades.md §2. 'OPPOSING_
+    -- VIEWS' / 'DIFFERENT_ANGLES' from _classify_pair_stance, or NULL
+    -- for rows persisted before this column existed. Surfaced to the
+    -- reviewer CLI (aarva/crosscut.py) as a `[divergent]` tag.
+    stance               TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_crosscut_candidates_date
     ON crosscut_pair_candidates(candidate_date);
@@ -399,6 +405,11 @@ class Database:
                 # daily-pipeline crosscuts.
                 "ALTER TABLE editions ADD COLUMN subhead_hook TEXT",
                 "ALTER TABLE editions ADD COLUMN originating_prompt TEXT",
+                # Divergent-view tier reviewer marker (2026-07-15) —
+                # see docs/session_plan_users_and_crosscut_upgrades.md
+                # §2 and the roadmap's "mark divergent-tier candidates
+                # in the reviewer CLI" item.
+                "ALTER TABLE crosscut_pair_candidates ADD COLUMN stance TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:

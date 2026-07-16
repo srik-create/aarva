@@ -589,21 +589,24 @@ def _persist_candidate(
     b: _CrosscutArticle,
     eval_out: dict,
     divergence: float,
+    stance: Optional[str] = None,
 ) -> int:
     with db.connect() as conn:
         cur = conn.execute("""
             INSERT INTO crosscut_pair_candidates
                 (candidate_date, article_a_id, article_b_id,
                  topic_label, angle_a_label, angle_b_label,
-                 connection_summary, connection_score, divergence_score)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 connection_summary, connection_score, divergence_score,
+                 stance)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (today.isoformat(), a.id, b.id,
               eval_out.get("topic_label"),
               eval_out.get("angle_a"),
               eval_out.get("angle_b"),
               eval_out.get("connection_summary"),
               float(eval_out.get("score") or 0),
-              float(divergence)))
+              float(divergence),
+              stance))
         return int(cur.lastrowid)
 
 
@@ -1573,9 +1576,9 @@ def detect_pair_candidates(
     # shared across both admit passes so an article picked in the
     # divergent tier can't also fill a current-logic slot.
     appearances: dict[int, int] = {}
-    keep: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float]] = []
+    keep: list[tuple[dict, _CrosscutArticle, _CrosscutArticle, float, str]] = []
 
-    def _admit(entries, quota: int) -> int:
+    def _admit(entries, quota: int, stance: str) -> int:
         admitted = 0
         for result, a, b, div in entries:
             if admitted >= quota:
@@ -1583,7 +1586,7 @@ def detect_pair_candidates(
             if (appearances.get(a.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE
                     or appearances.get(b.id, 0) >= DEFAULT_MAX_APPEARANCES_PER_ARTICLE):
                 continue
-            keep.append((result, a, b, div))
+            keep.append((result, a, b, div, stance))
             appearances[a.id] = appearances.get(a.id, 0) + 1
             appearances[b.id] = appearances.get(b.id, 0) + 1
             admitted += 1
@@ -1594,8 +1597,14 @@ def detect_pair_candidates(
         # pairs exist than the 60% target, take all of them and fill
         # the rest from current-logic (never force a shortfall).
         target_divergent = round(longlist_size * 0.6)
-        n_divergent = _admit(divergent_evals, min(target_divergent, len(divergent_evals)))
-        n_current = _admit(current_logic_evals, longlist_size - n_divergent)
+        n_divergent = _admit(
+            divergent_evals, min(target_divergent, len(divergent_evals)),
+            "OPPOSING_VIEWS",
+        )
+        n_current = _admit(
+            current_logic_evals, longlist_size - n_divergent,
+            "DIFFERENT_ANGLES",
+        )
         logger.info(
             "crosscut pair-select: divergent tier found %d pairs, "
             "filled longlist %d/%d (divergent/current-logic)",
@@ -1606,10 +1615,10 @@ def detect_pair_candidates(
             "crosscut pair-select: no divergent pairs found, using "
             "current-logic only"
         )
-        _admit(current_logic_evals, longlist_size)
+        _admit(current_logic_evals, longlist_size, "DIFFERENT_ANGLES")
 
-    for result, a, b, div in keep:
-        _persist_candidate(db, today, a, b, result, div)
+    for result, a, b, div, stance in keep:
+        _persist_candidate(db, today, a, b, result, div, stance=stance)
         stats.pairs_persisted += 1
 
     logger.info(
