@@ -35,7 +35,30 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-2. **OOM-frequency investigation (Section 3 of
+2. **Author-provenance-based accents (per-article, not per-
+   publication).** Full spec at
+   `docs/session_plan_author_provenance_accents.md`. Today's
+   accent steer is publication-based, which under-covers pubs
+   like The Diplomat (unaffiliated authors from everywhere) and
+   over-simplifies pubs like Himal Southasian (pan-South-Asian
+   authorship). Fix: classify each article's author's current
+   PROVENANCE (not name-based ethnicity) using a small Gemini
+   call that reads byline + body for evidence like "based in
+   Delhi" / "here in London" / bio footers. Cache result on
+   `articles.author_country_code`. TTS precedence becomes:
+   author provenance > publication tag > default. Non-diaspora
+   authors get their regional accent; diaspora authors get their
+   country-of-residence accent; ambiguous/unknown cases fall
+   through cleanly to the existing publication tag (or default).
+   User constraint explicitly rules out name-based inference —
+   Neel Mukherjee (Indian name, UK-based) must get UK, not
+   India. Also: `publications.yaml` gets a `country: india`
+   pragmatic tag on Himal Southasian in the same PR (config-
+   only) as a stopgap improvement for that publication until
+   this ships. Backfill script for existing articles; ~$5 total
+   at $0.001/article LLM call.
+
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
