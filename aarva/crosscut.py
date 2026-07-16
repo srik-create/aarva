@@ -34,7 +34,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 
 
-from aarva.cli_utils import BOLD, DIM, RED, GREEN, YELLOW, BLUE  # noqa: F401
+from aarva.cli_utils import BOLD, DIM, RED, GREEN, YELLOW, BLUE, MAGENTA  # noqa: F401
 
 
 @dataclass
@@ -56,6 +56,11 @@ class _Candidate:
     connection_score: float
     divergence_score: float
     selected: bool
+    # Divergent-view tier (2026-07-15) — 'OPPOSING_VIEWS' /
+    # 'DIFFERENT_ANGLES', or None for rows persisted before this
+    # column existed. See docs/session_plan_users_and_crosscut_
+    # upgrades.md §2.
+    stance: Optional[str]
 
 
 def _load_today_longlist(db: Database, today: date) -> list[_Candidate]:
@@ -64,7 +69,7 @@ def _load_today_longlist(db: Database, today: date) -> list[_Candidate]:
             SELECT cpc.id, cpc.candidate_date, cpc.article_a_id, cpc.article_b_id,
                    cpc.topic_label, cpc.angle_a_label, cpc.angle_b_label,
                    cpc.connection_summary, cpc.connection_score,
-                   cpc.divergence_score, cpc.selected_at,
+                   cpc.divergence_score, cpc.selected_at, cpc.stance,
                    a.title AS title_a, a.word_count AS wc_a,
                    pa.name AS pub_a,
                    b.title AS title_b, b.word_count AS wc_b,
@@ -97,6 +102,7 @@ def _load_today_longlist(db: Database, today: date) -> list[_Candidate]:
             connection_score=float(r["connection_score"] or 0),
             divergence_score=float(r["divergence_score"] or 0),
             selected=bool(r["selected_at"]),
+            stance=r["stance"],
         )
         for r in rows
     ]
@@ -121,6 +127,7 @@ def _print_candidate(idx: int, c: _Candidate) -> None:
     print()
     print(f"  {BOLD(f'[{idx}]')}  {BOLD(c.topic_label or '(no topic)')}  "
           f"{DIM('—')}  {YELLOW(score_str)}  {DIM(div_str)}"
+          + (f"  {MAGENTA('[divergent]')}" if c.stance == "OPPOSING_VIEWS" else "")
           + (f"  {GREEN('★ selected')}" if c.selected else ""))
     print(f"       {DIM(c.connection_summary)}")
     print(f"       {DIM('A:')} {BLUE(c.pub_a)}  "

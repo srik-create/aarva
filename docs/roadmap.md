@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-15
+**Last updated:** 2026-07-16
 
 ---
 
@@ -36,29 +36,7 @@ GitHub Pages.
    Section 3's `originating_prompt` column) or Section 5 (share
    functionality, self-contained).
 
-2. **Small add — mark divergent-tier candidates in the reviewer
-   CLI.** The 2026-07-15 divergent-view tier ships with in-memory
-   bucketing but no visible signal to the reviewer at longlist-
-   selection time. User asked 2026-07-15 to make it visible so
-   they can factor the tier into their pick.
-   **Fix:**
-   - Add `stance TEXT` column to `crosscut_pair_candidates`
-     (main DB — this table lives there, not in the listener DB).
-     Values: `'OPPOSING_VIEWS'`, `'DIFFERENT_ANGLES'`, `NULL` for
-     legacy rows.
-   - Populate `stance` in `_persist_candidate` (~L594 of
-     `aarva/stages/stage_crosscut.py`) by threading the
-     `_classify_pair_stance` result through from the caller
-     (already computed during pair-detection, just currently
-     discarded after bucketing).
-   - In `aarva/crosscut.py` review CLI: add a small `[divergent]`
-     tag next to the topic label for rows where
-     `stance = 'OPPOSING_VIEWS'`. Rows with `DIFFERENT_ANGLES`
-     or NULL get no tag — divergent is the visually-distinguished
-     thing, not the other way around.
-   No listener-facing surface changes. Small single-PR change.
-
-3. **OOM-frequency investigation (Section 3 of
+2. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -119,9 +97,33 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-15)
+## Recently completed (2026-06-29 → 2026-07-16)
 
 Most recent first.
+
+### 2026-07-16
+
+- **Mark divergent-tier candidates in the reviewer CLI.** The
+  2026-07-15 divergent-view tier shipped with in-memory bucketing but
+  no visible signal to the reviewer at longlist-selection time — user
+  asked to make it visible so they can factor the tier into their
+  pick. Added a `stance TEXT` column to `crosscut_pair_candidates`
+  (main DB), populated in `_persist_candidate` from the
+  `_classify_pair_stance` result already computed during pair-
+  detection (previously discarded after bucketing — the two buckets
+  (`divergent_evals`/`current_logic_evals`) each only ever hold one
+  stance, so `_admit()` now takes the bucket's stance as a constant
+  rather than needing to carry it per-pair through the tuples).
+  `aarva/crosscut.py`'s review CLI now shows a magenta `[divergent]`
+  tag next to the topic label for `OPPOSING_VIEWS` rows;
+  `DIFFERENT_ANGLES` and legacy `NULL` rows get no tag. No
+  listener-facing changes.
+  - **Verified for real:** inserted three test candidates directly
+    into the local main DB (one `OPPOSING_VIEWS`, one
+    `DIFFERENT_ANGLES`, one legacy `NULL`) and ran the actual
+    `python -m aarva.crosscut --list-only` CLI command — confirmed
+    the `[divergent]` tag appeared only on the `OPPOSING_VIEWS` row.
+    Test data cleaned up afterward.
 
 ### 2026-07-15
 
