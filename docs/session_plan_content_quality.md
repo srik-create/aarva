@@ -248,43 +248,12 @@ question.
 
 ---
 
-## Section 4 — Show search query on `/listener-created` listings
+## Section 4 — DROPPED 2026-07-15
 
-### Goal
-
-On the `/listener-created` browse page, show each episode's
-originating prompt underneath the topic label. Lets visitors see
-what other listeners have been asking Aarva, and understand the
-relationship between the prompt and the episode Aarva built for it.
-
-### Decisions locked
-
-- Uses the `editions.originating_prompt` column added in Section 3.
-  Section 3 must land first (or in the same PR).
-- **Display verbatim** — the raw prompt string as the listener
-  typed it, no LLM paraphrase, no cleanup beyond basic HTML
-  escaping. If the listener typed it in lowercase with a typo,
-  that's what visitors see. Feels human.
-- **Placement:** small italic text under the topic label, above
-  the two article titles. Prefix with a subtle "asked:" label so
-  it's clear this is what the listener asked for.
-- **Fallback:** if `originating_prompt` is NULL (older episodes
-  from before Section 3 landed), just don't render the "asked:"
-  line — no fallback placeholder.
-
-### Files likely to change
-
-- `aarva/services/queries.py` — include `originating_prompt` in the
-  listener-episode load query
-- `aarva/server/templates/listener_created.html` — render the
-  "asked: <prompt>" line under the topic label
-
-### Verification
-
-- Two listener episodes with prompts set → each shows the prompt
-  correctly on `/listener-created`.
-- One listener episode with NULL prompt → renders cleanly without
-  the "asked:" line.
+Superseded. The search prompt is already referenced in the
+crosscut intro copy (via Section 3's `originating_prompt` wiring),
+so a separate "asked:" line under each `/listener-created` card is
+redundant. Removed from the spec.
 
 ---
 
