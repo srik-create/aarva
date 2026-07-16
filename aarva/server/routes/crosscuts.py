@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse
 from aarva.server.app import app
 from aarva.server.templates import templates
 from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
+from aarva.services.share_analytics import log_referrer_visit
 
 
 @app.get("/crosscuts", response_class=HTMLResponse)
@@ -48,6 +49,13 @@ async def crosscut_detail(request: Request, edition_id: int) -> HTMLResponse:
         rows = load_listener_episodes(listener_db, edition_id=edition_id)
     if not rows:
         raise HTTPException(status_code=404, detail="Crosscut not found")
+
+    # Share analytics (2026-07-16) — see aarva/services/share_analytics.py.
+    log_referrer_visit(
+        listener_db, "crosscut", int(edition_id),
+        request.headers.get("referer", ""), request.url.hostname or "",
+    )
+
     return templates.TemplateResponse(
         request, "crosscut.html",
         {

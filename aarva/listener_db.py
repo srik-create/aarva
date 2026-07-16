@@ -14,18 +14,21 @@ docs/session_plan_listener_db_split.md for the full design.
 
 Narrow schema — the tables an on-demand crosscut build needs:
 `editions`, `edition_pieces`, `crosscut_embeddings`, `jobs` (since
-2026-07-15), and `users` + `user_sessions` (also since 2026-07-15).
-No `articles`, `publications`, or `magic_link_tokens` tables here;
-those stay in the main DB. `edition_pieces` carries three
-denormalized columns (article_title, article_publication,
-article_byline) captured at build time so `/listener-created` and
-`/crosscut/<id>` can render without a cross-database join.
+2026-07-15), `users` + `user_sessions` (also since 2026-07-15), and
+`share_signals` (since 2026-07-16). No `articles`, `publications`, or
+`magic_link_tokens` tables here; those stay in the main DB.
+`edition_pieces` carries three denormalized columns (article_title,
+article_publication, article_byline) captured at build time so
+`/listener-created` and `/crosscut/<id>` can render without a
+cross-database join.
 
-`jobs`, `users`, and `user_sessions` all moved here from `aarva/db.py`
-for the same reason the episode tables did: it's Render-authored data
-that a laptop→Render sync would otherwise silently wipe. See
-docs/session_plan_jobs_to_listener_db.md and
-docs/session_plan_users_and_crosscut_upgrades.md.
+`jobs`, `users`, `user_sessions`, and `share_signals` all moved (or,
+for share_signals, were designed from the start to live) here rather
+than `aarva/db.py`: it's Render-authored data that a laptop→Render
+sync would otherwise silently wipe. See
+docs/session_plan_jobs_to_listener_db.md,
+docs/session_plan_users_and_crosscut_upgrades.md, and
+docs/session_plan_content_quality.md Section 5.
 """
 from __future__ import annotations
 
@@ -173,6 +176,47 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 );
 CREATE INDEX IF NOT EXISTS idx_listener_user_sessions_user ON user_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_listener_user_sessions_expires ON user_sessions(expires_at);
+
+-- Share-button clicks + inbound referrer visits, for articles and
+-- crosscuts (2026-07-16, alongside Section 5 share functionality —
+-- see docs/session_plan_content_quality.md). Lives here, not the
+-- main DB, for the same reason jobs/users do: every write happens
+-- from a live Render request (a listener sharing or visiting a
+-- page), and the main DB is atomic-replaced by every laptop→Render
+-- sync — same bug class, caught before it could bite this table too.
+--
+-- No FK on content_id: 'article' rows reference the main DB's
+-- articles.id; 'crosscut' rows reference an editions.id that could
+-- live in either DB (same ambiguity crosscut_detail's own comment
+-- describes). Purely informational — nothing in the app joins
+-- against this table.
+--
+-- signal:
+--   'share_clicked'   — the share button succeeded (Web Share
+--                       resolved, or copy-link succeeded). No
+--                       destination-platform info — the Web Share
+--                       API deliberately never exposes which app the
+--                       listener picked.
+--   'referrer_visit'  — a page view arrived with an external Referer
+--                       header. The only available proxy for "where
+--                       this got shared to" given no platform-
+--                       specific share buttons — see referrer_domain.
+--                       Browser-based platforms (X, Facebook,
+--                       LinkedIn) preserve the referrer; messaging
+--                       apps (WhatsApp, iMessage) typically strip it
+--                       entirely, so those shares show up as
+--                       ordinary direct visits, not attributed to
+--                       any platform.
+CREATE TABLE IF NOT EXISTS share_signals (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    content_type    TEXT NOT NULL CHECK (content_type IN ('article', 'crosscut')),
+    content_id      INTEGER NOT NULL,
+    signal          TEXT NOT NULL CHECK (signal IN ('share_clicked', 'referrer_visit')),
+    referrer_domain TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_listener_share_signals_content
+    ON share_signals(content_type, content_id);
 """
 
 

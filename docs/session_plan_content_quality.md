@@ -259,6 +259,27 @@ redundant. Removed from the spec.
 
 ## Section 5 — Share functionality
 
+### DONE 2026-07-16
+
+Shipped as specced (Web Share + copy-link fallback, no platform
+buttons; OG/Twitter meta tags on article + crosscut pages), plus one
+addition beyond this spec's stated non-goal on analytics: the user
+asked mid-session whether *where* a share landed could be tracked as
+a proxy for *who* shared it. Web Share can't expose the destination
+platform (a hard API limitation, confirmed before building anything),
+so added inbound-referrer logging instead — a `share_signals` table
+in the listener DB (not main DB, for the same sync-wipe reason as
+jobs/users) capturing both a `share_clicked` count and a
+`referrer_visit` platform bucket. See `docs/roadmap.md`'s 2026-07-16
+"Recently completed" entry for full detail, including a real
+pre-existing bug (`piece.article_id` vs `piece.id`) found and fixed
+in `article.html` while touching it for the share button.
+
+Verified against a real local server: fetched real article/crosscut
+pages, confirmed correct meta tag values and share-button markup,
+POSTed a real share event, sent real `Referer` headers and confirmed
+correct platform bucketing and same-origin exclusion.
+
 ### Goal
 
 Listeners can share individual articles + crosscut episodes from

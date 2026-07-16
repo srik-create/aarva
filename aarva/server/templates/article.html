@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 {% block title %}{{ piece.title }} — Aarva{% endblock %}
+{% block meta %}
+  {% set og_url = request.app.state.server_cfg.public_url ~ '/article/' ~ piece.id %}
+  {% set og_description = piece.hook or piece.contextualisation or '' %}
+  {% set og_image = request.app.state.pipeline_cfg.raw.get('output', {}).get('feed_image', '') %}
+  <meta property="og:title" content="{{ piece.title }}" />
+  <meta property="og:description" content="{{ og_description }}" />
+  <meta property="og:url" content="{{ og_url }}" />
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
+  <meta name="twitter:title" content="{{ piece.title }}" />
+  <meta name="twitter:description" content="{{ og_description }}" />
+  {% if og_image %}<meta name="twitter:image" content="{{ og_image }}" />{% endif %}
+{% endblock %}
 {% block content %}
   {# Wrap the article in an expanded card whose colour matches the
      JTBD tile that brought the listener here — so the article page
@@ -28,7 +40,7 @@
     <div class="mt-10" data-player
          data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
          data-track-title="{{ piece.title | title_case }}"
-         data-track-link="/article/{{ piece.article_id }}">
+         data-track-link="/article/{{ piece.id }}">
       <div class="flex items-center gap-5">
         <button type="button"
                 aria-label="Play"
@@ -53,6 +65,13 @@
         </div>
       </div>
     </div>
+
+    {% with share_content_type="article", share_content_id=piece.id,
+       share_url=(request.app.state.server_cfg.public_url ~ "/article/" ~ piece.id),
+       share_title=piece.title,
+       share_text=(piece.hook or piece.contextualisation or "") %}
+      {% include "_share_button.html" %}
+    {% endwith %}
 
     {% if piece.contextualisation %}
       <div class="mt-12">
