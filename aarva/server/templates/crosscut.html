@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 {% block title %}{{ crosscut.topic_label or "Crosscut" }} — Aarva{% endblock %}
+{% block meta %}
+  {% set og_title = (crosscut.topic_label or "Crosscut") | title_case %}
+  {% set og_url = request.app.state.server_cfg.public_url ~ '/crosscut/' ~ crosscut.edition_id %}
+  {% set og_description = crosscut.subhead_hook or "" %}
+  {% set og_image = request.app.state.pipeline_cfg.raw.get('output', {}).get('feed_image', '') %}
+  <meta property="og:title" content="{{ og_title }}" />
+  <meta property="og:description" content="{{ og_description }}" />
+  <meta property="og:url" content="{{ og_url }}" />
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
+  <meta name="twitter:title" content="{{ og_title }}" />
+  <meta name="twitter:description" content="{{ og_description }}" />
+  {% if og_image %}<meta name="twitter:image" content="{{ og_image }}" />{% endif %}
+{% endblock %}
 {% block content %}
   <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
     <p class="text-xs text-peach-dark uppercase tracking-widest font-semibold">Crosscut</p>
@@ -52,6 +65,13 @@
         </div>
       </div>
     </div>
+
+    {% with share_content_type="crosscut", share_content_id=crosscut.edition_id,
+       share_url=(request.app.state.server_cfg.public_url ~ "/crosscut/" ~ crosscut.edition_id),
+       share_title=((crosscut.topic_label or "Crosscut") | title_case),
+       share_text=(crosscut.subhead_hook or "") %}
+      {% include "_share_button.html" %}
+    {% endwith %}
 
     {# ─── The two source articles ─────────────────────────────────── #}
     <div class="mt-12">

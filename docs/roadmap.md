@@ -25,15 +25,15 @@ GitHub Pages.
 
 ## In progress
 
-1. **Content-quality + share + listener-transparency pass.**
+1. **Content-quality + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
-   sections. **Sections 1-3 shipped 2026-07-11.** **Section 4
-   dropped 2026-07-15** — the search prompt is already referenced
-   in the crosscut intro copy via Section 3's wiring, so a
-   separate "asked:" line on `/listener-created` is redundant.
-   **Section 5 (share) is the next active item** — self-contained,
-   spec is complete, just needs Claude Code to pick up. Section 6
-   (outro music) is blocked on an external audio asset.
+   sections. **Sections 1-3 shipped 2026-07-11. Section 4 dropped
+   2026-07-15** — the search prompt is already referenced in the
+   crosscut intro copy via Section 3's wiring, so a separate
+   "asked:" line on `/listener-created` is redundant. **Section 5
+   (share) shipped 2026-07-16** — see "Recently completed". Section 6
+   (outro music) is blocked on an external audio asset — nothing
+   left to do until the asset lands.
 
 4. **Search suggestions — dropdown on focus + no-results fallback.**
    Full spec at `docs/session_plan_search_suggestions.md`. Two
@@ -113,6 +113,56 @@ the sequence.
 Most recent first.
 
 ### 2026-07-16
+
+- **Share functionality (Section 5) + share-analytics proxy.** Full
+  spec at `docs/session_plan_content_quality.md` §5. Listeners can
+  now share individual articles + crosscut episodes from aarva.app,
+  with good link previews everywhere (X, LinkedIn, WhatsApp,
+  iMessage, Slack).
+  - Share button (below the audio player on both `article.html` and
+    `crosscut.html`, via a shared `_share_button.html` partial +
+    `aarva/server/static/share.js`): tries `navigator.share()` first
+    (mobile system share sheet), falls back to
+    `navigator.clipboard.writeText` + a "Copied!" toast. No
+    platform-specific buttons, per spec.
+  - Open Graph + Twitter Card meta tags on both pages (new
+    `{% block meta %}` in `base.html`, populated per-page): title,
+    description (article's `hook` / crosscut's `subhead_hook`),
+    absolute canonical url, the static Aarva cover image, `og:type =
+    "article"` everywhere (the spec's offered simplification).
+  - **User asked mid-session**: since Web Share deliberately never
+    tells the app which destination the listener picked (a hard
+    platform limitation, not a scope choice — the only way to learn
+    the destination is platform-specific share buttons, which the
+    spec explicitly rules out), added a proxy: log the `Referer`
+    header on inbound page views as a `referrer_visit` signal,
+    bucketed to a friendly platform name (X, Facebook, LinkedIn, …)
+    when recognized, or the raw hostname otherwise. Also logs a
+    `share_clicked` signal (no destination info, just a count) when
+    the share button succeeds. Both land in a new `share_signals`
+    table — **in the listener DB, not the main DB**, on the same
+    reasoning as the jobs/users moves: every write here happens from
+    a live Render request, and the main DB is atomic-replaced by
+    every laptop→Render sync.
+  - Known gap, stated upfront rather than discovered: messaging apps
+    (WhatsApp, iMessage) typically strip the referrer entirely, so
+    shares via those surface as ordinary direct visits, not
+    attributed to any platform — referrer-based tracking can only
+    ever see browser-based platforms.
+  - **Found and fixed in passing:** `article.html`'s in-page player
+    remote-control link was referencing `piece.article_id`, a key
+    that's never actually set on the `piece` dict (the route sets
+    `piece.id`) — Jinja silently renders undefined as empty, so the
+    mini-player's "back to article" link has been `/article/` (no id)
+    this whole time. Fixed to `piece.id`, unrelated to Section 5 but
+    caught while touching this exact template.
+  - **Verified for real:** ran a local server and fetched real
+    `/article/<id>` and `/crosscut/<id>` pages — confirmed correct
+    OG/Twitter tag values, confirmed the fixed player link, POSTed to
+    `/api/v1/share-event` and confirmed the row landed in the
+    listener DB, sent real `Referer` headers (`t.co`, `linkedin.com`,
+    same-origin) and confirmed correct bucketing + correct exclusion
+    of internal navigation. Test data cleaned up afterward.
 
 - **Mark divergent-tier candidates in the reviewer CLI.** The
   2026-07-15 divergent-view tier shipped with in-memory bucketing but

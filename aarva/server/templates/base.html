@@ -9,6 +9,17 @@
   <title>{% block title %}Aarva{% endblock %}</title>
   <meta name="description" content="The world as your classroom, the finest journalism as your curriculum. Written by humans. Narrated by AI." />
 
+  {# ─── Open Graph / Twitter Card — share previews (Section 5) ────── #}
+  {# Site-wide defaults here; article.html / crosscut.html override
+     og:title / og:description / og:url / og:image / twitter:* via
+     the `meta` block below with page-specific values. og:type is
+     "article" everywhere per the spec's "simplicity" option — no
+     per-content-type distinction needed. #}
+  <meta property="og:site_name" content="Aarva" />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary_large_image" />
+  {% block meta %}{% endblock %}
+
   {# ─── Typography ─────────────────────────────────────────────────── #}
   {# Fraunces (serif, variable) for headings; Inter (sans) for body.   #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -805,5 +816,8 @@
       }
     })();
   </script>
+
+  {# ─── Share button (Section 5) ──────────────────────────────────── #}
+  <script src="/static/share.js"></script>
 </body>
 </html>

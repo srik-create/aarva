@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse
 from aarva.server.app import app
 from aarva.server.jtbd_meta import card_color_for_jtbd
 from aarva.server.templates import templates
+from aarva.services.share_analytics import log_referrer_visit
 
 
 @app.get("/article/{article_id}", response_class=HTMLResponse)
@@ -78,6 +79,14 @@ async def article_detail(request: Request, article_id: int) -> HTMLResponse:
 
     piece = dict(row)
     card_color = card_color_for_jtbd(piece.get("jtbd_primary"))
+
+    # Share analytics (2026-07-16) — rough proxy for "where this got
+    # shared to" since Web Share doesn't expose the destination
+    # platform. See aarva/services/share_analytics.py.
+    log_referrer_visit(
+        request.app.state.listener_db, "article", int(piece["id"]),
+        request.headers.get("referer", ""), request.url.hostname or "",
+    )
 
     return templates.TemplateResponse(
         request, "article.html",
