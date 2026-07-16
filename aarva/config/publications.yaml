@@ -407,6 +407,15 @@ publications:
     # Bangladesh, Nepal, Sri Lanka, Bhutan. Long-form leaning. Free.
     # WordPress site so /feed/ is the conventional endpoint; probe will
     # confirm.
+    # `country: india` is a pragmatic tag: Himal covers all of South Asia,
+    # not just India, but the accent map only has us/uk/india codes, and
+    # educated South Asian English is close enough across the region that
+    # 'india' is a better fit than the default neutral American. The
+    # author-provenance work in
+    # docs/session_plan_author_provenance_accents.md will make this less
+    # coarse — non-Indian authors from this pub will fall to their own
+    # provenance signal once that ships. Until then, this tag applies.
+    country: india
     rss_url: https://www.himalmag.com/feed/
     homepage: https://www.himalmag.com
     tier: D
