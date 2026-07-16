@@ -35,30 +35,7 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-2. **Author-provenance-based accents (per-article, not per-
-   publication).** Full spec at
-   `docs/session_plan_author_provenance_accents.md`. Today's
-   accent steer is publication-based, which under-covers pubs
-   like The Diplomat (unaffiliated authors from everywhere) and
-   over-simplifies pubs like Himal Southasian (pan-South-Asian
-   authorship). Fix: classify each article's author's current
-   PROVENANCE (not name-based ethnicity) using a small Gemini
-   call that reads byline + body for evidence like "based in
-   Delhi" / "here in London" / bio footers. Cache result on
-   `articles.author_country_code`. TTS precedence becomes:
-   author provenance > publication tag > default. Non-diaspora
-   authors get their regional accent; diaspora authors get their
-   country-of-residence accent; ambiguous/unknown cases fall
-   through cleanly to the existing publication tag (or default).
-   User constraint explicitly rules out name-based inference —
-   Neel Mukherjee (Indian name, UK-based) must get UK, not
-   India. Also: `publications.yaml` gets a `country: india`
-   pragmatic tag on Himal Southasian in the same PR (config-
-   only) as a stopgap improvement for that publication until
-   this ships. Backfill script for existing articles; ~$5 total
-   at $0.001/article LLM call.
-
-3. **OOM-frequency investigation (Section 3 of
+2. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -124,6 +101,77 @@ the sequence.
 Most recent first.
 
 ### 2026-07-16
+
+- **Author-provenance-based TTS accents (per-article, not per-
+  publication).** Full spec at
+  `docs/session_plan_author_provenance_accents.md`. Accent steering
+  is no longer purely publication-based. New Stage 8.5 (`aarva/
+  stages/stage_8c_author_provenance.py`, wired into `daily.py` as
+  `--stage 85` — the numeric CLI only takes ints, so this mirrors the
+  existing "Stage 1.5" → `15` convention) classifies each article's
+  author's CURRENT provenance from byline + body evidence only, never
+  from the name, caching the result on the new `articles.
+  author_country_code` column (`NULL` = not yet classified, distinct
+  from `'unknown'` = classified, no usable evidence — a terminal
+  result, not a retry state). `stage_9_tts.py::_accent_prompt_for`'s
+  precedence is now: known author provenance overrides the
+  publication tag; `unknown`/`NULL` falls through to the publication
+  tag; neither known → no accent steer. Threaded through all three
+  TTS-consumption paths: daily-pipeline pieces (direct column + join),
+  crosscut pieces read from the main DB (join), and crosscut pieces
+  read from the listener DB (denormalized `edition_pieces.
+  author_country_code`, written at build time by `_persist_episode`,
+  same pattern as the existing `article_title`/`article_publication`/
+  `article_byline` columns — see `aarva/listener_db.py`). New
+  `scripts/backfill_author_country.py` for the existing catalog
+  (~8,300 articles as of 2026-07-16; not yet run in full — a 50-
+  article slice was run for verification, see below).
+  - **Spec inaccuracy found:** the spec's file list included `aarva/
+    services/queries.py`, reasoning that TTS-reading queries there
+    would need the new column. In this codebase, accent steering
+    happens once, at TTS-synthesis time (baked into the MP3) — the
+    functions in `queries.py` only serve already-synthesized audio to
+    the web app, so no changes were needed there.
+  - **Real bug found and fixed before shipping:** the spec's draft
+    prompt already forbade inferring provenance from the author's
+    name or from the publication, but didn't cover a third leak —
+    inferring from the article's *topic*. Running the classifier
+    against a real 50-article slice, 20 of 22 `us` classifications
+    had no explicit author-residence evidence at all; the model was
+    reading "US domestic policy topic, published by a US newsroom
+    (ProPublica, local papers)" as implicit evidence the reporter
+    lives in the US. Added an explicit rule against topic/dateline-
+    based inference and re-ran the same slice: all 7 confirmed false
+    positives correctly became `unknown`, while every previously-
+    correct classification (`us`, `uk`, `india`) was preserved.
+  - **Verified for real:** ran the actual classifier against real
+    catalog articles with known bio evidence — Ajay Kamalakaran
+    ("primarily based in Mumbai") → `india`; Henry Wismayer ("a
+    writer based in London") → `uk`; Viola Zhou ("based in New York
+    City", despite a Chinese-heritage name — confirms no name-based
+    shortcut) → `us`; Jay Tilden (explicit Washington D.C. bio) →
+    `us`. Confirmed the classifier distinguishes the *subject* of an
+    article from its *author* — an article naming someone else's
+    home city ("she lives in London", about the profile subject, not
+    the byline) correctly returned `unknown` rather than misattributing
+    it, in two separate real examples. A no-byline article correctly
+    returned `unknown`. Directly unit-tested `_accent_prompt_for`'s
+    five precedence branches (override, unknown-falls-through,
+    NULL-falls-through, neither-known, author-only-signal) against the
+    real function — all passed. Ran `_load_crosscut_edition_for_tts`
+    against a real main-DB crosscut edition (id 85) and confirmed
+    `author_country_code` comes through the join correctly; inserted
+    and cleaned up a synthetic listener-DB row to confirm the
+    denormalized-column branch also works, since no real listener-DB
+    episode existed locally to test against.
+  - **Known minor residual limitation:** one edge case remains where
+    a non-person "channel" byline (e.g. "Aeon Video") narrates a
+    third party's nationality in the text (a documentary synopsis
+    describing "US filmmaker X") — the classifier can still attribute
+    that to the byline. Rare in the catalog; the unknown/publication-
+    tag fallback bounds the damage to a wrong-but-plausible accent on
+    a small slice of non-bylined syndicated content, not a systemic
+    issue. Not fixed further this session — flag if it recurs.
 
 - **Search suggestions — no-results fallback (Feature B).** Full spec
   at `docs/session_plan_search_suggestions.md`. When `/create`

@@ -1,3 +1,25 @@
+**STATUS: DONE (2026-07-16).** Shipped per this spec with a few
+adjustments — see `docs/roadmap.md`'s 2026-07-16 "Recently completed"
+entry for the full writeup. Summary of deviations:
+- Wired as `--stage 85` in `daily.py` (not a literal "8c") since the
+  CLI's `--stage` is `type=int`; mirrors the existing "Stage 1.5" →
+  `15` convention.
+- `aarva/services/queries.py` needed no changes — it only serves
+  already-synthesized audio, not TTS-time accent selection.
+- The draft prompt below under-specified one leak: inferring
+  provenance from the article's *topic* (e.g. US-domestic-policy
+  articles on ProPublica got `us` with no actual author-residence
+  evidence). Fixed in `stage_8c_author_provenance.py`'s prompt with
+  an explicit rule against topic/dateline-based inference; re-verified
+  against the same real articles that had triggered it.
+- One narrow residual edge case not fixed: non-person "channel"
+  bylines (e.g. "Aeon Video") describing a third party's nationality
+  in the body can still get misattributed. Bounded by the unknown/
+  publication-tag fallback; not worth the complexity to close further
+  right now.
+
+---
+
 # Session plan — author-provenance-based accents (per-article, not per-publication)
 
 Written by Cowork for the next Claude Code session (2026-07-16+).

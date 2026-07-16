@@ -84,6 +84,13 @@ CREATE TABLE IF NOT EXISTS edition_pieces (
     article_title       TEXT,
     article_publication TEXT,
     article_byline      TEXT,
+    -- Author-provenance-based TTS accent (2026-07-16) — see
+    -- docs/session_plan_author_provenance_accents.md. Denormalized
+    -- alongside the three columns above for the same reason: no
+    -- articles table in this file to join against. Read by
+    -- stage_crosscut.py::_load_crosscut_edition_for_tts, written by
+    -- _persist_episode.
+    author_country_code  TEXT,
     PRIMARY KEY (edition_id, article_id)
 );
 
@@ -238,6 +245,7 @@ class ListenerDatabase(Database):
             for migration in (
                 "ALTER TABLE editions ADD COLUMN subhead_hook TEXT",
                 "ALTER TABLE editions ADD COLUMN originating_prompt TEXT",
+                "ALTER TABLE edition_pieces ADD COLUMN author_country_code TEXT",
             ):
                 try:
                     conn.execute(migration)
