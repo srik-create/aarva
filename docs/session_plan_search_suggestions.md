@@ -136,6 +136,25 @@ aesthetic. Signals "you can ask across all these registers."
 
 ## Feature B — No-results fallback: near-miss + retry
 
+### DONE 2026-07-16
+
+Shipped, with one real gap this spec's own "what Cowork owes" section
+anticipated and asked to be checked rather than guessed: the proposed
+0.45 near-miss floor. Tested against the real catalog before shipping
+— deliberately nonsensical prompts (keyboard mashing, a bare digit
+string) all scored 0.6+ against unrelated articles, so 0.45 filtered
+nothing in practice. Flagged to the user; chose to reuse
+`DEFAULT_EXISTING_MATCH_FLOOR` (0.65) instead. Re-verified after the
+change: gibberish correctly returns no near-miss, genuine near-misses
+still surface correctly.
+
+See `docs/roadmap.md`'s 2026-07-16 "Recently completed" entry for the
+full verification detail, including why a true end-to-end empty state
+couldn't be cheaply forced through the real route (the proposal LLM
+is more generative than expected — it found plausible pairings even
+for intentionally-absurd prompts) and how the empty-state template
+was verified directly instead.
+
 ### Goal
 
 Currently the empty state on `/create?q=…` when nothing matches

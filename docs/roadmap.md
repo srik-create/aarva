@@ -35,16 +35,7 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-2. **Search suggestions — no-results fallback.** Full spec at
-   `docs/session_plan_search_suggestions.md` Feature B (Feature A,
-   the focus dropdown, shipped 2026-07-16 — see "Recently
-   completed"). When `/create` returns no candidates, fallback
-   shows (a) a semantic near-miss link if any catalog entry hits at
-   ≥0.45 similarity, and (b) the same 6 example prompts (now a
-   shared constant, `aarva/services/prompt_suggestions.py`) as
-   clickable chips. Static-cost, no LLM calls.
-
-3. **OOM-frequency investigation (Section 3 of
+2. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -110,6 +101,49 @@ the sequence.
 Most recent first.
 
 ### 2026-07-16
+
+- **Search suggestions — no-results fallback (Feature B).** Full spec
+  at `docs/session_plan_search_suggestions.md`. When `/create`
+  returns zero candidates, the empty state now shows (a) a semantic
+  near-miss link — "the closest thing we have to what you asked" —
+  when any existing crosscut or standalone article clears the
+  similarity floor, and (b) the same 6 example prompts from Feature A
+  (shared constant, no duplication) as clickable chips that submit
+  directly (`/create?q=...`), unlike Feature A's pre-fill-only
+  behavior. New `find_near_miss()` + `NearMiss` in
+  `aarva/services/episode_candidates.py`; wired into
+  `create.py::api_candidates` (only called when the normal flow
+  returns nothing); `_candidates_fragment.html`'s empty-state block
+  rewritten to render both.
+  - **Spec's proposed floor (0.45) tested against the real catalog
+    and found broken before shipping:** several deliberately
+    nonsensical prompts (`asdf jkl qwerty zxcv`, a bare digit string,
+    random letter/number spelling) all scored 0.6+ against completely
+    unrelated articles — the floor didn't filter anything in
+    practice, so the near-miss section would have shown on nearly
+    every no-results page, often pointing at something unrelated.
+    Flagged to the user rather than shipping as specced; chose to
+    reuse `DEFAULT_EXISTING_MATCH_FLOOR` (0.65, the same bar the
+    primary existing-match tier already trusts) instead of a separate
+    relaxed floor. Re-verified with the same gibberish prompts after
+    the change — all now correctly return no near-miss — while a
+    genuine near-miss ("the new left in american politics" → two
+    real, on-topic articles at 0.66) still surfaces correctly.
+  - **Verified for real:** `find_near_miss()` tested directly against
+    the real DB for both the false-positive gibberish cases (now
+    correctly empty) and true positives (both an article match and,
+    separately, forcing a crosscut-path hit using near-verbatim text
+    from a real crosscut's own intro). Confirmed the LLM proposal
+    step is too generative to naturally produce a true empty state
+    for adversarial test prompts (it found plausible-sounding
+    pairings even for "the letter q the letter z the number 8"), so
+    rather than burn repeated real API calls hunting for one, verified
+    the empty-state template directly: rendered
+    `_candidates_fragment.html` with real `NearMiss` data via the
+    actual Jinja environment, confirming both the "near-miss present"
+    and "near-miss absent, chips only" branches render correctly,
+    including correct URL-encoding of the trickiest example (the
+    em-dash + apostrophe one) in the chip links.
 
 - **Search suggestions — focus dropdown (Feature A).** Full spec at
   `docs/session_plan_search_suggestions.md`. Focusing the header
