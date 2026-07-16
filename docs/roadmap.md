@@ -27,14 +27,25 @@ GitHub Pages.
 
 1. **Content-quality + share + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
-   sections; five are ready to implement, one (outro music) is
-   blocked on an external audio asset. **Sections 1-3 shipped
-   2026-07-11** — see "Recently completed" below. All 30 existing
-   crosscuts now have `subhead_hook` backfilled (ran on the laptop;
-   goes live on the next daily-pipeline sync). Next up: Section 4
-   (show search prompt on `/listener-created`, small, depends on
-   Section 3's `originating_prompt` column) or Section 5 (share
-   functionality, self-contained).
+   sections. **Sections 1-3 shipped 2026-07-11.** **Section 4
+   dropped 2026-07-15** — the search prompt is already referenced
+   in the crosscut intro copy via Section 3's wiring, so a
+   separate "asked:" line on `/listener-created` is redundant.
+   **Section 5 (share) is the next active item** — self-contained,
+   spec is complete, just needs Claude Code to pick up. Section 6
+   (outro music) is blocked on an external audio asset.
+
+4. **Search suggestions — dropdown on focus + no-results fallback.**
+   Full spec at `docs/session_plan_search_suggestions.md`. Two
+   related enhancements to the header prompt input. Feature A:
+   on focus into an empty prompt, show a dropdown of 6 example
+   prompts spanning different registers (topic, feeling,
+   juxtaposition, question, opinion, vibe) — clicking pre-fills
+   the input. Feature B: when `/create` returns no candidates,
+   fallback shows (a) a semantic near-miss link if any catalog
+   entry hits at ≥0.45 similarity, and (b) the same 6 example
+   prompts as clickable chips. Both static-cost, no LLM calls.
+   Independent of Section 5.
 
 2. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
