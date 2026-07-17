@@ -50,6 +50,7 @@ if __package__ is None or __package__ == "":
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
+from aarva.services.review_reasons import REJECTION_REASONS
 
 
 from aarva.cli_utils import BOLD, DIM, RED, GREEN, YELLOW, BLUE  # noqa: F401
@@ -334,6 +335,56 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
     return decisions
 
 
+def _prompt_reject_reasons(
+    pieces: list[ProposedPiece], decisions: dict,
+) -> dict[int, tuple[str, Optional[str]]]:
+    """Ask the reviewer WHY for each piece marked 'r' this round.
+
+    Reviewer feedback learning loop, Phase 1 (docs/session_plan_
+    reviewer_learning_loop.md). Returns {piece_index: (reason_code,
+    reason_note_or_None)}. Called once, after decisions are parsed and
+    before the final confirm — so a reject typed as part of a batch
+    line (e.g. '1a 2r 3s') still gets its reason captured immediately,
+    matching the existing single-confirm flow rather than fragmenting
+    it per piece."""
+    reasons: dict[int, tuple[str, Optional[str]]] = {}
+    piece_by_index = {p.index: p for p in pieces}
+    rejected_indices = [
+        idx for idx, (action, _bias) in decisions["piece_actions"].items()
+        if action == "r"
+    ]
+    if not rejected_indices:
+        return reasons
+
+    print()
+    print(BOLD("Why were these rejected?"))
+    menu = "  ".join(
+        f"{i}={code}" for i, (code, _label) in enumerate(REJECTION_REASONS, start=1)
+    )
+    print(DIM(f"  {menu}"))
+
+    for idx in rejected_indices:
+        piece = piece_by_index.get(idx)
+        title = piece.title if piece else f"piece {idx}"
+        while True:
+            raw = input(BOLD(f"  [{idx}] {title[:60]} — reason (1-{len(REJECTION_REASONS)}): ")).strip()
+            try:
+                choice = int(raw)
+                if not (1 <= choice <= len(REJECTION_REASONS)):
+                    raise ValueError
+            except ValueError:
+                print(RED(f"    Enter a number 1-{len(REJECTION_REASONS)}."))
+                continue
+            code, _label = REJECTION_REASONS[choice - 1]
+            note = None
+            if code == "other":
+                note = input(BOLD("    Note: ")).strip() or None
+            reasons[idx] = (code, note)
+            break
+
+    return reasons
+
+
 def _apply_decisions(
     db: Database,
     edition_id: int,
@@ -345,9 +396,11 @@ def _apply_decisions(
     Side effects:
       - Pieces marked 'a' → review_status = 'approved'
       - Pieces marked 'r' → deleted from edition_pieces, added to
-        edition_rejections, article status reset to 'scored'.
-        If the action carries a length bias, the slot's bias is
-        persisted on editions.slot_biases so Stage 7's refill respects it.
+        edition_rejections (with reason/reason_note from decisions
+        ['reject_reasons'] if present — see _prompt_reject_reasons),
+        article status reset to 'scored'. If the action carries a
+        length bias, the slot's bias is persisted on
+        editions.slot_biases so Stage 7's refill respects it.
       - Pieces marked 'd' → deleted from edition_pieces AND the slot
         name is added to editions.dropped_slots so Stage 7 won't refill it.
       - Slots in decisions['add_slots'] are appended to
@@ -384,10 +437,14 @@ def _apply_decisions(
 
             elif action == "r":
                 # Reject + maybe set length bias for the slot.
+                reason, reason_note = decisions.get("reject_reasons", {}).get(
+                    piece.index, (None, None),
+                )
                 conn.execute(
                     "INSERT OR IGNORE INTO edition_rejections "
-                    "(edition_id, article_id, slot_at_rejection) VALUES (?, ?, ?)",
-                    (edition_id, piece.article_id, piece.slot),
+                    "(edition_id, article_id, slot_at_rejection, reason, reason_note) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    (edition_id, piece.article_id, piece.slot, reason, reason_note),
                 )
                 conn.execute(
                     "DELETE FROM edition_pieces "
@@ -510,6 +567,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             except ValueError as e:
                 print(RED(f"  Couldn't parse that: {e}"))
                 print(DIM("  Try again, or Ctrl-C to cancel."))
+        decisions["reject_reasons"] = _prompt_reject_reasons(pieces, decisions)
 
     # Confirm before writing. Group actions by type for a readable summary.
     actions = decisions["piece_actions"]

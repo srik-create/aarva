@@ -184,6 +184,13 @@ CREATE TABLE IF NOT EXISTS edition_rejections (
     article_id          INTEGER NOT NULL REFERENCES articles(id),
     slot_at_rejection   TEXT,   -- which slot the piece was filling when rejected
     rejected_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Reviewer feedback learning loop, Phase 1 (2026-07-17) — see
+    -- docs/session_plan_reviewer_learning_loop.md. reason: one of the
+    -- codes in aarva/services/review_reasons.py, NULL for legacy rows
+    -- (no retroactive backfill by design). reason_note: optional free
+    -- text, populated when reason='other'.
+    reason               TEXT,
+    reason_note          TEXT,
     PRIMARY KEY (edition_id, article_id)
 );
 
@@ -420,6 +427,10 @@ class Database:
                 # Author-provenance-based TTS accent (2026-07-16) — see
                 # docs/session_plan_author_provenance_accents.md.
                 "ALTER TABLE articles ADD COLUMN author_country_code TEXT",
+                # Reviewer feedback learning loop, Phase 1 (2026-07-17) —
+                # see docs/session_plan_reviewer_learning_loop.md.
+                "ALTER TABLE edition_rejections ADD COLUMN reason TEXT",
+                "ALTER TABLE edition_rejections ADD COLUMN reason_note TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:
