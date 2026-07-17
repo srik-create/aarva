@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-16
+**Last updated:** 2026-07-17
 
 ---
 
@@ -35,7 +35,7 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-3. **Reviewer feedback learning loop.** Full spec at
+2. **Reviewer feedback learning loop.** Full spec at
    `docs/session_plan_reviewer_learning_loop.md`. Turn the
    approve/reject signal into a learning system that PROPOSES
    (never auto-enables) new filter rules over time. Three phases:
@@ -53,7 +53,7 @@ GitHub Pages.
    accumulate; Phase 3 is a rolling stream of small enablement
    PRs going forward.
 
-4. **OOM-frequency investigation (Section 3 of
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
