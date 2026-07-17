@@ -1,3 +1,14 @@
+**STATUS: Phase 1 DONE (2026-07-17).** See `docs/roadmap.md`'s
+2026-07-17 "Recently completed" entry for the full writeup. One
+adaptation: the spec assumed a per-piece interactive prompt; the
+actual review CLI takes one batch command line, so the reason prompt
+runs once per rejected piece right after that line parses, before the
+existing single confirm — not fragmenting the CLI's existing UX.
+Phase 2 and Phase 3 are still open, per this doc's own sequencing
+(Phase 2 needs 2-3 weeks of Phase 1 data first).
+
+---
+
 # Session plan — reviewer feedback learning loop
 
 Written by Cowork for the next Claude Code session (2026-07-16+).

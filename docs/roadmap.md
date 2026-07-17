@@ -48,10 +48,11 @@ GitHub Pages.
    PRs — structural filters go into Stage 2 (transcripts,
    listicles, video-dependent), qualitative go into per-reason
    taste centroids that extend Stage 7's existing scoring. Not
-   autonomous — every filter is human-in-the-loop. Phase 1
-   ships immediately; Phase 2 waits 2-3 weeks for data to
-   accumulate; Phase 3 is a rolling stream of small enablement
-   PRs going forward.
+   autonomous — every filter is human-in-the-loop. **Phase 1
+   shipped 2026-07-17** — see "Recently completed". Phase 2 waits
+   2-3 weeks for Phase 1 data to accumulate before it's worth
+   running; Phase 3 is a rolling stream of small enablement PRs
+   after that.
 
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
@@ -119,6 +120,39 @@ the sequence.
 Most recent first.
 
 ### 2026-07-17
+
+- **Reviewer feedback learning loop — Phase 1 (rejection reason
+  capture).** Full spec at
+  `docs/session_plan_reviewer_learning_loop.md`. Rejecting a piece in
+  `python -m aarva.review` now prompts for WHY — a numbered menu of
+  seven codes (too_long, too_short, wrong_tone, transcript,
+  video_dependent, listicle, other+free-text note) — captured on new
+  `edition_rejections.reason` / `reason_note` columns (both nullable;
+  legacy rows stay `NULL` by design, no retroactive backfill). New
+  `aarva/services/review_reasons.py` holds the reason list as data
+  (add a reason later = one line, no DB enum). Phase 2 (periodic LLM
+  pattern-analysis → proposed filter rules) waits 2-3 weeks for real
+  rejection data to accumulate; Phase 3 (enabling proposed filters,
+  one small PR each) follows after that.
+  - **Spec-vs-reality adaptation:** the spec assumed the review CLI
+    prompts per-piece interactively. The actual CLI takes one batch
+    command line for all pieces at once (e.g. `1a 2r 3s`), parsed by
+    `_parse_decisions`. Adapted by prompting for reasons for every
+    rejected piece right after that line parses (in
+    `_prompt_reject_reasons`), before the existing single final
+    "Proceed? [Y/n]" confirm — preserves the existing one-line batch
+    UX instead of fragmenting confirmation per piece.
+  - **Verified for real:** ran the actual `python -m aarva.review` CLI
+    (via piped stdin) against a disposable copy of the real DB (never
+    against the live proposed pieces) with a synthetic test edition.
+    Confirmed: a standard reason code (listicle) persists correctly
+    with `reason_note=NULL`; the `other` code persists the typed
+    free-text note; invalid input (non-numeric, out-of-range) reprompts
+    without corrupting state; approve + reject in the same batch line
+    both land correctly; the migration adds both columns cleanly to
+    the real DB with 0 downstream breakage (grepped every existing
+    `edition_rejections` consumer — all key on `article_id`, none
+    touch the new columns).
 
 - **BUG (small) fixed — iPhone: prompt-input placeholder truncated.**
   On narrow iPhone widths, the header prompt input's placeholder
