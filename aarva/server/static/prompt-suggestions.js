@@ -13,6 +13,23 @@
       var dropdown = wrapper.querySelector('[data-prompt-suggestions]');
       if (!input || !dropdown) return;
 
+      // Narrow-iPhone placeholder truncation fix (2026-07-17) — the
+      // Create button squeezes the input enough that the full
+      // placeholder clips to "…anythin". Swap to a shorter variant
+      // below Tailwind's `sm` breakpoint (640px); CSS alone can't
+      // change placeholder text, so this needs the JS. The full
+      // string stays as the HTML attribute default so anything
+      // rendered before this runs (or without JS) still shows sane
+      // text.
+      var FULL_PLACEHOLDER = input.placeholder;
+      var SHORT_PLACEHOLDER = 'Create an episode…';
+      var narrowQuery = window.matchMedia('(max-width: 639px)');
+      function updatePlaceholder() {
+        input.placeholder = narrowQuery.matches ? SHORT_PLACEHOLDER : FULL_PLACEHOLDER;
+      }
+      updatePlaceholder();
+      narrowQuery.addEventListener('change', updatePlaceholder);
+
       function show() {
         if (input.value.trim() === '') dropdown.hidden = false;
       }
