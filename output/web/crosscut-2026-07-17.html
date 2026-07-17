@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Friday, 17 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-17</div>
+      <div class="edition-meta">2 pieces · Crosscut · Friday, 17 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · escaping social limits</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-17/crosscut_0087.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>15 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A blind girl sells flowers on the streets of 19th-century Bengal, her life boxed in by rules she didn&#x27;t make. Writing earlier this month, Paulami Sengupta looks back at the novel Rajani, where the only way out for a girl like her was a lucky twist of birth. Something interesting emerges when that fictional escape hatch meets a report from yesterday about kids in Assam. These students aren&#x27;t waiting for a secret inheritance. They’re children of laborers, sitting in classrooms and aiming for seats in government. It’s worth pausing on how fiction solves poverty versus how real people fight it. One relies on a miracle of bloodline; the other bets on the hard work of a school desk.</p>
+        <article class='piece'>
+<p class='hook'>Writing earlier this month, Paulami Sengupta looks back at a 19th-century Bengali novel about a blind girl selling flowers in Kolkata. While the story is full of romantic metaphors about lotuses, the social walls of caste are much harder to break. Notice how Sengupta describes Rajani’s physical defiance—specifically the moment she hurls a broken staff at a man trying to force her into marriage. It shows a character acting with her own fierce will.</p>
+<h2 class='title'>‘Rajani’: How Bankim Chandra Chattopadhyay addressed caste, class, and desire in the 19th century</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Paulami Sengupta</span></p>
+<p class='source'><a href='https://scroll.in/article/1093821/rajani-how-bankim-chandra-chattopadhyay-addressed-caste-class-and-desire-in-the-19th-century?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Sengupta shows how Chattopadhyay’s Rajani is trapped by her &quot;low-born&quot; status until the plot provides a convenient way out. It’s a nineteenth-century literary solution: the blind flower girl eventually gets to trade her basket for a mansion because she turns out to be a gentleman’s daughter after all. The novel fixes the social friction by rewriting the girl’s history. But look at the children in the next report from modern Assam. For twelve-year-old Nishanta Rabha, there’s no secret lineage waiting to be discovered. His father is a daily wager, and his reality is shaped by the search for work to help his family survive.
+
+The interesting thing is that while the old novel uses high-caste blood to grant its heroine a seat at the table, these students are looking at a classroom chair as the tool to build their own. They aren&#x27;t dreaming of being rescued by a plot twist; they want to become the ones doing the rescuing—as teachers or local leaders. Where Chattopadhyay’s world requires a miracle of birth to solve poverty, the report from Goalpara suggests the only way out is through the &quot;will&quot; Nishanta mentions. It’s a shift from a story about who you were born as to a story about what you can learn to become.</p>
+        <article class='piece'>
+
+<h2 class='title'>Assam’s out-of-school children dream of becoming MLAs, teachers</h2>
+<p class='byline'><span class='publication'>The Hindu</span></p>
+<p class='source'><a href='https://www.thehindu.com/news/national/assam/assams-out-of-school-children-dream-of-becoming-mlas-teachers/article71228928.ece' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A blind girl selling flowers in an old Bengali novel finds escape when a secret about her birth comes to light at the very end. That’s a tidy ending. In the real classrooms of Assam, students are building their own exits with a pen and a notebook. Fiction fixes a life with a single lucky stroke. Real change moves at the slow speed of a lesson plan. What lingers is this: if a person&#x27;s worth isn&#x27;t decided by their father&#x27;s name anymore, who gets to decide when the work is finally enough?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
