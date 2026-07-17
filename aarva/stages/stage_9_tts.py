@@ -186,7 +186,7 @@ def _load_edition_pieces(
             SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
                    ep.hook, ep.contextualisation,
                    ep.audio_url AS existing_audio_url,
-                   a.title, a.full_text, a.byline,
+                   a.title, a.full_text, a.byline, a.author_country_code,
                    p.name AS publication_name
               FROM edition_pieces ep
               JOIN articles a ON a.id = ep.article_id
@@ -266,8 +266,23 @@ def _build_publication_country_map() -> dict[str, str]:
 
 
 def _accent_prompt_for(piece: dict, country_map: dict[str, str]) -> str | None:
-    """Look up the per-piece accent steer for this piece, or None if the
-    piece's publication has no country tag."""
+    """Look up the per-piece accent steer for this piece.
+
+    Precedence (2026-07-16 — docs/session_plan_author_provenance_
+    accents.md): author provenance strictly overrides the publication
+    tag. Publication-based steering under-covers publications with
+    unaffiliated global authors (The Diplomat) and over-covers pan-
+    regional ones (Himal Southasian) — the real signal is where the
+    AUTHOR currently lives/works, classified by Stage 8c and cached on
+    articles.author_country_code. Falls through to the publication tag
+    when provenance is NULL (not yet classified) or 'unknown'
+    (classified, no usable evidence) — both cases mean "we don't know
+    the author", so the publication tag is the best remaining signal.
+    None (no accent steer) when neither is available."""
+    author_cc = (piece.get("author_country_code") or "").strip().lower()
+    if author_cc in _COUNTRY_TO_ACCENT_PROMPT:
+        return _COUNTRY_TO_ACCENT_PROMPT[author_cc]
+
     pub_name = (piece.get("publication_name") or "").strip()
     if not pub_name:
         return None

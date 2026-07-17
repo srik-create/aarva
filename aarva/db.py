@@ -33,7 +33,14 @@ CREATE TABLE IF NOT EXISTS articles (
         CHECK (status IN ('ingested', 'filtered_out', 'scored', 'in_basket',
                           'in_edition', 'extraction_failed')),
     embedding       BLOB,      -- float32 numpy bytes, L2-normalised
-    embedding_model TEXT       -- name of the model used (for invalidation on swap)
+    embedding_model TEXT,      -- name of the model used (for invalidation on swap)
+    -- Author-provenance-based TTS accent (2026-07-16) — see
+    -- docs/session_plan_author_provenance_accents.md and
+    -- aarva/stages/stage_8c_author_provenance.py. NULL = not yet
+    -- classified; 'unknown' = classified but no usable evidence
+    -- (a terminal result, not a retry state) — these are deliberately
+    -- distinct. Never inferred from the author's name alone.
+    author_country_code TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
 CREATE INDEX IF NOT EXISTS idx_articles_publication ON articles(publication_id);
@@ -410,6 +417,9 @@ class Database:
                 # §2 and the roadmap's "mark divergent-tier candidates
                 # in the reviewer CLI" item.
                 "ALTER TABLE crosscut_pair_candidates ADD COLUMN stance TEXT",
+                # Author-provenance-based TTS accent (2026-07-16) — see
+                # docs/session_plan_author_provenance_accents.md.
+                "ALTER TABLE articles ADD COLUMN author_country_code TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:

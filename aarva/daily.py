@@ -25,7 +25,8 @@ from aarva.db import Database
 from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
-    stage_7_assemble, stage_8_hook_context, stage_9_tts, stage_crosscut,
+    stage_7_assemble, stage_8_hook_context, stage_8c_author_provenance,
+    stage_9_tts, stage_crosscut,
 )
 
 
@@ -296,16 +297,18 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                 "`python -m aarva.daily --crosscut-build`\n"
                 "  5. Daily hooks/contexts/show-notes:   "
                 "`python -m aarva.daily --stage 8`\n"
-                "  6. Daily TTS:                         "
+                "  6. Author-provenance classification:  "
+                "`python -m aarva.daily --stage 85`\n"
+                "  7. Daily TTS:                         "
                 "`python -m aarva.daily --stage 9`\n"
-                "  7. Crosscut TTS:                      "
+                "  8. Crosscut TTS:                      "
                 "`python -m aarva.daily --crosscut-tts`\n"
-                "  8. Render HTML + RSS:                 "
+                "  9. Render HTML + RSS:                 "
                 "`python -m aarva.daily --stage 10`\n"
-                "  9. Deploy to gh-pages:                "
+                "  10. Deploy to gh-pages:               "
                 "`bash scripts/publish.sh`\n"
                 "\n"
-                "(Skip steps 2–4 + 7 on days without a crosscut.)"
+                "(Skip steps 2–4 + 8 on days without a crosscut.)"
             )
             return
 
@@ -326,6 +329,28 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
             log.exception("Stage 8 failed")
+            sys.exit(1)
+
+    # Stage 8.5 — Author-provenance classification (feeds Stage 9's
+    # accent steering — see docs/session_plan_author_provenance_accents.md).
+    # Numbered 85 to mirror the existing "Stage 1.5" -> 15 convention,
+    # since --stage is an int and "8c" doesn't map cleanly.
+    if stage is None or stage == 85:
+        log.info("Stage 8.5 — Author-provenance classification starting")
+        run_id = db.start_run("stage_8c_author_provenance")
+        try:
+            s85stats = stage_8c_author_provenance.classify_pending_articles(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 8.5 done — %d candidates, %d classified "
+                "(us=%d uk=%d india=%d unknown=%d), %d errors",
+                s85stats.candidates, s85stats.classified,
+                s85stats.us, s85stats.uk, s85stats.india, s85stats.unknown,
+                s85stats.errors,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 8.5 failed")
             sys.exit(1)
 
     # Stage 9 — TTS audio synthesis
@@ -458,7 +483,7 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             log.exception("Stage 10 failed")
             sys.exit(1)
 
-    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8, 9, 10):
+    if stage is not None and stage not in (1, 15, 2, 4, 456, 7, 8, 85, 9, 10):
         log.warning("Stage %d is not yet implemented (Day %d work).",
                     stage, _stage_to_day(stage))
         sys.exit(2)

@@ -1014,10 +1014,12 @@ def _selected_candidate(db: Database, today: date) -> Optional[dict]:
                    a.title AS title_a, a.full_text AS full_text_a, a.byline AS byline_a,
                    a.word_count AS wc_a,
                    a.published_date AS published_date_a,
+                   a.author_country_code AS author_country_code_a,
                    pa.name AS pub_a,
                    b.title AS title_b, b.full_text AS full_text_b, b.byline AS byline_b,
                    b.word_count AS wc_b,
                    b.published_date AS published_date_b,
+                   b.author_country_code AS author_country_code_b,
                    pb.name AS pub_b,
                    sa.fingerprint_json AS fp_a,
                    sb.fingerprint_json AS fp_b
@@ -1085,9 +1087,12 @@ def _persist_episode(
     target_db: when set (the on-demand /create flow), the editions +
     edition_pieces rows are written here instead of `db` — see
     aarva/listener_db.py. That file has no `articles` table, so
-    edition_pieces also gets the article title/publication/byline
-    denormalized from `cand` (already joined from the main DB by
-    `_selected_candidate`) instead of relying on a join. `articles`
+    edition_pieces also gets the article title/publication/byline/
+    author_country_code denormalized from `cand` (already joined from
+    the main DB by `_selected_candidate`) instead of relying on a
+    join — author_country_code feeds the accent-steer precedence in
+    stage_9_tts.py::_accent_prompt_for (2026-07-16 — see
+    docs/session_plan_author_provenance_accents.md). `articles`
     status updates always go against `db` (the main DB) regardless,
     since `articles` never moves — and the candidate-link update is
     skipped for target_db writes, since crosscut_pair_candidates.edition_id
@@ -1120,18 +1125,22 @@ def _persist_episode(
                 INSERT INTO edition_pieces
                     (edition_id, article_id, slot, position,
                      bridge_text, show_notes, review_status,
-                     article_title, article_publication, article_byline)
-                VALUES (?, ?, 'crosscut_piece_a', 0, ?, ?, 'proposed', ?, ?, ?)
+                     article_title, article_publication, article_byline,
+                     author_country_code)
+                VALUES (?, ?, 'crosscut_piece_a', 0, ?, ?, 'proposed', ?, ?, ?, ?)
             """, (edition_id, int(cand["article_a_id"]), bridge_a, passage_a,
-                  cand.get("title_a"), cand.get("pub_a"), cand.get("byline_a")))
+                  cand.get("title_a"), cand.get("pub_a"), cand.get("byline_a"),
+                  cand.get("author_country_code_a")))
             conn.execute("""
                 INSERT INTO edition_pieces
                     (edition_id, article_id, slot, position,
                      bridge_text, show_notes, review_status,
-                     article_title, article_publication, article_byline)
-                VALUES (?, ?, 'crosscut_piece_b', 1, ?, ?, 'proposed', ?, ?, ?)
+                     article_title, article_publication, article_byline,
+                     author_country_code)
+                VALUES (?, ?, 'crosscut_piece_b', 1, ?, ?, 'proposed', ?, ?, ?, ?)
             """, (edition_id, int(cand["article_b_id"]), bridge_between, passage_b,
-                  cand.get("title_b"), cand.get("pub_b"), cand.get("byline_b")))
+                  cand.get("title_b"), cand.get("pub_b"), cand.get("byline_b"),
+                  cand.get("author_country_code_b")))
         else:
             conn.execute("""
                 INSERT INTO edition_pieces
@@ -1678,14 +1687,15 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
     texts. Returns a dict suitable for the TTS assembly, or None if
     the edition isn't a built crosscut.
 
-    Also resolves each piece's source publication_name, for the
-    region-specific accent steer (2026-07-15 — docs/session_plan_
-    users_and_crosscut_upgrades.md §3). The two DBs this runs against
-    carry it differently: the listener DB denormalizes it onto
-    edition_pieces.article_publication (no articles table there — see
-    aarva/listener_db.py); the main DB doesn't carry it on
-    edition_pieces at all, so this joins articles/publications
-    directly there instead."""
+    Also resolves each piece's source publication_name (2026-07-15 —
+    docs/session_plan_users_and_crosscut_upgrades.md §3) and
+    author_country_code (2026-07-16 — docs/session_plan_author_
+    provenance_accents.md), both needed by stage_9_tts.py's
+    _accent_prompt_for. The two DBs this runs against carry them
+    differently: the listener DB denormalizes both onto edition_pieces
+    (no articles table there — see aarva/listener_db.py); the main DB
+    doesn't carry either on edition_pieces at all, so this joins
+    articles/publications directly there instead."""
     from aarva.listener_db import ListenerDatabase
     is_listener = isinstance(db, ListenerDatabase)
     with db.connect() as conn:
@@ -1702,7 +1712,8 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
             pieces = conn.execute("""
                 SELECT ep.article_id, ep.position, ep.slot,
                        ep.bridge_text, ep.show_notes AS passage,
-                       ep.article_publication AS publication_name
+                       ep.article_publication AS publication_name,
+                       ep.author_country_code
                   FROM edition_pieces ep
                  WHERE ep.edition_id = ?
                  ORDER BY ep.position
@@ -1711,7 +1722,8 @@ def _load_crosscut_edition_for_tts(db: Database, edition_id: int) -> Optional[di
             pieces = conn.execute("""
                 SELECT ep.article_id, ep.position, ep.slot,
                        ep.bridge_text, ep.show_notes AS passage,
-                       p.name AS publication_name
+                       p.name AS publication_name,
+                       a.author_country_code
                   FROM edition_pieces ep
                   JOIN articles a ON a.id = ep.article_id
                   JOIN publications p ON p.id = a.publication_id
