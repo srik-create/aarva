@@ -7,7 +7,7 @@ Source of truth for orientation. Read this at the start of any session
 - `docs/roadmap.md` — what's next, what's deferred, recent commits
 - `docs/aarva_architecture_v1.md` — deep technical reference (schema, stages)
 
-**Last updated:** 2026-06-30
+**Last updated:** 2026-07-17
 
 ---
 
@@ -180,6 +180,12 @@ future-us knows whether to revisit.
 | 2026-06-26 | Domain: `aarva.app` (registered, Cloudflare DNS) | Owned by user; clean | Standard DNS |
 | 2026-06-26 | Tailwind via CDN (no build step) | Phase-1 simplicity | Migrate to a Tailwind build later if needed |
 
+### Process / AI-agent workflow
+
+| When | Decision | Rationale | Reversible? |
+|---|---|---|---|
+| 2026-07-17 | **Claude Code git protocol carve-out (AGENTS.md rule 20a).** Claude Code commits, pushes, and opens PRs directly (including a `Co-Authored-By: Claude Sonnet 5` trailer) — the conversation itself is the sign-off, not a separate "say commit"/"say push" gate. An explicit "merge it" is still required before merging. Cowork continues to follow rule 20 (sign-off gates) and rule 22 (no AI attribution) exactly as written. | Matches how Claude Code has actually operated on this repo all along; the user confirmed keeping it rather than retrofitting the stricter Cowork-oriented protocol onto Claude Code sessions. | Yes — revert rule 20a in AGENTS.md to fold Claude Code back under rule 20/22 |
+
 ---
 
 ## Open questions / things to revisit
@@ -232,7 +238,10 @@ as defaults unless overridden:
 - **Track time-sensitive items.** The user values seeing deferred
   work surfaced when adjacent work begins.
 - **Cleanliness of commit history.** One-concept-per-commit (rule
-  21), explicit sign-off (rule 20), branch+PR for anything non-trivial.
+  21), branch+PR for anything non-trivial. Explicit sign-off (rule 20)
+  applies to Cowork; Claude Code follows its own carve-out (rule 20a)
+  — commit+push+PR directly, conversation is the sign-off, explicit
+  "merge it" before merging.
 
 ---
 

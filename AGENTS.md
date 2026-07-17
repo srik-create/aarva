@@ -310,6 +310,19 @@ Last updated: 2026-06-29
     The principle: every commit boundary is a real checkpoint, not a
     routine save.
 
+20a. **Claude Code sessions follow a different protocol from rule 20
+    and rule 22's no-attribution clause — Cowork continues to follow
+    both exactly as written.** Confirmed with the user 2026-07-17.
+    For Claude Code specifically: after implementing and verifying a
+    change, commit directly (including a `Co-Authored-By: Claude
+    Sonnet 5 <noreply@anthropic.com>` trailer), push the branch, and
+    open the PR — no separate "say commit" / "say push" gate. The
+    conversation itself is the sign-off (the user asked for the work,
+    confirmed the approach, and reviews the PR); the user gives an
+    explicit "merge it" before Claude Code merges. This is a
+    deliberate carve-out for Claude Code's existing working style on
+    this repo, not an error to be corrected back to rule 20/22.
+
 21. **One concept per commit.** Don't bundle a refactor with a bug
     fix with a new feature — even if they were done in the same
     session. Future bisects, reverts, and code review all get
