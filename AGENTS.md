@@ -39,6 +39,16 @@ Last updated: 2026-06-29
    - Adding/removing publications from the allowlist
    - Changing prompt definitions in ways that change outputs
    - Migration choices that affect existing data
+   - **Any change to listener-facing copy — including placeholders,
+     button labels, empty-state text, headings, hooks, contextualisation,
+     narrator introductions, or descriptions displayed anywhere on
+     aarva.app or in the RSS feed.** Even if the change is framed as a
+     technical fix (e.g., truncating a placeholder to solve a mobile
+     overflow bug), any modification to what a listener sees or hears
+     counts as an editorial decision and needs explicit user sign-off.
+     Bit us 2026-07-16 when the iPhone placeholder truncation dropped
+     "on anything" from "create an episode on anything" and shipped
+     before the user saw the wording change.
 
    Examples that DON'T need pre-approval:
    - Fixing a typo
