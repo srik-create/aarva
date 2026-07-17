@@ -123,9 +123,17 @@ Most recent first.
   author_country_code`, written at build time by `_persist_episode`,
   same pattern as the existing `article_title`/`article_publication`/
   `article_byline` columns — see `aarva/listener_db.py`). New
-  `scripts/backfill_author_country.py` for the existing catalog
-  (~8,300 articles as of 2026-07-16; not yet run in full — a 50-
-  article slice was run for verification, see below).
+  `scripts/backfill_author_country.py` for the existing catalog — run
+  in full 2026-07-17: 8,238/8,238 classified, 0 errors (971 us / 50 uk
+  / 106 india / 7,156 unknown; 69 articles skipped for lacking
+  extracted text). The heavy `unknown` skew is expected — most
+  articles simply don't contain explicit author-residence evidence,
+  and those pieces fall back to the existing publication tag exactly
+  as before this feature shipped. Spot-checked a random sample of the
+  `us` results post-backfill: all had either explicit
+  university/employer affiliation in the byline or clear first-person
+  location markers in the body (e.g. "our D.C. happy hour tonight") —
+  no recurrence of the topic-inference bug below at full scale.
   - **Spec inaccuracy found:** the spec's file list included `aarva/
     services/queries.py`, reasoning that TTS-reading queries there
     would need the new column. In this codebase, accent steering
