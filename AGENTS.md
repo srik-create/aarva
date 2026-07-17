@@ -262,6 +262,20 @@ Last updated: 2026-06-29
     starts adjacent work (e.g., "before we add search, the deferred
     crosscut-embeddings item should land first — still that order?").
 
+    **BEFORE EVERY READ OR EDIT of `docs/roadmap.md`, fetch first.**
+    Applies to BOTH Cowork sessions and Claude Code sessions. Run
+    `git fetch origin main` and read the copy from `origin/main`
+    (or the current local working tree if you're mid-branch off a
+    freshly-fetched main). Never rely on a copy that was read
+    earlier in the same session — the roadmap changes multiple
+    times per day between sessions and even within one, and stale
+    references to In-Progress items produce wrong advice to the
+    user. This isn't optional. Cowork violated this on 2026-07-16
+    twice in the same afternoon (stated items 0 and 2 were still
+    open when both had been marked done via merged PRs 30 minutes
+    earlier); the discipline is: fetch, then read, then act.
+    No exceptions.
+
 17b. **`docs/project_brief.md` is the persistent context.** It
     captures what Aarva is, the architecture in one paragraph,
     standing user preferences, and the full chronological decisions
