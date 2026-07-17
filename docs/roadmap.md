@@ -25,24 +25,6 @@ GitHub Pages.
 
 ## In progress
 
-0. **BUG (small) — iPhone: prompt-input placeholder truncated.** On
-   narrow iPhone widths the header prompt input's placeholder
-   "Create an episode on anything" gets clipped to "…anythin" because
-   the Create button's fixed width is squeezing the input. Screenshot
-   attached to the request in Cowork's 2026-07-16 thread.
-   **Fix (any of these three works):**
-   - Media-query the placeholder text to a shorter variant on
-     narrow viewports (e.g. "Create an episode…").
-   - Reduce the Create button's horizontal padding on mobile so
-     the input has more room.
-   - Stack the button below the input on very narrow viewports.
-   Recommended: shortened placeholder via media query — smallest
-   change, preserves the current visual layout, no button
-   restyling. Any of the three is fine.
-   Small single-PR change. No listener-facing surface beyond the
-   header prompt input itself.
-
-
 1. **Content-quality + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections. **Sections 1-3 shipped 2026-07-11. Section 4 dropped
@@ -114,9 +96,28 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-16)
+## Recently completed (2026-06-29 → 2026-07-17)
 
 Most recent first.
+
+### 2026-07-17
+
+- **BUG (small) fixed — iPhone: prompt-input placeholder truncated.**
+  On narrow iPhone widths, the header prompt input's placeholder
+  ("Create an episode on anything") was getting clipped to
+  "…anythin" because the Create button squeezes the input.
+  `aarva/server/static/prompt-suggestions.js` (already wiring this
+  same input for the focus-dropdown) now swaps to a shorter variant
+  ("Create an episode…") below Tailwind's `sm` breakpoint (640px) via
+  `matchMedia`, since CSS alone can't change placeholder text
+  conditionally. Full text stays as the HTML default for wider
+  viewports and as the pre-JS fallback.
+  - **Verified for real:** drove a real headless Chromium via
+    Playwright at 375px (iPhone SE), 430px (iPhone Pro Max), and
+    1280px (desktop) — confirmed the shortened placeholder renders
+    with no clipping on both narrow widths, the full placeholder is
+    preserved at desktop width, and the existing focus-dropdown
+    behavior in the same file is unaffected.
 
 ### 2026-07-16
 
