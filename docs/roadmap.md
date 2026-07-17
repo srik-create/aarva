@@ -25,33 +25,6 @@ GitHub Pages.
 
 ## In progress
 
-0. **Revert iPhone placeholder truncation + try preserving-copy
-   fixes.** The 2026-07-16 shipped fix silently changed the
-   listener-facing copy from "create an episode on anything" to
-   "create an episode…" — the truncated version loses the "on
-   anything" hook that was doing the work of signalling scope.
-   User pushed back 2026-07-17: this was a copy change dressed
-   up as a CSS fix, should not have shipped without approval.
-   **Fix path (mockups required before landing):**
-   - **Try option 2 first — reduce Create button padding on
-     mobile.** Media query shrinks the button's horizontal
-     padding on iPhone-narrow widths so the input has more room.
-     Keeps the placeholder copy verbatim ("create an episode on
-     anything"). Zero copy change.
-   - **If option 2 doesn't fit the copy on the narrowest common
-     iPhone width, then option 1 — shrink font size** on narrow
-     viewports via media query. Placeholder is transient (goes
-     away on focus), so smaller text isn't a big legibility
-     hit. Still keeps the copy verbatim.
-   - **Do not combine both without user sign-off. Do not fall
-     back to any copy change without user sign-off.**
-   **Mockup gate**: Claude Code MUST produce a visual mockup
-   (screenshot from a headless-browser run at the target iPhone
-   viewport width, e.g. 375px or 390px) of the proposed fix and
-   share it with the user for approval BEFORE landing the PR.
-   Applies to option 2 first; if option 2 doesn't fit, produce
-   a separate mockup of option 1 and re-request approval.
-
 1. **Content-quality + listener-transparency pass.**
    Full spec at `docs/session_plan_content_quality.md`. Six
    sections. **Sections 1-3 shipped 2026-07-11. Section 4 dropped
@@ -147,6 +120,34 @@ the sequence.
 Most recent first.
 
 ### 2026-07-17
+
+- **iPhone placeholder truncation — fixed properly (copy-preserving,
+  mockup-approved).** Supersedes the 2026-07-16 fix, which silently
+  shortened the listener-facing placeholder copy ("create an episode
+  on anything" → "create an episode…") — a copy change dressed up as
+  a CSS fix, shipped without approval. Reverted that JS entirely, and
+  landed **option 2** from the roadmap's fix path instead: the
+  Create button's horizontal padding shrinks on narrow viewports
+  (`px-2.5` below Tailwind's `sm` breakpoint, `px-4` at `sm`+) so the
+  input has more room. Zero copy change — placeholder stays "Create
+  an episode on anything" everywhere.
+  - **Verified for real, mockup-gated per the roadmap's own
+    requirement:** swept real headless-Chromium screenshots across
+    a range of iPhone widths against the true original (unmodified)
+    markup to find which width reproduces the user's original bug
+    report (clipped by exactly one trailing letter, "g") — landed on
+    ~400px, a mainstream modern-iPhone width, not the 375px worst
+    case initially assumed. Shared both the 400px and 375px (iPhone
+    SE) mockups with the user before landing anything.
+  - **Decision: ship as-is.** At 400px (matches the reported bug)
+    option 2 fully fixes it — full copy renders with room to spare.
+    At 375px (iPhone SE) it still clips. User decided not to chase
+    the SE case with option 1 (font-size reduction) — revisit only
+    if iPhone SE traffic turns out to be material.
+  - New AGENTS.md rule from this incident: copy changes need
+    pre-approval like any other material trade-off (rule 4), and any
+    fix to this specific bug needs a shared headless-browser mockup
+    at the target viewport before landing, not just before merging.
 
 - **Reviewer feedback learning loop — Phase 1 (rejection reason
   capture).** Full spec at
