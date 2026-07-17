@@ -35,7 +35,25 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-2. **OOM-frequency investigation (Section 3 of
+3. **Reviewer feedback learning loop.** Full spec at
+   `docs/session_plan_reviewer_learning_loop.md`. Turn the
+   approve/reject signal into a learning system that PROPOSES
+   (never auto-enables) new filter rules over time. Three phases:
+   (1) capture rejection reasons at review time via a short
+   picker in the CLI — new `edition_rejections.reason` +
+   `reason_note` columns, seven starter codes; (2) periodic LLM
+   analysis of reason-tagged rejections outputs a "proposed
+   filters" report to `docs/learning_reports/`; (3) operator
+   reviews the report and enables filters as small individual
+   PRs — structural filters go into Stage 2 (transcripts,
+   listicles, video-dependent), qualitative go into per-reason
+   taste centroids that extend Stage 7's existing scoring. Not
+   autonomous — every filter is human-in-the-loop. Phase 1
+   ships immediately; Phase 2 waits 2-3 weeks for data to
+   accumulate; Phase 3 is a rolling stream of small enablement
+   PRs going forward.
+
+4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
