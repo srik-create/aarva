@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 18 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-18</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 18 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · militarized state power</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-18/crosscut_0089.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>24 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>The sight of a surplus armored vehicle parked behind a local police station tells a story of logistics, contracts, and heavy metal. Writing earlier this week, Whitney Curry Wimbish tracks how war machines are flowing into the hands of American immigration officers and neighborhood cops. It’s a ledger of hardware. But a different kind of cost appears when those weapons eventually become the government itself. Matt Gallagher, writing just yesterday, looks back at the 1952 military coup in Egypt to see what happens to the people who once cheered for the soldiers. Something interesting emerges when the tally of rifles and armor is placed alongside the wreckage of broken lives and lost revolutions.</p>
+        <article class='piece'>
+<p class='hook'>A quarter of a trillion dollars buys thousands of armored vehicles and rifles. Writing just last week for The American Prospect, Whitney Curry Wimbish maps out the specific contracts behind a sharp surge in deportation spending. Notice how she connects these hardware purchases to the 12,000 new agents hired to carry the gear. It’s a group that includes recruits who previously failed police academies or were caught lying on official felony reports.</p>
+<h2 class='title'>Feds and Deputized Cops Stockpiling War Machines for Deportation</h2>
+<p class='byline'><span class='publication'>The American Prospect</span><span class='sep'>·</span><span>Whitney Curry Wimbish</span></p>
+<p class='source'><a href='https://prospect.org/2026/07/13/feds-deputized-cops-stockpiling-war-machines-for-deportation-ice-trump/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>A quarter-trillion-dollar pile of military hardware and the ink on thousands of local police contracts—that’s the image Whitney Curry Wimbish leaves behind. It shows a country arming itself against its own neighbors, where the primary worry is the lack of training behind the trigger of a new rifle. The hardware is the story there. The interesting thing is how the focus shifts when turning to Matt Gallagher. He looks past the procurement records and the literal weight of the tanks to find the wreckage of a life in the wake of a military coup that happened decades ago in Egypt. Read alongside Wimbish, Gallagher’s account of an exiled writer’s suicide in a London flat starts to look like a warning about the far end of that same path. While Wimbish tracks the physical tools of state force, Gallagher follows the slow rot of disillusionment that sets in once the soldiers take over. These two writers are looking at opposite ends of the same timeline—one at the moment the engine is being started, and the other long after it has finished its work. It suggests the real danger isn&#x27;t just who holds the gun, but what happens to a person’s sense of possibility once the guns become the only way to talk to one another.</p>
+        <article class='piece'>
+
+<h2 class='title'>How Revolutions Break Their Believers</h2>
+<p class='byline'><span class='publication'>War on the Rocks</span><span class='sep'>·</span><span>Matt Gallagher</span></p>
+<p class='source'><a href='https://warontherocks.com/how-revolutions-break-their-believers/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A surplus tank idling in a precinct lot isn’t just a piece of heavy machinery. In Egypt, those same steel silhouettes eventually became the backdrop for decades of quiet heartbreak. It starts with a line item—a crate of rifles or an armored truck—but it ends with a shift in how a person views their own street. What lingers is the way this hardware reshapes the people on both sides of the glass. When the tools of war become the tools of everyday policing, what happens to the trust that holds a neighborhood together?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
