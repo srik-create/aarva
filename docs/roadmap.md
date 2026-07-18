@@ -54,6 +54,23 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
+5. **Review CLI polish — drop-then-resurface fix +
+   un-approve.** Full spec at
+   `docs/session_plan_review_cli_polish.md`. Two independent
+   gaps caught during the 2026-07-18 daily review:
+   (a) Dropped articles (`Nd`) resurface in the SAME edition
+   because Stage 7's next refill respects the dropped SLOT but
+   the dropped ARTICLE is still eligible for other slots. Fix:
+   new `editions.dropped_article_ids` column; Stage 7 filters
+   pool against it. Future editions unchanged — drop still means
+   "not this edition" not "never again."
+   (b) No way to un-approve an approved piece before the edition
+   is finalised (current CLI only sees `review_status='proposed'`
+   rows). Fix: new `Nu` command + CLI listing shows approved
+   pieces with a ✓ marker so their indices are visible.
+   Both in one PR — same file (`aarva/review.py`), small schema
+   change, small Stage 7 change.
+
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
