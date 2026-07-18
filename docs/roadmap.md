@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-16
+**Last updated:** 2026-07-18
 
 ---
 
@@ -35,7 +35,7 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-3. **Reviewer feedback learning loop.** Full spec at
+2. **Reviewer feedback learning loop.** Full spec at
    `docs/session_plan_reviewer_learning_loop.md`. Turn the
    approve/reject signal into a learning system that PROPOSES
    (never auto-enables) new filter rules over time. Three phases:
@@ -54,7 +54,7 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-5. **Review CLI polish — drop-then-resurface fix +
+3. **Review CLI polish — drop-then-resurface fix +
    un-approve.** Full spec at
    `docs/session_plan_review_cli_polish.md`. Two independent
    gaps caught during the 2026-07-18 daily review:
@@ -70,26 +70,6 @@ GitHub Pages.
    pieces with a ✓ marker so their indices are visible.
    Both in one PR — same file (`aarva/review.py`), small schema
    change, small Stage 7 change.
-
-6. **iOS player bugs — lock-screen metadata +
-   fixed-position mid-scroll lag.** Full spec at
-   `docs/session_plan_ios_player_bugs.md`. Two iPhone-only
-   bugs surfaced 2026-07-18:
-   (a) Lock Screen / Control Center Now Playing shows a stale
-   track title (yesterday's daily, or an earlier article) while
-   the browser is actually playing a different piece. Root
-   cause: the shared player never calls
-   `navigator.mediaSession.setMetadata()`, so iOS never learns
-   about `src` swaps in `playTrack()`. Fix: wire the Media
-   Session API — metadata + action handlers + position state.
-   (b) The persistent mini-player bar temporarily sits in the
-   MIDDLE of the viewport during momentum scrolling on iOS
-   Safari (long-standing iOS `position: fixed` + rubber-band
-   quirk). Fix: promote the bar to its own GPU compositor layer
-   via `transform: translateZ(0)` + friends.
-   Both changes are self-contained in
-   `aarva/server/templates/base.html`. Device-side verification
-   required (headless browser can't repro iOS-only quirks).
 
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
@@ -152,9 +132,46 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-17)
+## Recently completed (2026-06-29 → 2026-07-18)
 
 Most recent first.
+
+### 2026-07-18
+
+- **iOS player bugs — lock-screen metadata + fixed-position mid-scroll
+  lag.** Full spec at `docs/session_plan_ios_player_bugs.md`. Both
+  fixes landed in `aarva/server/templates/base.html`:
+  - **Fix 1 (lock-screen metadata):** `playTrack()` now sets
+    `navigator.mediaSession.metadata` on every track/src swap;
+    `play`/`pause`/`seekbackward`/`seekforward`/`seekto` action
+    handlers registered once at module init (not per-track, so
+    lock-screen/Control Center/Bluetooth controls survive src swaps);
+    `setPositionState` mirrors progress on `timeupdate` for the
+    lock-screen scrubber.
+  - **Fix 2 (mid-scroll lag):** `[data-mini-player]` promoted to its
+    own GPU compositor layer (`transform: translateZ(0)` +
+    `backface-visibility: hidden` + `will-change: transform`) to
+    eliminate the iOS Safari momentum-scroll position:fixed quirk.
+  - **Verified headlessly (what's checkable without real iOS
+    hardware):** no console/page errors on load or during playback;
+    confirmed via real Playwright-driven Chromium that
+    `mediaSession.metadata` populates correctly on play and correctly
+    UPDATES when switching to a different track — the exact src-swap
+    path the bug described. The lock-screen rendering itself and the
+    momentum-scroll rendering quirk are iOS-Safari-specific and can't
+    be reproduced in headless Chromium.
+  - **Real-device verification: PENDING.** Per the spec's explicit
+    device-testing gate, this needs confirmation on an actual iPhone
+    (Lock Screen title updates correctly across track switches,
+    scrubber/play/pause work from the lock screen, mini-player stays
+    glued to the bottom during momentum scroll). The Media Session
+    API requires a secure context (HTTPS) — a local-network HTTP test
+    from a phone wouldn't exercise Fix 1 at all — so the user opted to
+    merge straight to `main` (Render auto-deploys) and test on the
+    live aarva.app site rather than stand up a temporary HTTPS tunnel,
+    accepting a fix-forward-if-needed risk instead of a pre-merge
+    device gate. Follow up once confirmed; if either fix doesn't hold
+    up on-device, expect a small fix-forward PR, not a revert.
 
 ### 2026-07-17
 
