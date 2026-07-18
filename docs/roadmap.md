@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-16
+**Last updated:** 2026-07-18
 
 ---
 
@@ -35,7 +35,7 @@ GitHub Pages.
    (outro music) is blocked on an external audio asset — nothing
    left to do until the asset lands.
 
-3. **Reviewer feedback learning loop.** Full spec at
+2. **Reviewer feedback learning loop.** Full spec at
    `docs/session_plan_reviewer_learning_loop.md`. Turn the
    approve/reject signal into a learning system that PROPOSES
    (never auto-enables) new filter rules over time. Three phases:
@@ -54,24 +54,7 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-5. **Review CLI polish — drop-then-resurface fix +
-   un-approve.** Full spec at
-   `docs/session_plan_review_cli_polish.md`. Two independent
-   gaps caught during the 2026-07-18 daily review:
-   (a) Dropped articles (`Nd`) resurface in the SAME edition
-   because Stage 7's next refill respects the dropped SLOT but
-   the dropped ARTICLE is still eligible for other slots. Fix:
-   new `editions.dropped_article_ids` column; Stage 7 filters
-   pool against it. Future editions unchanged — drop still means
-   "not this edition" not "never again."
-   (b) No way to un-approve an approved piece before the edition
-   is finalised (current CLI only sees `review_status='proposed'`
-   rows). Fix: new `Nu` command + CLI listing shows approved
-   pieces with a ✓ marker so their indices are visible.
-   Both in one PR — same file (`aarva/review.py`), small schema
-   change, small Stage 7 change.
-
-4. **OOM-frequency investigation (Section 3 of
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -132,9 +115,53 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-17)
+## Recently completed (2026-06-29 → 2026-07-18)
 
 Most recent first.
+
+### 2026-07-18
+
+- **Review CLI polish — drop-then-resurface fix + un-approve.** Full
+  spec at `docs/session_plan_review_cli_polish.md`. Two independent
+  gaps in `python -m aarva.review`, shipped together in one PR (same
+  file, related schema/Stage 7 touch points):
+  - **Fix 1 — drop excludes the article from the WHOLE edition, not
+    just the dropped slot.** New `editions.dropped_article_ids`
+    column (JSON list, parallels the existing `dropped_slots`).
+    `_apply_decisions`'s `'d'` branch now appends the article_id
+    alongside the slot name. `stage_7_assemble.py::_load_edition_
+    overrides` returns it as a 4th tuple item; the candidate pool is
+    filtered against it (merged with the existing rejected-articles
+    exclusion set) before slot-filling. Future editions unaffected —
+    a drop still only means "not this edition."
+  - **Fix 2 — `Nu` un-approve command.** `_load_proposed` renamed to
+    `_load_review_pieces` and now loads BOTH `'proposed'` and
+    `'approved'` pieces for the edition, with continuous indices
+    spanning both — approved pieces render with a green "✓ approved"
+    marker so their index is visible and referenceable. `Nu` flips
+    `review_status` back to `'proposed'` (guarded on the row
+    currently being `'approved'`, so it's a safe no-op otherwise).
+  - **Spec extension (not in the original doc, added for safety):**
+    the blanket shortcuts (`all-a`, `all-r`, blank-Enter) now only
+    sweep pieces that were `'proposed'` at load time — approved
+    pieces stay frozen unless explicitly referenced by index (e.g.
+    `3u`). Without this, making approved pieces visible/indexed would
+    have let a blanket `all-r` accidentally reject pieces the reviewer
+    had already frozen, which contradicts this codebase's existing
+    "approved pieces stay frozen" invariant (`_apply_decisions`'s own
+    docstring).
+  - **Verified for real** against a disposable copy of the real DB
+    (never the live proposed pieces), with a synthetic multi-piece
+    test edition: confirmed `dropped_article_ids` persists correctly
+    on drop and `_load_edition_overrides` returns it; confirmed the
+    real `_load_candidates()` pool has the dropped article excluded
+    after applying the same filter Stage 7 now uses; confirmed
+    un-approve flips status back to `'proposed'` and a follow-up
+    reject on the same (now re-proposed) piece works correctly
+    end-to-end including the reason picker; confirmed `all-r` leaves
+    an already-approved piece untouched while still correctly
+    rejecting the proposed one; confirmed the plain all-proposed,
+    no-approved-pieces case (the common daily case) is unaffected.
 
 ### 2026-07-17
 

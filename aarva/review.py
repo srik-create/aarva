@@ -57,12 +57,13 @@ from aarva.cli_utils import BOLD, DIM, RED, GREEN, YELLOW, BLUE  # noqa: F401
 
 
 @dataclass
-class ProposedPiece:
+class ReviewPiece:
     index: int               # 1-based for display
     edition_id: int
     article_id: int
     slot: str
     position: int
+    review_status: str       # 'proposed' or 'approved' — see _load_review_pieces
     title: str
     byline: Optional[str]
     publication_name: str
@@ -105,10 +106,19 @@ def _find_edition_to_review(db: Database, edition_id: Optional[int]) -> Optional
         return int(row["id"]) if row else None
 
 
-def _load_proposed(db: Database, edition_id: int) -> list[ProposedPiece]:
+def _load_review_pieces(db: Database, edition_id: int) -> list[ReviewPiece]:
+    """Load both 'proposed' and 'approved' pieces for this edition, in
+    slot order, with continuous 1-based indices spanning both statuses.
+
+    Review CLI polish, Fix 2 (2026-07-18 — docs/session_plan_review_
+    cli_polish.md): approved pieces need to be visible (and indexable)
+    so the reviewer can un-approve one with 'Nu' — previously only
+    proposed pieces were loaded, so an approved piece had no index to
+    reference."""
     with db.connect() as conn:
         rows = conn.execute("""
             SELECT ep.edition_id, ep.article_id, ep.slot, ep.position,
+                   ep.review_status,
                    a.title, a.byline, a.canonical_url, a.excerpt, a.word_count,
                    p.name AS publication_name,
                    s.rigour, s.posture, s.self_implication, s.ranking_score,
@@ -118,17 +128,18 @@ def _load_proposed(db: Database, edition_id: int) -> list[ProposedPiece]:
               JOIN publications p ON p.id = a.publication_id
               LEFT JOIN article_scores s ON s.article_id = a.id
              WHERE ep.edition_id = ?
-               AND ep.review_status = 'proposed'
+               AND ep.review_status IN ('proposed', 'approved')
              ORDER BY ep.position
         """, (edition_id,)).fetchall()
 
     return [
-        ProposedPiece(
+        ReviewPiece(
             index=i + 1,
             edition_id=int(r["edition_id"]),
             article_id=int(r["article_id"]),
             slot=r["slot"],
             position=int(r["position"] or 0),
+            review_status=r["review_status"],
             title=r["title"] or "",
             byline=r["byline"],
             publication_name=r["publication_name"] or "",
@@ -157,7 +168,7 @@ def _approved_count(db: Database, edition_id: int) -> int:
     return int(row["n"])
 
 
-def _print_piece(p: ProposedPiece) -> None:
+def _print_piece(p: ReviewPiece) -> None:
     """Render one piece, two-paragraphs-or-so worth of context."""
     scores = ""
     if p.rigour is not None and p.posture is not None:
@@ -178,8 +189,9 @@ def _print_piece(p: ProposedPiece) -> None:
     if p.word_count:
         length_str = f"{p.word_count:,} words  ·  ~{p.estimated_minutes:.0f} min audio"
 
+    approved_marker = f"{GREEN('✓ approved')}  " if p.review_status == "approved" else ""
     print()
-    print(f"  {BOLD(f'[{p.index}]')}  {BOLD(p.slot.replace('_', ' '))}  "
+    print(f"  {BOLD(f'[{p.index}]')}  {approved_marker}{BOLD(p.slot.replace('_', ' '))}  "
           f"{DIM('—')}  {YELLOW(p.publication_name)}")
     print(f"       {BOLD(p.title)}")
     if p.byline:
@@ -225,13 +237,15 @@ KNOWN_SLOT_ALIASES = {
 }
 
 
-def _parse_decisions(raw: str, n_pieces: int) -> dict:
+def _parse_decisions(
+    raw: str, n_pieces: int, proposed_indices: Optional[set[int]] = None,
+) -> dict:
     """Parse the review-CLI command line into a structured decisions dict.
 
     Returns a dict with three keys:
-      piece_actions: {piece_index: ('a' | 'r' | 'd', length_bias_or_None)}
+      piece_actions: {piece_index: ('a' | 'r' | 'd' | 'u', length_bias_or_None)}
                      'a' = approve, 'r' = reject (with optional bias),
-                     'd' = drop without refill
+                     'd' = drop without refill, 'u' = un-approve
       add_slots:     [alias, ...] — extras to ADD via "+behind" etc.
       add_bias:      currently unused; reserved
 
@@ -242,6 +256,7 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
       <N>l            reject piece N, refill prefer LONGER
       <N>s            reject piece N, refill prefer SHORTER
       <N>d            drop piece N entirely; no refill
+      <N>u            un-approve piece N (approved → proposed)
       +behind         add a lens_card_behind slot
       +humans         add a lens_card_humans slot
       +future, +feature, +curiosity, +escape, +delight  (other aliases)
@@ -256,8 +271,20 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
       all-a           approve everything (no slot adds)
       all-r           reject everything (no slot adds; no length bias)
       (empty)         approve all + no other changes
-    """
+
+    proposed_indices: piece indices whose review_status is currently
+    'proposed', vs. already-'approved' (Fix 2, docs/session_plan_
+    review_cli_polish.md). The blanket shortcuts (all-a / all-r /
+    empty) only sweep THESE indices — approved pieces stay frozen
+    unless explicitly referenced by index (e.g. '3u'), matching the
+    existing "approved pieces stay frozen" invariant. None (default)
+    means treat every index as sweepable, for callers that don't
+    distinguish (kept for backward compatibility)."""
     cleaned = raw.strip().lower().replace(",", " ").replace(";", " ")
+    sweepable = (
+        set(range(1, n_pieces + 1)) if proposed_indices is None
+        else proposed_indices
+    )
 
     decisions = {
         "piece_actions": {},   # type: dict[int, tuple[str, Optional[str]]]
@@ -265,11 +292,11 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
     }
 
     if cleaned in ("", "all-a", "alla", "a"):
-        for i in range(1, n_pieces + 1):
+        for i in sweepable:
             decisions["piece_actions"][i] = ("a", None)
         return decisions
     if cleaned in ("all-r", "allr", "r"):
-        for i in range(1, n_pieces + 1):
+        for i in sweepable:
             decisions["piece_actions"][i] = ("r", None)
         return decisions
 
@@ -310,17 +337,17 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
         # Default action is approve if no suffix.
         action_char = "a"
         bias = None
-        if tok[-1] in ("a", "r", "l", "s", "d"):
+        if tok[-1] in ("a", "r", "l", "s", "d", "u"):
             action_char = tok[-1]
             num_part = tok[:-1]
         else:
             num_part = tok
         if not num_part:
-            raise ValueError(f"can't parse '{tok}' as <number>[a|r|l|s|d]")
+            raise ValueError(f"can't parse '{tok}' as <number>[a|r|l|s|d|u]")
         try:
             idx = int(num_part)
         except ValueError as e:
-            raise ValueError(f"can't parse '{tok}' as <number>[a|r|l|s|d]") from e
+            raise ValueError(f"can't parse '{tok}' as <number>[a|r|l|s|d|u]") from e
         if idx < 1 or idx > n_pieces:
             raise ValueError(f"piece {idx} out of range (1–{n_pieces})")
 
@@ -336,7 +363,7 @@ def _parse_decisions(raw: str, n_pieces: int) -> dict:
 
 
 def _prompt_reject_reasons(
-    pieces: list[ProposedPiece], decisions: dict,
+    pieces: list[ReviewPiece], decisions: dict,
 ) -> dict[int, tuple[str, Optional[str]]]:
     """Ask the reviewer WHY for each piece marked 'r' this round.
 
@@ -388,7 +415,7 @@ def _prompt_reject_reasons(
 def _apply_decisions(
     db: Database,
     edition_id: int,
-    pieces: list[ProposedPiece],
+    pieces: list[ReviewPiece],
     decisions: dict,
 ) -> dict:
     """Apply decisions to the DB. Returns a small summary dict.
@@ -401,24 +428,36 @@ def _apply_decisions(
         article status reset to 'scored'. If the action carries a
         length bias, the slot's bias is persisted on
         editions.slot_biases so Stage 7's refill respects it.
-      - Pieces marked 'd' → deleted from edition_pieces AND the slot
-        name is added to editions.dropped_slots so Stage 7 won't refill it.
+      - Pieces marked 'd' → deleted from edition_pieces, the slot
+        name is added to editions.dropped_slots so Stage 7 won't refill
+        it, AND the article_id is added to editions.dropped_article_ids
+        so Stage 7 won't pick it into any OTHER slot of THIS edition
+        either (review CLI polish Fix 1, docs/session_plan_review_cli_
+        polish.md) — still eligible for future editions.
+      - Pieces marked 'u' → review_status flipped back from 'approved'
+        to 'proposed' (Fix 2 — un-approve; a no-op if the piece wasn't
+        actually approved).
       - Slots in decisions['add_slots'] are appended to
         editions.extra_slots so Stage 7's next run adds them.
     """
-    summary = {"approved": 0, "rejected": 0, "dropped": 0, "added": 0}
+    summary = {
+        "approved": 0, "rejected": 0, "dropped": 0, "added": 0, "unapproved": 0,
+    }
 
     # Load current overrides from the editions row, mutate them in
     # Python, then write back. SQLite has no native JSON_set so this is
     # the cleanest approach.
     with db.connect() as conn:
         row = conn.execute(
-            "SELECT extra_slots, dropped_slots, slot_biases "
+            "SELECT extra_slots, dropped_slots, slot_biases, dropped_article_ids "
             "FROM editions WHERE id = ?", (edition_id,),
         ).fetchone()
     extra_slots = json.loads((row["extra_slots"] if row else None) or "[]")
     dropped_slots = json.loads((row["dropped_slots"] if row else None) or "[]")
     slot_biases = json.loads((row["slot_biases"] if row else None) or "{}")
+    dropped_article_ids = json.loads(
+        (row["dropped_article_ids"] if row else None) or "[]",
+    )
 
     with db.connect() as conn:
         for piece in pieces:
@@ -434,6 +473,18 @@ def _apply_decisions(
                 # consumed — clear it.
                 slot_biases.pop(piece.slot, None)
                 summary["approved"] += 1
+
+            elif action == "u":
+                # Un-approve: flip back to 'proposed' so the reviewer can
+                # re-decide next round. Guard the WHERE on the current
+                # status so this is a no-op if the piece isn't approved.
+                conn.execute(
+                    "UPDATE edition_pieces SET review_status = 'proposed' "
+                    "WHERE edition_id = ? AND article_id = ? "
+                    "AND review_status = 'approved'",
+                    (edition_id, piece.article_id),
+                )
+                summary["unapproved"] += 1
 
             elif action == "r":
                 # Reject + maybe set length bias for the slot.
@@ -461,9 +512,12 @@ def _apply_decisions(
 
             elif action == "d":
                 # Drop: remove the piece + add the slot to dropped_slots
-                # so Stage 7 won't refill it. We don't add to rejections
-                # because we don't want to ban the article from FUTURE
-                # editions — the user just doesn't want it in this one.
+                # so Stage 7 won't refill it, AND add the article_id to
+                # dropped_article_ids so Stage 7 won't pick this article
+                # into any OTHER slot of THIS edition either. We don't
+                # add to rejections because we don't want to ban the
+                # article from FUTURE editions — the user just doesn't
+                # want it in this one.
                 conn.execute(
                     "DELETE FROM edition_pieces "
                     "WHERE edition_id = ? AND article_id = ?",
@@ -475,6 +529,8 @@ def _apply_decisions(
                 )
                 if piece.slot not in dropped_slots:
                     dropped_slots.append(piece.slot)
+                if piece.article_id not in dropped_article_ids:
+                    dropped_article_ids.append(piece.article_id)
                 # Any bias for this slot is now meaningless — clear it.
                 slot_biases.pop(piece.slot, None)
                 summary["dropped"] += 1
@@ -489,9 +545,10 @@ def _apply_decisions(
         # Write back the mutated overrides.
         conn.execute(
             "UPDATE editions SET extra_slots = ?, dropped_slots = ?, "
-            "slot_biases = ? WHERE id = ?",
+            "slot_biases = ?, dropped_article_ids = ? WHERE id = ?",
             (json.dumps(extra_slots), json.dumps(dropped_slots),
-             json.dumps(slot_biases), edition_id),
+             json.dumps(slot_biases), json.dumps(dropped_article_ids),
+             edition_id),
         )
 
     return summary
@@ -516,9 +573,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("Either Stage 7 hasn't run yet, or all pieces are already approved.")
         return 0
 
-    pieces = _load_proposed(db, edition_id)
+    pieces = _load_review_pieces(db, edition_id)
     if not pieces:
-        print(GREEN(f"Edition #{edition_id} has no proposed pieces — all approved already."))
+        print(GREEN(f"Edition #{edition_id} has no pieces to review."))
         return 0
 
     with db.connect() as conn:
@@ -535,23 +592,26 @@ def main(argv: Optional[list[str]] = None) -> int:
     print()
     print(DIM("─" * 70))
 
+    proposed_indices = {p.index for p in pieces if p.review_status == "proposed"}
+
     if args.auto_approve:
         decisions = {
-            "piece_actions": {i: ("a", None) for i in range(1, len(pieces) + 1)},
+            "piece_actions": {i: ("a", None) for i in proposed_indices},
             "add_slots": [],
         }
-        print(GREEN(f"Auto-approving all {len(pieces)} pieces."))
+        print(GREEN(f"Auto-approving all {len(proposed_indices)} proposed piece(s)."))
     else:
         print(BOLD("Per-piece commands:"))
         print(DIM("  Na  approve piece N        Nd  drop piece N (no refill)"))
         print(DIM("  Nr  reject piece N         Nl  reject + prefer LONGER replacement"))
         print(DIM("                             Ns  reject + prefer SHORTER replacement"))
+        print(DIM("  Nu  un-approve piece N (approved -> proposed, re-decide next round)"))
         print(BOLD("Edition-level commands:"))
         print(DIM("  +behind  +humans  +future  +feature  +curiosity  +escape"))
         print(DIM("    add another slot of that type for refill"))
         print(BOLD("Shortcuts:"))
-        print(DIM("  all-a    approve everything"))
-        print(DIM("  (empty)  approve everything"))
+        print(DIM("  all-a    approve everything proposed (approved pieces untouched)"))
+        print(DIM("  (empty)  approve everything proposed (approved pieces untouched)"))
         print(DIM("  Example: '1a 2l 3a 4d 5a 6s +behind'"))
         print()
         while True:
@@ -562,7 +622,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 print(YELLOW("Cancelled. No changes made."))
                 return 1
             try:
-                decisions = _parse_decisions(raw, len(pieces))
+                decisions = _parse_decisions(raw, len(pieces), proposed_indices)
                 break
             except ValueError as e:
                 print(RED(f"  Couldn't parse that: {e}"))
@@ -574,6 +634,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     n_approve = sum(1 for v in actions.values() if v[0] == "a")
     n_reject  = sum(1 for v in actions.values() if v[0] == "r")
     n_drop    = sum(1 for v in actions.values() if v[0] == "d")
+    n_unapprove = sum(1 for v in actions.values() if v[0] == "u")
     n_longer  = sum(1 for v in actions.values() if v[1] == "longer")
     n_shorter = sum(1 for v in actions.values() if v[1] == "shorter")
     n_added   = len(decisions.get("add_slots", []))
@@ -589,6 +650,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             parts[-1] += DIM(f" ({', '.join(bias_bits)})")
     if n_drop:
         parts.append(YELLOW(f"drop {n_drop}"))
+    if n_unapprove:
+        parts.append(BLUE(f"un-approve {n_unapprove}"))
     if n_added:
         parts.append(BLUE(f"+{n_added} slot{'s' if n_added > 1 else ''}"))
     print(f"  About to: {'  ·  '.join(parts)}")
@@ -609,10 +672,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     s_rejected = summary["rejected"]
     s_dropped = summary["dropped"]
     s_added = summary["added"]
+    s_unapproved = summary["unapproved"]
     print()
     print(f"  {GREEN(f'✓ {s_approved} approved')}, "
           f"{RED(f'✗ {s_rejected} rejected')}, "
           f"{YELLOW(f'⊘ {s_dropped} dropped')}, "
+          f"{BLUE(f'↺ {s_unapproved} un-approved')}, "
           f"{BLUE(f'+ {s_added} slots added')}")
 
     # Print next-step guidance.
@@ -626,7 +691,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("  Then re-run this review:")
         print(f"  {YELLOW('python -m aarva.review')}")
     else:
-        remaining_proposed = len(_load_proposed(db, edition_id))
+        remaining_proposed = sum(
+            1 for p in _load_review_pieces(db, edition_id)
+            if p.review_status == "proposed"
+        )
         if remaining_proposed == 0:
             print(GREEN(BOLD("All pieces approved! ✓")))
             print("  Run the finalize script to generate hooks, contexts, audio, "
