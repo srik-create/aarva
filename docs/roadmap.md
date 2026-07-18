@@ -71,6 +71,26 @@ GitHub Pages.
    Both in one PR — same file (`aarva/review.py`), small schema
    change, small Stage 7 change.
 
+6. **iOS player bugs — lock-screen metadata +
+   fixed-position mid-scroll lag.** Full spec at
+   `docs/session_plan_ios_player_bugs.md`. Two iPhone-only
+   bugs surfaced 2026-07-18:
+   (a) Lock Screen / Control Center Now Playing shows a stale
+   track title (yesterday's daily, or an earlier article) while
+   the browser is actually playing a different piece. Root
+   cause: the shared player never calls
+   `navigator.mediaSession.setMetadata()`, so iOS never learns
+   about `src` swaps in `playTrack()`. Fix: wire the Media
+   Session API — metadata + action handlers + position state.
+   (b) The persistent mini-player bar temporarily sits in the
+   MIDDLE of the viewport during momentum scrolling on iOS
+   Safari (long-standing iOS `position: fixed` + rubber-band
+   quirk). Fix: promote the bar to its own GPU compositor layer
+   via `transform: translateZ(0)` + friends.
+   Both changes are self-contained in
+   `aarva/server/templates/base.html`. Device-side verification
+   required (headless browser can't repro iOS-only quirks).
+
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
