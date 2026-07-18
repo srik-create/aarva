@@ -1,3 +1,20 @@
+**STATUS: Code shipped 2026-07-18, real-device verification PENDING.**
+Both fixes landed in `aarva/server/templates/base.html` and merged to
+`main`. Headless verification confirmed the JS wiring is correct
+(metadata sets and updates correctly across track switches, no
+console errors) but the actual iOS Lock Screen rendering and the
+momentum-scroll rendering quirk can only be confirmed on real iPhone
+hardware. Per this doc's own device-testing gate, the plan was to
+verify before merging — but the Media Session API requires a secure
+context (HTTPS), so a local-network HTTP test from a phone wouldn't
+exercise Fix 1 at all. The user chose to merge straight to `main`
+(Render auto-deploys) and test on the live aarva.app site instead of
+standing up a temporary HTTPS tunnel first, accepting a fix-forward-
+if-needed risk. See `docs/roadmap.md`'s 2026-07-18 entry — update
+this note once device verification actually happens.
+
+---
+
 # Session plan — iOS player bugs (lock-screen metadata + fixed-position scroll)
 
 Written by Cowork for the next Claude Code session (2026-07-18+).
