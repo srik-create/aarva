@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Monday, 20 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-20</div>
+      <div class="edition-meta">2 pieces · Crosscut · Monday, 20 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · grazing on public land</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-20/crosscut_0093.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>21 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>In the high deserts of the American West, new federal rules are moving to pack more cattle onto public soil while quieting the voices of the people who live nearby. Writing earlier this month, Roberto “Bear” Guerra looks at a shift that treats the land less like a community space and more like a factory floor. But look back to ancient Crete, and a different picture of herding emerges. In a piece from yesterday, Flint Dibble examines a goat’s tooth to show that feeding a city was never just about local fences. There’s a real puzzle here: is the land a simple machine for meat, or a shared resource that requires many different voices to survive?</p>
+        <article class='piece'>
+<p class='hook'>Writing for ProPublica earlier this month, Roberto “Bear” Guerra follows a federal plan to rewrite the rules for 155 million acres of public land—an area twice the size of New Mexico. The shift aims to increase cattle numbers while cutting out the public’s right to complain. Notice how Guerra points to the way these new regulations would strip away the specific steps where ordinary people currently get to see and comment on grazing permits.</p>
+<h2 class='title'>The First Major Overhaul of Public Lands Grazing Regulations in a Generation Looks to Cut Out Public Involvement</h2>
+<p class='byline'><span class='publication'>ProPublica</span><span class='sep'>·</span><span>Roberto “Bear” Guerra</span></p>
+<p class='source'><a href='https://www.propublica.org/article/public-land-livestock-grazing-ranching-access' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Roberto “Bear” Guerra leaves the story at a point of friction: 155 million acres of the American West are being remapped to prioritize cattle over the public’s right to speak up. The logic coming out of the Bureau of Land Management treats these vast stretches of dirt and sagebrush primarily as a production line for meat. By cutting out the steps where neighbors or ecologists can object, the government is betting that a narrower, more streamlined management style is the best way to run a working range.
+
+But turn the page to Flint Dibble’s work in ancient Crete, and the very idea of a single &quot;correct&quot; way to manage animals starts to look a bit thin. While modern regulators try to lock in one specific vision of how ranching should function, the chemical signatures in ancient goat teeth show that the Greeks thrived by doing the exact opposite. They didn&#x27;t choose between nomadic herding and local farm life; they used both at the same time. Read alongside Guerra, Dibble’s findings suggest that the variety modern officials are trying to regulate away might be the very thing that kept societies stable for centuries. The interesting thing is that a piece of land rarely has just one job. The friction isn&#x27;t just about who gets to use the grass, but whether a place is healthier when it&#x27;s treated as a simple factory or a multi-layered resource.</p>
+        <article class='piece'>
+
+<h2 class='title'>Goat’s tooth shows that ancient Greek food economy was more complicated than researchers thought</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Flint Dibble, The Conversation</span></p>
+<p class='source'><a href='https://scroll.in/article/1093942/goats-tooth-shows-that-ancient-greek-food-economy-more-complicated-than-researchers-thought?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Traces of salt and soil left in ancient Cretan teeth show that herding was once a flexible, shared job that kept whole civilizations alive. Today, in the American West, that old way of working together is being replaced by closed-door rule changes and higher cattle counts that shut the public out. What’s left to sit with is the gap between a piece of land treated like a factory and one treated like a neighborhood. If history shows that survival depends on many different people having a stake in the grass, who loses out when the gates are locked?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
