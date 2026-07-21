@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 21 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-21</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 21 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · death as protest</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-21/crosscut_0095.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>20 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A group of mothers in Rio de Janeiro gathers to ensure the names of their sons, killed during police raids, don&#x27;t just fade into statistics. Writing for *The Independent* last week, Eleonore Hughes looks at how these women are turning private mourning into a public push for reparations. It’s a shift from quiet sorrow to a sharp legal demand. Something different happens when the protest comes from the person willing to risk their own life. In a piece published yesterday, Ghazala Jamil looks at the history of hunger strikes and self-immolation. There&#x27;s a haunting puzzle in how a body—through its very suffering—can become the final piece of leverage used to corner a government.</p>
+        <article class='piece'>
+<p class='hook'>Ana Paula Oliveira’s son, Johnatha, was walking home from his grandmother’s house in a Rio favela when a police officer shot him in the back. Writing for The Independent last week, Eleonore Hughes follows the way Oliveira and other grieving mothers have turned their private pain into a national political movement. Notice how these women are moving beyond protests to demand actual public funding for the psychological support that keeps them from falling apart.</p>
+<h2 class='title'>United by grief, mothers in Brazil demand reparations after police killed their sons</h2>
+<p class='byline'><span class='publication'>The Independent</span><span class='sep'>·</span><span>Eleonore Hughes</span></p>
+<p class='source'><a href='https://www.independent.co.uk/news/brazil-rio-de-janeiro-police-officers-jair-bolsonaro-police-b3015270.html' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Ana Paula Oliveira stands in a school in Manguinhos, marking the anniversary of a son lost to a police bullet. That image from Eleonore Hughes leaves a specific weight: the idea that a death can be transformed into a ledger, a demand for reparations, and a reason for a community to refuse to disappear. It treats the loss of life as a debt the state hasn&#x27;t paid.
+
+The shift to Ghazala Jamil’s look at hunger strikes and self-immolation changes the math. Jamil moves the focus away from the survivors picking up the pieces and toward the protesters who use their own physical survival as a bargaining chip. Where the mothers in Rio fight to make the state acknowledge a death that already happened, the hunger striker forces the state to watch a death in slow motion. It’s a different kind of leverage. Reading Jamil alongside Hughes, the observation surfaces that when the law fails, the body becomes the only evidence that can’t be argued away. One piece uses grief to build a movement; the other uses the threat of grief to stop a machine. What emerges is the realization that in the face of absolute power, the most radical thing a person can do is refuse to let a death be quiet.</p>
+        <article class='piece'>
+
+<h2 class='title'>A new book reflects on why a hunger strike is the most culturally resonant political protest</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Ghazala Jamil</span></p>
+<p class='source'><a href='https://scroll.in/article/1094326/a-new-book-reflects-on-why-a-hunger-strike-is-the-most-culturally-resonant-political-protest?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A mother in Rio de Janeiro stands before a judge, her son’s name painted on a banner. Somewhere else, a person sits in a quiet room and pushes away a plate of food. These acts turn the silence of death into a loud, public call for change. What’s left to sit with is the image of a body, or the memory of one, being the only way to be heard when every other door is locked. If a person&#x27;s most private grief becomes a public demand, what does that cost the one who has to live it?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
