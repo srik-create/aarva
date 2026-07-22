@@ -1805,7 +1805,7 @@ def synthesize_crosscut_episode(
     from aarva.stages.stage_9_tts import (
         _accent_prompt_for, _build_publication_country_map,
     )
-    country_map = _build_publication_country_map()
+    country_map = _build_publication_country_map(db)
     accent_a = _accent_prompt_for(a, country_map)
     accent_b = _accent_prompt_for(b, country_map)
     if accent_a:

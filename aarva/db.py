@@ -55,7 +55,16 @@ CREATE TABLE IF NOT EXISTS publications (
     tier            TEXT,
     enabled         INTEGER DEFAULT 1,
     licence_status  TEXT,
-    notes           TEXT
+    notes           TEXT,
+    -- Operator search + ad-hoc URL ingest (2026-07-22) — see
+    -- docs/session_plan_operator_search_and_url_ingest.md. Publications
+    -- known via publications.yaml carry their country tag there (see
+    -- aarva.config.Publication.country); this DB-level column exists
+    -- ONLY for publications registered at ingest time via `python -m
+    -- aarva.ingest_url` (option b), which never touch the YAML file.
+    -- stage_9_tts.py::_build_publication_country_map() merges both
+    -- sources so ad-hoc publications still get real accent steering.
+    country         TEXT
 );
 
 
@@ -442,6 +451,9 @@ class Database:
                 # Review CLI polish, Fix 1 (2026-07-18) — see
                 # docs/session_plan_review_cli_polish.md.
                 "ALTER TABLE editions ADD COLUMN dropped_article_ids TEXT",
+                # Operator search + ad-hoc URL ingest (2026-07-22) — see
+                # docs/session_plan_operator_search_and_url_ingest.md.
+                "ALTER TABLE publications ADD COLUMN country TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:
@@ -624,7 +636,18 @@ class Database:
         enabled: bool = True,
         licence_status: Optional[str] = None,
         notes: Optional[str] = None,
+        country: Optional[str] = None,
     ) -> int:
+        """country: DB-level accent tag (2026-07-22, see docs/session_
+        plan_operator_search_and_url_ingest.md) — ONLY for publications
+        registered via `python -m aarva.ingest_url`'s "register now"
+        option; YAML-known publications carry their country tag in
+        publications.yaml instead (aarva.config.Publication.country).
+        Omitting it (the default, used by every other existing caller)
+        leaves an already-set DB value untouched — COALESCE(?, country)
+        rather than a blind overwrite, so the daily RSS-driven sync
+        that calls this for every YAML publication can't accidentally
+        clobber an ad-hoc-registered publication's country tag."""
         with self.connect() as conn:
             existing = conn.execute(
                 "SELECT id FROM publications WHERE name = ?", (name,)
@@ -634,20 +657,23 @@ class Database:
                     """
                     UPDATE publications
                        SET rss_url = ?, homepage = ?, tier = ?, enabled = ?,
-                           licence_status = ?, notes = ?
+                           licence_status = ?, notes = ?,
+                           country = COALESCE(?, country)
                      WHERE id = ?
                     """,
                     (rss_url, homepage, tier, int(enabled), licence_status, notes,
-                     existing["id"]),
+                     country, existing["id"]),
                 )
                 return int(existing["id"])
             cursor = conn.execute(
                 """
                 INSERT INTO publications
-                    (name, rss_url, homepage, tier, enabled, licence_status, notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (name, rss_url, homepage, tier, enabled, licence_status,
+                     notes, country)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (name, rss_url, homepage, tier, int(enabled), licence_status, notes),
+                (name, rss_url, homepage, tier, int(enabled), licence_status,
+                 notes, country),
             )
             return int(cursor.lastrowid)
 
