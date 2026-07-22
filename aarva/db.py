@@ -115,6 +115,14 @@ CREATE TABLE IF NOT EXISTS editions (
     -- Review-CLI overrides for daily editions (unused for crosscut).
     extra_slots     TEXT DEFAULT '[]',
     dropped_slots   TEXT DEFAULT '[]',
+    -- Review CLI polish, Fix 1 (2026-07-18) — see
+    -- docs/session_plan_review_cli_polish.md. dropped_slots (above)
+    -- only excludes the SLOT for refill; without this, the dropped
+    -- ARTICLE remained eligible for a different slot in the same
+    -- edition. JSON list of article_ids dropped from THIS edition
+    -- only — still eligible for future editions. NULL/absent on
+    -- legacy editions, treated as an empty list.
+    dropped_article_ids TEXT DEFAULT '[]',
     slot_biases     TEXT DEFAULT '{}',
     -- Crosscut episode-level framing text (unused for daily editions).
     -- intro_text:    ~100 words framing the topic + the two angles
@@ -431,6 +439,9 @@ class Database:
                 # see docs/session_plan_reviewer_learning_loop.md.
                 "ALTER TABLE edition_rejections ADD COLUMN reason TEXT",
                 "ALTER TABLE edition_rejections ADD COLUMN reason_note TEXT",
+                # Review CLI polish, Fix 1 (2026-07-18) — see
+                # docs/session_plan_review_cli_polish.md.
+                "ALTER TABLE editions ADD COLUMN dropped_article_ids TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:

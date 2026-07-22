@@ -1,3 +1,15 @@
+**STATUS: DONE (2026-07-18).** Both fixes shipped in one PR. See
+`docs/roadmap.md`'s 2026-07-18 "Recently completed" entry for the
+full writeup. One addition beyond this spec: the blanket shortcuts
+(`all-a`/`all-r`/blank-Enter) were restricted to only sweep pieces
+that were `'proposed'` at load time, so making approved pieces
+visible/indexed (Fix 2) can't let a blanket `all-r` accidentally
+reject an already-frozen approved piece — not explicitly called out
+in this doc, added to preserve the existing "approved pieces stay
+frozen" invariant.
+
+---
+
 # Session plan — review CLI polish (drop-then-resurface fix + un-approve)
 
 Written by Cowork for the next Claude Code session (2026-07-18+).

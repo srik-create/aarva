@@ -501,23 +501,30 @@ def _articles_rejected_for_edition(db: Database, edition_id: int) -> set[int]:
 
 def _load_edition_overrides(
     db: Database, edition_id: int,
-) -> tuple[list[str], list[str], dict[str, str]]:
+) -> tuple[list[str], list[str], dict[str, str], list[int]]:
     """Read the review-CLI overrides (extra_slots / dropped_slots /
-    slot_biases) from the editions row. Returns ([], [], {}) if the
-    row doesn't exist or the columns are NULL.
+    slot_biases / dropped_article_ids) from the editions row. Returns
+    ([], [], {}, []) if the row doesn't exist or the columns are NULL.
+
+    dropped_article_ids (2026-07-18 — see docs/session_plan_review_
+    cli_polish.md Fix 1) lists articles dropped via `Nd` in this
+    edition specifically — excluded from every slot of THIS edition,
+    still eligible for future ones. Parallels dropped_slots (which
+    excludes a SLOT from refill, not the article itself).
     """
     with db.connect() as conn:
         row = conn.execute(
-            "SELECT extra_slots, dropped_slots, slot_biases "
+            "SELECT extra_slots, dropped_slots, slot_biases, dropped_article_ids "
             "FROM editions WHERE id = ?",
             (edition_id,),
         ).fetchone()
     if not row:
-        return [], [], {}
+        return [], [], {}, []
     extra = json.loads(row["extra_slots"] or "[]")
     dropped = json.loads(row["dropped_slots"] or "[]")
     biases = json.loads(row["slot_biases"] or "{}")
-    return list(extra), list(dropped), dict(biases)
+    dropped_article_ids = json.loads(row["dropped_article_ids"] or "[]")
+    return list(extra), list(dropped), dict(biases), list(dropped_article_ids)
 
 
 def _expand_slot_list(
@@ -953,27 +960,33 @@ def assemble_edition(
         if stats.rebuilt_existing:
             logger.info("Stage 7: existing edition for %s deleted; rebuilding.", today)
 
+    # Read review-CLI overrides for this edition (extra_slots, dropped_slots,
+    # slot_biases, dropped_article_ids). On the first build these are all empty.
+    extra_slot_names: list[str] = []
+    dropped_slot_names: list[str] = []
+    slot_biases: dict[str, str] = {}
+    dropped_article_ids: list[int] = []
+    if existing_edition_id is not None:
+        extra_slot_names, dropped_slot_names, slot_biases, dropped_article_ids = (
+            _load_edition_overrides(db, existing_edition_id)
+        )
+
     candidates = _load_candidates(db)
-    # In review-refill mode, exclude the articles the user already rejected.
-    if rejected_for_this_edition:
+    # In review-refill mode, exclude articles the user already rejected AND
+    # articles dropped from THIS edition (Fix 1, docs/session_plan_review_
+    # cli_polish.md — a drop excludes the article from every slot of this
+    # edition, not just the slot it was dropped from; still eligible for
+    # future editions since this set is per-edition, not global).
+    excluded_for_this_edition = rejected_for_this_edition | set(dropped_article_ids)
+    if excluded_for_this_edition:
         candidates = [c for c in candidates
-                      if c.article_id not in rejected_for_this_edition]
+                      if c.article_id not in excluded_for_this_edition]
     stats.candidate_pool = len(candidates)
     if not candidates and not approved_pieces:
         logger.warning("Stage 7: no scored articles available; edition not built.")
         return stats
 
     past_edition_ids = _articles_used_in_past_editions(db)
-
-    # Read review-CLI overrides for this edition (extra_slots, dropped_slots,
-    # slot_biases). On the first build these are all empty.
-    extra_slot_names: list[str] = []
-    dropped_slot_names: list[str] = []
-    slot_biases: dict[str, str] = {}
-    if existing_edition_id is not None:
-        extra_slot_names, dropped_slot_names, slot_biases = (
-            _load_edition_overrides(db, existing_edition_id)
-        )
 
     # Build the per-edition slot list: V01_SLOTS minus dropped, plus extras.
     edition_slots = _expand_slot_list(extra_slot_names, dropped_slot_names)
