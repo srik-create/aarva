@@ -71,6 +71,27 @@ GitHub Pages.
    Both in one PR — same file (`aarva/review.py`), small schema
    change, small Stage 7 change.
 
+7. **TTS boilerplate strip + Gemini safety-block detection.**
+   Full spec at `docs/session_plan_tts_boilerplate_strip.md`.
+   Two articles in two consecutive days (2026-07-18 blueberry
+   piece, 2026-07-22 crosscut passage_b) failed at Gemini TTS
+   chunk 5 with `'NoneType' object is not subscriptable` —
+   deterministic content block on terminal boilerplate
+   (production credits, crisis-line hotline footer).
+   (a) Add a paragraph-classifier in Stage 1 that strips
+   terminal boilerplate (production credits, crisis-line
+   footers, author bios, subscription CTAs) from `full_text`
+   at ingestion. Do NOT preserve stripped content anywhere —
+   listeners who want it click through to the source article
+   (explicit user decision 2026-07-22).
+   (b) Update `aarva/clients/tts.py::_synth_chunk` to detect
+   `response.candidates is None` and `finish_reason=SAFETY`
+   BEFORE subscripting, so operator gets a useful
+   "refused synthesis (block_reason=…)" log line instead of
+   40 wasted seconds of retries and a cryptic exception.
+   Both in one PR. Regex-only classifier in v1; add LLM
+   fallback for bio-detection if regex misses too often.
+
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
