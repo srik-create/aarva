@@ -54,26 +54,22 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-3. **TTS boilerplate strip + Gemini safety-block detection.**
-   Full spec at `docs/session_plan_tts_boilerplate_strip.md`.
-   Two articles in two consecutive days (2026-07-18 blueberry
-   piece, 2026-07-22 crosscut passage_b) failed at Gemini TTS
-   chunk 5 with `'NoneType' object is not subscriptable` —
-   deterministic content block on terminal boilerplate
-   (production credits, crisis-line hotline footer).
-   (a) Add a paragraph-classifier in Stage 1 that strips
-   terminal boilerplate (production credits, crisis-line
-   footers, author bios, subscription CTAs) from `full_text`
-   at ingestion. Do NOT preserve stripped content anywhere —
-   listeners who want it click through to the source article
-   (explicit user decision 2026-07-22).
-   (b) Update `aarva/clients/tts.py::_synth_chunk` to detect
-   `response.candidates is None` and `finish_reason=SAFETY`
-   BEFORE subscripting, so operator gets a useful
-   "refused synthesis (block_reason=…)" log line instead of
-   40 wasted seconds of retries and a cryptic exception.
-   Both in one PR. Regex-only classifier in v1; add LLM
-   fallback for bio-detection if regex misses too often.
+3. **Operator search + ad-hoc URL ingest.** Full spec at
+   `docs/session_plan_operator_search_and_url_ingest.md`. Two
+   operator-only CLI tools that share a common "add article to
+   today's edition" primitive:
+   (a) `python -m aarva.find "<query>"` — hybrid semantic +
+   keyword search over the DB's valid candidate pool (not
+   previously published, not rejected, not dropped from today).
+   Interactive add-by-index after results.
+   (b) `python -m aarva.ingest_url <url>` — fetch, extract,
+   score, embed a specific URL. Unknown-publication URLs prompt
+   at ingest time — (a) shared 'Ad hoc' pub, (b) register a DB
+   row now, (c) abort. Optional `--add-to-edition` in the same
+   command.
+   Both bypass Stage 7's automatic selection; manual adds land
+   as `review_status='proposed'` pieces in today's edition and
+   integrate transparently with the existing review CLI.
 
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
@@ -136,9 +132,59 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-18)
+## Recently completed (2026-06-29 → 2026-07-22)
 
 Most recent first.
+
+### 2026-07-22
+
+- **TTS boilerplate strip + Gemini safety-block detection.** Full
+  spec at `docs/session_plan_tts_boilerplate_strip.md`. Two articles
+  in two consecutive daily runs failed at Gemini TTS chunk 5 with a
+  cryptic `'NoneType' object is not subscriptable` — a deterministic
+  Gemini safety-filter block on terminal publication boilerplate
+  (production credits, a suicide-crisis-line footer), which returns
+  HTTP 200 with `candidates=None` rather than an error.
+  - **Fix A — strip terminal boilerplate at ingestion.** New
+    `aarva/services/terminal_boilerplate.py`: a regex classifier that
+    walks backward from the last paragraph of `full_text` and strips
+    any matching production-credit / crisis-line / author-bio /
+    subscription-CTA paragraph, stopping at the first non-matching
+    paragraph (protects mid-article prose — e.g. an article whose
+    actual topic is the 988 hotline is never touched, since the
+    classifier matches specific boilerplate phrase shapes, not a bare
+    "988"). `Correction:`/`Editor's note:` paragraphs are explicitly
+    never stripped. Wired into `aarva/stages/stage_1_ingest.py`
+    (correcting the spec's assumed filename, `stage_1_extract.py` —
+    doesn't exist; ingestion lives in `stage_1_ingest.py`) — word_count
+    is recomputed from the cleaned text so Stage 2's floor and
+    audio-length estimates stay accurate. No schema change, no
+    backfill (new articles only, per explicit user decision).
+  - **Fix B — fail fast on Gemini safety blocks.**
+    `aarva/clients/tts.py::_synthesize_chunk` (spec named it
+    `_synth_chunk`; actual name differs) now checks
+    `response.candidates` and `finish_reason` before ever subscripting
+    the response, raising a new `_NonRetryableTTSError` with the
+    block reason and a chunk preview — the retry loop catches this
+    specifically and fails immediately instead of burning ~40s through
+    the full backoff cycle for a block that retrying can never fix.
+  - **Verified for real:** ran the classifier against the exact
+    boilerplate text quoted in the spec (both real failure cases) —
+    confirmed full strip with the preceding editorial paragraph
+    intact in both; confirmed a synthetic topical-988-article and a
+    `Correction:` paragraph are correctly left untouched. One known,
+    spec-acknowledged limitation: the bio detector is regex-only and
+    could false-positive on a profile piece whose last paragraph
+    describes its subject ("X is a journalist who...") rather than
+    the author — accepted for v1, revisit with an LLM-assist fallback
+    if it proves material in practice. For Fix B, mocked the Gemini
+    client response directly (no real API spend, since safety blocks
+    aren't reliably reproducible on demand): confirmed
+    `candidates=None` and `finish_reason=SAFETY` both raise
+    `_NonRetryableTTSError` immediately with exactly one API call
+    (no retries); confirmed a simulated transient network error still
+    runs the full retry-with-backoff cycle unaffected; confirmed a
+    normal successful synthesis is unaffected.
 
 ### 2026-07-18
 

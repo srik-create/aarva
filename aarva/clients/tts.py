@@ -32,6 +32,18 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 
+class _NonRetryableTTSError(Exception):
+    """Gemini refused synthesis on content-policy grounds (safety block).
+
+    See docs/session_plan_tts_boilerplate_strip.md Fix B. This is a
+    deterministic block, not a transient failure — retrying the exact
+    same chunk will produce the exact same block every time. Raised
+    instead of letting the generic exception handler burn through the
+    full retry-with-backoff cycle (~40s wasted) for a failure retrying
+    can never fix.
+    """
+
+
 @dataclass(frozen=True)
 class SynthesisResult:
     output_path: Path
@@ -440,6 +452,35 @@ class GeminiTTSClient(TTSClient):
                     contents=prompt,
                     config=config,
                 )
+                # Handle Gemini's content-policy block BEFORE touching
+                # response.candidates — a blocked request returns HTTP 200
+                # with candidates=None (or empty), which used to raise a
+                # bare 'NoneType' object is not subscriptable' on the next
+                # line, get caught by the generic handler below, and burn
+                # through the full retry cycle for a failure retrying can
+                # never fix (see docs/session_plan_tts_boilerplate_strip.md
+                # Fix B).
+                if not response.candidates:
+                    reason = ""
+                    pf = getattr(response, "prompt_feedback", None)
+                    if pf is not None:
+                        reason = getattr(pf, "block_reason", "") or ""
+                    raise _NonRetryableTTSError(
+                        f"Gemini TTS refused synthesis (block_reason={reason!r}). "
+                        f"This is a deterministic content block — retrying will "
+                        f"not help. Chunk starts with: {text[:120]!r}"
+                    )
+                first_candidate = response.candidates[0]
+                finish_reason = getattr(first_candidate, "finish_reason", None)
+                if finish_reason and str(finish_reason).upper() in (
+                    "SAFETY", "PROHIBITED_CONTENT", "SPII", "BLOCKLIST",
+                ):
+                    raise _NonRetryableTTSError(
+                        f"Gemini TTS candidate blocked "
+                        f"(finish_reason={finish_reason}). "
+                        f"Chunk starts with: {text[:120]!r}"
+                    )
+
                 # The audio data lives at:
                 #   response.candidates[0].content.parts[0].inline_data.data
                 # Both the docs and the cookbook show this exact path.
@@ -494,6 +535,12 @@ class GeminiTTSClient(TTSClient):
                     return pcm
 
                 return pcm
+            except _NonRetryableTTSError as e:
+                # Deterministic content block — retrying the same chunk
+                # produces the same block every time. Fail fast instead
+                # of burning through the backoff cycle.
+                logger.error("GeminiTTS: %s — non-retryable.", e)
+                raise
             except Exception as e:
                 last_error = e
                 # Exponential backoff with jitter: 2, 5, 10, 20s.
