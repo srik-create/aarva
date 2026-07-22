@@ -108,6 +108,23 @@
     [data-mini-player-inner] {
       padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
+    /* iOS Safari momentum-scroll workaround (2026-07-18 — see
+       docs/session_plan_ios_player_bugs.md Fix 2): position:fixed
+       elements can briefly render as position:absolute during
+       elastic overscroll, letting the bar lag mid-viewport until
+       scroll settles. Promoting the bar to its own compositor layer
+       eliminates the lag with essentially zero cost. Safe here
+       because [data-mini-player] itself is the fixed element (not an
+       ancestor of one) — the new containing block this creates only
+       matters if a future change adds a position:fixed descendant
+       inside the bar, which isn't the case today (the speed menu
+       uses position:absolute). */
+    [data-mini-player] {
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      will-change: transform;
+    }
     /* Header: viewport-fit=cover means content extends under the iOS
        status bar (clock / signal / battery). Push the header's content
        down by safe-area-inset-top so the wordmark + nav don't collide
@@ -530,6 +547,35 @@
       // unreliable; storing the originally-set value here is simpler.
       let current = { src: null, title: '', link: '' };
 
+      // iOS Lock Screen / Control Center action handlers (2026-07-18 —
+      // docs/session_plan_ios_player_bugs.md Fix 1). Registered ONCE
+      // here, not inside playTrack, so lock-screen / Control Center /
+      // connected-Bluetooth controls stay wired to the shared audio
+      // element across every src swap.
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', function() {
+          if (audio.src) audio.play().catch(function(){});
+        });
+        navigator.mediaSession.setActionHandler('pause', function() {
+          audio.pause();
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', function(details) {
+          audio.currentTime = Math.max(0, audio.currentTime - (details.seekOffset || 10));
+        });
+        navigator.mediaSession.setActionHandler('seekforward', function(details) {
+          audio.currentTime = Math.min(audio.duration || 0,
+                                       audio.currentTime + (details.seekOffset || 10));
+        });
+        // seekto handler for the lock-screen scrubber (iOS 15+).
+        navigator.mediaSession.setActionHandler('seekto', function(details) {
+          if (details.fastSeek && 'fastSeek' in audio) {
+            audio.fastSeek(details.seekTime);
+          } else {
+            audio.currentTime = details.seekTime;
+          }
+        });
+      }
+
       function fmt(seconds) {
         if (!seconds || isNaN(seconds)) return '0:00';
         const s = Math.floor(seconds);
@@ -635,6 +681,24 @@
         current = { src: src, title: title || '', link: link || '/today' };
         audio.src = src;
         audio.currentTime = 0;
+        // iOS Lock Screen / Control Center fix (2026-07-18 — see
+        // docs/session_plan_ios_player_bugs.md Fix 1). Without this,
+        // iOS never learns about src swaps and keeps showing whichever
+        // title was playing when the Now Playing widget first picked
+        // up the audio element.
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title:  current.title || 'Aarva',
+            artist: 'Aarva',
+            album:  'Aarva',
+            artwork: [
+              { src: '/static/icons/apple-touch-icon.png',
+                sizes: '180x180', type: 'image/png' },
+              { src: '/static/icons/icon-512.png',
+                sizes: '512x512', type: 'image/png' },
+            ],
+          });
+        }
         showBar();
         audio.play().catch(function(){});
         updateUI();
@@ -650,6 +714,18 @@
         let last = 0;
         audio.addEventListener('timeupdate', function() {
           updateUI();
+          // Mirror progress into the lock-screen scrubber (Fix 1).
+          // Wrapped in try/catch — some browsers throw if duration is
+          // NaN or position exceeds duration by a rounding epsilon.
+          if ('mediaSession' in navigator && audio.duration) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration:     audio.duration,
+                playbackRate: audio.playbackRate,
+                position:     audio.currentTime,
+              });
+            } catch (e) { /* ignore — cosmetic only */ }
+          }
           const now = Date.now();
           if (now - last > 3000) {     // throttle disk writes
             last = now;

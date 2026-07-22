@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-18
+**Last updated:** 2026-07-22
 
 ---
 
@@ -54,7 +54,28 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-3. **OOM-frequency investigation (Section 3 of
+3. **TTS boilerplate strip + Gemini safety-block detection.**
+   Full spec at `docs/session_plan_tts_boilerplate_strip.md`.
+   Two articles in two consecutive days (2026-07-18 blueberry
+   piece, 2026-07-22 crosscut passage_b) failed at Gemini TTS
+   chunk 5 with `'NoneType' object is not subscriptable` —
+   deterministic content block on terminal boilerplate
+   (production credits, crisis-line hotline footer).
+   (a) Add a paragraph-classifier in Stage 1 that strips
+   terminal boilerplate (production credits, crisis-line
+   footers, author bios, subscription CTAs) from `full_text`
+   at ingestion. Do NOT preserve stripped content anywhere —
+   listeners who want it click through to the source article
+   (explicit user decision 2026-07-22).
+   (b) Update `aarva/clients/tts.py::_synth_chunk` to detect
+   `response.candidates is None` and `finish_reason=SAFETY`
+   BEFORE subscripting, so operator gets a useful
+   "refused synthesis (block_reason=…)" log line instead of
+   40 wasted seconds of retries and a cryptic exception.
+   Both in one PR. Regex-only classifier in v1; add LLM
+   fallback for bio-detection if regex misses too often.
+
+4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -162,6 +183,41 @@ Most recent first.
     an already-approved piece untouched while still correctly
     rejecting the proposed one; confirmed the plain all-proposed,
     no-approved-pieces case (the common daily case) is unaffected.
+
+- **iOS player bugs — lock-screen metadata + fixed-position mid-scroll
+  lag.** Full spec at `docs/session_plan_ios_player_bugs.md`. Both
+  fixes landed in `aarva/server/templates/base.html`:
+  - **Fix 1 (lock-screen metadata):** `playTrack()` now sets
+    `navigator.mediaSession.metadata` on every track/src swap;
+    `play`/`pause`/`seekbackward`/`seekforward`/`seekto` action
+    handlers registered once at module init (not per-track, so
+    lock-screen/Control Center/Bluetooth controls survive src swaps);
+    `setPositionState` mirrors progress on `timeupdate` for the
+    lock-screen scrubber.
+  - **Fix 2 (mid-scroll lag):** `[data-mini-player]` promoted to its
+    own GPU compositor layer (`transform: translateZ(0)` +
+    `backface-visibility: hidden` + `will-change: transform`) to
+    eliminate the iOS Safari momentum-scroll position:fixed quirk.
+  - **Verified headlessly (what's checkable without real iOS
+    hardware):** no console/page errors on load or during playback;
+    confirmed via real Playwright-driven Chromium that
+    `mediaSession.metadata` populates correctly on play and correctly
+    UPDATES when switching to a different track — the exact src-swap
+    path the bug described. The lock-screen rendering itself and the
+    momentum-scroll rendering quirk are iOS-Safari-specific and can't
+    be reproduced in headless Chromium.
+  - **Real-device verification: PENDING.** Per the spec's explicit
+    device-testing gate, this needs confirmation on an actual iPhone
+    (Lock Screen title updates correctly across track switches,
+    scrubber/play/pause work from the lock screen, mini-player stays
+    glued to the bottom during momentum scroll). The Media Session
+    API requires a secure context (HTTPS) — a local-network HTTP test
+    from a phone wouldn't exercise Fix 1 at all — so the user opted to
+    merge straight to `main` (Render auto-deploys) and test on the
+    live aarva.app site rather than stand up a temporary HTTPS tunnel,
+    accepting a fix-forward-if-needed risk instead of a pre-merge
+    device gate. Follow up once confirmed; if either fix doesn't hold
+    up on-device, expect a small fix-forward PR, not a revert.
 
 ### 2026-07-17
 
