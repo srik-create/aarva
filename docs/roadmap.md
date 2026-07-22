@@ -92,6 +92,23 @@ GitHub Pages.
    Both in one PR. Regex-only classifier in v1; add LLM
    fallback for bio-detection if regex misses too often.
 
+8. **Operator search + ad-hoc URL ingest.** Full spec at
+   `docs/session_plan_operator_search_and_url_ingest.md`. Two
+   operator-only CLI tools that share a common "add article to
+   today's edition" primitive:
+   (a) `python -m aarva.find "<query>"` — hybrid semantic +
+   keyword search over the DB's valid candidate pool (not
+   previously published, not rejected, not dropped from today).
+   Interactive add-by-index after results.
+   (b) `python -m aarva.ingest_url <url>` — fetch, extract,
+   score, embed a specific URL. Unknown-publication URLs prompt
+   at ingest time — (a) shared 'Ad hoc' pub, (b) register a DB
+   row now, (c) abort. Optional `--add-to-edition` in the same
+   command.
+   Both bypass Stage 7's automatic selection; manual adds land
+   as `review_status='proposed'` pieces in today's edition and
+   integrate transparently with the existing review CLI.
+
 4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
