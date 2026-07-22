@@ -1,3 +1,18 @@
+**STATUS: DONE (2026-07-22).** Both features shipped in one PR. See
+`docs/roadmap.md`'s 2026-07-22 "Recently completed" entry for the
+full writeup, including several real spec-vs-reality gaps found and
+corrected (domain-matching had no existing helper; `ExtractedArticle`
+has no title/byline — those come from RSS metadata that doesn't
+exist for an ad-hoc URL; `editions.published_date` isn't actually a
+"has this published" flag; `publications` had no `country` column at
+all). One deliberate deviation, confirmed with the user before
+proceeding: Feature A extends the existing `aarva/search.py` instead
+of a new `aarva/find.py` — `search.py` already covered ~90% of the
+same ground (lexical+semantic search, filters, ranked display,
+interactive picker).
+
+---
+
 # Session plan — operator search + ad-hoc URL ingest
 
 Written by Cowork for the next Claude Code session (2026-07-22+).

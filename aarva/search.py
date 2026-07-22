@@ -342,6 +342,7 @@ def _build_filtered_pool(
     since: Optional[str],
     lexical_query: Optional[str],
     full_text_search: bool,
+    require_full_text: bool = False,
 ) -> list[dict]:
     """Pull articles matching the structural filters. The optional
     lexical_query applies an additional substring filter (case-
@@ -351,8 +352,15 @@ def _build_filtered_pool(
     candidates that passed editorial filters AND haven't already been
     used). The user can broaden via --status (a comma-separated list,
     or 'any' to disable the filter entirely).
+
+    require_full_text: --for-edition mode (docs/session_plan_operator_
+    search_and_url_ingest.md) needs criterion 5 of the "valid candidate"
+    definition — a non-empty extracted body. Off by default since most
+    callers don't need the extra WHERE clause.
     """
     where: list[str] = []
+    if require_full_text:
+        where.append("a.full_text IS NOT NULL AND LENGTH(a.full_text) > 0")
     params: list[Any] = []
 
     if pub_substr:
@@ -601,6 +609,25 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--publish-force", action="store_true",
                     help="When publishing, override the in-edition / FAIL "
                          "guards. Implies --publish.")
+    ap.add_argument("--for-edition", action="store_true",
+                    help="Restrict results to articles eligible for today's "
+                         "daily edition: status='scored', has extracted "
+                         "text, and not already used in a published "
+                         "edition / rejected / dropped from today (see "
+                         "aarva.services.candidate_filter). Overrides "
+                         "--status.")
+    ap.add_argument("--add-to-edition", action="store_true",
+                    help="After showing results, interactively pick which "
+                         "ones to add to today's daily edition as proposed "
+                         "pieces (review_status='proposed', slot="
+                         "'manual_addition'). They appear in the next "
+                         "`python -m aarva.review` session.")
+    ap.add_argument("--add", type=str, default=None,
+                    help="Add specific article id(s) to today's edition "
+                         "directly, no picker — comma-separated (e.g. "
+                         "--add 9028,9031). Runs alongside a search if a "
+                         "query/filters are also given (for context); "
+                         "with no query, skips search entirely.")
     ap.add_argument("--ask", type=str, default=None,
                     help="Natural-language search. Gemini parses the "
                          "sentence into structured filters + a semantic "
@@ -645,9 +672,32 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.ask_dry_run and not args.ask:
         print(RED("--ask-dry-run requires --ask."))
         return 1
+    add_ids: list[int] = []
+    if args.add:
+        try:
+            add_ids = [int(x.strip()) for x in args.add.split(",") if x.strip()]
+        except ValueError:
+            print(RED("--add must be a comma-separated list of article ids, "
+                       f"e.g. --add 9028,9031 (got {args.add!r})"))
+            return 1
+        if not add_ids:
+            print(RED("--add requires at least one article id."))
+            return 1
+    if args.add_to_edition and (args.publish or args.publish_force):
+        print(RED("--add-to-edition and --publish target different "
+                   "destinations for the same picks — use one or the "
+                   "other, not both."))
+        return 1
 
     config = load_pipeline_config()
     db = Database(config.db_path)
+
+    # ─── --add with no query/--ask: skip search entirely, add directly ──
+    # ("python -m aarva.find --add 9028" in the spec's CLI shape — the
+    # operator already knows the id from a prior run and just wants it
+    # added, no need to re-run a search first.)
+    if add_ids and not args.query and not args.ask:
+        return _do_direct_adds(db, add_ids)
 
     # ─── --ask mode: NL → structured filters via Gemini ──────────────
     parsed: Optional[dict] = None
@@ -728,10 +778,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         pub_substr=eff_pub,
         lens=eff_lens,
         jtbd=pool_jtbd,
-        status=args.status,
+        # --for-edition forces status='scored' (criterion 1 of the
+        # "valid candidate" definition) regardless of --status.
+        status="scored" if args.for_edition else args.status,
         since=eff_since,
         lexical_query=args.query if not use_semantic else None,
         full_text_search=args.full_text,
+        require_full_text=args.for_edition,
     )
     # Multi-jtbd post-filter: keep only articles matching any of the
     # inferred buckets (primary OR secondary).
@@ -742,6 +795,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             if (a.get("jtbd_primary") in wanted
                 or a.get("jtbd_secondary") in wanted)
         ]
+    # --for-edition criteria 2/3/4: not already in a published edition,
+    # not rejected, not dropped from today's edition. See
+    # aarva.services.candidate_filter for why this can't be a simple
+    # WHERE fragment (published-ness isn't a single-column check).
+    if args.for_edition:
+        from aarva.services.candidate_filter import excluded_article_ids
+        excluded = excluded_article_ids(db)
+        pool = [a for a in pool if a["id"] not in excluded]
     total_pool = len(pool)
 
     if use_semantic:
@@ -762,20 +823,29 @@ def main(argv: Optional[list[str]] = None) -> int:
     want_publish = args.publish or args.publish_force
     batch_size = args.limit if args.limit > 0 else 20
 
-    # Non-publish path: just show the top-N batch and exit.
-    if not want_publish:
+    # Plain display path: no --publish, no --add-to-edition. A direct
+    # --add alongside a search still displays first (for context), then
+    # adds the specified id(s) — spec's "search + non-interactive add".
+    if not want_publish and not args.add_to_edition:
         display = results[:args.limit] if args.limit > 0 else results
         _print_results(display, args.query, mode, total_pool, args.json)
+        if add_ids:
+            _do_direct_adds(db, add_ids)
         return 0
 
-    # Publish path: interactive picker over the full ranked list. Show
-    # one batch at a time, accept numbers/ranges/"all", "more" to
-    # paginate, "q" / empty to cancel.
     if not results:
         # _print_results still has a useful "0 results" header.
         _print_results([], args.query, mode, total_pool, args.json)
         return 0
 
+    if args.add_to_edition:
+        return _interactive_add_to_edition(
+            db, results, args.query, mode, total_pool, batch_size=batch_size,
+        )
+
+    # Publish path: interactive picker over the full ranked list. Show
+    # one batch at a time, accept numbers/ranges/"all", "more" to
+    # paginate, "q" / empty to cancel.
     return _interactive_publish(
         results, args.query, mode, total_pool,
         batch_size=batch_size, force=args.publish_force,
@@ -868,6 +938,103 @@ def _interactive_publish(
         if force:
             argv_pa = ["--force"] + argv_pa
         return _pa.main(argv_pa)
+
+
+def _do_direct_adds(db: Database, article_ids: list[int]) -> int:
+    """--add <id>[,<id>...]: add specific article ids to today's edition
+    directly, no picker. Prints one result line per id. Returns 1 if
+    any add failed with 'no_edition' (nothing useful to report success
+    on), 0 otherwise — 'already_present' is a no-op, not a failure."""
+    from aarva.services.edition_ops import add_article_to_todays_edition
+
+    print()
+    saw_no_edition = False
+    for article_id in article_ids:
+        result = add_article_to_todays_edition(db, article_id)
+        if result == "added":
+            print(f"  {GREEN('✓')} id={article_id} added to today's edition "
+                  f"(proposed).")
+        elif result == "already_present":
+            print(f"  {DIM('·')} id={article_id} already in today's edition "
+                  f"— no-op.")
+        else:
+            print(f"  {RED('✗')} id={article_id}: no daily edition exists "
+                  f"for today yet (Stage 7 hasn't run).")
+            saw_no_edition = True
+    return 1 if saw_no_edition else 0
+
+
+def _interactive_add_to_edition(
+    db: Database,
+    full_ranked: list[tuple[Optional[float], dict]],
+    query: Optional[str],
+    mode: str,
+    total_pool: int,
+    *,
+    batch_size: int,
+) -> int:
+    """--add-to-edition: same pagination/picker shape as
+    _interactive_publish, but adds picks to today's daily edition
+    (aarva.services.edition_ops) instead of publishing them as bonus
+    episodes."""
+    from aarva.services.edition_ops import add_article_to_todays_edition
+
+    offset = 0
+    while True:
+        batch = full_ranked[offset:offset + batch_size]
+        if not batch:
+            print(DIM("No more results in this search."))
+            return 0
+
+        window_label = (
+            f"{len(batch)} results "
+            f"{offset + 1}-{offset + len(batch)} of {len(full_ranked)} "
+            f"(after filters)"
+        )
+        _print_results(batch, query, mode, total_pool, json_mode=False)
+
+        print(BOLD(f"\nWindow: {window_label}"))
+        print(BOLD("Add to today's edition:"))
+        print(f"  {YELLOW('1,3,5')}     add results 1, 3 and 5")
+        print(f"  {YELLOW('1-3')}       add 1 through 3 (range)")
+        print(f"  {YELLOW('all')}       add everything in this batch")
+        print(f"  {YELLOW('more')}      show the next batch")
+        print(f"  {YELLOW('q / ↵')}     cancel")
+        try:
+            choice = input(BOLD("> ")).strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return 1
+
+        if not choice or choice in ("q", "quit"):
+            print(DIM("Cancelled."))
+            return 0
+        if choice == "more":
+            offset += batch_size
+            continue
+        if choice == "all":
+            selected = [a for _, a in batch]
+        else:
+            try:
+                indices = _parse_picks(choice, len(batch))
+            except ValueError as e:
+                print(RED(f"  {e}"))
+                continue
+            selected = [batch[i - 1][1] for i in indices]
+
+        print()
+        no_edition = False
+        for a in selected:
+            result = add_article_to_todays_edition(db, int(a["id"]))
+            label = f"id={a['id']}  [{a['publication']}]  {(a['title'] or '')[:60]}"
+            if result == "added":
+                print(f"  {GREEN('✓')} {label}")
+            elif result == "already_present":
+                print(f"  {DIM('· already in edition')} {label}")
+            else:
+                print(f"  {RED('✗ no edition for today yet')} {label}")
+                no_edition = True
+        return 1 if no_edition else 0
 
 
 def _parse_picks(choice: str, max_n: int) -> list[int]:

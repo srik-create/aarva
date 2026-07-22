@@ -54,24 +54,7 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-3. **Operator search + ad-hoc URL ingest.** Full spec at
-   `docs/session_plan_operator_search_and_url_ingest.md`. Two
-   operator-only CLI tools that share a common "add article to
-   today's edition" primitive:
-   (a) `python -m aarva.find "<query>"` — hybrid semantic +
-   keyword search over the DB's valid candidate pool (not
-   previously published, not rejected, not dropped from today).
-   Interactive add-by-index after results.
-   (b) `python -m aarva.ingest_url <url>` — fetch, extract,
-   score, embed a specific URL. Unknown-publication URLs prompt
-   at ingest time — (a) shared 'Ad hoc' pub, (b) register a DB
-   row now, (c) abort. Optional `--add-to-edition` in the same
-   command.
-   Both bypass Stage 7's automatic selection; manual adds land
-   as `review_status='proposed'` pieces in today's edition and
-   integrate transparently with the existing review CLI.
-
-4. **OOM-frequency investigation (Section 3 of
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -137,6 +120,90 @@ the sequence.
 Most recent first.
 
 ### 2026-07-22
+
+- **Operator search + ad-hoc URL ingest.** Full spec at
+  `docs/session_plan_operator_search_and_url_ingest.md`.
+  - **Feature A (search)** — extended the existing `aarva/search.py`
+    (lexical + semantic search, filters, ranked display, interactive
+    picker) rather than building a separate `aarva/find.py` as the
+    spec assumed — `search.py` already covered ~90% of the same
+    ground and duplicating it would have meant two divergent search
+    implementations. Confirmed with the user before proceeding. New
+    `--for-edition` flag restricts results to the "valid candidate"
+    definition (status='scored', has extracted text, not already
+    published/rejected/dropped-today — see new `aarva/services/
+    candidate_filter.py`). New `--add-to-edition` (interactive
+    picker, same batch/pagination shape as the existing `--publish`
+    flow) and `--add <id>[,<id>...]` (direct, non-interactive) both
+    add picks to today's daily edition via new `aarva/services/
+    edition_ops.py::add_article_to_todays_edition`.
+  - **Feature B (URL ingest)** — new `aarva/ingest_url.py`: fetch a
+    specific URL, extract it, run Stage 2 (filters) → Stage 4-5-6
+    (scoring) → Stage 8.5 (author provenance) → embedding generation
+    inline for just that one article (each stage scoped via the same
+    `article_filter_ids` pattern Stage 4-5-6 already had — added the
+    same param to Stage 2's `filter_hard` for consistency), then
+    inserts into `articles`. Unknown-publication domains prompt:
+    (a) shared "Ad hoc" pub, (b) register a new pub row now (DB
+    only, `publications.yaml` untouched), (c) abort. Optional
+    `--add-to-edition` reuses the same primitive as Feature A.
+  - **Spec-vs-reality gaps found and corrected:**
+    - No existing helper matches a URL's domain to a known
+      publication (Stage 1's RSS flow always already knows which
+      publication it's pulling from) — written fresh.
+    - `ExtractedArticle` (the extraction return type) has no
+      title/byline/date fields — those normally come from the RSS
+      feed entry, which doesn't exist for an ad-hoc URL. Added a
+      `trafilatura.extract_metadata()` call (verified against a real
+      ProPublica URL) to fill this gap without touching the tuned
+      extraction cascade.
+    - The spec's criterion for "already published" was `editions.
+      published_date IS NOT NULL` — but that column defaults to
+      `CURRENT_TIMESTAMP` at row creation (Stage 7 time), so it's
+      non-NULL for every edition immediately, published or not. Used
+      the real signal instead: `edition_pieces.audio_url IS NOT
+      NULL`, matching what `aarva/services/queries.py`'s own
+      `load_daily_pieces_with_audio` ("pieces ... whose audio has
+      been generated") already keys published-ness on.
+    - The spec wanted a per-article-registered "country tag" to
+      drive TTS accent for ad-hoc publications, but `publications`
+      had no `country` column at all — publication-level accent
+      steering was entirely `publications.yaml`-driven. Added the
+      column and merged it into `stage_9_tts.py::
+      _build_publication_country_map()` (now optionally takes `db`)
+      so DB-only ad-hoc publications actually get accent steering,
+      not silently inert metadata.
+  - **Real bug caught during verification:** the first working
+    version of the "known publication" domain-match path called
+    `db.upsert_publication(name=pub_name)` with no other fields —
+    which silently overwrote the existing row's `rss_url`/`homepage`/
+    `tier` with NULL, since those params default to None and the
+    UPDATE always applies them. Would have broken that publication's
+    RSS ingestion until the next `publications.yaml` sync re-fixed
+    it. Caught by inspecting the real (disposable-copy) DB row
+    before/after a real ingestion — fixed to do a plain lookup for
+    already-known publications instead of an upsert. Also hardened
+    `upsert_publication` itself: `country` now uses
+    `COALESCE(?, country)` in the UPDATE so omitting it (every other
+    existing caller) can never clobber an already-set value.
+  - **Verified for real, mostly against a disposable copy of the
+    real DB:** `--for-edition` confirmed to actually exclude
+    articles (138 vs. 142 results for the same query with/without
+    the flag) against the live DB (read-only, safe); `--add`/
+    `--add-to-edition` verified for all three outcomes (`added`,
+    `already_present`, `no_edition`) against a disposable copy; a
+    real, previously-unseen article was fully ingested end-to-end
+    (real extraction, real Stage 2/4-5-6/8.5 calls, real embedding)
+    from a known publication with correct title/byline/date via the
+    metadata fallback; the unknown-publication prompt's all three
+    options (ad-hoc, register-with-country, abort) verified directly,
+    including idempotency (a second ad-hoc call reuses the same row,
+    doesn't duplicate it) and that a registered country tag actually
+    appears in `_build_publication_country_map(db)`'s output;
+    confirmed Stage 2's new `article_filter_ids` scoping leaves other
+    pending `'ingested'` articles completely untouched; confirmed the
+    real production DB was never mutated by any of this — only
+    disposable copies were.
 
 - **TTS boilerplate strip + Gemini safety-block detection.** Full
   spec at `docs/session_plan_tts_boilerplate_strip.md`. Two articles

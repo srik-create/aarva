@@ -17,6 +17,8 @@ import logging
 import re
 from dataclasses import dataclass
 
+from typing import Optional
+
 from aarva.config import PipelineConfig
 from aarva.db import Database
 
@@ -108,8 +110,16 @@ def _is_digest_or_collection(
 def filter_hard(
     config: PipelineConfig,
     db: Database,
+    *,
+    article_filter_ids: Optional[set[int]] = None,
 ) -> FilterStats:
-    """Run Stage 2: hard filters on articles that survived Stage 1.5."""
+    """Run Stage 2: hard filters on articles that survived Stage 1.5.
+
+    article_filter_ids: if provided, only filter articles with these
+    IDs (mirrors stage_4_5_6_score.py::score_all's same-named param) —
+    used by aarva/ingest_url.py to run this stage on a single ad-hoc
+    article without touching other pending 'ingested' articles.
+    """
     word_floor = config.filters.word_floor
     listicle_keywords = config.filters.listicle_keywords
 
@@ -125,6 +135,7 @@ def filter_hard(
             (int(r["id"]), r["title"], r["byline"], int(r["word_count"] or 0),
              r["publication"])
             for r in rows
+            if article_filter_ids is None or int(r["id"]) in article_filter_ids
         ]
 
     stats = FilterStats(candidates=len(candidates))

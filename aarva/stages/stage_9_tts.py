@@ -249,20 +249,45 @@ _COUNTRY_TO_ACCENT_PROMPT: dict[str, str] = {
 }
 
 
-def _build_publication_country_map() -> dict[str, str]:
-    """Return {publication_name: country_code} from publications.yaml.
+def _build_publication_country_map(db: Database | None = None) -> dict[str, str]:
+    """Return {publication_name: country_code}, merging two sources.
 
-    Publications without a country tag are absent from the map. Loaded
-    once per Stage 9 invocation; the YAML file is small (<10 KB)."""
+    Publications known via publications.yaml carry their country tag
+    there (see aarva.config.Publication.country). Publications
+    registered at ingest time via `python -m aarva.ingest_url` (option
+    b — "register now") never touch that YAML file — they only exist
+    as a DB row with a `publications.country` column (2026-07-22, see
+    docs/session_plan_operator_search_and_url_ingest.md). Without this
+    merge, ad-hoc publications would silently get no accent steering
+    at all. DB values win on name collision (shouldn't happen in
+    practice — YAML-known publications don't get re-registered ad hoc).
+
+    `db` is optional so existing callers that never see a DB-only
+    publication keep working with no behavior change if omitted.
+    Publications without a country tag from either source are absent
+    from the map. Loaded once per Stage 9 (or crosscut TTS) invocation."""
+    country_map: dict[str, str] = {}
     try:
         from aarva.config import load_publications
-        return {
+        country_map.update({
             p.name: p.country for p in load_publications()
             if p.country
-        }
+        })
     except Exception as e:
         logger.warning("Could not load publications.yaml for accent map: %s", e)
-        return {}
+
+    if db is not None:
+        try:
+            with db.connect() as conn:
+                rows = conn.execute(
+                    "SELECT name, country FROM publications "
+                    "WHERE country IS NOT NULL AND country != ''"
+                ).fetchall()
+            country_map.update({r["name"]: r["country"] for r in rows})
+        except Exception as e:
+            logger.warning("Could not load DB publication country tags: %s", e)
+
+    return country_map
 
 
 def _accent_prompt_for(piece: dict, country_map: dict[str, str]) -> str | None:
@@ -624,7 +649,7 @@ def generate_for_edition(
     audio_dir = config.audio_dir
     # Pre-load the publication-name → country lookup for accent steering.
     # Built once per Stage 9 run; reused across every piece's TTS call.
-    country_map = _build_publication_country_map()
+    country_map = _build_publication_country_map(db)
     logger.info(
         "Stage 9: synthesizing %d pieces  |  rule=%s  |  "
         "female pool=%s  |  male pool=%s  |  "
