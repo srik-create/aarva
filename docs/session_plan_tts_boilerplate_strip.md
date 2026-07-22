@@ -1,3 +1,12 @@
+**STATUS: DONE (2026-07-22).** Both fixes shipped in one PR. See
+`docs/roadmap.md`'s 2026-07-22 "Recently completed" entry for the
+full writeup. Two naming corrections vs. this spec: ingestion lives
+in `aarva/stages/stage_1_ingest.py`, not `stage_1_extract.py`
+(doesn't exist); the TTS chunk method is `_synthesize_chunk`, not
+`_synth_chunk`.
+
+---
+
 # Session plan — strip terminal boilerplate before TTS + surface Gemini safety blocks
 
 Written by Cowork for the next Claude Code session (2026-07-18+).

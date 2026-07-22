@@ -17,6 +17,7 @@ from typing import Optional
 
 from aarva.config import PipelineConfig, Publication, load_publications
 from aarva.db import Database
+from aarva.services.terminal_boilerplate import strip_terminal_boilerplate
 from aarva.sources.article_extractor import ExtractedArticle, extract_article
 from aarva.sources.rss import FeedEntry, fetch_feed
 
@@ -30,6 +31,7 @@ class IngestionStats:
     already_known: int = 0
     extraction_failed: int = 0
     inserted: int = 0
+    boilerplate_stripped: int = 0
 
 
 def _ensure_publication_in_db(db: Database, pub: Publication) -> int:
@@ -78,14 +80,31 @@ def _ingest_entry(
         stats.extraction_failed += 1
         return
 
+    # Strip terminal boilerplate (production credits, crisis-line
+    # footers, author bios, subscription CTAs) before persisting — see
+    # docs/session_plan_tts_boilerplate_strip.md. Useless in audio and,
+    # worse, deterministically trips Gemini TTS's safety filter. Not
+    # preserved anywhere; listeners who want it click through to the
+    # source article. word_count is recomputed from the cleaned text
+    # so Stage 2's floor and audio-length estimates stay accurate.
+    full_text, stripped = strip_terminal_boilerplate(extracted.full_text)
+    word_count = len(full_text.split()) if stripped else extracted.word_count
+    if stripped:
+        stats.boilerplate_stripped += 1
+        for label, preview in stripped:
+            logger.info(
+                "Stage 1: %s — stripped terminal paragraph (%s): %r",
+                entry.canonical_url, label, preview,
+            )
+
     article_id = db.insert_article(
         canonical_url=entry.canonical_url,
         title=entry.title,
         byline=entry.byline,
         publication_id=publication_id,
         published_date=entry.published_date,
-        word_count=extracted.word_count,
-        full_text=extracted.full_text,
+        word_count=word_count,
+        full_text=full_text,
         excerpt=extracted.excerpt,
         status="ingested",
     )
@@ -142,4 +161,8 @@ def ingest_today(
             stats.inserted, stats.already_known, stats.extraction_failed,
         )
 
+    logger.info(
+        "Stage 1: stripped terminal boilerplate from %d of %d articles.",
+        stats.boilerplate_stripped, stats.inserted,
+    )
     return stats

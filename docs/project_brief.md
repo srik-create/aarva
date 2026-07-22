@@ -7,7 +7,7 @@ Source of truth for orientation. Read this at the start of any session
 - `docs/roadmap.md` — what's next, what's deferred, recent commits
 - `docs/aarva_architecture_v1.md` — deep technical reference (schema, stages)
 
-**Last updated:** 2026-07-17
+**Last updated:** 2026-07-22
 
 ---
 
@@ -143,6 +143,7 @@ future-us knows whether to revisit.
 | 2026-06-26 | `lens_card_future` and `lens_card_behind` capped to last 6 days | News-y slots lose meaning fast | Yes — `assembly.slot_max_age_days` override |
 | 2026-07-17 | **Reviewer feedback learning loop, Phase 1: capture a reason code on every reject.** `python -m aarva.review` now prompts for one of seven codes (too_long/too_short/wrong_tone/transcript/video_dependent/listicle/other+note) after a reject, stored on new `edition_rejections.reason`/`reason_note` columns. Reason list lives as data in `aarva/services/review_reasons.py`, not a DB enum. Legacy rows stay `reason=NULL` — no retroactive backfill. | Today's rejection signal is a single undifferentiated blob (one rejection-centroid vector); different rejection reasons want different remediations (a hard Stage 2 filter for structural reasons vs. a soft taste-centroid penalty for qualitative ones). See `docs/session_plan_reviewer_learning_loop.md`. | Yes — `reason`/`reason_note` are both nullable and unused by any other code path yet; removing the CLI prompt or the columns is a no-op for everything else |
 | 2026-07-17 | **Author-provenance-based TTS accent steering** — supersedes the 2026-06-18 publication-only country tag as the primary signal for TTS accent choice; the publication tag stays as fallback. New `articles.author_country_code` (`us`/`uk`/`india`/`unknown`/`NULL`), classified once per article by a small Gemini call reading byline + body evidence, explicitly never the author's name. Precedence at TTS time: known author provenance > publication tag > default. Full catalog (8,238 articles) backfilled 2026-07-17. See `docs/session_plan_author_provenance_accents.md`. | Publication-only tagging under-covers unaffiliated publications (The Diplomat) and over-generalizes pan-regional ones (Himal Southasian); diaspora authors need country-of-residence, not name-inferred heritage — the 2026-06-18 row's "Indian Hindu pieces shouldn't sound American" goal is better served per-author than per-publication. | Yes — `author_country_code` is nullable per article; clearing it reverts a piece to publication-tag-only behavior |
+| 2026-07-22 | **Strip terminal publication boilerplate (production credits, crisis-line footers, author bios, subscription CTAs) from article text at ingestion — not preserved anywhere.** New `aarva/services/terminal_boilerplate.py` regex classifier, wired into Stage 1. New articles only, no backfill. | Two articles in two days deterministically tripped Gemini TTS's safety filter on this exact kind of tail content (a suicide-crisis-line footer, a production-credits list) — useless in audio either way, since a listener can't dial a hotline mid-episode. Explicit user decision: listeners who want it click through to the source article. See `docs/session_plan_tts_boilerplate_strip.md`. | Yes — new articles only; an already-ingested article's `full_text` is untouched unless it re-fails at TTS and gets manually re-cleaned |
 
 ### Tech / infrastructure
 
