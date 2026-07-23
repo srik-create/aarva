@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Thursday, 23 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-23</div>
+      <div class="edition-meta">2 pieces · Crosscut · Thursday, 23 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · building physical habits</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-23/crosscut_0099.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>41 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Josh Kerr crossed the finish line in 3:42.66 just a few days ago, ending a twenty-seven-year wait for a new world record in the mile. It’s a feat with roots in 18th-century street bets, as a piece from the Smithsonian Magazine explains. But something interesting emerges when this elite speed is set against the mental wiring of a casual jogger. Writing in Psyche yesterday, Eike Buabang looks at the neurological shift that happens when a difficult choice finally becomes an automatic reflex. It’s worth pausing on how the same internal machinery that drives a world record also helps an ordinary person ignore the snooze button on a cold morning and just start running.</p>
+        <article class='piece'>
+<p class='hook'>Josh Kerr stood in London Stadium last weekend, chasing a specific number: 222. That’s the total seconds needed to finish a mile in three minutes and forty-two seconds. In a Smithsonian Magazine article from earlier this week, the writer sets Kerr’s new world record against a long history of people pushing their bodies. Notice how the writer connects this modern feat to eighteenth-century street bets, where runners sometimes stripped naked just to find a bit more speed.</p>
+<h2 class='title'>For the First Time in 27 Years, a Man Set a New World Record for Fastest Mile. People Have Chased the Goal for Centuries</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/smart-news/for-the-first-time-in-27-years-a-man-set-a-new-world-record-for-fastest-mile-people-have-chased-the-goal-for-centuries-180989154/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>The Smithsonian piece leaves the listener at the finish line in London, watching Josh Kerr shave fractions of a second off a record that stood for nearly thirty years. It’s a story of Project 222 and the giants who came before, framing the mile as a pursuit of something almost superhuman. But behind the blistering speed and the roaring crowds lies a much quieter, more relatable struggle. Eike Buabang, up next, isn&#x27;t looking at the final lap; the focus shifts to the very first moment of the day—the groggy battle with the snooze button. While the first piece celebrates the peak of human willpower, Buabang suggests that relying on willpower is actually a losing game. The interesting thing is how these two perspectives overlap. Kerr’s record-breaking run looks like a feat of extreme motivation, but read alongside Buabang, it starts to look like the ultimate result of a brain that has simply turned &quot;going&quot; into an automatic reflex. If the mile is sport’s greatest goal, Buabang shows that the engine behind it is a neurological shortcut that closes the gap between wanting to do something and actually doing it. It turns out the elite athlete and the casual jogger are using the exact same hardware to beat the morning chill.</p>
+        <article class='piece'>
+
+<h2 class='title'>How to become the person you want to be</h2>
+<p class='byline'><span class='publication'>Psyche</span><span class='sep'>·</span><span>Eike Buabang</span></p>
+<p class='source'><a href='https://psyche.co/guides/how-to-become-the-person-you-want-to-be' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Josh Kerr’s 3:42.66 mile began long before he hit the track, built on the same neurological shift that helps a tired person ignore the snooze button on a rainy Tuesday. Whether it’s a bet on an 18th-century cobblestone street or a solo jog through the park, the body eventually stops asking for permission to move. What lingers is the idea that the hardest part of a run isn&#x27;t the lungs, but the moment the brain decides to stop arguing. If the body can be trained to move without thinking, how much of talent is actually just a quiet mind?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

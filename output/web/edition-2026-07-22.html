@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Wednesday, 22 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-22</div>
+      <div class="edition-meta">6 pieces · Wednesday, 22 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If the rules for global sanctions are too messy to follow, who ends up holding the keys?</p>
+        <h2 class="title">Sanctions Gaps and the Governance of Corruption Risk</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>William Burke-White</span>
+        </p>
+        <p class="contextualisation">Relief trucks stalled at the Syrian border after the 2023 earthquake because the rules meant to help were too tangled to follow. Writing on 4 June 2026, the piece points to these legal gray areas—places where one country says yes and another says maybe—as the spots where corruption actually takes root. It offers a shift in perspective, moving away from the idea of sanctions as simple on-off switches. Instead, the focus is on the messy middle ground where influence is bought and sold just to get aid across a border.</p>
+        <p class='show-notes'>Sanctions regimes often produce legal gaps where trade is neither fully prohibited nor clearly authorized, creating new opportunities for corruption. Examples from Syria and Iraq show how fragmented international rules allow intermediaries to control access to markets. Reducing these risks requires aligning legal definitions across borders and building anti-corruption safeguards directly into the design of sanctions.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_1216.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>20 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/138646/sanctions-gaps-and-the-governance-of-corruption-risk/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=sanctions-gaps-and-the-governance-of-corruption-risk' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">If a rocky world 49 light-years away has air and water, is life the only thing missing?</p>
+        <h2 class="title">Could Life Exist on This Nearby World? In a First, Astronomers Find an Atmosphere on an Earth-Like Exoplanet in the Habitable Zone</h2>
+        <p class="byline">
+          <span class="publication">Smithsonian Magazine</span>
+          
+        </p>
+        <p class="contextualisation">Astronomers pointed the Magellan Clay Telescope at a rocky world 49 light-years away and caught the faint signature of helium escaping into space. In this report from 21 July 2026, finding an atmosphere around exoplanet LHS 1140 b marks a shift from speculating about habitable worlds to actually seeing one. The piece follows researchers as they map the cosmic shoreline, a boundary where some planets hold onto their air while others lose it to the stars. It turns the search for life into a concrete question of chemistry and timing.</p>
+        <p class='show-notes'>Astronomers have found an atmosphere on LHS 1140 b, a rocky exoplanet located 49 light-years away. The world orbits in its star&#x27;s habitable zone, where temperatures may allow for liquid water to exist on the surface. Data from the Magellan Clay Telescope shows escaping helium, suggesting the planet is large enough to retain its gases despite radiation from its host star.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_9302.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.smithsonianmag.com/smart-news/could-life-exist-on-this-nearby-world-in-a-first-astronomers-find-an-atmosphere-on-an-earth-like-exoplanet-in-the-habitable-zone-180989149/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">How much can anyone really know about the farm that grew the blueberries in their fridge?</p>
+        <h2 class="title">My Maddening Quest to Find Out if Blueberries Come From Farms Where Workers Were Harmed</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Max Blau</span>
+        </p>
+        <p class="contextualisation">A plastic pint of blueberries in a Georgia grocery store is the starting point for this ProPublica report from 21 July 2026. The search for the farm that grew them hits a wall of corporate silence and hidden labor contracts. The systems bringing produce to the kitchen table are often built to hide exactly how workers are treated. Only a few pennies stand between worker abuse and fair pay, yet most major brands still refuse to spend them.</p>
+        <p class='show-notes'>An investigation into why grocery shoppers cannot easily find out if their blueberries come from farms that mistreat workers. Tracing supply chains from Georgia fields to store shelves shows how labor contractors and a lack of federal rules hide the conditions of farm laborers. It also looks at why major food brands and grocery chains have largely declined to join programs that guarantee fair pay and safety for pickers.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_9028.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://projects.propublica.org/blueberries-farmworker-mistreatment/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">When a doctor predicts a child’s life, how much of the story are they missing?</p>
+        <h2 class="title">Opinion: My adult daughter has Down syndrome. Her life is entirely different from what experts expected</h2>
+        <p class="byline">
+          <span class="publication">STAT News</span>
+          <span class='sep'>·</span><span>Michelle Sie Whitten</span>
+        </p>
+        <p class="contextualisation">A genetic counselor once handed a mother a tissue and a terrifying video, predicting a very short life for her unborn child. Writing on 25 June 2026, Michelle Sie Whitten looks back at that moment as a parent whose daughter just graduated from university. A persistent gap remains between clinical statistics and the actual lives of people with Down syndrome. While medical technology has advanced, the way many professionals talk to families often remains stuck in the past, relying on outdated assumptions instead of evidence.</p>
+        <p class='show-notes'>Expectant parents often receive outdated statistics and medical warnings after a Down syndrome diagnosis. Using her experience raising a daughter with the condition, the author compares these warnings with the reality of daily life. She reviews recent gains in healthcare and argues for providing families with accurate, neutral information.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_4705.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.statnews.com/2026/06/25/prenatal-down-syndrome-diagnosis-screening-life-expectancy-health-facts/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">How did a kitchen cream separator and a few dead mice reveal what genes are made of?</p>
+        <h2 class="title">How we learned what genes are made of</h2>
+        <p class="byline">
+          <span class="publication">Works in Progress</span>
+          <span class='sep'>·</span><span>Kevin Blake, PhD</span>
+        </p>
+        <p class="contextualisation">The story begins with dead mice and a kitchen cream separator modified to handle lethal bacteria. Writing on 29 May 2026, Kevin Blake tracks the messy path to discovering how traits are inherited. Before the 1940s, the scientific world was convinced that proteins, not DNA, held the secrets of life. Blake looks past the famous names of Watson and Crick to find the cautious researchers who proved that a supposedly stupid substance was the foundation of biology. It shows how science actually moves: through persistence, luck, and the people history often forgets.</p>
+        <p class='show-notes'>Oswald Avery and his team used a kitchen cream separator to isolate the chemical basis of inheritance in 1944, building on earlier experiments with bacteria and mice. Their work led to the discovery that genes are encoded in DNA, overturning the long-held belief that they were made of protein. These findings provided the foundation for modern biology and the later discovery of the double helix.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_0811.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>16 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.worksinprogress.news/p/the-mystery-of-inheritance' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+
+      <article class="piece">
+        <p class="hook">How does the world look different when seen from a train window in the middle of the night?</p>
+        <h2 class="title">‘No matter how busy a train is, you can always find a quiet space’: Travel writer Monisha Rajesh</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Amritesh Mukherjee</span>
+        </p>
+        <p class="contextualisation">Monisha Rajesh watches the world from the window of a sleeper car, catching glimpses of lit-up living rooms and people winding down for the night. In this conversation from 20 June 2026, life on the rails turns out to be louder and messier than the brochures suggest. The discussion moves from the loss of anonymity in the age of Instagram to the heavy history of the tracks themselves. It captures the specific kind of honesty that happens when strangers are tucked into a shared, moving space.</p>
+        <p class='show-notes'>Travel writer Monisha Rajesh discusses her decade of writing about global rail travel. The conversation covers her latest book on night trains, the impact of social media on traveler anonymity, and the colonial histories built into railway lines. Rajesh explains how the physical closeness of a train car changes her interactions with strangers and the way she views the countries passing by her window.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-22/article_3672.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1090225/no-matter-how-busy-a-train-is-you-can-always-find-a-quiet-space-travel-writer-monisha-rajesh?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
