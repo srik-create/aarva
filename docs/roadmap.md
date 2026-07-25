@@ -70,16 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Dynamic catalog count on /create loading state.**
-   Full spec at `docs/session_plan_create_catalog_count_dynamic.md`.
-   The /create page's loading dialog reads *"Aarva is matching
-   your prompt against ~5,000 articles…"* — hardcoded number,
-   stale (catalog is now 10k+). Query `COUNT(*) FROM articles
-   WHERE embedding IS NOT NULL` on every /create render, floor
-   to the nearest 1,000, render with thousands separator.
-   Copy shape unchanged — only the number becomes dynamic
-   (AGENTS.md rule 4 sign-off from user 2026-07-22).
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -130,6 +120,22 @@ the sequence.
 Most recent first.
 
 ### 2026-07-22
+
+- **Dynamic catalog count on /create loading state.** Full spec at
+  `docs/session_plan_create_catalog_count_dynamic.md`. The loading
+  dialog's *"Aarva is matching your prompt against ~5,000 articles…"*
+  had a hardcoded, now-stale number (catalog is 10k+). `/create`'s
+  route now runs `SELECT COUNT(*) FROM articles WHERE embedding IS
+  NOT NULL` (the true searchable pool, sub-millisecond), floors to
+  the nearest 1,000 with a 1,000 safety minimum, and passes it into
+  the template with a thousands separator. Copy wording unchanged
+  except the number (AGENTS.md rule 4 sign-off from user 2026-07-22).
+  - **Verified for real:** ran a live local server against the real
+    DB — real count (10,020) correctly floors to and renders
+    "~10,000 articles"; confirmed the flooring formula against all
+    of the spec's worked examples (10,432/10,987 → ~10,000; 11,001 →
+    ~11,000; 0/500/999 → ~1,000 safety floor); confirmed the
+    empty-`q` → redirect-to-`/` behavior is unaffected.
 
 - **Operator search + ad-hoc URL ingest.** Full spec at
   `docs/session_plan_operator_search_and_url_ingest.md`.
