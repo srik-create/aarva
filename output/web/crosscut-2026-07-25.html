@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 25 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-25</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 25 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · math and morals</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-25/crosscut_0103.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>19 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A coder in a glass office calculates how to save a billion lives while a neighbor next door struggles for rent. Writing two days ago, William Thibeau looks at effective altruism and finds a strange math that prizes abstract beings over the person standing in front of you. It’s a morality built on spreadsheets. Something interesting emerges when that logic hits the ground. Sarah Setlaelo, writing yesterday, looks back at Nelson Mandela. He wasn’t a man of formulas. He chose the messy, uncomfortable work of sitting across from enemies to build a nation. Putting these together shows the friction between the cold clarity of a calculation and the difficult, face-to-face reality of compromise.</p>
+        <article class='piece'>
+<p class='hook'>A daughter’s smile is often treated as a mere evolutionary defect by the Silicon Valley elites William Thibeau critiques for Compact, writing just two days ago. He tracks how billion-dollar firms like Anthropic are built on Effective Altruism, a philosophy that values abstract strangers over neighbors. Listen for the way he links the 1970s rise of television to a moral shift that pushed the neighbor’s child out of view.</p>
+<h2 class='title'>Misanthropic Altruism</h2>
+<p class='byline'><span class='publication'>Compact</span><span class='sep'>·</span><span>William Thibeau</span></p>
+<p class='source'><a href='https://www.compactmag.com/article/misanthropic-altruism/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Thibeau leaves the listener with the image of a spreadsheet trying to outvote a soul. In that world, a daughter’s smile is just one more data point to be weighed against the needs of a thousand strangers. It is a vision of morality where the &quot;calculating reformer&quot; wins by being perfectly logical and completely detached. But notice what happens when that cold math hits the actual friction of history. Sarah Setlaelo brings in Nelson Mandela, a leader who didn&#x27;t work with a calculator or even a grand theory, but with what she calls pragmatism. Where Thibeau warns about the &quot;bureaucrat&quot; mask, Setlaelo describes a &quot;philosopher king&quot; who understood that real change doesn&#x27;t come from a wealth pledge or an IPO. It comes from the &quot;Janusian contradiction&quot;—the difficult, face-to-face work of holding a divided country together. Read together, the two pieces suggest that the further a person gets from the neighbors right in front of them, the easier it is to mistake a formula for a virtue. Mandela’s legacy looks less like a set of rules and more like an argument that the most important moral work happens in the exact spots where the math fails.</p>
+        <article class='piece'>
+
+<h2 class='title'>Africa’s last philosopher king</h2>
+<p class='byline'><span class='publication'>Africa Is a Country</span><span class='sep'>·</span><span>Sarah Setlaelo</span></p>
+<p class='source'><a href='https://africasacountry.com/2026/07/africas-last-philosopher-king' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the gap between a data point and a handshake. A spreadsheet might show how to save lives in the next century, but it doesn&#x27;t explain how to sit across from an enemy and find a way forward. Nelson Mandela didn&#x27;t find peace in a formula; he found it in stubborn compromise. When the focus stays fixed on a distant future, the neighbors right here can feel like a distraction. At what point does the math of doing good become an excuse to avoid the harder work of being good to the person in the room?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
