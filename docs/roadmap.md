@@ -80,6 +80,25 @@ GitHub Pages.
    Copy shape unchanged — only the number becomes dynamic
    (AGENTS.md rule 4 sign-off from user 2026-07-22).
 
+5. **Site-wide redesign — black + red + Anton + hero doodles.**
+   Full spec at `docs/session_plan_black_red_redesign.md`.
+   Replace the current warm-cream + JTBD-pastels palette with
+   near-black `#0A0A0A` + warm off-white `#F0E5D0` + pure red
+   `#FF2A2A` (sole accent). Replace Fraunces+Inter with Anton
+   (uppercase display) + Inter (body). Add per-fixed-nav-page
+   AI-generated hero doodles (~10 SVG line drawings in single-
+   weight red on black). Retire per-JTBD card colors — cards
+   become uniform dark surfaces with red-tinted borders for
+   featured items; JTBD identity comes through eyebrow labels
+   alone. Hooks become red-bordered Anton pull-quotes (replacing
+   Fraunces italic). PWA icon + apple-touch-icon + podcast cover
+   regenerated to the new palette in the SAME PR — "AARVA" in
+   warm off-white on near-black with a single red dot accent
+   (user confirmed 2026-07-22). AGENTS.md rule 4 sign-off from
+   user 2026-07-22 via approved Cowork mockups (Variant A
+   refined). Ships as one big PR — dozens of templates, mockup-
+   gate verification required.
+
 ---
 
 ## Deferred — to return to (in priority order)
