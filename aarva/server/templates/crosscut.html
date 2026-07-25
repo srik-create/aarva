@@ -14,133 +14,136 @@
   {% if og_image %}<meta name="twitter:image" content="{{ og_image }}" />{% endif %}
 {% endblock %}
 {% block content %}
-  <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
-    <p class="text-xs text-peach-dark uppercase tracking-widest font-semibold">Crosscut</p>
-    <h1 class="editorial text-4xl font-bold leading-tight tracking-tightish mt-2 text-ink">
-      {{ (crosscut.topic_label or "Two angles") | title_case }}
-    </h1>
-    {# Content-quality Section 2: subhead_hook is the primary
-       sub-heading when set; title_a x title_b demotes to secondary
-       metadata underneath. NULL subhead_hook (older crosscuts) falls
-       back cleanly — no blank slot. #}
-    {% if crosscut.subhead_hook %}
-      <p class="text-ink-light mt-3 text-lg leading-relaxed">{{ crosscut.subhead_hook }}</p>
-    {% endif %}
-    <p class="text-sm text-ink-light mt-2 leading-relaxed">
-      <em class="editorial">{{ crosscut.title_a | title_case }}</em>
-      <span class="text-ink-light mx-1">×</span>
-      <em class="editorial">{{ crosscut.title_b | title_case }}</em>
-    </p>
-    {% if crosscut.edition_date %}
-      <p class="text-sm text-ink-light mt-2">Published {{ crosscut.edition_date }}</p>
-    {% endif %}
+  <p class="eyebrow">Crosscut{% if crosscut.duration_seconds %} · {{ crosscut.duration_seconds | duration_minutes }}{% endif %}</p>
+  <h1 class="editorial text-4xl leading-tight mt-2 text-cream-text">
+    {{ (crosscut.topic_label or "Two angles") | title_case }}
+  </h1>
+  {# Content-quality Section 2: subhead_hook is the primary
+     sub-heading when set; title_a x title_b demotes to secondary
+     metadata underneath. NULL subhead_hook (older crosscuts) falls
+     back cleanly — no blank slot. #}
+  {% if crosscut.subhead_hook %}
+    <p class="text-cream-light mt-3 text-lg leading-relaxed">{{ crosscut.subhead_hook }}</p>
+  {% endif %}
+  <p class="text-sm text-cream-muted mt-2 leading-relaxed">
+    <em class="editorial not-italic">{{ crosscut.title_a | title_case }}</em>
+    <span class="text-cream-muted mx-1">×</span>
+    <em class="editorial not-italic">{{ crosscut.title_b | title_case }}</em>
+  </p>
+  {% if crosscut.edition_date %}
+    <p class="text-sm text-cream-muted mt-2">Published {{ crosscut.edition_date }}</p>
+  {% endif %}
 
-    {# ─── Custom audio player ─────────────────────────────────────── #}
-    {# Wrapper carries the track metadata for the site-wide shared
-       player in base.html; the in-page UI is a remote control. #}
-    <div class="mt-10" data-player
-         data-track-src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
-         data-track-title="{{ (crosscut.topic_label or 'Crosscut') | title_case }}"
-         data-track-link="/crosscut/{{ crosscut.edition_id }}">
-      <div class="flex items-center gap-5">
-        <button type="button"
-                aria-label="Play"
-                class="play-btn shrink-0 w-20 h-20 rounded-full bg-night text-{{ card_color }} flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
-                data-play-button>
-          <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-        </button>
-        <div class="flex-1">
-          <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
-            <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
-          </div>
-          <p class="text-sm text-ink-light mt-2">
-            <span data-current-time>0:00</span>
-            <span class="mx-1">/</span>
-            <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
-            {% if crosscut.narrator_voice %}
-              <span class="mx-1">·</span> Narrator {{ crosscut.narrator_voice }}
-            {% endif %}
+  {# Hero doodle (layout pattern #1) #}
+  <div class="my-8 bg-night-soft rounded-2xl p-8 flex items-center justify-center">
+    <img src="/static/doodles/crosscut_detail.svg" alt="" aria-hidden="true" class="w-full max-w-xs">
+  </div>
+
+  {# ─── Custom audio player ─────────────────────────────────────── #}
+  {# Wrapper carries the track metadata for the site-wide shared
+     player in base.html; the in-page UI is a remote control. #}
+  <div class="mt-10" data-player
+       data-track-src="{{ crosscut.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+       data-track-title="{{ (crosscut.topic_label or 'Crosscut') | title_case }}"
+       data-track-link="/crosscut/{{ crosscut.edition_id }}">
+    <div class="flex items-center gap-5">
+      <button type="button"
+              aria-label="Play"
+              class="play-btn shrink-0 w-20 h-20 rounded-full bg-red-accent text-night flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
+              data-play-button>
+        <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <div class="flex-1">
+        <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
+          <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+        </div>
+        <p class="text-sm text-cream-muted mt-2">
+          <span data-current-time>0:00</span>
+          <span class="mx-1">/</span>
+          <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
+          {% if crosscut.narrator_voice %}
+            <span class="mx-1">·</span> Narrator {{ crosscut.narrator_voice }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {% with share_content_type="crosscut", share_content_id=crosscut.edition_id,
+     share_url=(request.app.state.server_cfg.public_url ~ "/crosscut/" ~ crosscut.edition_id),
+     share_title=((crosscut.topic_label or "Crosscut") | title_case),
+     share_text=(crosscut.subhead_hook or "") %}
+    {% include "_share_button.html" %}
+  {% endwith %}
+
+  {# ─── The two source articles — list rows, not filled cards ────── #}
+  <div class="mt-12">
+    <h2 class="eyebrow">In this episode</h2>
+    <div>
+      {# Article A #}
+      <div class="py-5 border-b border-night-border">
+        <p class="eyebrow">{{ crosscut.pub_a }}</p>
+        <h3 class="editorial text-lg leading-snug text-cream-text">
+          {% if crosscut.article_a_id %}
+            <a href="/article/{{ crosscut.article_a_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_a | title_case }}</a>
+          {% else %}
+            {{ crosscut.title_a | title_case }}
+          {% endif %}
+        </h3>
+        {% if crosscut.byline_a %}
+          <p class="text-sm text-cream-light mt-1">by {{ crosscut.byline_a }}</p>
+        {% endif %}
+        {% if crosscut.url_a %}
+          <p class="mt-3">
+            <a href="{{ crosscut.url_a }}" target="_blank" rel="noopener"
+               class="text-sm text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">
+              Read on {{crosscut.pub_a }} →
+            </a>
           </p>
-        </div>
+        {% endif %}
+      </div>
+
+      {# Article B #}
+      <div class="py-5 border-b border-night-border last:border-b-0">
+        <p class="eyebrow">{{ crosscut.pub_b }}</p>
+        <h3 class="editorial text-lg leading-snug text-cream-text">
+          {% if crosscut.article_b_id %}
+            <a href="/article/{{ crosscut.article_b_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_b | title_case }}</a>
+          {% else %}
+            {{ crosscut.title_b | title_case }}
+          {% endif %}
+        </h3>
+        {% if crosscut.byline_b %}
+          <p class="text-sm text-cream-light mt-1">by {{ crosscut.byline_b }}</p>
+        {% endif %}
+        {% if crosscut.url_b %}
+          <p class="mt-3">
+            <a href="{{ crosscut.url_b }}" target="_blank" rel="noopener"
+               class="text-sm text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">
+              Read on {{crosscut.pub_b }} →
+            </a>
+          </p>
+        {% endif %}
       </div>
     </div>
+  </div>
 
-    {% with share_content_type="crosscut", share_content_id=crosscut.edition_id,
-       share_url=(request.app.state.server_cfg.public_url ~ "/crosscut/" ~ crosscut.edition_id),
-       share_title=((crosscut.topic_label or "Crosscut") | title_case),
-       share_text=(crosscut.subhead_hook or "") %}
-      {% include "_share_button.html" %}
-    {% endwith %}
-
-    {# ─── The two source articles ─────────────────────────────────── #}
+  {# ─── Intro / bridge / outro context ──────────────────────────── #}
+  {% if crosscut.intro_text or crosscut.bridge_between or crosscut.outro_text %}
     <div class="mt-12">
-      <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-4 font-semibold">In this episode</h2>
-      <div class="space-y-4">
-        {# Article A #}
-        <div class="bg-ink/5 rounded-2xl p-5">
-          <p class="text-xs text-ink-light uppercase tracking-wide">{{ crosscut.pub_a }}</p>
-          <h3 class="editorial text-lg font-semibold leading-snug mt-1 text-ink">
-            {% if crosscut.article_a_id %}
-              <a href="/article/{{ crosscut.article_a_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_a | title_case }}</a>
-            {% else %}
-              {{ crosscut.title_a | title_case }}
-            {% endif %}
-          </h3>
-          {% if crosscut.byline_a %}
-            <p class="text-sm text-ink-light mt-1">by {{ crosscut.byline_a }}</p>
-          {% endif %}
-          {% if crosscut.url_a %}
-            <p class="mt-3">
-              <a href="{{ crosscut.url_a }}" target="_blank" rel="noopener"
-                 class="text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
-                Read on {{crosscut.pub_a }} →
-              </a>
-            </p>
-          {% endif %}
-        </div>
-
-        {# Article B #}
-        <div class="bg-ink/5 rounded-2xl p-5">
-          <p class="text-xs text-ink-light uppercase tracking-wide">{{ crosscut.pub_b }}</p>
-          <h3 class="editorial text-lg font-semibold leading-snug mt-1 text-ink">
-            {% if crosscut.article_b_id %}
-              <a href="/article/{{ crosscut.article_b_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_b | title_case }}</a>
-            {% else %}
-              {{ crosscut.title_b | title_case }}
-            {% endif %}
-          </h3>
-          {% if crosscut.byline_b %}
-            <p class="text-sm text-ink-light mt-1">by {{ crosscut.byline_b }}</p>
-          {% endif %}
-          {% if crosscut.url_b %}
-            <p class="mt-3">
-              <a href="{{ crosscut.url_b }}" target="_blank" rel="noopener"
-                 class="text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
-                Read on {{crosscut.pub_b }} →
-              </a>
-            </p>
-          {% endif %}
-        </div>
-      </div>
+      <h2 class="eyebrow">The connection</h2>
+      {% if crosscut.intro_text %}
+        <p class="text-cream-text leading-relaxed">{{ crosscut.intro_text }}</p>
+      {% endif %}
+      {% if crosscut.bridge_between %}
+        <p class="text-cream-text leading-relaxed mt-4">{{ crosscut.bridge_between }}</p>
+      {% endif %}
+      {% if crosscut.outro_text %}
+        <p class="text-cream-light leading-relaxed mt-4 not-italic">{{ crosscut.outro_text }}</p>
+      {% endif %}
     </div>
-
-    {# ─── Intro / bridge / outro context ──────────────────────────── #}
-    {% if crosscut.intro_text or crosscut.bridge_between or crosscut.outro_text %}
-      <div class="mt-12">
-        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">The connection</h2>
-        {% if crosscut.intro_text %}
-          <p class="text-ink leading-relaxed">{{ crosscut.intro_text }}</p>
-        {% endif %}
-        {% if crosscut.bridge_between %}
-          <p class="text-ink leading-relaxed mt-4">{{ crosscut.bridge_between }}</p>
-        {% endif %}
-        {% if crosscut.outro_text %}
-          <p class="text-ink leading-relaxed mt-4 italic">{{ crosscut.outro_text }}</p>
-        {% endif %}
-      </div>
-    {% endif %}
-  </article>
+  {% endif %}
 
   {# Player JS is shared via base.html. #}
 {% endblock %}

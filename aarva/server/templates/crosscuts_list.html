@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Crosscuts — Aarva{% endblock %}
 {% block content %}
-  <div class="mb-10">
-    <p class="text-xs text-cream-muted uppercase tracking-widest">Browse</p>
-    <h1 class="editorial text-4xl font-bold tracking-tightish mt-2 text-cream-text">Crosscuts</h1>
+  <div class="mb-8">
+    <p class="eyebrow">The archive</p>
+    <h1 class="editorial text-4xl leading-tight mt-2 text-cream-text">Crosscuts</h1>
     <p class="text-cream-light mt-4 max-w-2xl leading-relaxed">
       Two articles in conversation. Each crosscut pairs two pieces from
       related territory, with bridges drawing out the non-obvious
@@ -11,12 +11,17 @@
     </p>
   </div>
 
+  {# Hero doodle (layout pattern #1) #}
+  <div class="mb-10 bg-night-soft rounded-2xl p-8 flex items-center justify-center">
+    <img src="/static/doodles/crosscuts.svg" alt="" aria-hidden="true" class="w-full max-w-xs">
+  </div>
+
   {% if crosscuts %}
     <div class="space-y-5">
       {% for crosscut in crosscuts %}
-        <section class="p-6 bg-peach rounded-2xl text-ink">
-          <p class="text-xs text-peach-dark uppercase tracking-widest font-semibold">{{ crosscut.edition_date }}</p>
-          <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">
+        <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
+          <p class="eyebrow">{{ crosscut.edition_date }}</p>
+          <h2 class="editorial text-2xl leading-snug text-cream-text">
             <a href="/crosscut/{{ crosscut.edition_id }}" class="hover:opacity-70 transition-opacity">{{ (crosscut.topic_label or "Two angles") | title_case }}</a>
           </h2>
           {# Content-quality Section 2: subhead_hook is the primary
@@ -24,12 +29,12 @@
              secondary metadata underneath. NULL subhead_hook (older
              crosscuts) falls back cleanly — no blank slot. #}
           {% if crosscut.subhead_hook %}
-            <p class="text-ink mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
+            <p class="text-cream-text mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
           {% endif %}
-          <p class="text-sm text-ink-light mt-2 leading-relaxed">
-            <em class="editorial">{{ crosscut.title_a | title_case }}</em>
-            <span class="text-ink-light mx-1">×</span>
-            <em class="editorial">{{ crosscut.title_b | title_case }}</em>
+          <p class="text-sm text-cream-muted mt-2 leading-relaxed">
+            <em class="editorial not-italic">{{ crosscut.title_a | title_case }}</em>
+            <span class="text-cream-muted mx-1">×</span>
+            <em class="editorial not-italic">{{ crosscut.title_b | title_case }}</em>
           </p>
           {# Compact player; data-track-* attrs feed the shared player in base.html. #}
           <div class="mt-5" data-player
@@ -38,16 +43,16 @@
                data-track-link="/crosscut/{{ crosscut.edition_id }}">
             <div class="flex items-center gap-4">
               <button type="button" aria-label="Play"
-                      class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                      class="shrink-0 w-14 h-14 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
                       data-play-button>
                 <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
               </button>
               <div class="flex-1">
-                <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
-                  <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+                <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                  <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
                 </div>
-                <p class="text-xs text-ink-light mt-2">
+                <p class="text-xs text-cream-muted mt-2">
                   <span data-current-time>0:00</span>
                   <span class="mx-1">/</span>
                   <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
