@@ -70,6 +70,16 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Dynamic catalog count on /create loading state.**
+   Full spec at `docs/session_plan_create_catalog_count_dynamic.md`.
+   The /create page's loading dialog reads *"Aarva is matching
+   your prompt against ~5,000 articles…"* — hardcoded number,
+   stale (catalog is now 10k+). Query `COUNT(*) FROM articles
+   WHERE embedding IS NOT NULL` on every /create render, floor
+   to the nearest 1,000, render with thousands separator.
+   Copy shape unchanged — only the number becomes dynamic
+   (AGENTS.md rule 4 sign-off from user 2026-07-22).
+
 ---
 
 ## Deferred — to return to (in priority order)
