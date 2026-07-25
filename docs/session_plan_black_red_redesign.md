@@ -1,5 +1,12 @@
 # Session plan — black + red redesign (Variant A refined)
 
+**STATUS: DONE (2026-07-25).** Implemented as specced, with two
+noted deviations (no per-episode doodles on `/crosscuts`, no filter
+chips — see `docs/roadmap.md`'s 2026-07-25 "Recently completed"
+entry for why). See that entry for the full verification summary.
+
+---
+
 Written by Cowork for the next Claude Code session (2026-07-22+).
 Site-wide visual redesign of aarva.app: swap the warm-cream palette
 for near-black + warm off-white + pure red, replace the Fraunces+Inter
