@@ -141,15 +141,27 @@ RECOVERED_EPISODES = [
 
 @app.get("/create", response_class=HTMLResponse)
 async def create_candidates(request: Request) -> HTMLResponse:
-    """Render the candidate-page shell. No LLM / DB work here — the
-    candidates load asynchronously via /api/candidates."""
+    """Render the candidate-page shell. No LLM work here — the
+    candidates load asynchronously via /api/candidates. The one DB
+    call is a sub-millisecond COUNT for the loading copy's catalog-
+    size figure (docs/session_plan_create_catalog_count_dynamic.md)."""
     q = (request.query_params.get("q") or "").strip()
     if not q:
         return RedirectResponse(url="/", status_code=303)
 
+    db = request.app.state.db
+    with db.connect() as conn:
+        row = conn.execute(
+            "SELECT COUNT(*) AS n FROM articles WHERE embedding IS NOT NULL"
+        ).fetchone()
+    raw_count = int(row["n"] if row else 0)
+    # Floor to the nearest 1,000, with a 1,000 safety minimum so the
+    # copy never reads "~0 articles".
+    catalog_size = max(1000, (raw_count // 1000) * 1000)
+
     return templates.TemplateResponse(
         request, "create.html",
-        {"prompt": q},
+        {"prompt": q, "catalog_size": catalog_size},
     )
 
 
