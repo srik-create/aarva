@@ -242,12 +242,40 @@ gradients. See the mockups for exact style — cars/figures for
 "systems in control", cityscape for "concrete cities", geometric
 gestures for archive tiles.
 
-**Generation approach**: prompt an LLM (Gemini 3 or Claude Sonnet)
-to produce SVG code directly for each theme. Iterate on 2-3 drafts
-per doodle until it feels right. Do NOT use raster image gen +
-vectorization — the SVGs need to be small (< 2KB each), scale
-cleanly, and be editable if we want to tweak later. The mockup's
-existing sketches are a good starting reference for style.
+**Generation approach**: prompt Gemini (Aarva's standing rule —
+Claude LLM is coding-only; all other LLM work goes through Gemini)
+to produce SVG code directly for each theme. **Text-to-SVG, not
+text-to-image + vectorization** — the ask is "return the SVG source
+for a single-weight red line drawing of X in a 200×112 viewBox."
+Iterate on 2-3 drafts per doodle until it feels right. SVGs need to
+stay small (< 2KB each), scale cleanly, and be editable if we want
+to tweak later. The mockup's existing sketches are a good starting
+reference for style.
+
+**Prompt template** (adapt per doodle):
+```
+Produce SVG source only (no explanation, no markdown fence) for a
+single-weight line drawing on transparent background.
+
+- viewBox: 0 0 200 112
+- stroke: #FF2A2A, stroke-width 1.5, stroke-linecap round,
+  stroke-linejoin round
+- no fills except where a shape is deliberately filled in the
+  same red (rare)
+- style: gestural / sketchy, not geometric-clean. Confident single
+  strokes, no cross-hatching.
+
+Subject: {THEME_DESCRIPTION}
+
+Return ONLY the <svg>...</svg> element.
+```
+
+Reuse whichever Gemini client Aarva already uses for other LLM
+work (`aarva/clients/llm.py` or similar). Save each returned SVG
+to `aarva/server/static/doodles/<slug>.svg`. Manually inspect each
+before committing — the LLM occasionally emits invalid SVG or
+overshoots the viewBox; reject and re-prompt when that happens.
+No runtime generation — doodles are curated static assets.
 
 Store the SVG source as-is (not compiled to PNG). Serve inline via
 `{% include "doodles/today.svg" %}` OR as a static file. Recommend
