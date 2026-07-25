@@ -1,8 +1,11 @@
 """Generate Aarva's podcast cover art.
 
-Apple Podcasts requires 3000×3000 PNG, RGB, square. The design matches the
-web renderer's brand: warm cream background, bold black "Aarva" wordmark,
-saturated red accent dot, small editorial subtitle.
+Apple Podcasts requires 3000×3000 PNG, RGB, square. The design matches
+the black+red web redesign (docs/session_plan_black_red_redesign.md):
+near-black background, Anton uppercase "AARVA" wordmark in warm
+off-white, a single red dot accent — the same "AARVA●" mark used by
+the PWA icons (scripts/generate_pwa_icons.py), scaled up with a
+tagline and editorial subtitle underneath.
 
 Run with the venv active:
     python scripts/generate_logo.py
@@ -14,7 +17,6 @@ automatically and the RSS feed references it via the feed_image config.
 """
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -25,104 +27,88 @@ except ImportError:
     sys.exit(1)
 
 
-# ─── Brand tokens (mirror aarva/output/web_renderer.py) ──────────────────────
-SIZE        = 3000
-PAPER       = (245, 239, 224)   # warm cream
-INK         = (10, 10, 10)
-INK_MID     = (42, 42, 42)
-ACCENT_RED  = (230, 57, 70)
-ACCENT_NAVY = (29, 53, 87)
+# ─── Brand tokens (mirror base.html's Tailwind color tokens) ────────────────
+SIZE          = 3000
+BG_COLOUR     = (10, 10, 10)      # #0A0A0A night
+TEXT_COLOUR   = (240, 229, 208)   # #F0E5D0 cream-text
+MUTED_COLOUR  = (196, 186, 168)   # cream-light-ish, for the tagline/subtitle
+ACCENT_COLOUR = (255, 42, 42)     # #FF2A2A red-accent
 
-# ─── Font discovery ──────────────────────────────────────────────────────────
-# macOS ships several Helvetica variants. We try the bold/black weights first
-# (heavier weights look much better at this scale), falling back to whatever
-# the system has.
-FONT_CANDIDATES = [
-    # (path, index, label)
-    ("/System/Library/Fonts/Helvetica.ttc", 1, "Helvetica Bold"),
-    ("/System/Library/Fonts/HelveticaNeue.ttc", 4, "Helvetica Neue Bold"),
-    ("/System/Library/Fonts/Supplemental/HelveticaNeue.ttc", 4, "Helvetica Neue Bold (Supplemental)"),
-    ("/Library/Fonts/Helvetica.ttc", 1, "Helvetica Bold (Library)"),
-    ("/System/Library/Fonts/Helvetica.ttc", 0, "Helvetica"),
-]
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+FONT_PATH = _REPO_ROOT / "scripts" / "fonts" / "Anton-Regular.ttf"
+
+WORDMARK = "AARVA"
+LETTER_SPACING_EM = 0.02
+DOT_FRAC = 0.07  # dot diameter as a fraction of canvas width
 
 
-def find_font() -> tuple[str, int, str]:
-    for path, index, label in FONT_CANDIDATES:
-        if os.path.exists(path):
-            try:
-                ImageFont.truetype(path, 100, index=index)
-                return path, index, label
-            except (OSError, IndexError):
-                continue
-    raise RuntimeError(
-        "No suitable Helvetica variant found. Install Helvetica or modify "
-        "FONT_CANDIDATES in this script."
-    )
+def _wordmark_width(font: ImageFont.FreeTypeFont, spacing_px: float, dot_d: float) -> float:
+    advances = [font.getlength(ch) for ch in WORDMARK]
+    gaps = spacing_px * len(WORDMARK)
+    return sum(advances) + gaps + dot_d
 
 
 def main() -> None:
-    font_path, font_index, font_label = find_font()
-    print(f"Using font: {font_label}  ({font_path}, index={font_index})")
-
-    # Wordmark sizing: target ~70% of canvas width, leaving 15% margin each side.
-    # We iteratively pick a font size that fits — much more robust than guessing
-    # against the textbbox, which can underestimate visual extent for some fonts.
-    target_text_width = int(SIZE * 0.70)
-    main_font_size = 1400
-    while main_font_size > 200:
-        candidate = ImageFont.truetype(font_path, main_font_size, index=font_index)
-        bbox = ImageDraw.Draw(Image.new("RGB", (10, 10))).textbbox(
-            (0, 0), "Aarva.", font=candidate
+    if not FONT_PATH.exists():
+        raise RuntimeError(
+            f"Anton font not found at {FONT_PATH}. Download it from "
+            "https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf"
         )
-        if bbox[2] - bbox[0] <= target_text_width:
-            font_main = candidate
-            break
-        main_font_size -= 25
-    else:
-        font_main = ImageFont.truetype(font_path, 200, index=font_index)
 
-    tag_font_size  = max(110, main_font_size // 7)
-    font_tag = ImageFont.truetype(font_path, tag_font_size, index=font_index)
-    # font_micro is built below after we auto-size it against the new
-    # (longer) micro_text. Keeping the build at the use-site lets us iterate
-    # without colliding with the tagline sizing.
-
-    img  = Image.new("RGB", (SIZE, SIZE), PAPER)
+    img  = Image.new("RGB", (SIZE, SIZE), BG_COLOUR)
     draw = ImageDraw.Draw(img)
 
-    # ─── Wordmark: "Aarva." with red dot ──────────────────────────────────
-    main_text = "Aarva"
-    dot_text  = "."
+    # ─── Wordmark: "AARVA" + red dot, same mark as the PWA icons ──────────
+    dot_d = SIZE * DOT_FRAC
+    target_w = SIZE * 0.70
+    main_font_size = 1400
+    while main_font_size > 100:
+        candidate = ImageFont.truetype(str(FONT_PATH), main_font_size)
+        spacing_px = main_font_size * LETTER_SPACING_EM
+        if _wordmark_width(candidate, spacing_px, dot_d) <= target_w:
+            font_main = candidate
+            break
+        main_font_size -= 20
+    else:
+        font_main = ImageFont.truetype(str(FONT_PATH), 100)
+        spacing_px = 100 * LETTER_SPACING_EM
 
-    main_bbox = draw.textbbox((0, 0), main_text, font=font_main)
-    dot_bbox  = draw.textbbox((0, 0), dot_text,  font=font_main)
-    full_bbox = draw.textbbox((0, 0), main_text + dot_text, font=font_main)
-
-    main_w  = main_bbox[2] - main_bbox[0]
-    total_w = full_bbox[2] - full_bbox[0]
+    total_w = _wordmark_width(font_main, spacing_px, dot_d)
+    full_bbox = draw.textbbox((0, 0), WORDMARK, font=font_main)
     total_h = full_bbox[3] - full_bbox[1]
 
-    x_start = (SIZE - total_w) // 2 - full_bbox[0]
-    y       = (SIZE - total_h) // 2 - full_bbox[1] - 120
+    x = (SIZE - total_w) / 2
+    y = (SIZE - total_h) / 2 - full_bbox[1] - 120
 
-    draw.text((x_start,          y), main_text, fill=INK,        font=font_main)
-    draw.text((x_start + main_w, y), dot_text,  fill=ACCENT_RED, font=font_main)
+    for ch in WORDMARK:
+        bbox = draw.textbbox((0, 0), ch, font=font_main)
+        draw.text((x - bbox[0], y), ch, fill=TEXT_COLOUR, font=font_main)
+        x += font_main.getlength(ch) + spacing_px
+
+    dot_cy = y + full_bbox[1] + total_h / 2
+    draw.ellipse(
+        [(x, dot_cy - dot_d / 2), (x + dot_d, dot_cy + dot_d / 2)],
+        fill=ACCENT_COLOUR,
+    )
 
     # ─── Tagline below ─────────────────────────────────────────────────────
+    tag_font_size = max(110, main_font_size // 7)
+    font_tag = ImageFont.truetype(str(FONT_PATH), tag_font_size)
     tagline = "the world as your classroom"
     tag_bbox = draw.textbbox((0, 0), tagline, font=font_tag)
     tag_w = tag_bbox[2] - tag_bbox[0]
     tag_x = (SIZE - tag_w) // 2 - tag_bbox[0]
-    tag_y = y + total_h + 240
-    draw.text((tag_x, tag_y), tagline, fill=INK_MID, font=font_tag)
+    tag_y = int(y + total_h + 240)
+    draw.text((tag_x, tag_y), tagline, fill=MUTED_COLOUR, font=font_tag)
 
     # ─── Bottom rule + label ──────────────────────────────────────────────
+    # Cream, not red — the dot above is the one red accent (same "single
+    # accent" rule the rest of the black+red redesign follows).
     rule_y = int(SIZE * 0.88)
     margin = int(SIZE * 0.08)
     draw.rectangle(
         [(margin, rule_y), (SIZE - margin, rule_y + 16)],
-        fill=INK,
+        fill=TEXT_COLOUR,
     )
 
     micro_text = "Carefully handpicked journalism, narrated - daily"
@@ -136,20 +122,20 @@ def main() -> None:
     micro_target_width = int((SIZE - 2 * margin) * 0.95)
     micro_font_size = max(70, main_font_size // 10)
     while micro_font_size > 60:
-        candidate = ImageFont.truetype(font_path, micro_font_size, index=font_index)
+        candidate = ImageFont.truetype(str(FONT_PATH), micro_font_size)
         bbox = draw.textbbox((0, 0), micro_text, font=candidate)
         if bbox[2] - bbox[0] <= micro_target_width:
             font_micro = candidate
             break
         micro_font_size -= 5
     else:
-        font_micro = ImageFont.truetype(font_path, 60, index=font_index)
+        font_micro = ImageFont.truetype(str(FONT_PATH), 60)
 
     micro_bbox = draw.textbbox((0, 0), micro_text, font=font_micro)
     micro_w = micro_bbox[2] - micro_bbox[0]
     micro_x = (SIZE - micro_w) // 2 - micro_bbox[0]
     micro_y = rule_y + 60
-    draw.text((micro_x, micro_y), micro_text, fill=INK, font=font_micro)
+    draw.text((micro_x, micro_y), micro_text, fill=TEXT_COLOUR, font=font_micro)
 
     # ─── Save ─────────────────────────────────────────────────────────────
     out_path = Path(__file__).resolve().parents[1] / "aarva" / "output" / "cover.png"
