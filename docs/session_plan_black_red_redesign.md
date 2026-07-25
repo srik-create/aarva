@@ -316,11 +316,82 @@ Order-of-work inside the PR:
 4. **Cleanup** — remove now-unused Tailwind color tokens (`peach`,
    `lemon`, etc.), the Fraunces link, `.hook` italic, and
    `jtbd_meta.card_color_for_jtbd` if not used elsewhere.
-5. **PWA icon + apple-touch-icon** — update `theme_color` in
-   `manifest.json` to `#0A0A0A`. The PWA icon itself may need
-   redesign (currently a cream-on-night "Aarva" mark) — if it looks
-   wrong against the new palette, flag it and open a separate
-   follow-up. Don't redesign in this PR.
+5. **PWA icon + apple-touch-icon + podcast cover** — regenerate
+   the full icon set to match the new palette. Same PR (user
+   confirmed 2026-07-22). See "PWA icon regeneration" section
+   below for spec.
+
+### PWA icon regeneration
+
+Regenerate all icon assets to the new palette. Same PR.
+
+**Design:**
+- Background: `#0A0A0A` (matches page bg).
+- Wordmark: "AARVA" in Anton uppercase, warm off-white `#F0E5D0`,
+  centred vertically and horizontally, letter-spacing 0.02em (same
+  as the header masthead). Weight appropriate to the icon size —
+  the letters should feel confident and readable at 60×60px on a
+  home-screen grid.
+- Single red accent: a small red dot (`#FF2A2A`, ~6-8% of icon
+  width) after the final "A" — e.g. "AARVA●" — as the one red
+  moment. Do NOT add red anywhere else. The dot is the same
+  visual language as the eyebrow labels and doodle strokes on the
+  main site — one accent, used with intent.
+- Safe zone: keep the wordmark within a ~12% margin from each
+  edge so iOS' rounded-corner mask and Android's adaptive-icon
+  crop don't clip the letters.
+
+**Assets to regenerate** (all in `aarva/server/static/icons/`):
+- `apple-touch-icon.png` — 180×180. Also used by the Media
+  Session API on the iPhone lock screen (see
+  `session_plan_ios_player_bugs.md`) — updated palette here fixes
+  that surface at the same time.
+- `icon-192.png` — 192×192 (PWA manifest).
+- `icon-512.png` — 512×512 (PWA manifest + Media Session
+  high-res artwork).
+- `icon-maskable-512.png` — 512×512, with generous safe zone
+  for Android's adaptive-icon mask (Android Chromium PWA).
+- `favicon.ico` — 32×32 + 16×16 (multi-size ICO).
+- `favicon-32.png`, `favicon-16.png` — modern browser variants.
+
+**Podcast cover** (`aarva/output/cover.png`, 3000×3000):
+- Regenerated via `scripts/generate_logo.py`. Update the script
+  to use the new palette (same "AARVA●" wordmark, same colors,
+  scaled up). This is what Apple Podcasts / Spotify / RSS
+  ingesters display. Not user-visible on the web app but visible
+  wherever the podcast is subscribed to.
+
+**Generation approach:**
+- `scripts/generate_logo.py` today produces cover.png. Extend or
+  duplicate it to output all PWA sizes from one master. Anton
+  should be installable from the same Google Fonts URL used
+  in-app, or embedded locally in the script.
+- Alternatively: render one large master SVG with the wordmark +
+  red dot, then export each size via CairoSVG or Pillow. Cleaner
+  than raster-per-size.
+
+**Manifest & meta updates** (`aarva/server/static/manifest.json`
++ `base.html`):
+- `manifest.json` — `theme_color: '#0A0A0A'`, `background_color:
+  '#0A0A0A'`. Update icon entries to reference the new files at
+  the new sizes.
+- `base.html` line 141 — `<meta name="theme-color"
+  content="#0A0A0A">` (already covered in step 1 of the ordered
+  work above).
+- `apple-mobile-web-app-status-bar-style` stays
+  `black-translucent` — still correct against the new palette.
+
+**Verification for icons:**
+1. Install the PWA on iPhone via "Add to Home Screen". Confirm
+   the home-screen icon shows the new black + red wordmark.
+2. Play a track. Lock the phone. Confirm the lock-screen Now
+   Playing artwork uses the new icon.
+3. On Android Chrome, install PWA. Confirm the adaptive-icon
+   crop doesn't clip the "AARVA" text.
+4. Load aarva.app in a fresh browser tab. Favicon in the tab bar
+   is the new icon.
+5. Subscribe to the RSS feed from Apple Podcasts / Overcast.
+   Confirm the podcast-cover art reflects the new design.
 
 ### Files that change
 
@@ -340,7 +411,13 @@ Big list. Cluster them for the PR description:
 - `aarva/server/templates/create.html`
 - `aarva/server/templates/_candidates_fragment.html`
 - `aarva/server/static/doodles/*.svg` (new — ~10 files)
-- `aarva/server/static/manifest.json` (theme_color)
+- `aarva/server/static/icons/*` (regenerated — apple-touch-icon,
+  icon-192, icon-512, icon-maskable-512, favicon variants)
+- `aarva/server/static/manifest.json` (theme_color +
+  background_color + icon entries)
+- `aarva/output/cover.png` (regenerated podcast cover, 3000×3000)
+- `scripts/generate_logo.py` (updated to new palette; may need
+  extension to emit all PWA sizes from one master)
 - `aarva/server/jtbd_meta.py` (retire `card_color_for_jtbd`)
 
 ---
