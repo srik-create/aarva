@@ -1,3 +1,8 @@
+**STATUS: DONE (2026-07-22).** Implemented exactly as specced. See
+`docs/roadmap.md`'s 2026-07-22 "Recently completed" entry.
+
+---
+
 # Session plan — dynamic catalog count on /create loading state
 
 Written by Cowork for the next Claude Code session (2026-07-22+).
