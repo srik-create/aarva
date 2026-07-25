@@ -31,16 +31,13 @@ from aarva.services.queries import (
 # the daily.
 _OTHER_GROUP = {
     "label": "Other reads",
-    "card_color": "paper",
-    "header_color": "cream-light",
 }
 
 
 def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
     """Bucket pieces into JTBD groups in display order. Returns a list
-    of dicts {label, card_color, header_color, slug, pieces} ready for
-    Jinja iteration. Empty groups are omitted so the template doesn't
-    render empty sections."""
+    of dicts {label, slug, pieces} ready for Jinja iteration. Empty
+    groups are omitted so the template doesn't render empty sections."""
     buckets: dict[str, list[dict]] = {j["key"]: [] for j in JTBD_INFO}
     other_bucket: list[dict] = []
     known_keys = set(buckets.keys())
@@ -57,8 +54,6 @@ def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
         if buckets[j["key"]]:
             grouped.append({
                 "label": j["label"],
-                "card_color": j["card_color"],
-                "header_color": j["header_color"],
                 "slug": j["slug"],
                 "pieces": buckets[j["key"]],
             })

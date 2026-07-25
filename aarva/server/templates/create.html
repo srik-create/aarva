@@ -2,8 +2,8 @@
 {% block title %}Create an episode — Aarva{% endblock %}
 {% block content %}
   <div class="mb-8">
-    <p class="text-xs text-cream-muted uppercase tracking-widest">Your prompt</p>
-    <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
+    <p class="eyebrow">Your prompt</p>
+    <h1 class="editorial text-3xl md:text-4xl mt-2 text-cream-text leading-snug">
       "{{ prompt }}"
     </h1>
   </div>
@@ -23,12 +23,12 @@
      the rendered fragment. If JS is disabled / the fetch fails the
      loading message stays + the error path swaps in a refresh hint. #}
   <div data-candidates-container data-prompt="{{ prompt }}">
-    <div class="p-6 bg-peach rounded-2xl text-ink">
+    <div class="p-6 bg-night-soft border border-night-border rounded-2xl">
       <div class="flex items-center gap-4">
-        <div class="shrink-0 w-7 h-7 rounded-full border-2 border-ink/20 border-t-ink animate-spin"></div>
+        <div class="shrink-0 w-7 h-7 rounded-full border-2 border-night-border border-t-red-accent animate-spin"></div>
         <div class="flex-1 min-w-0">
-          <p class="editorial text-lg font-semibold leading-snug">Looking for the right pairings…</p>
-          <p class="text-sm text-ink-light mt-1">Aarva is matching your prompt against ~{{ "{:,}".format(catalog_size) }} articles in the catalog and composing new pairings. Usually 5–10 seconds.</p>
+          <p class="editorial text-lg leading-snug text-cream-text">Looking for the right pairings…</p>
+          <p class="text-sm text-cream-light mt-1">Aarva is matching your prompt against ~{{ "{:,}".format(catalog_size) }} articles in the catalog and composing new pairings. Usually 5–10 seconds.</p>
         </div>
       </div>
     </div>

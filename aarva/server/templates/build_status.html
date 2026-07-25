@@ -2,8 +2,8 @@
 {% block title %}Building your episode — Aarva{% endblock %}
 {% block content %}
   <div class="mb-10">
-    <p class="text-xs text-cream-muted uppercase tracking-widest">Episode build</p>
-    <h1 class="editorial text-3xl md:text-4xl font-semibold tracking-tightish mt-2 text-cream-text leading-snug">
+    <p class="eyebrow">Episode build</p>
+    <h1 class="editorial text-3xl md:text-4xl mt-2 text-cream-text leading-snug">
       {{ payload.topic_label | title_case }}
     </h1>
     {% if payload.prompt %}
@@ -12,13 +12,13 @@
   </div>
 
   {% if job.status == 'completed' and job.result and job.result.episode_path %}
-    <section class="p-6 bg-peach rounded-2xl text-ink">
-      <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Ready to listen</p>
-      <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">Your episode is built.</h2>
-      <p class="text-ink-light mt-3">A listen link has been sent to your email.</p>
+    <section class="p-6 bg-night-soft border border-red-accent-fade rounded-2xl">
+      <p class="eyebrow">Ready to listen</p>
+      <h2 class="editorial text-2xl mt-2 leading-snug text-cream-text">Your episode is built.</h2>
+      <p class="text-cream-light mt-3">A listen link has been sent to your email.</p>
       <p class="mt-5">
         <a href="{{ job.result.episode_path }}"
-           class="inline-flex items-center gap-3 px-5 py-3 bg-night text-peach rounded-full font-medium hover:opacity-90 transition-opacity">
+           class="inline-flex items-center gap-3 px-5 py-3 bg-red-accent text-night rounded-full font-medium hover:opacity-90 transition-opacity">
           <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           Play your episode
         </a>
@@ -27,8 +27,8 @@
 
   {% elif job.status == 'failed' %}
     <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
-      <p class="text-xs uppercase tracking-widest text-blush-dark font-semibold">Build failed</p>
-      <h2 class="editorial text-xl font-semibold mt-2 text-cream-text leading-snug">Something didn't go right.</h2>
+      <p class="eyebrow">Build failed</p>
+      <h2 class="editorial text-xl mt-2 text-cream-text leading-snug">Something didn't go right.</h2>
       {% if job.error_message %}
         <p class="text-sm text-cream-muted mt-3 font-mono">{{ job.error_message }}</p>
       {% endif %}
@@ -43,13 +43,13 @@
       <div class="flex items-start gap-4">
         <div class="shrink-0 mt-1">
           {# Subtle spinner — pure CSS circle. #}
-          <div class="w-6 h-6 rounded-full border-2 border-cream-muted/30 border-t-cream-text animate-spin"></div>
+          <div class="w-6 h-6 rounded-full border-2 border-night-border border-t-red-accent animate-spin"></div>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-xs uppercase tracking-widest text-cream-muted">
+          <p class="eyebrow">
             {% if job.status == 'pending' %}Queued{% else %}Building{% endif %}
           </p>
-          <h2 class="editorial text-xl font-semibold mt-2 text-cream-text leading-snug">
+          <h2 class="editorial text-xl text-cream-text leading-snug">
             We're putting your episode together.
           </h2>
           {% if job.progress %}
