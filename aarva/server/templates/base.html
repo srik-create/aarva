@@ -21,10 +21,13 @@
   {% block meta %}{% endblock %}
 
   {# ─── Typography ─────────────────────────────────────────────────── #}
-  {# Fraunces (serif, variable) for headings; Inter (sans) for body.   #}
+  {# Black + red redesign (2026-07-22 — see docs/session_plan_black_
+     red_redesign.md, Variant A refined). Anton (condensed uppercase
+     display) for headings/wordmark; Inter (sans) for body. Fraunces
+     dropped entirely. #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   {# ─── Tailwind via CDN with custom config ────────────────────────── #}
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,40 +36,30 @@
       theme: {
         extend: {
           colors: {
-            // Dark theme: warm dark background with pastel cards "floating"
-            // on top. Each JTBD gets its own card colour.
-            'night':        '#1A1410',  // page background — deep coffee brown
-            'night-soft':   '#251B14',  // header / footer subtle lift
-            'night-border': '#3A2D22',  // dividers, soft borders on dark
-            'cream-text':   '#F5EEDF',  // primary text on dark (former cream)
-            'cream-light':  '#B7A78D',  // secondary text on dark
-            'cream-muted':  '#7E715E',  // tertiary / metadata on dark
-            'ink':          '#2D2418',  // text on pastel cards (deep warm brown)
-            'ink-light':    '#6E5F4B',  // secondary text on cards
-
-            // Pastel cards — desaturated ~15% from the earlier pass so
-            // they sit calmer against the dark page. Each pairs with
-            // -dark for inline metadata text on the card.
-            'sky':          '#BFCEDB',  // dusty blue — future-gazing
-            'sky-dark':     '#2C5878',
-            'peach':        '#E6C8B0',  // warm peach — crosscut + CTA
-            'peach-dark':   '#9C5733',
-            'lemon':        '#DDCF85',  // muted yellow — curiosity
-            'lemon-dark':   '#6E5E15',
-            'mint':         '#BCD0BF',  // soft green — smart-escape
-            'mint-dark':    '#3F5F44',
-            'blush':        '#DFB7BE',  // muted pink — delight
-            'blush-dark':   '#8C3D4F',
-            'lavender':     '#C8C2D8',  // muted purple — behind-the-news
-            'lavender-dark':'#4F4279',
-            'paper':        '#E8DFCE',  // neutral muted cream card (other)
+            // Black + red redesign (2026-07-22). Near-black page,
+            // warm off-white text, a single red accent used sparingly
+            // (Create button, eyebrow labels, hook border, play
+            // button, progress fill, doodle strokes). JTBD-pastel
+            // colors (peach/sky/lemon/mint/blush/lavender) and the
+            // 'ink'/'ink-light'/'paper' card-text colors are retired —
+            // every card is now a uniform dark surface; JTBD identity
+            // comes through the eyebrow label alone.
+            'night':            '#0A0A0A',  // page background — near black
+            'night-soft':       '#141414',  // cards, elevated surfaces
+            'night-border':     'rgba(240, 229, 208, 0.15)',  // subtle dividers
+            'cream-text':       '#F0E5D0',  // primary text — warm off-white
+            'cream-light':      'rgba(240, 229, 208, 0.65)',  // secondary text
+            'cream-muted':      'rgba(240, 229, 208, 0.45)',  // metadata, tertiary
+            'red-accent':       '#FF2A2A',  // sole accent color
+            'red-accent-fade':  'rgba(255, 42, 42, 0.15)',    // borders/tints
           },
           fontFamily: {
-            'serif': ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
-            'sans':  ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+            'sans':    ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+            'display': ['Anton', 'Impact', 'Oswald', 'sans-serif'],
           },
           letterSpacing: {
             'tightish': '-0.01em',
+            'wordmark': '0.02em',
           },
         },
       },
@@ -74,21 +67,47 @@
   </script>
 
   <style>
-    /* Default body uses our sans; headings opt into serif via the
-       `.editorial` utility class kept from earlier templates. */
+    /* Default body uses our sans; headings opt into the Anton display
+       face via the `.editorial` utility class. */
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .editorial {
-      font-family: 'Fraunces', Georgia, Cambria, serif;
-      font-optical-sizing: auto;
-      letter-spacing: -0.01em;
+      font-family: 'Anton', Impact, Oswald, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.005em;
+      font-weight: 400;   /* Anton is a single-weight display font */
     }
-    /* Tighter typographic block on hooks — italic Fraunces is lovely */
+    /* Small tracked-out uppercase label in red — precedes every H1 /
+       card H3 site-wide ("Daily edition", "Crosscut", "The archive",
+       publication names, dates). */
+    .eyebrow {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #FF2A2A;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+    /* Hook pull-quote — replaces the old italic-Fraunces treatment.
+       Sized down from the mockup's 22px to 18px: tested against the 5
+       longest real hooks in the DB (119-133 chars) at 375px width —
+       22px pushed the two 133-char hooks to 4-5 lines; 18px keeps
+       every one of them to exactly 3 lines. See docs/session_plan_
+       black_red_redesign.md's own "watch out" note on this exact
+       risk. */
     .hook {
-      font-family: 'Fraunces', Georgia, serif;
-      font-style: italic;
-      font-weight: 400;
+      font-family: 'Anton', sans-serif;
+      font-size: 18px;
+      line-height: 1.2;
+      text-transform: uppercase;
+      color: #F0E5D0;
+      letter-spacing: 0.005em;
+      border-left: 2px solid #FF2A2A;
+      padding-left: 14px;
+      margin: 0 0 18px;
     }
-    /* Audio player: subtle, doesn't fight the pastel cards */
+    /* Audio player: subtle, doesn't fight the dark cards */
     audio {
       width: 100%;
       border-radius: 9999px;
@@ -152,17 +171,20 @@
      to match the page background so the standalone app looks seamless. #}
   <link rel="manifest" href="/static/manifest.json">
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="icon" href="/static/icons/favicon.ico" sizes="32x32">
+  <link rel="icon" type="image/png" href="/static/icons/favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/static/icons/favicon-16.png" sizes="16x16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Aarva">
-  <meta name="theme-color" content="#1A1410">
+  <meta name="theme-color" content="#0A0A0A">
 </head>
 <body class="bg-night text-cream-text antialiased"
       hx-boost="true" hx-target="#main-content" hx-select="#main-content"
       hx-swap="innerHTML" hx-push-url="true">
   <header data-site-header class="border-b border-night-border bg-night-soft">
     <div class="max-w-3xl mx-auto px-5 py-5 flex items-baseline justify-between">
-      <a href="/" class="editorial text-2xl font-bold tracking-tightish text-cream-text">Aarva</a>
+      <a href="/" class="editorial text-2xl tracking-wordmark text-cream-text">Aarva</a>
       <nav class="text-sm text-cream-light space-x-5 hidden sm:block">
         <a href="/today" class="hover:text-cream-text transition-colors">Today</a>
         <a href="/editions" class="hover:text-cream-text transition-colors">Editions</a>
@@ -196,8 +218,8 @@
        outside #main-content, so it's never touched by htmx partial-
        navigation swaps — the JS wiring only ever needs to run once. #}
     <div class="max-w-3xl mx-auto px-5 pb-5 relative" data-prompt-suggestions-wrapper>
-      <form action="/create" method="get" class="flex items-center gap-2 bg-peach text-ink rounded-full pl-5 pr-2 py-2 shadow-md focus-within:ring-2 focus-within:ring-peach/60">
-        <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0 text-ink-light" fill="currentColor" aria-hidden="true">
+      <form action="/create" method="get" class="flex items-center gap-2 bg-night-soft text-cream-text border border-night-border rounded-full pl-5 pr-2 py-2 shadow-md focus-within:ring-2 focus-within:ring-red-accent/40">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0 text-cream-muted" fill="currentColor" aria-hidden="true">
           <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
         </svg>
         <input type="text" name="q" required
@@ -205,9 +227,9 @@
                placeholder="Create an episode on anything"
                autocomplete="off"
                data-prompt-input
-               class="flex-1 min-w-0 bg-transparent border-none outline-none text-ink placeholder-ink-light text-base">
+               class="flex-1 min-w-0 bg-transparent border-none outline-none text-cream-text placeholder-cream-muted text-base">
         <button type="submit"
-                class="shrink-0 px-2.5 sm:px-4 py-2 bg-night text-peach rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
+                class="shrink-0 px-2.5 sm:px-4 py-2 bg-red-accent text-night rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
           Create
         </button>
       </form>
@@ -231,7 +253,7 @@
     <div data-nav-backdrop class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
     <aside class="absolute top-0 right-0 bottom-0 w-72 max-w-[80vw] bg-night-soft border-l border-night-border shadow-2xl flex flex-col" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
       <div class="flex items-center justify-between px-5 py-4 border-b border-night-border">
-        <span class="editorial text-base font-semibold text-cream-text">Menu</span>
+        <span class="editorial text-base text-cream-text">Menu</span>
         <button type="button" data-nav-close aria-label="Close menu"
                 class="-mr-2 w-9 h-9 inline-flex items-center justify-center rounded-full text-cream-muted hover:text-cream-text hover:bg-night-border transition-colors">
           <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
@@ -322,7 +344,7 @@
   <div data-pwa-modal class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
     <div class="bg-night-soft border border-night-border rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl">
       <div class="flex items-start justify-between gap-4">
-        <h2 class="editorial text-xl font-semibold text-cream-text">Add Aarva to your Home Screen</h2>
+        <h2 class="editorial text-xl text-cream-text">Add Aarva to your Home Screen</h2>
         <button type="button" data-pwa-modal-close aria-label="Close"
                 class="-mr-2 -mt-1 shrink-0 w-9 h-9 inline-flex items-center justify-center text-cream-muted hover:text-cream-text rounded-full hover:bg-night-border transition-colors">
           <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
@@ -478,7 +500,7 @@
   <div data-mini-player class="hidden fixed bottom-0 inset-x-0 z-40 bg-night-soft border-t border-night-border shadow-2xl">
     <div data-mini-player-inner class="max-w-3xl mx-auto px-4 pt-3 flex items-center gap-3">
       <button type="button" data-mini-toggle aria-label="Play"
-              class="shrink-0 w-11 h-11 rounded-full bg-peach text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform">
+              class="shrink-0 w-11 h-11 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform">
         <svg viewBox="0 0 24 24" class="mini-play-icon w-5 h-5 ml-0.5" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
         <svg viewBox="0 0 24 24" class="mini-pause-icon w-5 h-5 hidden" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
       </button>
@@ -493,7 +515,7 @@
         <div class="flex items-center gap-2 mt-1">
           <span data-mini-current class="text-[10px] text-cream-muted shrink-0">0:00</span>
           <div data-mini-track class="h-1 flex-1 bg-night-border rounded-full overflow-hidden cursor-pointer">
-            <div data-mini-fill class="h-full bg-cream-light rounded-full" style="width:0%"></div>
+            <div data-mini-fill class="h-full bg-red-accent rounded-full" style="width:0%"></div>
           </div>
           <span data-mini-total class="text-[10px] text-cream-muted shrink-0">0:00</span>
           {# Playback speed: text button shows current rate ("1×");

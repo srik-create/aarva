@@ -17,35 +17,35 @@
 
   <div class="space-y-5">
     {% for c in candidates %}
-      <section class="p-6 bg-peach rounded-2xl text-ink">
+      <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
         <div class="flex items-baseline justify-between gap-3 flex-wrap">
-          <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">
+          <p class="eyebrow mb-0">
             {% if c.kind == 'existing' %}Already on Aarva{% else %}New — we'll create it for you{% endif %}
           </p>
           {% if c.duration_seconds_estimate %}
-            <p class="text-xs text-ink-light">
+            <p class="text-xs text-cream-muted">
               {% if c.kind == 'new' %}~{% endif %}{{ c.duration_seconds_estimate | duration_minutes }}
             </p>
           {% endif %}
         </div>
 
-        <h2 class="editorial text-2xl font-semibold mt-2 leading-snug">{{ c.topic_label | title_case }}</h2>
+        <h2 class="editorial text-2xl mt-2 leading-snug text-cream-text">{{ c.topic_label | title_case }}</h2>
 
-        <p class="text-sm text-ink-light mt-3 leading-relaxed">
-          <em class="editorial">{{ c.title_a | title_case }}</em>{% if c.byline_a %}, by {{ c.byline_a }}{% endif %}
-          <span class="text-ink-light mx-1">×</span>
-          <em class="editorial">{{ c.title_b | title_case }}</em>{% if c.byline_b %}, by {{ c.byline_b }}{% endif %}
+        <p class="text-sm text-cream-light mt-3 leading-relaxed">
+          <em class="editorial not-italic">{{ c.title_a | title_case }}</em>{% if c.byline_a %}, by {{ c.byline_a }}{% endif %}
+          <span class="text-cream-muted mx-1">×</span>
+          <em class="editorial not-italic">{{ c.title_b | title_case }}</em>{% if c.byline_b %}, by {{ c.byline_b }}{% endif %}
         </p>
-        <p class="text-xs text-ink-light mt-1">
+        <p class="text-xs text-cream-muted mt-1">
           {{ c.publication_a }} &middot; {{ c.publication_b }}
         </p>
 
-        <p class="hook text-ink mt-5 leading-relaxed whitespace-pre-line">{{ c.why }}</p>
+        <p class="hook mt-5 whitespace-pre-line">{{ c.why }}</p>
 
         <div class="mt-6">
           {% if c.kind == 'existing' %}
             <a href="/crosscut/{{ c.edition_id }}"
-               class="inline-flex items-center gap-3 px-5 py-3 bg-night text-peach rounded-full font-medium hover:opacity-90 transition-opacity">
+               class="inline-flex items-center gap-3 px-5 py-3 bg-red-accent text-night rounded-full font-medium hover:opacity-90 transition-opacity">
               <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
               Listen now
             </a>
@@ -64,13 +64,13 @@
               <input type="hidden" name="why" value="{{ c.why }}">
               <input type="email" name="email" required
                      placeholder="your email — we'll send the listen link"
-                     class="flex-1 px-4 py-3 rounded-full bg-ink/10 border border-ink/20 text-ink placeholder-ink-light focus:outline-none focus:border-ink/50 transition-colors">
+                     class="flex-1 px-4 py-3 rounded-full bg-night border border-night-border text-cream-text placeholder-cream-muted focus:outline-none focus:border-red-accent/50 transition-colors">
               <button type="submit"
-                      class="px-5 py-3 bg-night text-peach rounded-full font-medium hover:opacity-90 transition-opacity">
+                      class="px-5 py-3 bg-red-accent text-night rounded-full font-medium hover:opacity-90 transition-opacity">
                 Create this episode
               </button>
             </form>
-            <p class="text-xs text-ink-light mt-3">
+            <p class="text-xs text-cream-muted mt-3">
               Builds take ~15 min. You'll get an email link when it's ready; it'll also live in <a href="/listener-created" class="underline">Listener-created</a>.
             </p>
           {% endif %}

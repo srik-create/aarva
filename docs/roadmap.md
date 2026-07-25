@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-22
+**Last updated:** 2026-07-25
 
 ---
 
@@ -70,25 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Site-wide redesign — black + red + Anton + hero doodles.**
-   Full spec at `docs/session_plan_black_red_redesign.md`.
-   Replace the current warm-cream + JTBD-pastels palette with
-   near-black `#0A0A0A` + warm off-white `#F0E5D0` + pure red
-   `#FF2A2A` (sole accent). Replace Fraunces+Inter with Anton
-   (uppercase display) + Inter (body). Add per-fixed-nav-page
-   AI-generated hero doodles (~10 SVG line drawings in single-
-   weight red on black). Retire per-JTBD card colors — cards
-   become uniform dark surfaces with red-tinted borders for
-   featured items; JTBD identity comes through eyebrow labels
-   alone. Hooks become red-bordered Anton pull-quotes (replacing
-   Fraunces italic). PWA icon + apple-touch-icon + podcast cover
-   regenerated to the new palette in the SAME PR — "AARVA" in
-   warm off-white on near-black with a single red dot accent
-   (user confirmed 2026-07-22). AGENTS.md rule 4 sign-off from
-   user 2026-07-22 via approved Cowork mockups (Variant A
-   refined). Ships as one big PR — dozens of templates, mockup-
-   gate verification required.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -134,9 +115,67 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-22)
+## Recently completed (2026-06-29 → 2026-07-25)
 
 Most recent first.
+
+### 2026-07-25
+
+- **Site-wide redesign — black + red + Anton + hero doodles.** Full
+  spec at `docs/session_plan_black_red_redesign.md` ("Variant A
+  refined"). Replaced the warm-cream + JTBD-pastels palette with
+  near-black `#0A0A0A` + warm off-white `#F0E5D0` + a single red
+  accent `#FF2A2A`. Replaced Fraunces+Inter with Anton (uppercase
+  display) + Inter (body). Retired per-JTBD card colors — cards are
+  now uniform dark surfaces (`bg-night-soft`); featured/singled-out
+  content (the daily crosscut spotlight, a completed build) gets a
+  red-tinted border, everything else a neutral one. JTBD identity now
+  comes through eyebrow labels alone. Article hooks are now red-
+  bordered Anton pull-quotes. Added 9 AI-generated (Gemini text-to-
+  SVG) hero doodles, one per fixed-nav page, plus a `categories.svg`
+  reuse on `/category/<slug>`. Regenerated the full PWA icon set
+  (apple-touch-icon, icon-192, icon-512, icon-maskable-512, favicon
+  .ico + 32/16) and the 3000×3000 podcast cover with a new "AARVA●"
+  wordmark (Anton, cream-on-black, single red dot accent) — bundles
+  Anton-Regular.ttf (OFL) so icon generation doesn't depend on system
+  fonts. AGENTS.md rule 4 sign-off from user 2026-07-22 via approved
+  Cowork mockups. Shipped as one PR per the spec's explicit
+  instruction, gated on a real mockup-gate screenshot pass (Playwright
+  at 375px) across all 11 listener-facing pages + the mini-player.
+  - **Also cleaned up as dead code once the rewrite landed:**
+    `jtbd_meta.py`'s `card_color`/`header_color` fields and
+    `card_color_for_jtbd()`, plus the `card_color` Jinja filter and
+    the routes (`home.py`, `articles.py`, `crosscuts.py`,
+    `categories.py`) that computed and passed them — nothing in any
+    template referenced them after the redesign (confirmed by a
+    repo-wide grep before removing).
+  - **Deliberate deviations from the mockup, noted rather than
+    silently absorbed:**
+    - `/crosscuts`' mockup prose describes per-episode doodles on a
+      "stack of episode cards," but the spec's own Non-goals section
+      explicitly forbids per-episode doodles in v1 and only
+      provisions one `crosscuts.svg` asset for the whole page —
+      treated the prose as imprecise and shipped one page-level hero
+      doodle only, consistent with the Non-goals section and the
+      actual asset table.
+    - `/crosscuts`' mockup also shows filter chips; the route (and
+      `/publications`, `/categories`) has no query-param filtering
+      support at all in the backend. Inventing new filter logic
+      would have contradicted the spec's own "no information-
+      architecture changes" non-goal, so the chips were skipped.
+  - **Verified for real:** ran a live local server against a
+    disposable DB copy and drove real headless Chromium (Playwright)
+    at 375px across `/`, `/today`, `/crosscut/:id`, `/article/:id`,
+    `/crosscuts`, `/categories`, `/category/:slug`, `/publications`,
+    `/publication/:slug`, `/listener-created`, `/editions`, and
+    `/create?q=...` — confirmed every hero doodle renders, hooks stay
+    within 3 lines (tested against the 5 longest real hooks in the
+    DB, which is why `.hook`'s font-size is 18px rather than the
+    spec's suggested 22px — documented in a `base.html` comment),
+    the mini-player and play/pause both render and work in the new
+    palette, and no server errors were logged across the full sweep.
+    Visually inspected the regenerated icon set and podcast cover at
+    their actual output sizes.
 
 ### 2026-07-22
 

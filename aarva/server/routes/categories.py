@@ -52,7 +52,6 @@ async def categories_list(request: Request) -> HTMLResponse:
         {
             "label": j["label"],
             "slug": j["slug"],
-            "card_color": j["card_color"],
             "description": j["description"],
             "count": counts.get(j["key"], 0),
         }

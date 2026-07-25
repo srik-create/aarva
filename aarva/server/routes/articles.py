@@ -14,7 +14,6 @@ from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from aarva.server.app import app
-from aarva.server.jtbd_meta import card_color_for_jtbd
 from aarva.server.templates import templates
 from aarva.services.share_analytics import log_referrer_visit
 
@@ -78,7 +77,6 @@ async def article_detail(request: Request, article_id: int) -> HTMLResponse:
         raise HTTPException(status_code=404, detail="Article not found")
 
     piece = dict(row)
-    card_color = card_color_for_jtbd(piece.get("jtbd_primary"))
 
     # Share analytics (2026-07-16) — rough proxy for "where this got
     # shared to" since Web Share doesn't expose the destination
@@ -92,6 +90,5 @@ async def article_detail(request: Request, article_id: int) -> HTMLResponse:
         request, "article.html",
         {
             "piece": piece,
-            "card_color": card_color,
         },
     )

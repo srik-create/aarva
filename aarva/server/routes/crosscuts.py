@@ -60,6 +60,5 @@ async def crosscut_detail(request: Request, edition_id: int) -> HTMLResponse:
         request, "crosscut.html",
         {
             "crosscut": rows[0],
-            "card_color": "peach",
         },
     )
