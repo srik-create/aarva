@@ -15,7 +15,9 @@ This stage does Phase 2 of the Crosscut pipeline:
      fingerprint dimensions) for the divergence signal.
   3. Exclude pairs whose topic was used in any of the last N crosscut
      episodes (anti-repetition).
-  4. Take top ~30 by structural divergence. Each of those 30 gets a
+  4. Take top ~30 by topical similarity (divergence as a secondary
+     tie-break — see the pre-score formula's comment for why
+     similarity leads). Each of those 30 gets a
      stance classification (OPPOSING_VIEWS vs. DIFFERENT_ANGLES — see
      docs/session_plan_users_and_crosscut_upgrades.md Section 2, added
      2026-07-15) and the existing Gemini connection-eval (one-sentence
@@ -87,6 +89,11 @@ DEFAULT_SELECTED_PAIR_EXCLUSION_DAYS = 60
 # topics used in the last N crosscut episodes. We compare on the
 # topic_label LLM-output from those past episodes.
 DEFAULT_TOPIC_RECENCY_WINDOW = 3
+
+# Number of axes _divergence() checks (lens, pillar, jtbd_primary, plus
+# 6 narrative-fingerprint dimensions). Used to normalize divergence into
+# the pre-score formula below.
+_MAX_DIVERGENCE_AXES = 9
 
 
 @dataclass
@@ -1510,9 +1517,28 @@ def detect_pair_candidates(
                 # Too structurally similar; even at moderate topic
                 # similarity, this won't read as different angles.
                 continue
-            # Combined pre-score: rewards both being in the right
-            # similarity band AND being structurally divergent.
-            combined = div + (sim - sim_floor) * 2.0
+            # Combined pre-score: similarity-led, divergence as a
+            # secondary tie-break.
+            #
+            # Switched 2026-07-26 (see session_plan_llm_upgrade_gemini_
+            # 3_1_pro.md follow-up note). The old formula was
+            # `div + (sim - sim_floor) * 2.0` — div is an integer 0-9
+            # (_MAX_DIVERGENCE_AXES) but the sim term maxes out at 0.8,
+            # so div dominated the ranking almost regardless of sim.
+            # Verified against the real pool: the old formula's top 30
+            # were ALL div=9 (maximally different on every axis) at
+            # sim ~0.69-0.73, while pairs at sim ~0.81-0.84 (much more
+            # likely to share a genuine real-world subject) were never
+            # reachable. That's backwards for "same question, different
+            # angles" — it optimized for maximally different, not
+            # genuinely connected. Exposed when gemini-3.1-pro-preview's
+            # stricter connection-eval started correctly scoring these
+            # maximally-divergent-but-weakly-similar pairs near zero
+            # (gemini-3-flash-preview had been scoring them generously).
+            #
+            # To revert to the old div-led formula, restore:
+            #   combined = div + (sim - sim_floor) * 2.0
+            combined = sim + (div / _MAX_DIVERGENCE_AXES) * 0.3
             pre_scored.append((combined, div, a, b))
     stats.pairs_pre_scored = len(pre_scored)
     if not pre_scored:
@@ -1561,8 +1587,19 @@ def detect_pair_candidates(
             stats.skipped_for_topic_recency += 1
             logger.debug("Crosscut: skipping pair on recent topic '%s'", topic)
             continue
-        if int(result.get("score") or 0) < 4:
+        pair_score = int(result.get("score") or 0)
+        logger.debug(
+            "Crosscut eval: score=%d pair=(%d, %d) topic='%s'",
+            pair_score, a.id, b.id, topic,
+        )
+        if pair_score < 3:
             # Below quality floor; skip persisting low-scored pairs.
+            # Floor dropped 4 -> 3 on 2026-07-26 after the gemini-3.1-
+            # pro-preview upgrade: Pro scores this same prompt visibly
+            # stricter than gemini-3-flash-preview did (see
+            # session_plan_llm_upgrade_gemini_3_1_pro.md follow-up
+            # note) — 3 runs the same day persisted 1, 0, 0 pairs at
+            # the old floor vs. a 4-20/day historical baseline on Flash.
             continue
         entry = (result, a, b, float(div))
         if stance == "OPPOSING_VIEWS":
@@ -1632,7 +1669,7 @@ def detect_pair_candidates(
 
     logger.info(
         "Crosscut: persisted %d candidates (eval'd %d, stance-"
-        "classified %d, skipped %d for topic recency, filtered <4 "
+        "classified %d, skipped %d for topic recency, filtered <3 "
         "score)",
         stats.pairs_persisted, stats.pairs_eval_called,
         stats.pairs_stance_classified, stats.skipped_for_topic_recency,

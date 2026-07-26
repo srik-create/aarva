@@ -372,7 +372,12 @@ llm:
   # in preview. When it goes GA, drop the suffix. (Discovered via
   # ModelService.ListModels — only `models/gemini-3-flash-preview`
   # is exposed, not the bare `models/gemini-3-flash`.)
-  model: gemini-3-flash-preview
+  #
+  # Switched 2026-07-26 from gemini-3-flash-preview → gemini-3.1-pro-preview
+  # for flagship Pro-tier reasoning across ingestion + scoring + crosscut
+  # writing. Docs / benchmarks: see session_plan_llm_upgrade_gemini_3_1_pro.md.
+  # Pricing: $2/1M input + $12/1M output for ≤ 200K context (Vertex AI).
+  model: gemini-3.1-pro-preview
   #
   # Retries on transient errors. For Gemini, we observed:
   #   - 503 UNAVAILABLE: server overload, often in streaks. Needs >=3 retries.

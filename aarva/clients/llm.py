@@ -323,7 +323,9 @@ def _is_permanent_client_error(exc: Exception) -> bool:
     Today we catch:
       - 404 NOT_FOUND — bad model name (burned 6 retries on every call
         when pipeline.yaml pointed at `gemini-3-flash` before we
-        discovered the preview SKU is `gemini-3-flash-preview`).
+        discovered the preview SKU is `gemini-3-flash-preview`). Current
+        production model is `gemini-3.1-pro-preview` (switched 2026-07-26,
+        see session_plan_llm_upgrade_gemini_3_1_pro.md).
       - 429 RESOURCE_EXHAUSTED with "monthly spending cap" / "billing
         account" in the body — this is the paid-tier monthly spend
         cutoff, not a per-minute rate limit. It won't recover until
@@ -374,7 +376,7 @@ class GeminiAPIClient(LLMClient):
     higher quota, bump this in pipeline.yaml via `llm.rpm: 60` or whatever.
     """
 
-    DEFAULT_MODEL = "gemini-2.5-flash"
+    DEFAULT_MODEL = "gemini-3.1-pro-preview"
     # 16384 gives ample headroom for our largest JSON responses (the
     # Stage 4+5+6 combined score response with all eight rationales can
     # exceed 4096 tokens; truncation there returns partial JSON that
