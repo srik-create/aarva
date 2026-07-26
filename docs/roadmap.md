@@ -70,6 +70,18 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Text LLM upgrade — `gemini-3-flash-preview` →
+   `gemini-3.1-pro-preview`.** Full spec at
+   `docs/session_plan_llm_upgrade_gemini_3_1_pro.md`. Single-line
+   swap in `aarva/config/pipeline.yaml`; affects every text-gen
+   call in Aarva (Stages 2, 4-5-6, 8, 8a, 85, crosscut pair-
+   detection + stance + intro/bridge/outro writing, /create
+   propose_candidates). Not Stage 9 TTS — that's a separate
+   `tts.model`. No A/B — user's call — because ingestion + scoring
+   gains compound across the article pool over days, not in
+   one-day snapshots. Cost estimate ~$1-2/day at current volume.
+   Rollback is one line.
+
 ---
 
 ## Deferred — to return to (in priority order)
