@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-25
+**Last updated:** 2026-07-26
 
 ---
 
@@ -70,18 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Text LLM upgrade — `gemini-3-flash-preview` →
-   `gemini-3.1-pro-preview`.** Full spec at
-   `docs/session_plan_llm_upgrade_gemini_3_1_pro.md`. Single-line
-   swap in `aarva/config/pipeline.yaml`; affects every text-gen
-   call in Aarva (Stages 2, 4-5-6, 8, 8a, 85, crosscut pair-
-   detection + stance + intro/bridge/outro writing, /create
-   propose_candidates). Not Stage 9 TTS — that's a separate
-   `tts.model`. No A/B — user's call — because ingestion + scoring
-   gains compound across the article pool over days, not in
-   one-day snapshots. Cost estimate ~$1-2/day at current volume.
-   Rollback is one line.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -127,9 +115,45 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-25)
+## Recently completed (2026-06-29 → 2026-07-26)
 
 Most recent first.
+
+### 2026-07-26
+
+- **Text LLM upgrade — `gemini-3-flash-preview` → `gemini-3.1-pro-
+  preview`.** Full spec at
+  `docs/session_plan_llm_upgrade_gemini_3_1_pro.md`. One-line model
+  swap in `aarva/config/pipeline.yaml` (+ `DEFAULT_MODEL` in
+  `aarva/clients/llm.py`) — affects every text-gen call in Aarva
+  (Stages 2, 4-5-6, 8, 8a, 85, crosscut pair-detection + stance +
+  intro/bridge/outro writing, /create `propose_candidates`). Not
+  Stage 9 TTS or embeddings — separate models, untouched. Verified
+  end-to-end on a real full daily run (stages 1-8 + 85, ~1841-article
+  author-provenance backlog): zero real model errors, hooks and
+  crosscut writing noticeably sharper. Rollback is one line.
+  - **Bug found and fixed as part of verification:** the crosscut
+    pre-scoring formula in `aarva/stages/stage_crosscut.py` let
+    structural divergence (an integer 0-9 count of differing axes)
+    dominate over topical similarity (capped at a 0.8 contribution)
+    — so it was handing the connection-eval LLM pairs that were
+    maximally *different*, only loosely required to share a topic at
+    all (similarity floor of 0.45 is permissive). `gemini-3-flash-
+    preview` had been scoring these generously (5-7); `gemini-3.1-
+    pro-preview`'s stricter, more accurate judgment correctly scored
+    them near zero, dropping the daily crosscut yield from a
+    4-20/day historical baseline to 1, then 0, then 0 pairs across
+    three real runs the same day. Fixed by re-weighting the formula
+    to be similarity-led (`sim + (div/9)*0.3`, was `div + (sim -
+    0.45)*2.0`) and dropping the persistence floor from score≥4 to
+    score≥3 to compensate for Pro's stricter calibration on
+    otherwise-good pairs. Old formula kept in a code comment for a
+    one-line revert if the model changes again. Re-verified against
+    the same day's real article pool: 10/30 pairs persisted, scores
+    spread 2-9 (avg ~5.6) — back in the historical range, and the
+    actual pairs now share genuine real-world subjects (e.g. two
+    pieces on Nolan's *The Odyssey*, several on Iran-war policy)
+    instead of coincidental topic-adjacency.
 
 ### 2026-07-25
 

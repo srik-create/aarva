@@ -1,5 +1,15 @@
 # Session plan — upgrade text LLM from gemini-3-flash-preview → gemini-3.1-pro-preview
 
+**STATUS: DONE (2026-07-26).** Model swapped, verified end-to-end on
+a real full daily run (stages 1-8 + 85, zero model errors). One
+follow-up fix was needed and made as part of this change: the
+crosscut pre-scoring formula in `aarva/stages/stage_crosscut.py` was
+divergence-dominated and surfaced weakly-connected pairs that Flash
+had been scoring generously; Pro correctly scored them near zero.
+Re-weighted to be similarity-led + dropped the persistence floor
+4→3. See `docs/roadmap.md`'s 2026-07-26 "Recently completed" entry
+for full details.
+
 Written by Cowork for the next Claude Code session (2026-07-22+).
 Single-line model swap in `aarva/config/pipeline.yaml` upgrading
 the text LLM from mid-tier Flash to flagship Pro. Affects every
