@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Sunday, 26 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-26</div>
+      <div class="edition-meta">2 pieces · Crosscut · Sunday, 26 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · us war in iran</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-26/crosscut_0105.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>37 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Every time the president steps to a microphone to talk about Operation Epic Fury in Iran, the official explanation for the war seems to change. It&#x27;s worth pausing on what happens when a government cannot settle on a single rationale for combat. Writing in *The Atlantic* on July 18, Tom Nichols tracks this shifting messaging alongside the immediate toll on American lives. Three days later in *Just Security*, Michael Schmitt looks at the exact same confusion through the eyes of a 19th-century Prussian military strategist. Read together, these two articles ask a sharp question. If the public doesn&#x27;t understand what a military operation is actually for, can the soldiers fighting it ever hope to win?</p>
+        <article class='piece'>
+<p class='hook'>Writing last week, Tom Nichols grounds the ongoing war in Iran in a hard number: sixteen dead Americans. Notice how Nichols tracks the president’s changing reasons for those casualties over twenty weeks of fighting. One night, the goal is regime change. Later, it switches to stopping a nuclear weapon that intelligence agencies say doesn&#x27;t exist. The sharpest moment comes when he contrasts those shifting explanations with a deadly attack on a Jordanian air base.</p>
+<h2 class='title'>Trump Owes Americans a Better Explanation About Iran</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Tom Nichols</span></p>
+<p class='source'><a href='https://www.theatlantic.com/national-security/2026/07/trump-war-iran-casualties/687996/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading Tom Nichols, the lasting image is a commander-in-chief throwing out different excuses for a conflict while soldiers lose their lives at a Jordanian air base. Nichols points out that the justification for attacking Iran kept shifting—one minute it was about stopping a nuclear bomb that didn&#x27;t exist, the next it was about overthrowing the government on a gut instinct. It reads like a massive failure of political honesty.
+
+Michael Schmitt picks up that exact thread of confusion, but takes it straight to the battlefield. He relies on the 19th-century military theorist Carl von Clausewitz to look at why Operation Epic Fury is already falling apart. The interesting thing is how Schmitt bypasses the politics of the president&#x27;s changing story entirely. 
+
+Read alongside Schmitt, Nichols&#x27;s complaint takes on a much sharper edge. Nichols treats the shifting explanations as a betrayal of the American public. But put these two together, and that same political chaos starts to look like a structural military failure. The inability to give the public a straight answer wasn&#x27;t just a communication problem. It meant the troops on the ground never had a coherent objective to fight for in the first place.</p>
+        <article class='piece'>
+
+<h2 class='title'>Clausewitz on Operation Epic Fury</h2>
+<p class='byline'><span class='publication'>Just Security</span><span class='sep'>·</span><span>Michael Schmitt</span></p>
+<p class='source'><a href='https://www.justsecurity.org/147675/clausewitz-operation-epic-fury/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=clausewitz-operation-epic-fury' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the direct line between a microphone in Washington and a battlefield in Iran. When a president struggles to explain exactly why soldiers are fighting, the damage goes far beyond poll numbers. That political confusion breaks the military strategy itself, leaving troops to fight without a clear finish line. A 19th-century military theorist and today&#x27;s casualty reports both point to the exact same reality. The question left to sit with is this: When the reasons for starting a war keep changing, how does a soldier know when it is finally time to go home?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
