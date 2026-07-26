@@ -14,5 +14,6 @@ REJECTION_REASONS: list[tuple[str, str]] = [
     ("transcript", "Transcript of an audio/video interview"),
     ("video_dependent", "Meaning depends on embedded video we can't narrate"),
     ("listicle", "Listicle — numbered list, no essayistic argument"),
+    ("too_niche", "Too niche — specialised beyond the daily reader"),
     ("other", "Other (free text)"),
 ]
