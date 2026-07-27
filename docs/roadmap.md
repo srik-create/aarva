@@ -70,6 +70,21 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Promote listener-created crosscuts as /today bonus tracks.**
+   Full spec at
+   `docs/session_plan_promote_listener_created_as_bonus.md`.
+   Small extension to the existing bonus mechanism: a new
+   `daily_bonus_features` mapping table + a query helper + an
+   "Also today" section on /today (crosscut-card style, "From a
+   listener" eyebrow). CLI reuses `aarva.search` with
+   `--promote-bonus <edition_id>` / `--unpromote-bonus <id>` /
+   `b <index>` interactive shortcut / `--listener-only` filter.
+   Up to N per day, ordered. Listener-created only
+   (`edition_type='crosscut' AND user_id IS NOT NULL`) —
+   editorial crosscuts already show on /today via a separate
+   path. AGENTS.md rule 4 sign-off from user 2026-07-26: section
+   header "Also today", per-card eyebrow "From a listener".
+
 ---
 
 ## Deferred — to return to (in priority order)
