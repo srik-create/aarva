@@ -181,6 +181,15 @@ Most recent first.
   text instead), so the spec's contrast-check concern turned out to
   be moot. Verified via real Playwright screenshots at 375px across
   all four changed page types.
+  - **Follow-up same day**: `/categories` (the browse-tile list page)
+    was missed in the original restoration — the spec's file list
+    didn't name it, so it kept the uniform dark tile treatment while
+    every other JTBD-touching page got its color back. User caught
+    this live on aarva.app. Fixed by threading `card_color` through
+    `routes/categories.py` into `categories_list.html`'s tiles —
+    same `bg-{{ cat.card_color }} text-ink` pattern as everywhere
+    else, peach for the Crosscuts tile (matches the historical
+    pre-redesign version exactly). Verified via Playwright screenshot.
 
 ### 2026-07-26
 

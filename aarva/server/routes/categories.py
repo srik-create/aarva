@@ -54,6 +54,7 @@ async def categories_list(request: Request) -> HTMLResponse:
             "slug": j["slug"],
             "description": j["description"],
             "count": counts.get(j["key"], 0),
+            "card_color": j["card_color"],
         }
         for j in JTBD_INFO
     ]
