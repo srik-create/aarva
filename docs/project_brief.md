@@ -151,6 +151,7 @@ future-us knows whether to revisit.
 
 | When | Decision | Rationale | Reversible? |
 |---|---|---|---|
+| Pre-session | Project lives at `~/Projects/Aarva/` (NOT `~/Documents/...`) | The repo was originally under `~/Documents/Claude/Projects/Curio v2/`, but macOS Documents-folder permissions + iCloud sync interfered with launchd-driven automation (files became aliases; scripts couldn't be invoked). Moving outside Documents bypassed both. The rename from "Curio" to "Aarva" landed alongside the move. | Yes — move back any time, but Documents-folder permission issues would return |
 | Pre-session | BGE-base (local) for article embeddings | Free, no API, decent quality | Yes — embedding client is configurable |
 | Pre-session | SQLite as primary DB | Single-file, no ops | Migrating to Postgres ≈ 2 days of work if scale demands |
 | Pre-session | Gemini for pipeline LLM | Cost + quality vs. Claude API | Yes — `provider: anthropic_api` for fallback |
