@@ -408,8 +408,8 @@ Last updated: 2026-07-27
     information hierarchy.** Applies to BOTH Cowork and Claude
     Code sessions.
 
-    **At the start of EVERY session**, before responding to the
-    first user query:
+    **At the start of EVERY session AND after any mid-session
+    compaction**, before responding to the next user query:
 
     1. Read `AGENTS.md` (this file) fully.
     2. Read `docs/roadmap.md` — the "In progress" section fully,
@@ -424,6 +424,23 @@ Last updated: 2026-07-27
        - Any recent decisions (last 7 days) worth flagging
        This grounding pass is OBSERVABLE — its absence signals
        the reads didn't happen and the user can call it out.
+
+    **Compaction is a session-restart event.** Treat any of these
+    as a trigger to re-execute steps 1-4 above:
+    - A "conversation summary" / "session continuation" note
+      injected at the top of a turn.
+    - Explicit user instructions like "continue from where you
+      left off" or "resume the earlier task" that follow a
+      long silence or a summary block.
+    - Any signal that the earlier conversation has been
+      abstracted rather than kept verbatim.
+
+    The rationale: rule 17e's own text may get summarized away
+    by the compaction. Re-reading the docs re-anchors the rule
+    (and everything else) from disk. This makes the discipline
+    self-healing — even if the rule's phrasing is lost from
+    working memory, the moment the docs are re-read, the rule
+    reasserts itself.
 
     **Information hierarchy — strict.** When any factual detail
     is needed to spec, code, or suggest architecture:
