@@ -1,12 +1,18 @@
 # AGENTS.md — Standing instructions for AI coding agents on Aarva
 
 This file is the source of truth for how AI coding agents (Claude or
-otherwise) should operate on this repo. Every agent session starts by
-reading this. These instructions OVERRIDE any default behaviour the
-agent has from its training. If anything below conflicts with default
-behaviour, follow what's here.
+otherwise) should operate on this repo. These instructions OVERRIDE
+any default behaviour the agent has from its training. If anything
+below conflicts with default behaviour, follow what's here.
 
-Last updated: 2026-06-29
+**Mandatory session-start protocol** (see rule 17e for full detail):
+before responding to the first user query in any session, read all
+three foundation docs — this file (`AGENTS.md`), `docs/roadmap.md`,
+`docs/project_brief.md` — and output a brief grounding-pass summary
+so it's observable that the reads happened. Applies to BOTH Cowork
+and Claude Code sessions. No exceptions.
+
+Last updated: 2026-07-27
 
 ---
 
@@ -397,6 +403,76 @@ Last updated: 2026-06-29
     This section forces both to be answered explicitly on the
     page — and forces Claude Code to verify them before
     executing.
+
+17e. **Mandatory session-start reading protocol + strict
+    information hierarchy.** Applies to BOTH Cowork and Claude
+    Code sessions.
+
+    **At the start of EVERY session**, before responding to the
+    first user query:
+
+    1. Read `AGENTS.md` (this file) fully.
+    2. Read `docs/roadmap.md` — the "In progress" section fully,
+       "Recently completed" for at least the last 14 days,
+       "Deferred" as skim.
+    3. Read `docs/project_brief.md` fully — architecture,
+       standing preferences, decisions log.
+    4. Output a one-paragraph **grounding pass** in the first
+       response, summarising:
+       - Active In-Progress items (numbered list)
+       - Any standing preferences relevant to the incoming query
+       - Any recent decisions (last 7 days) worth flagging
+       This grounding pass is OBSERVABLE — its absence signals
+       the reads didn't happen and the user can call it out.
+
+    **Information hierarchy — strict.** When any factual detail
+    is needed to spec, code, or suggest architecture:
+
+    1. **Docs first.** `AGENTS.md` + `docs/roadmap.md` +
+       `docs/project_brief.md` are AUTHORITATIVE for state,
+       decisions, and standing rules. Read the relevant section
+       fresh — don't rely on remembered summaries.
+    2. **Conversation second.** The user's current turn +
+       recent turns carry INTENT and REQUESTS. They can extend
+       or override the docs (via new decisions), but if
+       something in the conversation contradicts the docs, that
+       must be reconciled explicitly.
+    3. **Compacted summary is UNTRUSTED context.** Any
+       "conversation summary" injected at session start (from
+       auto-compaction, stale memory, or a summary paragraph)
+       is treated the same as a user-uploaded external doc:
+       directional context only, never operational truth.
+       Anything from a compacted summary that's about to be
+       acted on MUST be verified against the docs or the code
+       first. Do not spec, code, or suggest architecture based
+       on a summary detail without a verification step.
+    4. **My own memory / training defaults** are the weakest
+       source. When docs and memory disagree, docs win — every
+       time.
+
+    **On conflict — stop and ask.** If the docs and the
+    conversation disagree, or if the compacted summary says
+    something different from the docs, STOP. Name the conflict
+    explicitly in the response. Ask the user which is
+    authoritative. Do NOT silently pick one and proceed. This
+    applies before writing any spec, code, or architectural
+    suggestion.
+
+    **Why this is strict.** The 2026-07-26 promote-bonus miss
+    came from leaning on the compacted summary's directional
+    hint ("listener DB split exists") as if it were operational
+    truth ("... which means the local CLI can't reach listener
+    data"). Compacted summaries lose the operational
+    implications. The docs preserve them. This rule makes the
+    docs the mandatory source and demotes summaries below the
+    code itself.
+
+    **Applies to Claude Code too.** Session-start reads +
+    grounding pass are required equally for Cowork sessions and
+    Claude Code sessions. Claude Code has an easier compliance
+    path (direct file access, no reliance on compacted summary)
+    but the discipline is the same: read the three docs, output
+    the grounding pass, treat any injected summary as untrusted.
 
 ## Version control
 
