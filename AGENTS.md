@@ -332,6 +332,72 @@ Last updated: 2026-06-29
     roadmap for the latest status of everything before writing
     specs."* This rule codifies that.
 
+17d. **Every session_plan MUST start with an "Architecture check"
+    section, filled in BEFORE the design body. Applies to BOTH
+    Cowork sessions and Claude Code sessions** — for both writing
+    and executing specs.
+
+    Three questions, answered explicitly with concrete file /
+    host / resource names:
+
+    1. **Where does the data live?** (main_db / listener_db / R2
+       bucket / config file / GitHub Pages / on a specific host)
+    2. **Where does the operation run?** (laptop CLI / Render
+       FastAPI process / GitHub Actions runner / static site
+       build / browser JS)
+    3. **Does the operation have physical access to the data it
+       needs?** yes / no. If NO — redesign before writing the
+       rest of the spec. Do not proceed with an interface that
+       can't reach its data.
+
+    Answering (3) requires GREPPING FIRST, not remembering. Run
+    the greps that verify the data location. For example, if
+    the spec touches listener_created content, grep for
+    `listener_db` in the routes / services to confirm which DB
+    the data lives in — do not assume from memory of a
+    compacted summary or an earlier design.
+
+    Also grep for related PATTERNS you can reuse: existing
+    admin endpoints, existing CLI shapes, existing auth
+    conventions. E.g. before writing a new admin route, grep
+    for `@app.(get|post).*/admin` — copy the shape that
+    already works instead of inventing a new one.
+
+    **Whose responsibility:**
+
+    - **Author of a spec (Cowork or Claude Code)**: fill in the
+      Architecture check before the design body. A spec that
+      lands without this section is malformed; bounce it back
+      to yourself and add the section before requesting user
+      sign-off.
+
+    - **Executor of an existing spec (usually Claude Code)**:
+      when starting on a spec, VERIFY the Architecture check
+      exists AND that its three answers still hold against
+      today's codebase. Re-run the greps yourself; don't trust
+      that the author's answers are current. If the section is
+      missing, wrong, or stale, STOP and flag it before writing
+      any code. Do not attempt to implement a spec whose
+      Architecture check doesn't verify — the spec is broken,
+      not a hint. Author a follow-up (rule 17c) or return to
+      the user for a redesign.
+
+    Bit us 2026-07-26: Cowork wrote a
+    `session_plan_promote_listener_created_as_bonus.md` that
+    designed a local CLI reading local DB to promote listener-
+    created crosscuts. But listener-created crosscuts live on
+    Render's `listener_db` (per the 2026-07-06 DB split, which
+    is in `docs/project_brief.md`), not the laptop's main_db.
+    The CLI couldn't have reached any real content. Claude Code
+    caught it at implementation time and proposed the correct
+    admin-endpoints-with-bearer-token design (mirroring the
+    existing `/admin/sync-db` pattern that Cowork also didn't
+    grep for). One rule 17b violation (didn't read
+    project_brief) compounded by one grep-before-spec miss.
+    This section forces both to be answered explicitly on the
+    page — and forces Claude Code to verify them before
+    executing.
+
 ## Version control
 
 20. **Never commit or push without explicit user sign-off.** At the
