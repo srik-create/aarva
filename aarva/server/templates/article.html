@@ -13,92 +13,103 @@
   {% if og_image %}<meta name="twitter:image" content="{{ og_image }}" />{% endif %}
 {% endblock %}
 {% block content %}
-  <p class="eyebrow">
-    <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:opacity-75 transition-colors">{{ piece.publication_name }}</a>
-    {% if piece.jtbd_primary | jtbd_label %}
-      <span class="mx-1">·</span>{{ piece.jtbd_primary | jtbd_label }}
+  {# Wrap the article in an expanded card whose colour matches the
+     JTBD tile that brought the listener here — so the article page
+     visually inherits its home-page identity (docs/session_plan_
+     restore_jtbd_card_colors.md). card_color comes from
+     aarva/server/routes/articles.py (falls back to 'paper' for
+     listener-created articles with no jtbd_primary). #}
+  <article class="bg-{{ card_color }} text-ink rounded-3xl p-8 md:p-10">
+    <p class="text-xs text-ink-light uppercase tracking-widest">
+      <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
+      {% if piece.jtbd_primary | jtbd_label %}
+        <span class="mx-1">·</span>{{ piece.jtbd_primary | jtbd_label }}
+      {% endif %}
+    </p>
+    <h1 class="editorial text-4xl leading-tight mt-2">{{ piece.title | title_case }}</h1>
+    {% if piece.byline %}
+      <p class="text-ink-light mt-3">by {{ piece.byline }}</p>
     {% endif %}
-  </p>
-  <h1 class="editorial text-4xl leading-tight mt-2 text-cream-text">{{ piece.title | title_case }}</h1>
-  {% if piece.byline %}
-    <p class="text-cream-light mt-3">by {{ piece.byline }}</p>
-  {% endif %}
-  {% if piece.published_date %}
-    <p class="text-sm text-cream-muted mt-1">Published {{ piece.published_date }}</p>
-  {% endif %}
+    {% if piece.published_date %}
+      <p class="text-sm text-ink-light mt-1">Published {{ piece.published_date }}</p>
+    {% endif %}
 
-  {# Hero doodle (layout pattern #1) #}
-  <div class="my-8 bg-night-soft rounded-2xl p-8 flex items-center justify-center">
-    <img src="/static/doodles/article_detail.svg" alt="" aria-hidden="true" class="w-full max-w-xs">
-  </div>
+    {# Hero doodle — stays dark; hero doodle backgrounds are a
+       non-JTBD surface (docs/session_plan_restore_jtbd_card_colors.md). #}
+    <div class="my-8 bg-night-soft rounded-2xl p-8 flex items-center justify-center">
+      <img src="/static/doodles/article_detail.svg" alt="" aria-hidden="true" class="w-full max-w-xs">
+    </div>
 
-  {% if piece.hook %}
-    <p class="hook mt-2">{{ piece.hook }}</p>
-  {% endif %}
+    {% if piece.hook %}
+      <p class="hook text-ink mt-2">{{ piece.hook }}</p>
+    {% endif %}
 
-  {# ─── Custom audio player with big round Play CTA ─────────────── #}
-  {# Audio src + title + link live on the wrapper as data-track-*
-     attributes; the shared player in base.html drives a single
-     <audio> element across the whole site, so there's no per-tile
-     <audio> any more. The play button becomes a remote control. #}
-  <div class="mt-10" data-player
-       data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
-       data-track-title="{{ piece.title | title_case }}"
-       data-track-link="/article/{{ piece.id }}">
-    <div class="flex items-center gap-5">
-      <button type="button"
-              aria-label="Play"
-              class="play-btn shrink-0 w-20 h-20 rounded-full bg-red-accent text-night flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
-              data-play-button>
-        {# Play triangle (becomes pause via JS) #}
-        <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-      </button>
-      <div class="flex-1">
-        <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
-          <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+    {# ─── Custom audio player with big round Play CTA ─────────────── #}
+    {# Audio src + title + link live on the wrapper as data-track-*
+       attributes; the shared player in base.html drives a single
+       <audio> element across the whole site, so there's no per-tile
+       <audio> any more. The play button becomes a remote control. #}
+    <div class="mt-10" data-player
+         data-track-src="{{ piece.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+         data-track-title="{{ piece.title | title_case }}"
+         data-track-link="/article/{{ piece.id }}">
+      <div class="flex items-center gap-5">
+        <button type="button"
+                aria-label="Play"
+                class="play-btn shrink-0 w-20 h-20 rounded-full bg-night text-{{ card_color }} flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                data-play-button>
+          {# Play triangle (becomes pause via JS) #}
+          <svg viewBox="0 0 24 24" class="play-icon w-8 h-8 ml-1" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg viewBox="0 0 24 24" class="pause-icon w-8 h-8 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <div class="flex-1">
+          <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+            <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+          </div>
+          <p class="text-sm text-ink-light mt-2">
+            <span data-current-time>0:00</span>
+            <span class="mx-1">/</span>
+            <span data-total-time>{{ piece.duration_seconds | duration }}</span>
+            {% if piece.narrator_voice %}
+              <span class="mx-1">·</span> Narrator {{ piece.narrator_voice }}
+            {% endif %}
+          </p>
         </div>
-        <p class="text-sm text-cream-muted mt-2">
-          <span data-current-time>0:00</span>
-          <span class="mx-1">/</span>
-          <span data-total-time>{{ piece.duration_seconds | duration }}</span>
-          {% if piece.narrator_voice %}
-            <span class="mx-1">·</span> Narrator {{ piece.narrator_voice }}
-          {% endif %}
-        </p>
       </div>
     </div>
-  </div>
 
-  {% with share_content_type="article", share_content_id=piece.id,
-     share_url=(request.app.state.server_cfg.public_url ~ "/article/" ~ piece.id),
-     share_title=piece.title,
-     share_text=(piece.hook or piece.contextualisation or "") %}
-    {% include "_share_button.html" %}
-  {% endwith %}
+    {% with share_content_type="article", share_content_id=piece.id,
+       share_url=(request.app.state.server_cfg.public_url ~ "/article/" ~ piece.id),
+       share_title=piece.title,
+       share_text=(piece.hook or piece.contextualisation or ""),
+       share_link_classes="text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink",
+       share_toast_class="text-ink-light" %}
+      {% include "_share_button.html" %}
+    {% endwith %}
 
-  {% if piece.contextualisation %}
-    <div class="mt-12">
-      <h2 class="eyebrow">Context</h2>
-      <p class="text-cream-text leading-relaxed">{{ piece.contextualisation }}</p>
-    </div>
-  {% endif %}
+    {% if piece.contextualisation %}
+      <div class="mt-12">
+        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">Context</h2>
+        <p class="leading-relaxed">{{ piece.contextualisation }}</p>
+      </div>
+    {% endif %}
 
-  {% if piece.show_notes %}
-    <div class="mt-10">
-      <h2 class="eyebrow">Show notes</h2>
-      <div class="text-cream-text leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
-    </div>
-  {% endif %}
+    {% if piece.show_notes %}
+      <div class="mt-10">
+        <h2 class="editorial text-xs uppercase tracking-widest text-ink-light mb-3 font-semibold">Show notes</h2>
+        <div class="leading-relaxed whitespace-pre-line">{{ piece.show_notes }}</div>
+      </div>
+    {% endif %}
 
-  {% if piece.canonical_url %}
-    <p class="mt-12">
-      <a href="{{ piece.canonical_url }}" target="_blank" rel="noopener"
-         class="inline-block text-sm text-cream-light hover:text-cream-text underline underline-offset-4 decoration-cream-muted hover:decoration-cream-text transition-colors">
-        Read on {{ piece.publication_name }} →
-      </a>
-    </p>
-  {% endif %}
+    {% if piece.canonical_url %}
+      <p class="mt-12">
+        <a href="{{ piece.canonical_url }}" target="_blank" rel="noopener"
+           class="inline-block text-sm text-ink-light hover:text-ink underline underline-offset-4 decoration-ink-light/40 hover:decoration-ink transition-colors">
+          Read on {{ piece.publication_name }} →
+        </a>
+      </p>
+    {% endif %}
+  </article>
 
   {# Player JS is shared via base.html. #}
 {% endblock %}

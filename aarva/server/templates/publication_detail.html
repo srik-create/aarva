@@ -2,7 +2,7 @@
 {% block title %}{{ publication.name }} — Aarva{% endblock %}
 {% block content %}
   <div class="mb-8">
-    <p class="eyebrow">Publication</p>
+    <p class="text-xs text-cream-muted uppercase tracking-widest">Publication</p>
     <h1 class="editorial text-4xl leading-tight mt-2 text-cream-text">{{ publication.name }}</h1>
     {% if publication.homepage %}
       <p class="mt-3 text-sm">
@@ -14,30 +14,35 @@
     {% endif %}
   </div>
 
-  {# Hero doodle (layout pattern #1) #}
+  {# Hero doodle — stays dark; hero doodle backgrounds are a non-JTBD
+     surface (docs/session_plan_restore_jtbd_card_colors.md). #}
   <div class="mb-10 bg-night-soft rounded-2xl p-8 flex items-center justify-center">
     <img src="/static/doodles/publication_detail.svg" alt="" aria-hidden="true" class="w-full max-w-xs">
   </div>
 
   {% if pieces %}
-    <div>
+    <div class="space-y-5">
       {% for piece in pieces %}
-        <article class="py-5 border-b border-night-border last:border-b-0">
-          <p class="eyebrow">
+        {# Per-article card colour mirrors the JTBD the listener would
+           see on /today or /category/<slug>. Publication pages span
+           JTBDs, so this varies from row to row. #}
+        {% set color = piece.jtbd_primary | card_color %}
+        <article class="bg-{{ color }} p-6 rounded-2xl text-ink">
+          <p class="text-xs text-ink-light uppercase tracking-wide">
             <span>{{ piece.edition_date }}</span>
             {% if piece.jtbd_primary %}
               <span class="mx-2">·</span>
               <span>{{ piece.jtbd_primary | jtbd_label }}</span>
             {% endif %}
           </p>
-          <h3 class="editorial text-xl leading-snug text-cream-text">
+          <h3 class="editorial text-xl leading-snug mt-1">
             <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
           </h3>
           {% if piece.byline %}
-            <p class="text-sm text-cream-light mt-1">by {{ piece.byline }}</p>
+            <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
           {% endif %}
           {% if piece.hook %}
-            <p class="hook mt-4">{{ piece.hook }}</p>
+            <p class="hook text-ink mt-4">{{ piece.hook }}</p>
           {% endif %}
           {# Compact player; data-track-* attrs feed the shared player in base.html. #}
           <div class="mt-5" data-player
@@ -46,16 +51,16 @@
                data-track-link="/article/{{ piece.article_id }}">
             <div class="flex items-center gap-4">
               <button type="button" aria-label="Play"
-                      class="shrink-0 w-14 h-14 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                      class="shrink-0 w-14 h-14 rounded-full bg-night text-{{ color }} flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
                       data-play-button>
                 <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
               </button>
               <div class="flex-1">
-                <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
-                  <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+                <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                  <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
                 </div>
-                <p class="text-xs text-cream-muted mt-2">
+                <p class="text-xs text-ink-light mt-2">
                   <span data-current-time>0:00</span>
                   <span class="mx-1">/</span>
                   <span data-total-time>{{ piece.duration_seconds | duration }}</span>

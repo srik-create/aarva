@@ -39,11 +39,9 @@
             // Black + red redesign (2026-07-22). Near-black page,
             // warm off-white text, a single red accent used sparingly
             // (Create button, eyebrow labels, hook border, play
-            // button, progress fill, doodle strokes). JTBD-pastel
-            // colors (peach/sky/lemon/mint/blush/lavender) and the
-            // 'ink'/'ink-light'/'paper' card-text colors are retired —
-            // every card is now a uniform dark surface; JTBD identity
-            // comes through the eyebrow label alone.
+            // button, progress fill, doodle strokes). Non-JTBD
+            // surfaces (nav, hero doodles, transcript body, mini-
+            // player, footer) stay on this dark palette.
             'night':            '#0A0A0A',  // page background — near black
             'night-soft':       '#141414',  // cards, elevated surfaces
             'night-border':     'rgba(240, 229, 208, 0.15)',  // subtle dividers
@@ -52,6 +50,34 @@
             'cream-muted':      'rgba(240, 229, 208, 0.45)',  // metadata, tertiary
             'red-accent':       '#FF2A2A',  // sole accent color
             'red-accent-fade':  'rgba(255, 42, 42, 0.15)',    // borders/tints
+
+            // Restored 2026-07-26 (docs/session_plan_restore_jtbd_
+            // card_colors.md) — the 2026-07-25 redesign removed these
+            // in favour of uniform dark cards, but /today felt flat
+            // without per-category visual distinction. JTBD-tagged
+            // article cards (home.html, category_detail.html,
+            // article.html, publication_detail.html) get a full
+            // pastel fill again; everything else stays on the dark
+            // palette above.
+            'peach':        '#E6C8B0',  // crosscut + CTA
+            'peach-dark':   '#9C5733',
+            'sky':          '#BFCEDB',  // future-gazing / behind
+            'sky-dark':     '#2C5878',
+            'lemon':        '#DDCF85',  // curiosity
+            'lemon-dark':   '#6E5E15',
+            'mint':         '#BCD0BF',  // smart-escape
+            'mint-dark':    '#3F5F44',
+            'blush':        '#DFB7BE',  // delight
+            'blush-dark':   '#8C3D4F',
+            'lavender':     '#C8C2D8', // behind-the-news
+            'lavender-dark':'#4F4279',
+            'paper':        '#E8DFCE', // neutral fallback
+
+            // Dark ink text-on-pastel (only used inside JTBD cards —
+            // everywhere else keeps the cream-text/-light/-muted
+            // scale above).
+            'ink':          '#2D2418',
+            'ink-light':    '#6E5F4B',
           },
           fontFamily: {
             'sans':    ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],

@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-26
+**Last updated:** 2026-07-27
 
 ---
 
@@ -85,23 +85,6 @@ GitHub Pages.
    path. AGENTS.md rule 4 sign-off from user 2026-07-26: section
    header "Also today", per-card eyebrow "From a listener".
 
-5. **Restore per-JTBD card colors on the black + red design.**
-   Full spec at `docs/session_plan_restore_jtbd_card_colors.md`.
-   Follow-up to the 2026-07-25 redesign (which removed pastel
-   card fills in favor of uniform dark cards). User looked at
-   the result 2026-07-26 and found /today felt flat without
-   per-category visual distinction. Bring back the original
-   pastel palette (peach/sky/lemon/mint/blush/lavender/paper)
-   as full card fills on JTBD-tagged article cards; text on
-   pastel goes back to `text-ink` dark; category-detail pages
-   get their per-JTBD theme back. Non-JTBD surfaces (nav,
-   doodle backgrounds, transcript body, mini-player, "Also
-   today" section) stay dark. Featured crosscut card keeps
-   peach fill + adds a subtle red-tinted border. Contrast
-   sanity check for red-accent eyebrow on each of the 7
-   pastels; fall back to per-pastel `-dark` variant if any
-   fail readability. Sign-off: user 2026-07-26.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -147,9 +130,34 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-26)
+## Recently completed (2026-06-29 → 2026-07-27)
 
 Most recent first.
+
+### 2026-07-27
+
+- **Restore per-JTBD card colors on the black + red design.** Full
+  spec at `docs/session_plan_restore_jtbd_card_colors.md`. Brought
+  back the original pastel palette (peach/sky/lemon/mint/blush/
+  lavender/paper) as full card fills on JTBD-tagged article cards,
+  with dark `text-ink`/`text-ink-light` on top — restored on
+  `/today` (crosscut card, bonus cards, JTBD-grouped cards),
+  `/category/<slug>`, `/article/<id>` (whole page wrapped in the
+  JTBD-colored card, matching the true pre-redesign pattern — tested
+  against the alternative "pastel hero + dark body" split the spec
+  raised as an option, and the single wrapped card read more coherent),
+  and `/publication/<slug>` (per-row JTBD color via a restored
+  `card_color` Jinja filter). `jtbd_meta.py`'s `card_color_for_jtbd`
+  and the `card_color`/`header_color` JTBDInfo fields are back.
+  Non-JTBD surfaces (nav, hero doodles, transcript-adjacent chrome,
+  mini-player, footer) stay on the dark palette. Featured crosscut
+  card keeps its peach fill plus a subtle red-tinted border. No
+  red-on-pastel contrast issue arose — the restoration follows the
+  original design's convention of never putting the red `.eyebrow`
+  label inside a pastel card (plain `ink-light`/per-pastel `-dark`
+  text instead), so the spec's contrast-check concern turned out to
+  be moot. Verified via real Playwright screenshots at 375px across
+  all four changed page types.
 
 ### 2026-07-26
 

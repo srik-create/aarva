@@ -158,12 +158,21 @@ def _jtbd_label(jtbd_primary: str | None) -> str:
     return info["label"] if info else ""
 
 
+def _card_color(jtbd_primary: str | None) -> str:
+    """Tailwind card-colour token for a JTBD key. Falls back to
+    'paper'. Thin wrapper so templates can `{{ piece.jtbd_primary |
+    card_color }}` without importing jtbd_meta directly."""
+    from aarva.server.jtbd_meta import card_color_for_jtbd
+    return card_color_for_jtbd(jtbd_primary)
+
+
 templates.env.filters["duration"] = _format_duration
 templates.env.filters["audio_url"] = _format_audio_url
 templates.env.filters["title_case"] = _title_case
 templates.env.filters["publication_slug"] = _publication_slug
 templates.env.filters["jtbd_label"] = _jtbd_label
 templates.env.filters["duration_minutes"] = _duration_minutes
+templates.env.filters["card_color"] = _card_color
 
 # Globals — available in every template without each route needing to
 # pass them explicitly. PROMPT_SUGGESTIONS is used by the header

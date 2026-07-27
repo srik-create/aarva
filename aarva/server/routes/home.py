@@ -28,16 +28,20 @@ from aarva.services.queries import (
 
 # Display order for "Other reads" — pieces with a JTBD outside the
 # main editorial taxonomy, or unknown JTBDs. Rendered at the bottom of
-# the daily.
+# the daily. Neutral 'paper' fill — matches card_color_for_jtbd's own
+# fallback for unknown/missing JTBDs.
 _OTHER_GROUP = {
     "label": "Other reads",
+    "card_color": "paper",
+    "header_color": "cream-light",
 }
 
 
 def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
     """Bucket pieces into JTBD groups in display order. Returns a list
-    of dicts {label, slug, pieces} ready for Jinja iteration. Empty
-    groups are omitted so the template doesn't render empty sections."""
+    of dicts {label, slug, card_color, header_color, pieces} ready for
+    Jinja iteration. Empty groups are omitted so the template doesn't
+    render empty sections."""
     buckets: dict[str, list[dict]] = {j["key"]: [] for j in JTBD_INFO}
     other_bucket: list[dict] = []
     known_keys = set(buckets.keys())
@@ -55,6 +59,8 @@ def _group_pieces_by_jtbd(pieces: list[dict]) -> list[dict]:
             grouped.append({
                 "label": j["label"],
                 "slug": j["slug"],
+                "card_color": j["card_color"],
+                "header_color": j["header_color"],
                 "pieces": buckets[j["key"]],
             })
     if other_bucket:

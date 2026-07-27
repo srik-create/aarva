@@ -1,5 +1,13 @@
 # Session plan — restore per-JTBD card colors on the black + red design
 
+**STATUS: DONE (2026-07-27).** Implemented as specced, with one
+interpretation call: the article-detail page uses a single JTBD-
+colored card wrapping the whole page (matching the true pre-redesign
+history) rather than the "pastel hero + dark body" split this doc
+raised as an open question — tested both readings and the single
+wrapped card looked more coherent. See `docs/roadmap.md`'s
+2026-07-27 "Recently completed" entry for full details.
+
 Written by Cowork for the next Claude Code session (2026-07-26+).
 Follow-up to `session_plan_black_red_redesign.md` (shipped
 2026-07-25). That PR removed the per-JTBD card colors — user

@@ -16,11 +16,13 @@
   </div>
 
   {% if crosscut %}
-    {# Featured content gets the card treatment (layout pattern #4):
-       red-tinted border, everything else on the page is a list row. #}
-    <section class="mb-12 p-6 bg-night-soft border border-red-accent-fade rounded-2xl">
-      <p class="eyebrow">Today's Crosscut</p>
-      <h2 class="editorial text-2xl leading-snug text-cream-text">
+    {# Featured content keeps its historic peach fill, plus a subtle
+       red-tinted border so the "featured" signal reads without a
+       second dominant color (docs/session_plan_restore_jtbd_card_
+       colors.md, locked decision #5). #}
+    <section class="mb-12 p-6 bg-peach border border-red-accent-fade rounded-2xl text-ink">
+      <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">Today's Crosscut</p>
+      <h2 class="editorial text-2xl leading-snug mt-2">
         <a href="/crosscut/{{ crosscut.edition_id }}" class="hover:opacity-70 transition-opacity">{{ (crosscut.topic_label or "Two angles") | title_case }}</a>
       </h2>
       {# Content-quality Section 2: subhead_hook is the primary
@@ -30,11 +32,11 @@
          crosscut.html, and listener_created.html — this card was
          overlooked when those three were updated. #}
       {% if crosscut.subhead_hook %}
-        <p class="text-cream-light mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
+        <p class="mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
       {% endif %}
-      <p class="text-sm text-cream-muted mt-2 leading-relaxed">
+      <p class="text-sm text-ink-light mt-2 leading-relaxed">
         <em class="editorial not-italic">{{ crosscut.title_a | title_case }}</em>
-        <span class="text-cream-muted mx-1">×</span>
+        <span class="text-ink-light mx-1">×</span>
         <em class="editorial not-italic">{{ crosscut.title_b | title_case }}</em>
       </p>
       {# Custom player (compact variant — same component as the article
@@ -47,16 +49,16 @@
            data-track-link="/crosscut/{{ crosscut.edition_id }}">
         <div class="flex items-center gap-4">
           <button type="button" aria-label="Play"
-                  class="shrink-0 w-14 h-14 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                  class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
                   data-play-button>
             <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
           </button>
           <div class="flex-1">
-            <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
-              <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+            <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+              <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
             </div>
-            <p class="text-xs text-cream-muted mt-2">
+            <p class="text-xs text-ink-light mt-2">
               <span data-current-time>0:00</span>
               <span class="mx-1">/</span>
               <span data-total-time>{{ crosscut.duration_seconds | duration }}</span>
@@ -76,21 +78,23 @@
      (layout pattern #3) — no filled card background. #}
   {% if bonus_pieces %}
     <section class="mb-12">
-      <h2 class="eyebrow">Bonus today</h2>
-      <div>
+      <h2 class="editorial text-xs uppercase tracking-widest text-cream-light mb-5 font-medium">
+        Bonus today
+      </h2>
+      <div class="space-y-5">
         {% for piece in bonus_pieces %}
-          <article class="py-5 border-b border-night-border last:border-b-0">
-            <p class="eyebrow">
-              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:opacity-75 transition-opacity">{{ piece.publication_name }}</a>
+          <article class="bg-paper p-6 rounded-2xl text-ink">
+            <p class="text-xs text-ink-light uppercase tracking-wide">
+              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
             </p>
-            <h3 class="editorial text-xl leading-snug text-cream-text">
+            <h3 class="editorial text-xl leading-snug mt-1">
               <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
             </h3>
             {% if piece.byline %}
-              <p class="text-sm text-cream-light mt-1">by {{ piece.byline }}</p>
+              <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
             {% endif %}
             {% if piece.hook %}
-              <p class="hook mt-4">{{ piece.hook }}</p>
+              <p class="hook text-ink mt-4">{{ piece.hook }}</p>
             {% endif %}
             {# Compact player — same shape as the JTBD-group cards
                below. data-track-* attributes feed the shared player
@@ -101,16 +105,16 @@
                  data-track-link="/article/{{ piece.article_id }}">
               <div class="flex items-center gap-4">
                 <button type="button" aria-label="Play"
-                        class="shrink-0 w-14 h-14 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                        class="shrink-0 w-14 h-14 rounded-full bg-night text-paper flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
                         data-play-button>
                   <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
                 </button>
                 <div class="flex-1">
-                  <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
-                    <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+                  <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                    <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
                   </div>
-                  <p class="text-xs text-cream-muted mt-2">
+                  <p class="text-xs text-ink-light mt-2">
                     <span data-current-time>0:00</span>
                     <span class="mx-1">/</span>
                     <span data-total-time>{{ piece.duration_seconds | duration }}</span>
@@ -129,27 +133,27 @@
 
   {% for group in grouped_pieces %}
     <section class="mb-12">
-      <h2 class="eyebrow">
+      <h2 class="editorial text-xs uppercase tracking-widest text-{{ group.header_color }} mb-5 font-medium">
         {% if group.slug %}
           <a href="/category/{{ group.slug }}" class="hover:opacity-70 transition-opacity">{{ group.label }} →</a>
         {% else %}
           {{ group.label }}
         {% endif %}
       </h2>
-      <div>
+      <div class="space-y-5">
         {% for piece in group.pieces %}
-          <article class="py-5 border-b border-night-border last:border-b-0">
-            <p class="eyebrow">
-              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:opacity-75 transition-colors">{{ piece.publication_name }}</a>
+          <article class="bg-{{ group.card_color }} p-6 rounded-2xl text-ink">
+            <p class="text-xs text-ink-light uppercase tracking-wide">
+              <a href="/publication/{{ piece.publication_name | publication_slug }}" class="hover:text-ink transition-colors">{{ piece.publication_name }}</a>
             </p>
-            <h3 class="editorial text-xl leading-snug text-cream-text">
+            <h3 class="editorial text-xl leading-snug mt-1">
               <a href="/article/{{ piece.article_id }}" class="hover:opacity-75 transition-opacity">{{ piece.title | title_case }}</a>
             </h3>
             {% if piece.byline %}
-              <p class="text-sm text-cream-light mt-1">by {{ piece.byline }}</p>
+              <p class="text-sm text-ink-light mt-1">by {{ piece.byline }}</p>
             {% endif %}
             {% if piece.hook %}
-              <p class="hook mt-4">{{ piece.hook }}</p>
+              <p class="hook text-ink mt-4">{{ piece.hook }}</p>
             {% endif %}
             {# Custom player (compact). Same component as article detail
                page; smaller round button + thinner row to fit the tile.
@@ -160,16 +164,16 @@
                  data-track-link="/article/{{ piece.article_id }}">
               <div class="flex items-center gap-4">
                 <button type="button" aria-label="Play"
-                        class="shrink-0 w-14 h-14 rounded-full bg-red-accent text-night flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                        class="shrink-0 w-14 h-14 rounded-full bg-night text-{{ group.card_color }} flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
                         data-play-button>
                   <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
                 </button>
                 <div class="flex-1">
-                  <div class="h-1.5 bg-night-border rounded-full overflow-hidden cursor-pointer" data-progress-track>
-                    <div class="h-full bg-red-accent rounded-full" style="width:0%" data-progress-fill></div>
+                  <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                    <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
                   </div>
-                  <p class="text-xs text-cream-muted mt-2">
+                  <p class="text-xs text-ink-light mt-2">
                     <span data-current-time>0:00</span>
                     <span class="mx-1">/</span>
                     <span data-total-time>{{ piece.duration_seconds | duration }}</span>
