@@ -18,28 +18,28 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     {% for cat in categories %}
       <a href="/category/{{ cat.slug }}"
-         class="block bg-night-soft border border-night-border text-cream-text rounded-2xl p-6 hover:opacity-90 transition-opacity">
+         class="block bg-{{ cat.card_color }} text-ink rounded-2xl p-6 hover:opacity-90 transition-opacity">
         <div class="flex items-baseline justify-between gap-4">
           <h2 class="editorial text-2xl leading-snug">{{ cat.label }}</h2>
-          <p class="text-sm text-cream-muted shrink-0">{{ cat.count }} piece{% if cat.count != 1 %}s{% endif %}</p>
+          <p class="text-sm text-ink-light shrink-0">{{ cat.count }} piece{% if cat.count != 1 %}s{% endif %}</p>
         </div>
-        <p class="text-cream-light mt-3 leading-relaxed">{{ cat.description }}</p>
+        <p class="text-ink-light mt-3 leading-relaxed">{{ cat.description }}</p>
       </a>
     {% endfor %}
 
     {# Crosscuts isn't a JTBD — it's a different content type — but
        lives in the same "browse by what kind of thing" mental model,
        so it gets a tile here too. The tile points at /crosscuts
-       (a dedicated route, not /category/<slug>). Same neutral card
-       treatment as the JTBD tiles above — no more per-category or
-       per-content-type color theming in the redesign. #}
+       (a dedicated route, not /category/<slug>). Peach matches the
+       crosscut card colour on /today and the crosscut detail page
+       (docs/session_plan_restore_jtbd_card_colors.md). #}
     <a href="/crosscuts"
-       class="block bg-night-soft border border-night-border text-cream-text rounded-2xl p-6 hover:opacity-90 transition-opacity">
+       class="block bg-peach text-ink rounded-2xl p-6 hover:opacity-90 transition-opacity">
       <div class="flex items-baseline justify-between gap-4">
         <h2 class="editorial text-2xl leading-snug">Crosscuts</h2>
-        <p class="text-sm text-cream-muted shrink-0">{{ crosscut_count }} episode{% if crosscut_count != 1 %}s{% endif %}</p>
+        <p class="text-sm text-ink-light shrink-0">{{ crosscut_count }} episode{% if crosscut_count != 1 %}s{% endif %}</p>
       </div>
-      <p class="text-cream-light mt-3 leading-relaxed">Paired-listening episodes — two articles in conversation, with bridges drawing out their non-obvious connections.</p>
+      <p class="text-ink-light mt-3 leading-relaxed">Paired-listening episodes — two articles in conversation, with bridges drawing out their non-obvious connections.</p>
     </a>
   </div>
 {% endblock %}
