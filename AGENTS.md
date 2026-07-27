@@ -491,6 +491,41 @@ Last updated: 2026-07-27
     but the discipline is the same: read the three docs, output
     the grounding pass, treat any injected summary as untrusted.
 
+    **Anti-drift within a session — cite the source for any
+    state assertion.** Any claim about project state (what
+    shipped / what's pending / what's deferred / what a decision
+    was) must either quote a specific doc location (e.g. "per
+    `docs/roadmap.md` line 74") or be prefaced with "let me
+    verify" followed by a Read of the relevant doc. If neither
+    happens, the assertion is coming from memory and is
+    presumptively wrong.
+
+    This is the enforcement ratchet: user reads a state claim,
+    sees no citation, sees no verification step — that's a
+    17e violation, callable in real time. Removes the "silent
+    memory-based assertion" failure mode that compounds into
+    bigger design misses like the 2026-07-26 promote-bonus
+    one. Also covers the long-session-drift case (many turns
+    with no compaction event) — every state assertion is a
+    micro-checkpoint, so drift can't accumulate silently.
+
+    The citation discipline applies to:
+    - What's In Progress / Deferred / Recently Completed
+      (source: `docs/roadmap.md`)
+    - What architectural decisions have been made
+      (source: `docs/project_brief.md` decisions log)
+    - What standing user preferences exist
+      (source: `docs/project_brief.md` Standing preferences)
+    - What a specific spec doc says or has DONE-status
+      (source: `docs/session_plan_*.md` file, line/section)
+    - What a specific piece of code does
+      (source: file path + line range, verified by Read)
+
+    Casual conversational continuations of the current turn's
+    topic don't need per-sentence citations. But any transition
+    to "here's what the project says about X" requires the
+    citation or the verify-first pattern.
+
 ## Version control
 
 20. **Never commit or push without explicit user sign-off.** At the
