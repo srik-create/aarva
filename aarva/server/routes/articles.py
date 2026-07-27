@@ -14,6 +14,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from aarva.server.app import app
+from aarva.server.jtbd_meta import card_color_for_jtbd
 from aarva.server.templates import templates
 from aarva.services.share_analytics import log_referrer_visit
 
@@ -86,9 +87,15 @@ async def article_detail(request: Request, article_id: int) -> HTMLResponse:
         request.headers.get("referer", ""), request.url.hostname or "",
     )
 
+    # Wrap the article in a card whose colour matches the JTBD tile
+    # that brought the listener here (falls back to 'paper' for
+    # listener-created articles, which have no jtbd_primary).
+    card_color = card_color_for_jtbd(piece.get("jtbd_primary"))
+
     return templates.TemplateResponse(
         request, "article.html",
         {
             "piece": piece,
+            "card_color": card_color,
         },
     )
