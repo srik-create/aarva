@@ -1,16 +1,29 @@
 """Authenticated admin endpoints.
 
-Today: the daily-DB-sync receiver, and a lost-listener-episode
-diagnostic. The sync endpoint expects a small JSON trigger pointing at
-a gzipped SQLite snapshot the laptop has already uploaded to R2; the
-server fetches from R2 over the fast backbone (vs. the laptop
-uploading the body directly over a residential link, which can blow
-past Render's 100-second request timeout on the Starter plan). Every
-sync runs the lost-episode diagnostic (see _find_lost_episodes) as a
-general safety check — its original rationale (jobs surviving in the
-main DB while the sync wiped editions in the listener DB) no longer
-applies since the 2026-07-15 jobs-table move put both in the same
-file, but it's cheap and still catches other loss scenarios.
+Today: the daily-DB-sync receiver, a lost-listener-episode
+diagnostic, and the listener-created-crosscut bonus-promotion pair.
+The sync endpoint expects a small JSON trigger pointing at a gzipped
+SQLite snapshot the laptop has already uploaded to R2; the server
+fetches from R2 over the fast backbone (vs. the laptop uploading the
+body directly over a residential link, which can blow past Render's
+100-second request timeout on the Starter plan). Every sync runs the
+lost-episode diagnostic (see _find_lost_episodes) as a general safety
+check — its original rationale (jobs surviving in the main DB while
+the sync wiped editions in the listener DB) no longer applies since
+the 2026-07-15 jobs-table move put both in the same file, but it's
+cheap and still catches other loss scenarios.
+
+promote-bonus / unpromote-bonus (2026-07-27, see
+docs/session_plan_promote_listener_created_as_bonus.md) are admin
+endpoints rather than a local CLI flag because of the same DB
+topology: listener-created crosscuts live in the listener DB on
+Render's persistent disk, and there's no live sync bringing that data
+back to the operator's laptop (only a one-way, disaster-recovery-only
+R2 snapshot). Running the write directly on Render — which already
+holds both DB connections in memory — sidesteps the whole problem.
+The operator finds the edition_id by browsing the live
+/listener-created page, then hits these endpoints (curl, or a small
+wrapper script) to promote/unpromote it.
 
 Tomorrow: any other operator-only hooks (force-deploy, cache flush,
 metrics scrape) live here too.
@@ -34,12 +47,14 @@ import logging
 import os
 import sqlite3
 import tempfile
+from datetime import date
 from pathlib import Path
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from aarva.server.app import app
+from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
 logger = logging.getLogger(__name__)
 
@@ -359,3 +374,181 @@ async def admin_diagnose_lost_episodes(request: Request) -> JSONResponse:
     _check_token(request)
     lost = _find_lost_episodes(request.app.state.db, request.app.state.listener_db)
     return JSONResponse({"status": "ok", "count": len(lost), "lost_episodes": lost})
+
+
+def _load_listener_crosscut_for_promotion(db, listener_db, edition_id: int) -> dict:
+    """Look up a crosscut by edition_id for promotion. Checks
+    listener_db first (everything since the 2026-07-06 split lives
+    there), falling back to the main db (pre-split legacy episodes
+    only). Raises HTTPException(404) if edition_id isn't a listener-
+    created crosscut in either DB, or HTTPException(400) if it is one
+    but has no synthesized audio yet — checked directly via raw SQL
+    (not the load_listener_episodes/load_crosscut_episodes helpers,
+    which both filter out rows with no audio_url — reusing them here
+    would collapse "doesn't exist" and "exists but no audio" into the
+    same not-found result). Returns the full row (same shape as those
+    helpers) once existence + audio are confirmed."""
+    with listener_db.connect() as conn:
+        row = conn.execute("""
+            SELECT e.user_id, ep.audio_url
+              FROM editions e
+              JOIN edition_pieces ep ON ep.edition_id = e.id AND ep.position = 0
+             WHERE e.id = ? AND e.edition_type = 'crosscut'
+        """, (edition_id,)).fetchone()
+    if row and row["user_id"] is not None:
+        if not row["audio_url"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"edition {edition_id} has no synthesized audio yet",
+            )
+        found = load_listener_episodes(listener_db, edition_id=edition_id)
+        return found[0]
+
+    # Fallback: pre-split legacy listener episodes in the main db.
+    with db.connect() as conn:
+        row = conn.execute("""
+            SELECT e.user_id, ep.audio_url
+              FROM editions e
+              JOIN edition_pieces ep ON ep.edition_id = e.id AND ep.position = 0
+             WHERE e.id = ? AND e.edition_type = 'crosscut'
+        """, (edition_id,)).fetchone()
+    if row and row["user_id"] is not None:
+        if not row["audio_url"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"edition {edition_id} has no synthesized audio yet",
+            )
+        found = load_crosscut_episodes(db, edition_id=edition_id)
+        return found[0]
+
+    raise HTTPException(
+        status_code=404,
+        detail=f"edition {edition_id} is not a listener-created crosscut",
+    )
+
+
+@app.post("/admin/promote-bonus")
+async def admin_promote_bonus(request: Request) -> JSONResponse:
+    """Promote a listener-created crosscut onto today's (or a given
+    date's) /today page, under the "Also today" section. See
+    docs/session_plan_promote_listener_created_as_bonus.md.
+
+    Request:
+      POST /admin/promote-bonus
+      Authorization: Bearer <AARVA_RENDER_SYNC_TOKEN>
+      Body: {"edition_id": <int>, "daily_date": "<YYYY-MM-DD>"}  (daily_date optional, defaults to today)
+
+    Response (200):
+      {"status": "ok", "position": <int>, "daily_date": "<date>"}
+
+    Errors:
+      400  missing/invalid edition_id, or the crosscut has no audio yet
+      401  invalid / missing bearer token
+      404  edition_id doesn't exist, or isn't a listener-created crosscut
+             (editorial crosscuts are refused — they already show on
+             /today via a separate path)
+    """
+    _check_token(request)
+    try:
+        payload = await request.json()
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="invalid JSON body")
+
+    edition_id = payload.get("edition_id") if isinstance(payload, dict) else None
+    if not isinstance(edition_id, int):
+        raise HTTPException(status_code=400, detail="payload missing integer 'edition_id'")
+
+    daily_date_str = payload.get("daily_date") if isinstance(payload, dict) else None
+    if daily_date_str:
+        try:
+            daily_date = date.fromisoformat(daily_date_str)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="daily_date must be YYYY-MM-DD")
+    else:
+        daily_date = date.today()
+
+    db = request.app.state.db
+    listener_db = request.app.state.listener_db
+
+    # Raises 404 / 400 itself if edition_id isn't a promotable
+    # listener-created crosscut.
+    _load_listener_crosscut_for_promotion(db, listener_db, edition_id)
+
+    with db.connect() as conn:
+        row = conn.execute("""
+            SELECT MAX(position) AS max_pos FROM daily_bonus_features
+             WHERE daily_date = ?
+        """, (daily_date.isoformat(),)).fetchone()
+        next_position = int(row["max_pos"] or 0) + 1
+        conn.execute("""
+            INSERT OR IGNORE INTO daily_bonus_features
+                (daily_date, featured_edition_id, position)
+            VALUES (?, ?, ?)
+        """, (daily_date.isoformat(), edition_id, next_position))
+        conn.commit()
+
+    logger.info(
+        "Promoted edition %d as bonus feature #%d for %s",
+        edition_id, next_position, daily_date.isoformat(),
+    )
+    return JSONResponse({
+        "status": "ok", "position": next_position,
+        "daily_date": daily_date.isoformat(),
+    })
+
+
+@app.post("/admin/unpromote-bonus")
+async def admin_unpromote_bonus(request: Request) -> JSONResponse:
+    """Remove a crosscut from a date's "Also today" bonus features.
+    Idempotent — un-promoting something that wasn't promoted is a
+    no-op, not an error. Does NOT reorder remaining positions (gaps
+    are fine; reordering is a future feature per the spec's non-goals).
+
+    Request:
+      POST /admin/unpromote-bonus
+      Authorization: Bearer <AARVA_RENDER_SYNC_TOKEN>
+      Body: {"edition_id": <int>, "daily_date": "<YYYY-MM-DD>"}  (daily_date optional, defaults to today)
+
+    Response (200):
+      {"status": "ok", "removed": <bool>, "daily_date": "<date>"}
+    """
+    _check_token(request)
+    try:
+        payload = await request.json()
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="invalid JSON body")
+
+    edition_id = payload.get("edition_id") if isinstance(payload, dict) else None
+    if not isinstance(edition_id, int):
+        raise HTTPException(status_code=400, detail="payload missing integer 'edition_id'")
+
+    daily_date_str = payload.get("daily_date") if isinstance(payload, dict) else None
+    if daily_date_str:
+        try:
+            daily_date = date.fromisoformat(daily_date_str)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="daily_date must be YYYY-MM-DD")
+    else:
+        daily_date = date.today()
+
+    db = request.app.state.db
+    with db.connect() as conn:
+        cur = conn.execute("""
+            DELETE FROM daily_bonus_features
+             WHERE daily_date = ? AND featured_edition_id = ?
+        """, (daily_date.isoformat(), edition_id))
+        conn.commit()
+        removed = cur.rowcount > 0
+
+    if removed:
+        logger.info(
+            "Un-promoted edition %d for %s", edition_id, daily_date.isoformat(),
+        )
+    else:
+        logger.info(
+            "edition %d was not promoted for %s — nothing to remove",
+            edition_id, daily_date.isoformat(),
+        )
+    return JSONResponse({
+        "status": "ok", "removed": removed, "daily_date": daily_date.isoformat(),
+    })

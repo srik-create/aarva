@@ -282,6 +282,32 @@ CREATE INDEX IF NOT EXISTS idx_crosscut_embeddings_model
     ON crosscut_embeddings(embedding_model);
 
 
+-- Promoted listener-created crosscuts, surfaced on /today under an
+-- "Also today" section (see docs/session_plan_promote_listener_
+-- created_as_bonus.md). Lightweight mapping table — doesn't mutate
+-- the promoted edition row at all, so un-promoting is a plain DELETE.
+--
+-- No FK on featured_edition_id: since the 2026-07-06 listener-DB
+-- split, virtually every listener-created crosscut lives in the
+-- separate listener DB (aarva/listener_db.py), not this one — the id
+-- may not correspond to any row in THIS file's `editions` table, so a
+-- REFERENCES clause would be meaningless (and, if foreign_keys were
+-- ever turned on, would incorrectly reject valid promotions). Written
+-- and read by the /admin/promote-bonus + /admin/unpromote-bonus
+-- endpoints (aarva/server/routes/admin.py) — see that module's
+-- docstring for why this is admin-endpoint-driven rather than a local
+-- CLI flag.
+CREATE TABLE IF NOT EXISTS daily_bonus_features (
+    daily_date          TEXT NOT NULL,
+    featured_edition_id INTEGER NOT NULL,
+    position            INTEGER NOT NULL,
+    added_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (daily_date, featured_edition_id)
+);
+CREATE INDEX IF NOT EXISTS idx_daily_bonus_features_date
+    ON daily_bonus_features(daily_date, position);
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,

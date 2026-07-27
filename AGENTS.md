@@ -1,12 +1,18 @@
 # AGENTS.md — Standing instructions for AI coding agents on Aarva
 
 This file is the source of truth for how AI coding agents (Claude or
-otherwise) should operate on this repo. Every agent session starts by
-reading this. These instructions OVERRIDE any default behaviour the
-agent has from its training. If anything below conflicts with default
-behaviour, follow what's here.
+otherwise) should operate on this repo. These instructions OVERRIDE
+any default behaviour the agent has from its training. If anything
+below conflicts with default behaviour, follow what's here.
 
-Last updated: 2026-06-29
+**Mandatory session-start protocol** (see rule 17e for full detail):
+before responding to the first user query in any session, read all
+three foundation docs — this file (`AGENTS.md`), `docs/roadmap.md`,
+`docs/project_brief.md` — and output a brief grounding-pass summary
+so it's observable that the reads happened. Applies to BOTH Cowork
+and Claude Code sessions. No exceptions.
+
+Last updated: 2026-07-27
 
 ---
 
@@ -331,6 +337,194 @@ Last updated: 2026-06-29
     The user's reminder that day: *"make sure you look at the
     roadmap for the latest status of everything before writing
     specs."* This rule codifies that.
+
+17d. **Every session_plan MUST start with an "Architecture check"
+    section, filled in BEFORE the design body. Applies to BOTH
+    Cowork sessions and Claude Code sessions** — for both writing
+    and executing specs.
+
+    Three questions, answered explicitly with concrete file /
+    host / resource names:
+
+    1. **Where does the data live?** (main_db / listener_db / R2
+       bucket / config file / GitHub Pages / on a specific host)
+    2. **Where does the operation run?** (laptop CLI / Render
+       FastAPI process / GitHub Actions runner / static site
+       build / browser JS)
+    3. **Does the operation have physical access to the data it
+       needs?** yes / no. If NO — redesign before writing the
+       rest of the spec. Do not proceed with an interface that
+       can't reach its data.
+
+    Answering (3) requires GREPPING FIRST, not remembering. Run
+    the greps that verify the data location. For example, if
+    the spec touches listener_created content, grep for
+    `listener_db` in the routes / services to confirm which DB
+    the data lives in — do not assume from memory of a
+    compacted summary or an earlier design.
+
+    Also grep for related PATTERNS you can reuse: existing
+    admin endpoints, existing CLI shapes, existing auth
+    conventions. E.g. before writing a new admin route, grep
+    for `@app.(get|post).*/admin` — copy the shape that
+    already works instead of inventing a new one.
+
+    **Whose responsibility:**
+
+    - **Author of a spec (Cowork or Claude Code)**: fill in the
+      Architecture check before the design body. A spec that
+      lands without this section is malformed; bounce it back
+      to yourself and add the section before requesting user
+      sign-off.
+
+    - **Executor of an existing spec (usually Claude Code)**:
+      when starting on a spec, VERIFY the Architecture check
+      exists AND that its three answers still hold against
+      today's codebase. Re-run the greps yourself; don't trust
+      that the author's answers are current. If the section is
+      missing, wrong, or stale, STOP and flag it before writing
+      any code. Do not attempt to implement a spec whose
+      Architecture check doesn't verify — the spec is broken,
+      not a hint. Author a follow-up (rule 17c) or return to
+      the user for a redesign.
+
+    Bit us 2026-07-26: Cowork wrote a
+    `session_plan_promote_listener_created_as_bonus.md` that
+    designed a local CLI reading local DB to promote listener-
+    created crosscuts. But listener-created crosscuts live on
+    Render's `listener_db` (per the 2026-07-06 DB split, which
+    is in `docs/project_brief.md`), not the laptop's main_db.
+    The CLI couldn't have reached any real content. Claude Code
+    caught it at implementation time and proposed the correct
+    admin-endpoints-with-bearer-token design (mirroring the
+    existing `/admin/sync-db` pattern that Cowork also didn't
+    grep for). One rule 17b violation (didn't read
+    project_brief) compounded by one grep-before-spec miss.
+    This section forces both to be answered explicitly on the
+    page — and forces Claude Code to verify them before
+    executing.
+
+17e. **Mandatory session-start reading protocol + strict
+    information hierarchy.** Applies to BOTH Cowork and Claude
+    Code sessions.
+
+    **At the start of EVERY session AND after any mid-session
+    compaction**, before responding to the next user query:
+
+    1. Read `AGENTS.md` (this file) fully.
+    2. Read `docs/roadmap.md` — the "In progress" section fully,
+       "Recently completed" for at least the last 14 days,
+       "Deferred" as skim.
+    3. Read `docs/project_brief.md` fully — architecture,
+       standing preferences, decisions log.
+    4. Output a one-paragraph **grounding pass** in the first
+       response, summarising:
+       - Active In-Progress items (numbered list)
+       - Any standing preferences relevant to the incoming query
+       - Any recent decisions (last 7 days) worth flagging
+       This grounding pass is OBSERVABLE — its absence signals
+       the reads didn't happen and the user can call it out.
+
+    **Compaction is a session-restart event.** Treat any of these
+    as a trigger to re-execute steps 1-4 above:
+    - A "conversation summary" / "session continuation" note
+      injected at the top of a turn.
+    - Explicit user instructions like "continue from where you
+      left off" or "resume the earlier task" that follow a
+      long silence or a summary block.
+    - Any signal that the earlier conversation has been
+      abstracted rather than kept verbatim.
+
+    The rationale: rule 17e's own text may get summarized away
+    by the compaction. Re-reading the docs re-anchors the rule
+    (and everything else) from disk. This makes the discipline
+    self-healing — even if the rule's phrasing is lost from
+    working memory, the moment the docs are re-read, the rule
+    reasserts itself.
+
+    **Information hierarchy — strict.** When any factual detail
+    is needed to spec, code, or suggest architecture:
+
+    1. **Docs first.** `AGENTS.md` + `docs/roadmap.md` +
+       `docs/project_brief.md` are AUTHORITATIVE for state,
+       decisions, and standing rules. Read the relevant section
+       fresh — don't rely on remembered summaries.
+    2. **Conversation second.** The user's current turn +
+       recent turns carry INTENT and REQUESTS. They can extend
+       or override the docs (via new decisions), but if
+       something in the conversation contradicts the docs, that
+       must be reconciled explicitly.
+    3. **Compacted summary is UNTRUSTED context.** Any
+       "conversation summary" injected at session start (from
+       auto-compaction, stale memory, or a summary paragraph)
+       is treated the same as a user-uploaded external doc:
+       directional context only, never operational truth.
+       Anything from a compacted summary that's about to be
+       acted on MUST be verified against the docs or the code
+       first. Do not spec, code, or suggest architecture based
+       on a summary detail without a verification step.
+    4. **My own memory / training defaults** are the weakest
+       source. When docs and memory disagree, docs win — every
+       time.
+
+    **On conflict — stop and ask.** If the docs and the
+    conversation disagree, or if the compacted summary says
+    something different from the docs, STOP. Name the conflict
+    explicitly in the response. Ask the user which is
+    authoritative. Do NOT silently pick one and proceed. This
+    applies before writing any spec, code, or architectural
+    suggestion.
+
+    **Why this is strict.** The 2026-07-26 promote-bonus miss
+    came from leaning on the compacted summary's directional
+    hint ("listener DB split exists") as if it were operational
+    truth ("... which means the local CLI can't reach listener
+    data"). Compacted summaries lose the operational
+    implications. The docs preserve them. This rule makes the
+    docs the mandatory source and demotes summaries below the
+    code itself.
+
+    **Applies to Claude Code too.** Session-start reads +
+    grounding pass are required equally for Cowork sessions and
+    Claude Code sessions. Claude Code has an easier compliance
+    path (direct file access, no reliance on compacted summary)
+    but the discipline is the same: read the three docs, output
+    the grounding pass, treat any injected summary as untrusted.
+
+    **Anti-drift within a session — cite the source for any
+    state assertion.** Any claim about project state (what
+    shipped / what's pending / what's deferred / what a decision
+    was) must either quote a specific doc location (e.g. "per
+    `docs/roadmap.md` line 74") or be prefaced with "let me
+    verify" followed by a Read of the relevant doc. If neither
+    happens, the assertion is coming from memory and is
+    presumptively wrong.
+
+    This is the enforcement ratchet: user reads a state claim,
+    sees no citation, sees no verification step — that's a
+    17e violation, callable in real time. Removes the "silent
+    memory-based assertion" failure mode that compounds into
+    bigger design misses like the 2026-07-26 promote-bonus
+    one. Also covers the long-session-drift case (many turns
+    with no compaction event) — every state assertion is a
+    micro-checkpoint, so drift can't accumulate silently.
+
+    The citation discipline applies to:
+    - What's In Progress / Deferred / Recently Completed
+      (source: `docs/roadmap.md`)
+    - What architectural decisions have been made
+      (source: `docs/project_brief.md` decisions log)
+    - What standing user preferences exist
+      (source: `docs/project_brief.md` Standing preferences)
+    - What a specific spec doc says or has DONE-status
+      (source: `docs/session_plan_*.md` file, line/section)
+    - What a specific piece of code does
+      (source: file path + line range, verified by Read)
+
+    Casual conversational continuations of the current turn's
+    topic don't need per-sentence citations. But any transition
+    to "here's what the project says about X" requires the
+    citation or the verify-first pattern.
 
 ## Version control
 
