@@ -275,3 +275,42 @@ def load_listener_episodes(
     """
     with db.connect() as conn:
         return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def load_featured_listener_crosscuts_for_date(
+    db: Database,
+    listener_db: Database,
+    edition_date: date,
+) -> list[dict[str, Any]]:
+    """Listener-created crosscuts promoted as bonus features for the
+    given daily edition date, ordered by position (see
+    docs/session_plan_promote_listener_created_as_bonus.md).
+
+    Promoted edition_ids almost always resolve in `listener_db` —
+    every listener-created crosscut built since the 2026-07-06
+    listener-DB split lives there. The main `db` is checked as a
+    fallback purely for the handful of pre-split legacy episodes that
+    still have user_id set on a main-DB editions row. Reuses
+    load_listener_episodes / load_crosscut_episodes (both already
+    return the same row shape the template needs) rather than a new
+    query — the promotion row only adds `position`.
+    """
+    with db.connect() as conn:
+        rows = conn.execute("""
+            SELECT featured_edition_id, position
+              FROM daily_bonus_features
+             WHERE daily_date = ?
+             ORDER BY position ASC
+        """, (edition_date.isoformat(),)).fetchall()
+
+    out: list[dict[str, Any]] = []
+    for r in rows:
+        edition_id = int(r["featured_edition_id"])
+        found = load_listener_episodes(listener_db, edition_id=edition_id)
+        if not found:
+            found = load_crosscut_episodes(db, edition_id=edition_id)
+        if found:
+            piece = dict(found[0])
+            piece["position"] = int(r["position"])
+            out.append(piece)
+    return out

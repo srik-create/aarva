@@ -70,21 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Promote listener-created crosscuts as /today bonus tracks.**
-   Full spec at
-   `docs/session_plan_promote_listener_created_as_bonus.md`.
-   Small extension to the existing bonus mechanism: a new
-   `daily_bonus_features` mapping table + a query helper + an
-   "Also today" section on /today (crosscut-card style, "From a
-   listener" eyebrow). CLI reuses `aarva.search` with
-   `--promote-bonus <edition_id>` / `--unpromote-bonus <id>` /
-   `b <index>` interactive shortcut / `--listener-only` filter.
-   Up to N per day, ordered. Listener-created only
-   (`edition_type='crosscut' AND user_id IS NOT NULL`) —
-   editorial crosscuts already show on /today via a separate
-   path. AGENTS.md rule 4 sign-off from user 2026-07-26: section
-   header "Also today", per-card eyebrow "From a listener".
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -135,6 +120,44 @@ the sequence.
 Most recent first.
 
 ### 2026-07-27
+
+- **Promote listener-created crosscuts as /today bonus tracks.** Full
+  spec at `docs/session_plan_promote_listener_created_as_bonus.md`.
+  New `daily_bonus_features` mapping table (main DB) + a query helper
+  + an "Also today" section on `/today`, styled identically to the
+  editorial crosscut card (peach fill + red-tinted border — matches
+  `docs/session_plan_restore_jtbd_card_colors.md`'s "featured accent"
+  pattern). Listener-created only (`edition_type='crosscut' AND
+  user_id IS NOT NULL`); editorial crosscuts are refused. Section
+  header "Also today", per-card eyebrow "From a listener" — AGENTS.md
+  rule 4 sign-off from user 2026-07-26.
+  - **Interface changed from the spec's design, with the user's
+    sign-off**: the spec proposed a local `aarva.search` CLI
+    (`--promote-bonus`/`--unpromote-bonus`/`--listener-only`), but
+    that can't work — since the 2026-07-06 listener-DB split, every
+    listener-created crosscut lives in the listener DB on Render's
+    persistent disk, and there's no live sync bringing that data back
+    to the operator's laptop (the only listener-DB backup is a
+    one-way, disaster-recovery-only R2 snapshot). The operator's local
+    CLI would only ever see the single pre-split legacy episode.
+    Shipped instead as two bearer-token-protected admin endpoints —
+    `POST /admin/promote-bonus` / `POST /admin/unpromote-bonus` — that
+    run directly on Render, where both DB connections already exist in
+    memory. The operator finds the edition_id by browsing the live
+    `/listener-created` page, then hits the endpoint with `curl`.
+  - Promoted edition_ids resolve against the listener DB first
+    (everything since 2026-07-06), falling back to the main DB for
+    the handful of pre-split legacy episodes — both paths verified.
+  - Verified end-to-end against disposable DB copies: auth (missing/
+    wrong token → 401), promote with audio (200, correct position),
+    reject editorial crosscuts (404), reject listener crosscuts with
+    no audio yet (400 — caught and fixed a bug where this had
+    collapsed into a false 404), reject nonexistent editions (404),
+    ordering across multiple promotions, un-promote (idempotent,
+    leaves gaps rather than renumbering), and the legacy main-DB
+    fallback path. Confirmed via real Playwright screenshot that the
+    "Also today" section renders correctly alongside the editorial
+    crosscut card.
 
 - **Restore per-JTBD card colors on the black + red design.** Full
   spec at `docs/session_plan_restore_jtbd_card_colors.md`. Brought

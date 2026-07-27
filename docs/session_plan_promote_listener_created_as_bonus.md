@@ -1,5 +1,18 @@
 # Session plan — promote listener-created crosscuts as bonus tracks on /today
 
+**STATUS: DONE (2026-07-27).** Implemented with one interface change
+from this doc, confirmed with the user before building: the "CLI
+extension" section below (`aarva.search --promote-bonus` etc.) can't
+work as specced — every listener-created crosscut since the
+2026-07-06 listener-DB split lives on Render's persistent disk, with
+no live sync back to the operator's laptop, so a local CLI would only
+ever see the one pre-split legacy episode. Shipped instead as two
+admin endpoints (`POST /admin/promote-bonus` / `POST /admin/
+unpromote-bonus`) that run directly on Render. Everything else
+(schema, query helper, "Also today" section, non-goals) matches this
+doc. See `docs/roadmap.md`'s 2026-07-27 "Recently completed" entry
+for full details.
+
 Written by Cowork for the next Claude Code session (2026-07-26+).
 Small extension to the existing bonus-track mechanism: let the
 operator promote specific listener-created crosscuts (those made
