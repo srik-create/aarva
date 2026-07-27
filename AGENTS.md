@@ -296,6 +296,42 @@ Last updated: 2026-06-29
     appropriate table in the same commit. Treat the doc and the
     code change as one unit.
 
+17c. **Before authoring or editing ANY `docs/session_plan_*.md`
+    file, check its STATUS line first, and check the roadmap.**
+    Every session_plan doc has a STATUS line at the top (e.g.
+    `**STATUS: DONE (2026-07-25).**` or nothing = still pending).
+    That line is authoritative:
+
+    - **If STATUS is DONE**: the spec is a historical record of
+      what shipped. Do NOT retroactively rewrite decisions,
+      palette values, file lists, or verification criteria. If
+      the user wants to change something in a shipped area,
+      author a NEW follow-up spec doc that references the
+      original — never mutate the shipped doc's decisions in
+      place. Adding a small post-facto clarification NOTE at
+      the top is OK; rewriting the "Decisions locked" section
+      is not.
+
+    - **If STATUS is anything else (pending, in-progress, or
+      absent)**: safe to edit in place. Amendments before
+      execution are normal.
+
+    Same discipline applies BEFORE writing a new spec: read
+    `docs/roadmap.md` (via rule 17a's fetch-first protocol) AND
+    scan for related session_plan docs' STATUS lines. If the
+    work you're about to spec is already shipped, don't
+    re-spec — write a follow-up or point the user at the
+    completed work. If it's already IN a pending spec, extend
+    that spec instead of duplicating.
+
+    Cowork violated this 2026-07-26: started editing the
+    already-DONE black+red redesign spec to add JTBD-color
+    restoration, before noticing the `**STATUS: DONE**` line.
+    Discarded the edits and wrote a follow-up spec instead.
+    The user's reminder that day: *"make sure you look at the
+    roadmap for the latest status of everything before writing
+    specs."* This rule codifies that.
+
 ## Version control
 
 20. **Never commit or push without explicit user sign-off.** At the
