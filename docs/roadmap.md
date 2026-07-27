@@ -85,6 +85,23 @@ GitHub Pages.
    path. AGENTS.md rule 4 sign-off from user 2026-07-26: section
    header "Also today", per-card eyebrow "From a listener".
 
+5. **Restore per-JTBD card colors on the black + red design.**
+   Full spec at `docs/session_plan_restore_jtbd_card_colors.md`.
+   Follow-up to the 2026-07-25 redesign (which removed pastel
+   card fills in favor of uniform dark cards). User looked at
+   the result 2026-07-26 and found /today felt flat without
+   per-category visual distinction. Bring back the original
+   pastel palette (peach/sky/lemon/mint/blush/lavender/paper)
+   as full card fills on JTBD-tagged article cards; text on
+   pastel goes back to `text-ink` dark; category-detail pages
+   get their per-JTBD theme back. Non-JTBD surfaces (nav,
+   doodle backgrounds, transcript body, mini-player, "Also
+   today" section) stay dark. Featured crosscut card keeps
+   peach fill + adds a subtle red-tinted border. Contrast
+   sanity check for red-accent eyebrow on each of the 7
+   pastels; fall back to per-pastel `-dark` variant if any
+   fail readability. Sign-off: user 2026-07-26.
+
 ---
 
 ## Deferred — to return to (in priority order)
