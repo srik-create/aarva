@@ -72,10 +72,75 @@
     </section>
   {% endif %}
 
+  {# Listener-created crosscuts the operator promoted onto today's
+     page via /admin/promote-bonus (see docs/session_plan_promote_
+     listener_created_as_bonus.md). Same peach + red-tinted-border
+     treatment as today's editorial crosscut above — both are
+     "featured" content, per docs/session_plan_restore_jtbd_card_
+     colors.md's "Crosscut card — featured accent" section. Sits
+     below the editorial crosscut, above the article-shaped bonus
+     section. #}
+  {% if featured_listener_crosscuts %}
+    <section class="mb-12">
+      <p class="editorial text-xs uppercase tracking-widest text-cream-light mb-5 font-medium">
+        Also today
+      </p>
+      {% for cc in featured_listener_crosscuts %}
+        <div class="mb-6 p-6 bg-peach border border-red-accent-fade rounded-2xl text-ink">
+          <p class="text-xs uppercase tracking-widest text-peach-dark font-semibold">
+            From a listener
+          </p>
+          <h2 class="editorial text-2xl leading-snug mt-2">
+            <a href="/crosscut/{{ cc.edition_id }}" class="hover:opacity-70 transition-opacity">
+              {{ (cc.topic_label or "Two angles") | title_case }}
+            </a>
+          </h2>
+          {% if cc.subhead_hook %}
+            <p class="mt-2 leading-relaxed">{{ cc.subhead_hook }}</p>
+          {% endif %}
+          {% if cc.originating_prompt %}
+            <p class="text-sm text-ink-light mt-2 italic">
+              asked: "{{ cc.originating_prompt }}"
+            </p>
+          {% endif %}
+          {# Same compact player as the editorial crosscut card above —
+             data-track-* attributes feed the shared player in base.html. #}
+          <div class="mt-5" data-player
+               data-track-src="{{ cc.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"
+               data-track-title="{{ (cc.topic_label or 'Crosscut') | title_case }}"
+               data-track-link="/crosscut/{{ cc.edition_id }}">
+            <div class="flex items-center gap-4">
+              <button type="button" aria-label="Play"
+                      class="shrink-0 w-14 h-14 rounded-full bg-night text-peach flex items-center justify-center shadow hover:scale-105 active:scale-95 transition-transform"
+                      data-play-button>
+                <svg viewBox="0 0 24 24" class="play-icon w-6 h-6 ml-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg viewBox="0 0 24 24" class="pause-icon w-6 h-6 hidden" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+              </button>
+              <div class="flex-1">
+                <div class="h-1.5 bg-ink/15 rounded-full overflow-hidden cursor-pointer" data-progress-track>
+                  <div class="h-full bg-ink/60 rounded-full" style="width:0%" data-progress-fill></div>
+                </div>
+                <p class="text-xs text-ink-light mt-2">
+                  <span data-current-time>0:00</span>
+                  <span class="mx-1">/</span>
+                  <span data-total-time>{{ cc.duration_seconds | duration }}</span>
+                  {% if cc.narrator_voice %}
+                    <span class="mx-1">·</span> Narrator {{ cc.narrator_voice }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </section>
+  {% endif %}
+
   {# Bonus pieces for the day being shown — rendered above the JTBD
      groups so they sit as clearly editorial-additional. Section
-     omitted entirely when there are no bonuses. List-row pattern
-     (layout pattern #3) — no filled card background. #}
+     omitted entirely when there are no bonuses. Paper-filled cards
+     (docs/session_plan_restore_jtbd_card_colors.md) — neutral, since
+     bonus pieces aren't tied to a single JTBD. #}
   {% if bonus_pieces %}
     <section class="mb-12">
       <h2 class="editorial text-xs uppercase tracking-widest text-cream-light mb-5 font-medium">

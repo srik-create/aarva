@@ -23,6 +23,7 @@ from aarva.services.queries import (
     load_bonus_pieces_with_audio,
     load_crosscut_episodes,
     load_daily_pieces_with_audio,
+    load_featured_listener_crosscuts_for_date,
 )
 
 
@@ -86,6 +87,7 @@ async def today(request: Request) -> HTMLResponse:
     """Today's daily edition, JTBD-grouped, with the day's crosscut
     (if one was published) appearing as a featured card above."""
     db = request.app.state.db
+    listener_db = request.app.state.listener_db
 
     edition_id = _latest_daily_edition_id(db)
     if edition_id is None:
@@ -122,6 +124,15 @@ async def today(request: Request) -> HTMLResponse:
         b for b in todays_bonuses if str(b["edition_date"]) == edition_date_str
     ]
 
+    # Listener-created crosscuts the operator has promoted onto today's
+    # page via /admin/promote-bonus — see
+    # docs/session_plan_promote_listener_created_as_bonus.md. Rendered
+    # in its own "Also today" section, below the editorial crosscut and
+    # above the article-shaped bonus section.
+    featured_listener_crosscuts = load_featured_listener_crosscuts_for_date(
+        db, listener_db, edition_dt,
+    )
+
     return templates.TemplateResponse(
         request, "home.html",
         {
@@ -129,5 +140,6 @@ async def today(request: Request) -> HTMLResponse:
             "grouped_pieces": grouped,
             "crosscut": todays_crosscut,
             "bonus_pieces": todays_bonuses,
+            "featured_listener_crosscuts": featured_listener_crosscuts,
         },
     )
