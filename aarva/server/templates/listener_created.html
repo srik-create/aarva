@@ -19,7 +19,7 @@
       {% for crosscut in crosscuts %}
         <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
           <p class="eyebrow">{{ crosscut.edition_date }}</p>
-          <h2 class="editorial text-2xl leading-snug text-cream-text">
+          <h2 class="editorial text-2xl leading-snug text-cream-title">
             <a href="/crosscut/{{ crosscut.edition_id }}" class="hover:opacity-70 transition-opacity">{{ (crosscut.topic_label or "Two angles") | title_case }}</a>
           </h2>
           {# Content-quality Section 2: subhead_hook is the primary
@@ -27,7 +27,7 @@
              secondary metadata underneath. NULL subhead_hook (older
              episodes) falls back cleanly — no blank slot. #}
           {% if crosscut.subhead_hook %}
-            <p class="text-cream-text mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
+            <p class="text-cream-body mt-2 leading-relaxed">{{ crosscut.subhead_hook }}</p>
           {% endif %}
           <p class="text-sm text-cream-muted mt-2 leading-relaxed">
             <em class="editorial not-italic">{{ crosscut.title_a | title_case }}</em>
@@ -81,7 +81,7 @@
         {% for rec in recovered_episodes %}
           <section class="p-6 bg-night-soft border border-night-border rounded-2xl opacity-75">
             <p class="eyebrow">{{ rec.edition_date }}</p>
-            <h2 class="editorial text-xl leading-snug text-cream-text">{{ rec.topic_label }}</h2>
+            <h2 class="editorial text-xl leading-snug text-cream-title">{{ rec.topic_label }}</h2>
             <p class="text-sm text-cream-muted mt-2 leading-relaxed">{{ rec.note }}</p>
             <div class="mt-5" data-player
                  data-track-src="{{ rec.audio_url | audio_url(request.app.state.pipeline_cfg.raw.get('tts', {}).get('r2', {}).get('public_url_base', '')) }}"

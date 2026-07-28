@@ -5,7 +5,7 @@ deferred. The goal is that anyone (including future-you and any AI
 agent picking up a session) can read this and know: what's done,
 what's in flight, what was deferred and why.
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-07-28
 
 ---
 
@@ -70,25 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **/create card readability + cream brightness hierarchy.**
-   Full spec at
-   `docs/session_plan_create_readability_and_cream_tiers.md`.
-   Two related listener-facing fixes in one PR: (a) the /create
-   pairing description was rendering `c.why` (multi-sentence
-   prose) with the Anton-uppercase `.hook` pull-quote treatment
-   — misapplied to long text, reads as a shouty blob. Swap to
-   sentence-case Inter body prose with the red left-border kept
-   as the editorial signal; italicise the two source-article
-   titles inline. (b) Introduce a three-tier cream brightness
-   hierarchy — `cream-text` (100%, kept) for wordmark + Anton
-   page H1s; new `cream-title` (85%) for card topics; new
-   `cream-body` (75%) for body prose + mini-player track title.
-   Metadata classes unchanged. AGENTS.md rule 4 sign-off from
-   user 2026-07-27 via three rounds of Cowork mockups
-   (description options, subheading options, three-tier
-   brightness). Grep-audit confirmed only one `.hook`
-   misapplication site-wide — the /create card is it.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -134,9 +115,44 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-27)
+## Recently completed (2026-06-29 → 2026-07-28)
 
 Most recent first.
+
+### 2026-07-28
+
+- **/create card readability + cream brightness hierarchy.** Full
+  spec at `docs/session_plan_create_readability_and_cream_tiers.md`.
+  Two related listener-facing fixes: (a) the `/create` pairing
+  description (`c.why`, multi-sentence prose) was rendering with the
+  Anton-uppercase `.hook` pull-quote treatment — misapplied at that
+  length, read as a shouty blob. Swapped to sentence-case Inter body
+  prose (`text-cream-body`) with the red left-border kept as the
+  editorial signal; the two source-article titles now render in
+  native italic Inter instead of accidental Anton uppercase. Grep-
+  audit confirmed this was the only `.hook` misapplication site-wide.
+  (b) Introduced a three-tier cream brightness hierarchy — `cream-
+  text` (100%, unchanged) stays for the wordmark and Anton page H1s;
+  new `cream-title` (85%) for card topics / list-item titles / repeat-
+  ing headings; new `cream-body` (75%) for body prose and the mini-
+  player track title. `cream-light`/`cream-muted` unchanged.
+  Re-categorised every `text-cream-text` site across
+  `base.html`, `_candidates_fragment.html`, `create.html`,
+  `create_quota_exceeded.html`, `build_status.html`, `crosscuts_list.html`,
+  `crosscut.html`, `editions_list.html`, `listener_created.html`,
+  `publications_list.html`, and `landing.html` — page H1s/wordmark
+  stayed at 100%, card/list-item titles moved to `cream-title`, body
+  prose moved to `cream-body`; short inline-emphasis and hover states
+  were left alone (different role, not what this fix targets).
+  `home.html`, `article.html`, `category_detail.html`,
+  `publication_detail.html`, `categories_list.html` needed no changes
+  — those either only have a page H1 or already moved to `text-ink`
+  on pastel per the JTBD-color restoration. AGENTS.md rule 4 sign-off
+  from user 2026-07-27 via three rounds of Cowork mockups. Verified
+  via real Playwright screenshots (`/create?q=how belief forms` with
+  actual Gemini-proposed candidates, `/today`, `/crosscuts`, landing
+  page) plus a computed-style check confirming the mini-player title
+  renders at exactly `rgba(240, 229, 208, 0.75)`.
 
 ### 2026-07-27
 
