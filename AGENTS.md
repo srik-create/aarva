@@ -265,7 +265,17 @@ Last updated: 2026-07-28
     - changes a Phase Plan status column;
     - makes a decision worth logging (add a row to "Decisions made");
     - completes or supersedes work that "In progress" or "Recently
-      completed" describes.
+      completed" describes;
+    - **authors a new `docs/session_plan_*.md` doc (add an "In
+      progress" row referencing the spec — same edit set as the
+      spec file itself, NOT deferred to Claude Code's
+      implementation PR).** Bit us 2026-07-28 when Cowork wrote
+      `session_plan_rss_extra_items.md` and told the user Claude
+      Code would update the roadmap at implementation time. Wrong
+      procedure — the standard flow is: Cowork writes the spec +
+      the "In progress" row together, user signs off, both land in
+      one commit, Claude Code moves the row to "Recently completed"
+      when the code ships.
 
     A PR that lands any of the above WITHOUT touching roadmap.md is
     malformed — bounce it back to yourself and add the roadmap edit
