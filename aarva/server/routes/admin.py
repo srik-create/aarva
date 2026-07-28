@@ -45,14 +45,21 @@ import hmac
 import json
 import logging
 import os
+import re
 import sqlite3
 import tempfile
 from datetime import date
 from pathlib import Path
 
+import httpx
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from aarva.output.rss_feed import (
+    _aarva_app_reference_html,
+    _resolve_audio_url_base,
+    _xml_esc,
+)
 from aarva.server.app import app
 from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
 
@@ -551,4 +558,141 @@ async def admin_unpromote_bonus(request: Request) -> JSONResponse:
         )
     return JSONResponse({
         "status": "ok", "removed": removed, "daily_date": daily_date.isoformat(),
+    })
+
+
+def _stat_or_head_byte_length(
+    audio_url: str, package_root: Path, audio_url_base: str,
+) -> int:
+    """Best-effort byte length for an admin-composed RSS item.
+
+    Stats Render's local disk first (works for episodes whose mp3
+    hasn't been R2-cleaned yet). Falls back to an HTTP HEAD against
+    the public audio URL for older, R2-only episodes. Returns 0 (with
+    the caller expected to log a warning) if both fail — mirrors
+    rss_feed.py's _audio_byte_length, which never hard-fails feed
+    generation over a missing byte count."""
+    try:
+        path = package_root / audio_url.lstrip("/")
+        if path.exists():
+            return path.stat().st_size
+    except Exception:
+        pass
+    try:
+        url = (
+            audio_url if re.match(r"^https?://", audio_url)
+            else f"{audio_url_base.rstrip('/')}/{audio_url.lstrip('/')}"
+        )
+        with httpx.Client(timeout=10) as client:
+            resp = client.head(url, follow_redirects=True)
+        if resp.status_code == 200:
+            length = resp.headers.get("content-length")
+            if length:
+                return int(length)
+    except Exception:
+        pass
+    return 0
+
+
+@app.get("/admin/episode-metadata")
+async def admin_episode_metadata(request: Request) -> JSONResponse:
+    """Fetch RSS-ready metadata for a crosscut edition_id — used by the
+    laptop's `python -m aarva.rss_add --from-edition` CLI to graduate
+    a listener-created (or main-DB) crosscut into the podcast RSS feed.
+    See docs/session_plan_rss_extra_items.md.
+
+    Request:
+      GET /admin/episode-metadata?edition_id=<int>
+      Authorization: Bearer <AARVA_RENDER_SYNC_TOKEN>
+
+    Response (200):
+      {"kind": "crosscut", "guid": "aarva-crosscut-<id>",
+       "episode_date": "<date>", "title": "Crosscut: <topic>",
+       "description_html": "<html>", "audio_url": "<relative path>",
+       "byte_length": <int>, "duration_seconds": <int|None>,
+       "author": "Aarva", "subtitle": "Crosscut · <topic>",
+       "itunes_episode_type": "full"}
+
+    Errors:
+      400  missing/invalid edition_id
+      401  invalid / missing bearer token
+      404  edition_id doesn't exist, or isn't a listener-created crosscut
+             (reuses _load_listener_crosscut_for_promotion's checks —
+             also 400s if the crosscut has no synthesized audio yet)
+    """
+    _check_token(request)
+    raw_id = request.query_params.get("edition_id")
+    if raw_id is None:
+        raise HTTPException(status_code=400, detail="missing edition_id query param")
+    try:
+        edition_id = int(raw_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="edition_id must be an integer")
+
+    db = request.app.state.db
+    listener_db = request.app.state.listener_db
+    # Raises 404 / 400 itself if edition_id isn't a promotable
+    # listener-created (or legacy pre-split) crosscut.
+    cc = _load_listener_crosscut_for_promotion(db, listener_db, edition_id)
+
+    topic = cc.get("topic_label") or "untitled"
+    title = f"Crosscut: {topic}"
+
+    # Description composed identically to _crosscut_item_xml
+    # (rss_feed.py) so a graduated episode reads the same in a podcast
+    # app as an editorial crosscut item does.
+    desc_parts = []
+    if cc.get("intro_text"):
+        desc_parts.append(_xml_esc(cc["intro_text"]))
+    if cc.get("bridge_between"):
+        desc_parts.append(f"<em>{_xml_esc(cc['bridge_between'])}</em>")
+    if cc.get("outro_text"):
+        desc_parts.append(_xml_esc(cc["outro_text"]))
+    sources = []
+    if cc.get("url_a"):
+        sources.append(
+            f'<a href="{_xml_esc(cc["url_a"])}">{_xml_esc(cc["pub_a"])}: '
+            f'{_xml_esc(cc["title_a"])}</a>'
+        )
+    if cc.get("url_b"):
+        sources.append(
+            f'<a href="{_xml_esc(cc["url_b"])}">{_xml_esc(cc["pub_b"])}: '
+            f'{_xml_esc(cc["title_b"])}</a>'
+        )
+    if sources:
+        desc_parts.append("Sources:<br/>" + "<br/>".join(sources))
+
+    pipeline_cfg = request.app.state.pipeline_cfg
+    aarva_app_url = (
+        (pipeline_cfg.raw.get("output", {}) or {})
+        .get("aarva_app_url", "").rstrip("/")
+    )
+    if aarva_app_url:
+        desc_parts.append(_aarva_app_reference_html(aarva_app_url))
+    description_html = "<br/><br/>".join(desc_parts)
+
+    package_root = pipeline_cfg.rss_feed_path.resolve().parent.parent
+    audio_url_base = _resolve_audio_url_base(pipeline_cfg)
+    byte_length = _stat_or_head_byte_length(
+        cc["audio_url"], package_root, audio_url_base,
+    )
+    if byte_length == 0:
+        logger.warning(
+            "episode-metadata: could not determine byte_length for "
+            "edition %d (audio_url=%s) — stat and HEAD both failed",
+            edition_id, cc["audio_url"],
+        )
+
+    return JSONResponse({
+        "kind": "crosscut",
+        "guid": f"aarva-crosscut-{edition_id}",
+        "episode_date": cc.get("edition_date"),
+        "title": title,
+        "description_html": description_html,
+        "audio_url": cc["audio_url"],
+        "byte_length": byte_length,
+        "duration_seconds": cc.get("duration_seconds"),
+        "author": "Aarva",
+        "subtitle": f"Crosscut · {topic}",
+        "itunes_episode_type": "full",
     })

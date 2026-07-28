@@ -113,7 +113,14 @@ def _audio_full_url(audio_url: str, audio_url_base: str) -> str:
     HTML. When Cloudflare R2 hosting is enabled in pipeline.yaml
     (tts.r2.enabled: true), audio_url_base is set to the R2 public URL
     so listeners stream from R2 while HTML pages stay on GH Pages.
+
+    No-op when audio_url is already absolute (has a scheme) — used by
+    rss_extra_items' fully-manual add path (docs/session_plan_rss_
+    extra_items.md), where the operator supplies a complete URL that
+    isn't necessarily on audio_url_base at all.
     """
+    if re.match(r"^https?://", audio_url):
+        return audio_url
     base = audio_url_base.rstrip("/")
     rel = audio_url.lstrip("/")
     return f"{base}/{rel}"
@@ -384,6 +391,55 @@ def _crosscut_item_xml(cc: dict, public_url_base: str, package_root: Path,
     </item>"""
 
 
+def _extra_item_xml(row: dict, public_url_base: str, package_root: Path,
+                    feed_image: str = "", audio_url_base: str = "",
+                    aarva_app_url: str = "") -> str:
+    """Render an ad-hoc rss_extra_items row as one RSS <item>. See
+    docs/session_plan_rss_extra_items.md.
+
+    Fields are already fully composed on the row (title includes any
+    "Crosscut: " prefix; description_html is the full body). This
+    render is a straight passthrough, not a compose step.
+    """
+    audio_url = _audio_full_url(
+        row["audio_url"],
+        audio_url_base or public_url_base,
+    )
+    pub_dt = row.get("episode_date")
+    if isinstance(pub_dt, str):
+        try:
+            pub_dt = datetime.fromisoformat(pub_dt).replace(tzinfo=timezone.utc)
+        except ValueError:
+            pub_dt = datetime.now(timezone.utc)
+    pub_date_rss = _format_rfc822(pub_dt) if pub_dt else _format_rfc822(
+        datetime.now(timezone.utc)
+    )
+    duration_str = _format_duration_hhmmss(row.get("duration_seconds"))
+    description = row.get("description_html") or ""
+    summary_text = _strip_html(description, max_chars=4000)
+    image_tag = (
+        f'<itunes:image href="{_xml_esc(feed_image)}"/>'
+        if feed_image else ""
+    )
+    return f"""    <item>
+      <title>{_xml_esc(row["title"])}</title>
+      <itunes:title>{_xml_esc(row["title"])}</itunes:title>
+      <link>{_xml_esc(aarva_app_url or public_url_base)}</link>
+      <description><![CDATA[{description}]]></description>
+      <content:encoded><![CDATA[{description}]]></content:encoded>
+      <itunes:summary>{_xml_esc(summary_text)}</itunes:summary>
+      <pubDate>{pub_date_rss}</pubDate>
+      <guid isPermaLink="false">{_xml_esc(row["guid"])}</guid>
+      <enclosure url="{_xml_esc(audio_url)}" length="{row.get("byte_length") or 0}" type="{_xml_esc(_mime_for(audio_url))}"/>
+      <itunes:duration>{_xml_esc(duration_str)}</itunes:duration>
+      <itunes:author>{_xml_esc(row.get("author") or "Aarva")}</itunes:author>
+      <itunes:subtitle>{_xml_esc(row.get("subtitle") or "")}</itunes:subtitle>
+      {image_tag}
+      <itunes:episodeType>{_xml_esc(row.get("itunes_episode_type") or "full")}</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>"""
+
+
 def _item_pub_dt(piece: dict) -> datetime:
     """Sort key for combined daily + crosscut feed."""
     raw = piece.get("published_date") or piece.get("edition_date")
@@ -462,11 +518,15 @@ def generate_feed(
     # Daily-edition pieces (one item each) + crosscut episodes (one item
     # per edition). We tag each with a kind so the renderer dispatches
     # correctly, then sort by publish/edition date.
+    from aarva.services.queries import load_rss_extra_items
     daily_pieces = _load_all_published_pieces(db)
     crosscut_eds = _load_published_crosscuts(db)
+    extra_items = load_rss_extra_items(db)
     combined = (
         [{"_kind": "daily",     **p} for p in daily_pieces]
         + [{"_kind": "crosscut", **c} for c in crosscut_eds]
+        + [{"_kind": "extra", "edition_date": row["episode_date"], **row}
+           for row in extra_items]
     )
     combined.sort(key=_item_pub_dt, reverse=True)
 
@@ -475,18 +535,23 @@ def generate_feed(
     # the old single-host behaviour.
     audio_url_base = _resolve_audio_url_base(config)
 
-    items_xml = "\n".join(
-        _crosscut_item_xml(
+    def _render_item(item: dict) -> str:
+        if item["_kind"] == "crosscut":
+            return _crosscut_item_xml(
+                item, public_url_base, package_root, feed_image,
+                audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
+            )
+        if item["_kind"] == "extra":
+            return _extra_item_xml(
+                item, public_url_base, package_root, feed_image,
+                audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
+            )
+        return _item_xml(
             item, public_url_base, package_root, feed_image,
             audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
         )
-        if item["_kind"] == "crosscut"
-        else _item_xml(
-            item, public_url_base, package_root, feed_image,
-            audio_url_base=audio_url_base, aarva_app_url=aarva_app_url,
-        )
-        for item in combined
-    )
+
+    items_xml = "\n".join(_render_item(item) for item in combined)
     pieces = combined   # for the FeedStats count below
     last_build_date = _format_rfc822(datetime.now(timezone.utc))
 

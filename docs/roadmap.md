@@ -70,26 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Ad-hoc extra items on the podcast RSS feed.** Full spec at
-   `docs/session_plan_rss_extra_items.md`. New `rss_extra_items`
-   table on main_db (RSS-payload-only, no joins to `articles`/
-   `editions`/`publications`) + new laptop CLI `python -m
-   aarva.rss_add` with two modes: `--from-edition <id>` fetches
-   metadata from Render via a new admin GET endpoint
-   (`/admin/episode-metadata`, reuses `_load_listener_crosscut_
-   for_promotion` + `_check_token` from the 2026-07-27 promote-
-   bonus endpoint), or fully-manual with explicit `--audio-url` /
-   `--title` / `--duration` / `--kind`. `Crosscut: ` title prefix
-   auto-applied when the added episode is a crosscut. Render loop
-   added to `aarva/output/rss_feed.py::generate_feed`. Purpose: let
-   the operator editorially add ANY new episode to the podcast RSS
-   on demand — including listener-created crosscuts that currently
-   live only on Render's listener_db and are invisible to the RSS
-   by design (`aarva/services/queries.py:189-193` filters list
-   queries to `user_id IS NULL`). RSS-only surface; zero website
-   changes (grep-verifiable). AGENTS.md rule 4 sign-off from user
-   2026-07-28.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -140,6 +120,59 @@ the sequence.
 Most recent first.
 
 ### 2026-07-28
+
+- **Ad-hoc extra items on the podcast RSS feed.** Full spec at
+  `docs/session_plan_rss_extra_items.md`. New `rss_extra_items` table
+  on main_db (RSS-payload-only, no joins to `articles`/`editions`/
+  `publications`) + new laptop CLI `python -m aarva.rss_add` with two
+  modes: `--from-edition <id>` fetches metadata from Render via a new
+  admin GET endpoint (`/admin/episode-metadata`, reuses
+  `_load_listener_crosscut_for_promotion` + `_check_token` from the
+  2026-07-27 promote-bonus endpoint), or fully-manual with explicit
+  `--audio-url` / `--title` / `--duration` / `--kind`. `Crosscut: `
+  title prefix auto-applied when the added episode is a crosscut,
+  never double-applied. Render loop added to
+  `aarva/output/rss_feed.py::generate_feed`. Also has `--list` /
+  `--remove <guid>` for management. Purpose: let the operator
+  editorially add ANY new episode to the podcast RSS on demand —
+  including listener-created crosscuts that currently live only on
+  Render's listener_db and are invisible to the RSS by design
+  (`aarva/services/queries.py:189-193` filters list queries to
+  `user_id IS NULL`). RSS-only surface; zero website changes (grep-
+  verified — `admin.py`'s new endpoint is the only reference under
+  `aarva/server/`, and that's an operator API, not a listener-facing
+  page). AGENTS.md rule 4 sign-off from user 2026-07-28.
+  - **Real bug found and fixed during implementation, not just
+    followed from the spec**: the spec assumed `_audio_full_url`
+    (`aarva/output/rss_feed.py`) was already a no-op for an
+    already-absolute audio URL — needed for `rss_add`'s fully-manual
+    mode, where the operator supplies a complete external URL that
+    may not live on `audio_url_base` at all. It wasn't — it always
+    prepended the base regardless, which would have corrupted every
+    manually-added item's enclosure URL (e.g.
+    `https://audio.aarva.app/https://audio.aarva.app/x.mp3`). Added a
+    scheme check (`^https?://`) so an absolute URL passes through
+    unchanged; relative-path behavior (the existing daily/crosscut
+    items) is untouched. Caught by writing a test for the assumed
+    behavior first, watching it fail, then fixing the function —
+    confirmed both the fix and its test are load-bearing (temporarily
+    reverted the fix, watched the new tests fail, restored it).
+  - Verified end-to-end against disposable DB copies and a real local
+    server: schema migration idempotent; admin endpoint's full
+    auth/validation matrix (missing/wrong token → 401, missing/non-
+    integer edition_id → 400, nonexistent edition → 404, crosscut with
+    no audio yet → 400) exercised via real HTTP requests against a
+    synthetic listener-DB crosscut; `--from-edition` and fully-manual
+    CLI modes both write correct rows; idempotent re-run confirmed (no
+    duplicate row); `--list`/`--remove` verified; generated feed.xml
+    confirmed well-formed XML with the extra item's `<enclosure>`,
+    `<title>`, `<itunes:duration>` all correct, both for a relative
+    (R2-hosted) audio path and an absolute manually-supplied URL.
+  - 25 new tests in `aarva/tests/test_rss_extra_items.py` (repo total:
+    40, all passing) — schema, query helper, render helpers (including
+    the `_audio_full_url` regression), CLI manual-mode + management,
+    and the admin endpoint's full auth/validation/composition surface
+    (called directly, no live server needed).
 
 - **Durable strip of The Independent's engagement CTA.** Full spec at
   `docs/session_plan_independent_commenting_forum_strip.md`. Follow-

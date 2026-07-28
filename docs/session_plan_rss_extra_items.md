@@ -1,5 +1,11 @@
 # Session plan — add ad-hoc extra items to the podcast RSS feed
 
+**STATUS: DONE (2026-07-28).** Implemented as specced, plus one real
+bug found and fixed along the way: `_audio_full_url` wasn't actually
+a no-op for absolute URLs as this spec assumed — needed for
+`rss_add`'s fully-manual mode. See `docs/roadmap.md`'s 2026-07-28
+"Recently completed" entry for full details and verification.
+
 Written by Cowork for the next Claude Code session (2026-07-28+).
 Follow-up to the promote-bonus admin endpoints that shipped
 2026-07-27 (`docs/session_plan_promote_listener_created_as_bonus.md`,
