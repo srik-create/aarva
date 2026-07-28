@@ -70,6 +70,24 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Durable strip of The Independent's engagement CTA.** Full spec
+   at `docs/session_plan_independent_commenting_forum_strip.md`
+   (WIP — audit sub-agent flagged six remaining uncited state
+   assertions on last round; Claude Code to tighten citations,
+   invoke 17f audit sub-agent for CLEAN, then PR). Follow-up to
+   `docs/session_plan_tts_boilerplate_strip.md` (STATUS: DONE
+   2026-07-22): adds three new alternatives (`join our commenting
+   forum`, `join thought-provoking conversations`, `join the
+   conversation\b`) to `_SUBSCRIPTION_CTA_RE` at
+   `aarva/services/terminal_boilerplate.py:85-93`, plus a first
+   test file at `aarva/tests/test_terminal_boilerplate.py`.
+   Trigger case: The Independent's article-tail CTA tripped
+   Gemini's PROHIBITED_CONTENT filter on 2026-07-28 (edition
+   1000011, listener-created crosscut, article 10317, passage_b
+   chunk 5/5). Immediate fix was a manual trim of article 10317
+   on Render; this is the durable fix that prevents recurrence
+   on future ingestion.
+
 ---
 
 ## Deferred — to return to (in priority order)
