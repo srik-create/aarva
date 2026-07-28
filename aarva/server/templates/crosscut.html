@@ -84,7 +84,7 @@
       {# Article A #}
       <div class="py-5 border-b border-night-border">
         <p class="eyebrow">{{ crosscut.pub_a }}</p>
-        <h3 class="editorial text-lg leading-snug text-cream-text">
+        <h3 class="editorial text-lg leading-snug text-cream-title">
           {% if crosscut.article_a_id %}
             <a href="/article/{{ crosscut.article_a_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_a | title_case }}</a>
           {% else %}
@@ -107,7 +107,7 @@
       {# Article B #}
       <div class="py-5 border-b border-night-border last:border-b-0">
         <p class="eyebrow">{{ crosscut.pub_b }}</p>
-        <h3 class="editorial text-lg leading-snug text-cream-text">
+        <h3 class="editorial text-lg leading-snug text-cream-title">
           {% if crosscut.article_b_id %}
             <a href="/article/{{ crosscut.article_b_id }}" class="hover:opacity-70 transition-opacity">{{ crosscut.title_b | title_case }}</a>
           {% else %}
@@ -134,10 +134,10 @@
     <div class="mt-12">
       <h2 class="eyebrow">The connection</h2>
       {% if crosscut.intro_text %}
-        <p class="text-cream-text leading-relaxed">{{ crosscut.intro_text }}</p>
+        <p class="text-cream-body leading-relaxed">{{ crosscut.intro_text }}</p>
       {% endif %}
       {% if crosscut.bridge_between %}
-        <p class="text-cream-text leading-relaxed mt-4">{{ crosscut.bridge_between }}</p>
+        <p class="text-cream-body leading-relaxed mt-4">{{ crosscut.bridge_between }}</p>
       {% endif %}
       {% if crosscut.outro_text %}
         <p class="text-cream-light leading-relaxed mt-4 not-italic">{{ crosscut.outro_text }}</p>

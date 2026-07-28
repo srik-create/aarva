@@ -29,18 +29,23 @@
           {% endif %}
         </div>
 
-        <h2 class="editorial text-2xl mt-2 leading-snug text-cream-text">{{ c.topic_label | title_case }}</h2>
+        <h2 class="editorial text-2xl mt-2 leading-snug text-cream-title">{{ c.topic_label | title_case }}</h2>
 
         <p class="text-sm text-cream-light mt-3 leading-relaxed">
-          <em class="editorial not-italic">{{ c.title_a | title_case }}</em>{% if c.byline_a %}, by {{ c.byline_a }}{% endif %}
+          <em class="text-cream-body">{{ c.title_a | title_case }}</em>{% if c.byline_a %}, by {{ c.byline_a }}{% endif %}
           <span class="text-cream-muted mx-1">×</span>
-          <em class="editorial not-italic">{{ c.title_b | title_case }}</em>{% if c.byline_b %}, by {{ c.byline_b }}{% endif %}
+          <em class="text-cream-body">{{ c.title_b | title_case }}</em>{% if c.byline_b %}, by {{ c.byline_b }}{% endif %}
         </p>
         <p class="text-xs text-cream-muted mt-1">
           {{ c.publication_a }} &middot; {{ c.publication_b }}
         </p>
 
-        <p class="hook mt-5 whitespace-pre-line">{{ c.why }}</p>
+        {# Was `.hook` (Anton uppercase pull-quote) — misapplied here
+           since c.why is multi-sentence prose, not a short single-
+           sentence hook (docs/session_plan_create_readability_and_
+           cream_tiers.md). Sentence-case Inter body prose, red left-
+           border kept as the editorial "why this pairing works" signal. #}
+        <p class="text-cream-body mt-5 leading-relaxed whitespace-pre-line border-l-2 border-red-accent pl-4">{{ c.why }}</p>
 
         <div class="mt-6">
           {% if c.kind == 'existing' %}

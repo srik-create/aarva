@@ -14,7 +14,7 @@
   {% if job.status == 'completed' and job.result and job.result.episode_path %}
     <section class="p-6 bg-night-soft border border-red-accent-fade rounded-2xl">
       <p class="eyebrow">Ready to listen</p>
-      <h2 class="editorial text-2xl mt-2 leading-snug text-cream-text">Your episode is built.</h2>
+      <h2 class="editorial text-2xl mt-2 leading-snug text-cream-title">Your episode is built.</h2>
       <p class="text-cream-light mt-3">A listen link has been sent to your email.</p>
       <p class="mt-5">
         <a href="{{ job.result.episode_path }}"
@@ -28,7 +28,7 @@
   {% elif job.status == 'failed' %}
     <section class="p-6 bg-night-soft border border-night-border rounded-2xl">
       <p class="eyebrow">Build failed</p>
-      <h2 class="editorial text-xl mt-2 text-cream-text leading-snug">Something didn't go right.</h2>
+      <h2 class="editorial text-xl mt-2 text-cream-title leading-snug">Something didn't go right.</h2>
       {% if job.error_message %}
         <p class="text-sm text-cream-muted mt-3 font-mono">{{ job.error_message }}</p>
       {% endif %}
@@ -49,7 +49,7 @@
           <p class="eyebrow">
             {% if job.status == 'pending' %}Queued{% else %}Building{% endif %}
           </p>
-          <h2 class="editorial text-xl text-cream-text leading-snug">
+          <h2 class="editorial text-xl text-cream-title leading-snug">
             We're putting your episode together.
           </h2>
           {% if job.progress %}
