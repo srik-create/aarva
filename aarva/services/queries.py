@@ -314,3 +314,17 @@ def load_featured_listener_crosscuts_for_date(
             piece["position"] = int(r["position"])
             out.append(piece)
     return out
+
+
+def load_rss_extra_items(db: Database) -> list[dict[str, Any]]:
+    """Ad-hoc extra items surfaced only in the podcast RSS feed.
+    See docs/session_plan_rss_extra_items.md."""
+    with db.connect() as conn:
+        rows = conn.execute("""
+            SELECT guid, episode_date, title, description_html,
+                   audio_url, byte_length, duration_seconds,
+                   author, subtitle, itunes_episode_type, added_at
+              FROM rss_extra_items
+             ORDER BY episode_date DESC, added_at DESC
+        """).fetchall()
+    return [dict(r) for r in rows]

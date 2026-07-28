@@ -308,6 +308,28 @@ CREATE INDEX IF NOT EXISTS idx_daily_bonus_features_date
     ON daily_bonus_features(daily_date, position);
 
 
+-- Ad-hoc extra items surfaced only in the podcast RSS feed — see
+-- docs/session_plan_rss_extra_items.md. Pure RSS payload, no joins to
+-- articles/editions/publications, so this feature can't tangle with
+-- the website or the daily pipeline. Written by aarva/rss_add.py
+-- (operator CLI); read by aarva/output/rss_feed.py::generate_feed.
+CREATE TABLE IF NOT EXISTS rss_extra_items (
+    guid              TEXT PRIMARY KEY,
+    episode_date      TEXT NOT NULL,
+    title             TEXT NOT NULL,
+    description_html  TEXT,
+    audio_url         TEXT NOT NULL,
+    byte_length       INTEGER NOT NULL DEFAULT 0,
+    duration_seconds  INTEGER,
+    author            TEXT,
+    subtitle          TEXT,
+    itunes_episode_type TEXT NOT NULL DEFAULT 'full',
+    added_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rss_extra_items_date
+    ON rss_extra_items(episode_date);
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,
