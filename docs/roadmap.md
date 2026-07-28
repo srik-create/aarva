@@ -70,24 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Durable strip of The Independent's engagement CTA.** Full spec
-   at `docs/session_plan_independent_commenting_forum_strip.md`
-   (WIP — audit sub-agent flagged six remaining uncited state
-   assertions on last round; Claude Code to tighten citations,
-   invoke 17f audit sub-agent for CLEAN, then PR). Follow-up to
-   `docs/session_plan_tts_boilerplate_strip.md` (STATUS: DONE
-   2026-07-22): adds three new alternatives (`join our commenting
-   forum`, `join thought-provoking conversations`, `join the
-   conversation\b`) to `_SUBSCRIPTION_CTA_RE` at
-   `aarva/services/terminal_boilerplate.py:85-93`, plus a first
-   test file at `aarva/tests/test_terminal_boilerplate.py`.
-   Trigger case: The Independent's article-tail CTA tripped
-   Gemini's PROHIBITED_CONTENT filter on 2026-07-28 (edition
-   1000011, listener-created crosscut, article 10317, passage_b
-   chunk 5/5). Immediate fix was a manual trim of article 10317
-   on Render; this is the durable fix that prevents recurrence
-   on future ingestion.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -138,6 +120,37 @@ the sequence.
 Most recent first.
 
 ### 2026-07-28
+
+- **Durable strip of The Independent's engagement CTA.** Full spec at
+  `docs/session_plan_independent_commenting_forum_strip.md`. Follow-
+  up to `docs/session_plan_tts_boilerplate_strip.md` (STATUS: DONE
+  2026-07-22). Added three new alternatives (`join our commenting
+  forum`, `join thought-provoking conversations`, `join the
+  conversation\b`) to `_SUBSCRIPTION_CTA_RE` at
+  `aarva/services/terminal_boilerplate.py:85-95`, plus the first test
+  file in `aarva/tests/` (`test_terminal_boilerplate.py`, 15 cases).
+  Trigger case: The Independent's article-tail CTA tripped Gemini's
+  `PROHIBITED_CONTENT` filter on 2026-07-28 (edition 1000011,
+  listener-created crosscut, article 10317, passage_b chunk 5/5).
+  Immediate fix was a manual trim of article 10317 on Render; this is
+  the durable fix that prevents recurrence on future ingestion.
+  - Before landing the code change, tightened the spec's citations
+    via the rule 17f external audit sub-agent (see
+    `docs/session_plan_independent_commenting_forum_strip.md`'s own
+    revision history / the separate citation-fix PR) — caught and
+    corrected a real factual error along the way: the spec had
+    claimed `/create`'s web route uses the same cleaner as the
+    operator's `aarva/ingest_url.py` CLI tool, but `/create`
+    (`aarva/server/routes/create.py`) doesn't import either
+    `ingest_url` or `strip_terminal_boilerplate` at all — they're two
+    separate ingestion paths that happen to share the same stripper
+    function.
+  - `pytest`/`pytest-asyncio` were already declared in `pyproject.toml`'s
+    `dev` extras and `testpaths` was already configured, just not
+    installed in this dev environment — installed and used to run the
+    new tests for real (all 15 pass; verified 4 of them fail without
+    the fix, confirming real regression coverage rather than a
+    tautology).
 
 - **/create card readability + cream brightness hierarchy.** Full
   spec at `docs/session_plan_create_readability_and_cream_tiers.md`.

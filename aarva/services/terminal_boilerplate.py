@@ -87,7 +87,10 @@ _SUBSCRIPTION_CTA_RE = re.compile(
     r"sign up for our newsletter|"
     r"subscribe to\b|"
     r"support our journalism|"
-    r"read more of our coverage"
+    r"read more of our coverage|"
+    r"join our commenting forum|"
+    r"join thought-provoking conversations|"
+    r"join the conversation\b"
     r")",
     re.IGNORECASE,
 )
