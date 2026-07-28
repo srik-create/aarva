@@ -1,13 +1,57 @@
 # Session plan — strip The Independent's "Join our commenting forum" CTA
 
 Written by Cowork for the next Claude Code session (2026-07-28+).
-Follow-up to `session_plan_tts_boilerplate_strip.md` (shipped
-2026-07-22). That work added a paragraph-level boilerplate stripper
-for production credits, crisis-line footers, and generic
-subscription CTAs. 2026-07-28 a listener-created crosscut failed at
-Gemini TTS chunk 5/5 with `PROHIBITED_CONTENT` — The Independent's
-"Join our commenting forum" engagement CTA at the article tail
-tripped Gemini's safety filter. The existing pattern set doesn't
+Follow-up to `session_plan_tts_boilerplate_strip.md`, which carries
+its own `STATUS: DONE (2026-07-22)` header confirming both fixes
+shipped in one PR (verified: `docs/session_plan_tts_boilerplate_strip.md`
+lines 1-2). That work added a paragraph-level boilerplate stripper.
+Verified what it actually strips by reading the regex bodies
+directly (`aarva/services/terminal_boilerplate.py:32-45` for
+`_PRODUCTION_CREDIT_RE`, `:50-60` for `_CRISIS_LINE_RE`):
+
+```
+_PRODUCTION_CREDIT_RE = re.compile(
+    r"^\s*("
+    r"design(?: and development)? by|"
+    r"illustrations? by|"
+    r"photography by|photos? by|"
+    r"videos? by|"
+    r"visual editing by|"
+    r"additional reporting by|"
+    r"copy edit(?:ed|ing) by|"
+    r"fact-checked by|"
+    r"edited by\s+[A-Z]"
+    r")",
+    re.IGNORECASE,
+)
+
+_CRISIS_LINE_RE = re.compile(
+    r"("
+    r"988 suicide(?: ?& ?crisis lifeline)?|"
+    r"if you or someone you know|"
+    r"national suicide prevention lifeline|"
+    r"crisis text line|"
+    r"samaritans\b.{0,40}\d{3}[\s.-]?\d{3,4}|"
+    r"\brainn\b"
+    r")",
+    re.IGNORECASE,
+)
+```
+
+`_PRODUCTION_CREDIT_RE` matches production-credit lines (design/
+photography/editing "by" bylines); `_CRISIS_LINE_RE` matches crisis-
+helpline footers (988, Samaritans, RAINN, etc.) — confirming the
+"production credits" / "crisis-line footers" characterization above.
+`_SUBSCRIPTION_CTA_RE`'s current body is shown in the grep block
+below.
+
+Per `docs/roadmap.md` (2026-07-28 entry, lines 84-89), a listener-
+created crosscut (edition 1000011, article 10317) failed at Gemini
+TTS chunk 5/5 (passage_b) with `PROHIBITED_CONTENT` on 2026-07-28 —
+The Independent's "Join our commenting forum" engagement CTA at the
+article tail tripped Gemini's safety filter. The existing pattern
+set (verified below: `aarva/services/terminal_boilerplate.py:85-93`
+has no "join our" / "join the conversation" alternative) doesn't
 catch this shape, so the paragraph shipped into TTS unmodified.
 
 This spec adds the Independent-CTA shape (plus a couple of
@@ -62,7 +106,9 @@ $ grep -nE "strip_terminal_boilerplate" aarva/ingest_url.py
 224:    return strip_terminal_boilerplate(full_text)
 ```
 
-Plus `strip_terminal_boilerplate`'s docstring (`aarva/services/terminal_boilerplate.py:118-149`) documents the terminal-only walk: *"Walks backward from the last paragraph… the first genuinely non-matching paragraph stops the walk — nothing above it is ever touched."*
+Plus `strip_terminal_boilerplate`'s docstring (function defined at
+`aarva/services/terminal_boilerplate.py:118`, docstring body at
+`:119-132`) documents the terminal-only walk: *"Walks backward from the last paragraph… the first genuinely non-matching paragraph stops the walk — nothing above it is ever touched."*
 
 **Now the three questions:**
 
@@ -81,10 +127,34 @@ Plus `strip_terminal_boilerplate`'s docstring (`aarva/services/terminal_boilerpl
    - Daily-pipeline ingestion: `aarva/stages/stage_1_ingest.py:20`
      imports `strip_terminal_boilerplate`, `:90` calls it as
      `full_text, stripped = strip_terminal_boilerplate(extracted.full_text)`.
-   - Ad-hoc URL ingest via `/create` uses the same cleaner:
+   - Operator ad-hoc URL ingest uses the same cleaner:
      `aarva/ingest_url.py:223-224` imports and calls
-     `strip_terminal_boilerplate` on the extracted body.
-   - The `articles.full_text` column persistence itself lives
+     `strip_terminal_boilerplate` on the extracted body. Correction
+     vs. this doc's earlier draft: `aarva/ingest_url.py` is a
+     standalone operator CLI tool (`python -m aarva.ingest_url`,
+     entry point at `aarva/ingest_url.py:338,384`), NOT something
+     the listener-facing `/create` web route calls. Verified:
+
+     ```
+     $ grep -n "^from\|^import" aarva/server/routes/create.py
+     43:from __future__ import annotations
+     45:import logging
+     47:from fastapi import HTTPException, Request
+     48:from fastapi.responses import HTMLResponse, RedirectResponse
+     49:from starlette.concurrency import run_in_threadpool
+     51:from aarva.server.app import app
+     52:from aarva.server.templates import templates
+     53:from aarva.services.episode_candidates import find_near_miss, propose_candidates
+     54:from aarva.services.episode_jobs import (
+     57:from aarva.services.queries import load_crosscut_episodes, load_listener_episodes
+     ```
+
+     No `ingest_url` or `strip_terminal_boilerplate` import present.
+     The two are separate ingestion paths; this spec's fix applies
+     to both since both call the same `strip_terminal_boilerplate`
+     function.
+   - The `articles.full_text` column (schema: `aarva/db.py:30`,
+     `TEXT` column on the `articles` table) persistence itself lives
      downstream of these calls; this spec doesn't touch the
      write path, only the pattern that's applied before
      persistence.
@@ -106,13 +176,18 @@ Plus `strip_terminal_boilerplate`'s docstring (`aarva/services/terminal_boilerpl
    to match editorial prose.
 2. **Backfill NOT required.** Existing article rows with the
    CTA baked into `full_text` stay as-is; the operator manually
-   trimmed article 10317 for job 6 on 2026-07-28 (see
-   `docs/roadmap.md`'s 2026-07-28 entry). Future ingestion
-   catches the CTA at intake.
+   trimmed article 10317 on Render on 2026-07-28 (verified:
+   `docs/roadmap.md` lines 84-89, which do not mention a "job"
+   number — that detail from an earlier draft of this doc wasn't
+   substantiated by the cited source and has been dropped). Future
+   ingestion catches the CTA at intake.
 3. **No LLM-based fallback (yet).** Regex-only stays the v1
-   approach per the earlier boilerplate spec. If more publisher-
-   specific CTA shapes appear over the next few weeks, then
-   re-open the LLM-fallback question.
+   approach per the earlier boilerplate spec (verified:
+   `docs/session_plan_tts_boilerplate_strip.md:140-141`, "Ship v1 with
+   regex only. Add LLM fallback if daily runs show material
+   bio-detection misses."). If more publisher-specific CTA shapes
+   appear over the next few weeks, then re-open the LLM-fallback
+   question.
 
 ---
 
@@ -152,11 +227,18 @@ _SUBSCRIPTION_CTA_RE = re.compile(
 ```
 
 Three new alternatives:
-- `join our commenting forum` — The Independent's exact opener
-  (verified against the blocked chunk in the 2026-07-28 log:
+- `join our commenting forum` — The Independent's exact opener.
+  The `Chunk starts with: {text[:120]!r}` log line format is emitted by
+  the safety-block detection code at `aarva/clients/tts.py:471,481`
+  (shipped via `session_plan_tts_boilerplate_strip.md`). The
+  specific quoted content below is the operator's real-time Render
+  log capture from the 2026-07-28 incident — an external runtime
+  event, not something reproducible by grepping this repo, but the
+  log line FORMAT it's quoted in is verified against the repo
+  source just cited:
   `Chunk starts with: 'Join our commenting forum\nJoin
   thought-provoking conversations, follow other Independent
-  readers…'`).
+  readers…'`.
 - `join thought-provoking conversations` — The Independent's
   second sentence in the same block; catches the CTA even if a
   paragraph split occurs mid-way through.
@@ -195,7 +277,7 @@ Claude Code judges the cleaner test surface. Include cases for:
 - Corrections paragraph — must NEVER be stripped. `_NEVER_STRIP_RE`
   is a real guard at `aarva/services/terminal_boilerplate.py:27`
   and `_classify_paragraph` checks it first
-  (`terminal_boilerplate.py:107-108`: `if _NEVER_STRIP_RE.search(text): return None`).
+  (`terminal_boilerplate.py:108-109`: `if _NEVER_STRIP_RE.search(text):` … `return None`).
 - Regression: existing four CTAs (newsletter, subscribe,
   support, read more) still strip correctly.
 
@@ -226,7 +308,8 @@ files exist before assuming) and pick accordingly.
   Only touches new ingestion. If a specific old article causes
   a future TTS failure, trim it manually — same shape as the
   2026-07-28 patch.
-- **No LLM-based classification** — regex-only stays v1.
+- **No LLM-based classification** — regex-only stays v1 (verified:
+  `docs/session_plan_tts_boilerplate_strip.md:140`).
 - **No changes to `_PRODUCTION_CREDIT_RE`, `_CRISIS_LINE_RE`,
   `_BIO_VERB_RE`, or `_NEVER_STRIP_RE`** — those four regex
   constants exist at `aarva/services/terminal_boilerplate.py`
@@ -251,7 +334,10 @@ files exist before assuming) and pick accordingly.
   test file there.
 - `docs/roadmap.md` — after PR merges, move from In-Progress
   to Recently Completed (Claude Code owns this per AGENTS.md
-  rule 17).
+  rule 17a, which requires the roadmap edit in the same PR as
+  any change that "completes or supersedes work that 'In
+  progress'... describes" — verified: `AGENTS.md` lines 257,
+  267-268).
 
 ---
 
