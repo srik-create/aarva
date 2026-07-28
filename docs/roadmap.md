@@ -70,6 +70,26 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Ad-hoc extra items on the podcast RSS feed.** Full spec at
+   `docs/session_plan_rss_extra_items.md`. New `rss_extra_items`
+   table on main_db (RSS-payload-only, no joins to `articles`/
+   `editions`/`publications`) + new laptop CLI `python -m
+   aarva.rss_add` with two modes: `--from-edition <id>` fetches
+   metadata from Render via a new admin GET endpoint
+   (`/admin/episode-metadata`, reuses `_load_listener_crosscut_
+   for_promotion` + `_check_token` from the 2026-07-27 promote-
+   bonus endpoint), or fully-manual with explicit `--audio-url` /
+   `--title` / `--duration` / `--kind`. `Crosscut: ` title prefix
+   auto-applied when the added episode is a crosscut. Render loop
+   added to `aarva/output/rss_feed.py::generate_feed`. Purpose: let
+   the operator editorially add ANY new episode to the podcast RSS
+   on demand — including listener-created crosscuts that currently
+   live only on Render's listener_db and are invisible to the RSS
+   by design (`aarva/services/queries.py:189-193` filters list
+   queries to `user_id IS NULL`). RSS-only surface; zero website
+   changes (grep-verifiable). AGENTS.md rule 4 sign-off from user
+   2026-07-28.
+
 ---
 
 ## Deferred — to return to (in priority order)
