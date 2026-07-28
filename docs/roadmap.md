@@ -70,6 +70,25 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **/create card readability + cream brightness hierarchy.**
+   Full spec at
+   `docs/session_plan_create_readability_and_cream_tiers.md`.
+   Two related listener-facing fixes in one PR: (a) the /create
+   pairing description was rendering `c.why` (multi-sentence
+   prose) with the Anton-uppercase `.hook` pull-quote treatment
+   — misapplied to long text, reads as a shouty blob. Swap to
+   sentence-case Inter body prose with the red left-border kept
+   as the editorial signal; italicise the two source-article
+   titles inline. (b) Introduce a three-tier cream brightness
+   hierarchy — `cream-text` (100%, kept) for wordmark + Anton
+   page H1s; new `cream-title` (85%) for card topics; new
+   `cream-body` (75%) for body prose + mini-player track title.
+   Metadata classes unchanged. AGENTS.md rule 4 sign-off from
+   user 2026-07-27 via three rounds of Cowork mockups
+   (description options, subheading options, three-tier
+   brightness). Grep-audit confirmed only one `.hook`
+   misapplication site-wide — the /create card is it.
+
 ---
 
 ## Deferred — to return to (in priority order)
