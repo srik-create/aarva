@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 28 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-28</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 28 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · womens health gaps</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-28/crosscut_0109.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>23 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>For decades, medical researchers studied male lab mice almost exclusively, building human health baselines on just half the population. That blind spot left a massive gap in what medicine knows about female bodies. Jonquilyn Hill traces how this history of exclusion created a void that online influencers now exploit around perimenopause. Reading that next to Anissa Durham’s reporting brings the consequences straight into the modern exam room. Durham looks at a misunderstood metabolic condition, showing how racial bias and outdated science delay diagnoses for Black and Latina women. It is worth pausing on what happens when the medical establishment looks away, and who pays the price when patients are left to find answers themselves.</p>
+        <article class='piece'>
+<p class='hook'>For generations, the medical establishment treated women as just &quot;small men,&quot; brushing off their symptoms as hysteria. In a piece published just this week, Jonquilyn Hill traces how that historical exclusion created a massive blind spot. Listen for the moment she connects this long legacy of neglect directly to modern social media feeds, pointing out that almost half of Americans now turn to uncredentialed online influencers just to understand their own bodies.</p>
+<h2 class='title'>Why it took so long to talk about perimenopause</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Jonquilyn Hill</span></p>
+<p class='source'><a href='https://www.vox.com/health/496667/perimenopause-womens-health-history' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Jonquilyn Hill ends with a frustrating image: patients sitting in a doctor&#x27;s office today, realizing the person in the white coat is still guessing about basic female biology. For decades, researchers treated women as small men, leaving entire medical fields playing catch-up. What jumps out reading Anissa Durham next is how that broad historical blind spot plays out in a specific hospital room. Durham looks at a condition recently renamed polyendocrine metabolic ovarian syndrome, or PMOS. Read alongside Hill, Durham’s reporting shows what happens when a baseline ignorance about female bodies collides with racial bias. 
+
+Hill points out that doctors historically dismissed women’s pain as hysteria. Durham picks up that thread and shows how that dismissal mutates for Black and Latina women, who are often assumed to have a higher pain tolerance. The interesting thing is how the two pieces lock together. Hill explains why the medical system lacks data on women in general, while Durham reveals who pays the highest price for that missing information: patients like Bontle Moka-Moliki, who spent years waiting for someone to treat her daily pain as real.</p>
+        <article class='piece'>
+
+<h2 class='title'>After PCOS became PMOS, there’s hope for new awareness among Black and Latina women</h2>
+<p class='byline'><span class='publication'>STAT News</span><span class='sep'>·</span><span>Anissa Durham</span></p>
+<p class='source'><a href='https://www.statnews.com/2026/07/28/pmos-name-change-growing-awareness-faster-diagnosis-women-of-color/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A missing female lab mouse decades ago eventually becomes a misdiagnosed patient today. What lingers after hearing these stories is how an empty space in medical data turns into an active hazard. That void gets filled by online salespeople peddling quick fixes, or by clinical biases that send Black and Latina women home with no answers. The science is finally starting to catch up, replacing old assumptions with actual biology. But a harder question remains. How does a patient trust a medical clinic that is only just beginning to learn how her body works?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
