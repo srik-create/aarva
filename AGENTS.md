@@ -12,7 +12,7 @@ three foundation docs — this file (`AGENTS.md`), `docs/roadmap.md`,
 so it's observable that the reads happened. Applies to BOTH Cowork
 and Claude Code sessions. No exceptions.
 
-Last updated: 2026-07-27
+Last updated: 2026-07-28
 
 ---
 
@@ -525,6 +525,56 @@ Last updated: 2026-07-27
     topic don't need per-sentence citations. But any transition
     to "here's what the project says about X" requires the
     citation or the verify-first pattern.
+
+17g. **Claude Code's audit-loop cap — scoped to Claude Code only,
+    does not change rule 17f.** Rule 17f (external audit sub-agent
+    before every `session_plan_*.md` commit, re-invoke until
+    `CLEAN`) stands exactly as authored, for both Cowork and Claude
+    Code. This rule only narrows HOW Claude Code responds to
+    rounds after the first two.
+
+    **The cap:** Claude Code must still invoke the round-1 audit
+    before any `session_plan_*.md` commit, and must fix every
+    finding from rounds 1-2 that is a genuinely MISSING citation
+    (no file+line reference and no grep/read result backing the
+    assertion at all). From round 3 onward, if every remaining
+    finding is citation-PRECISION only — the assertion already
+    has a file+line citation, just an inaccurate line number, an
+    off-by-one range, or a non-verbatim quote — Claude Code
+    self-verifies and fixes those directly (grep/Read the cited
+    range, correct it) instead of re-invoking the sub-agent again.
+    Re-invoke once more after the self-fix to confirm `CLEAN`
+    still holds; that final confirmation pass is not itself
+    subject to the cap.
+
+    **Why:** observed 2026-07-28 on
+    `docs/session_plan_independent_commenting_forum_strip.md` —
+    8 audit rounds, ~400k+ tokens total. Rounds 1-2 caught
+    everything that actually mattered, including a genuine
+    factual error (the spec had conflated `/create`'s web route
+    with the operator's separate `aarva/ingest_url.py` CLI tool).
+    Rounds 3-8 were exclusively line-number/range nits on
+    citations that already existed — precision drift, not the
+    self-review blindness rule 17f exists to catch. Re-invoking a
+    fresh ~40-60k-token sub-agent call each time to catch "cited
+    line 107 instead of 108" has no safety value over Claude Code
+    just re-reading the cited range itself; it only adds cost.
+    Confirmed with the user 2026-07-28 (exploratory discussion:
+    "is this methodology going to result in like 7 verification
+    runs each time... is it useful for it to continue this way").
+
+    **Why this doesn't apply to Cowork:** rule 17f's own
+    rationale is explicit that Cowork is the primary target — its
+    self-compliance gap is the failure mode being guarded against
+    (Cowork violated rule 17e's own citation discipline three
+    times in the same session as writing 17e). Cowork sessions
+    don't have the same direct-file-access, low-friction grep
+    habit Claude Code has, so a human/Cowork operator judging
+    "is this line-number nit worth a full re-audit" is a weaker
+    bet than Claude Code just checking it directly. The cap is a
+    Claude-Code-specific efficiency refinement, not a loosening
+    of the underlying discipline — rule 17f's "re-invoke until
+    CLEAN" remains the correct instruction for Cowork as written.
 
 ## Version control
 
