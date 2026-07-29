@@ -167,6 +167,33 @@ Most recent first.
     documented. Ask the user to retry the original back-navigation-
     triggered repro (not just the toggle-tap repro Fix A targets)
     once this is live.
+  - **Same-day follow-up: Fixes A-D were incomplete.** The user
+    reproduced continued overlap on a real iPhone shortly after Fixes
+    A-D deployed, with a real screen recording. Independent frame-by-
+    frame analysis pinpointed the residual cause: `playTrack()`'s
+    different-track branch paused the outgoing track and reassigned
+    `audio.src` directly, without a full `removeAttribute('src')`/
+    `load()` unload first — insufficient to force the browser to
+    discard already-decoded audio sitting in the native playback
+    buffer on iOS Safari, so leftover audio from the previous track
+    could keep emitting while the new track started, invisible to
+    every JS-observable signal (`audio.paused`/`currentTime`/`src`
+    all correctly showed only the new track). Both track switches the
+    user flagged as "when overlapping voices start" landed almost
+    exactly on the video's two track-switch moments, matching this
+    mechanism. **Fix E**: added `audio.removeAttribute('src');
+    audio.load();` between `pause()` and the new `src` assignment in
+    `playTrack()`, matching the close button's already-correct full-
+    unload pattern. Verified via a real headless-Chromium rapid
+    A→B→A→B track-switch sequence plus the Fix A toggle-race sequence
+    (8 rounds) — zero console errors, one `<audio>` element
+    throughout, correct final state; all 40 tests still pass. Same
+    honest gap as Fix B/C: headless Chromium can't exercise iOS
+    Safari's native buffering behavior, so this fix's actual
+    effectiveness on-device remains unconfirmed pending the user's
+    retest. Full detail, citations, and evidence artifacts in
+    `docs/session_plan_audio_player_overlap_fix.md`'s "Fix E" section
+    (added same day, went through a second rule 17f audit round).
   - Spec went through the rule 17f audit-subagent loop before
     landing (2 rounds — round 1 caught two off-by-a-few-lines
     citation errors, both fixed and reconfirmed CLEAN in round 2).
