@@ -1,11 +1,18 @@
-**STATUS: Code shipped 2026-07-29. Real-device confirmation of Fix
-B/C (the bfcache/backgrounding path) PENDING** — headless Chromium
-can't reproduce iOS Safari's bfcache lifecycle, so that path is
-verified by code review + regression tests only. Fix A (the toggle
-race) was verified directly: 12 rounds of rapid alternating taps in
-a real headless-Chromium run produced no errors, no duplicate audio
-elements, and correct final state. Ask the user to retry the
-ORIGINAL back-navigation repro (not just toggling) once this is live.
+**STATUS: Fixes A-D shipped 2026-07-29, found INCOMPLETE the same
+day** — the user reproduced continued overlap on a real iPhone after
+Fixes A-D deployed (screen recording, 2026-07-29 14:52-14:53 BST).
+Independent frame-by-frame analysis of that recording pinpointed the
+residual cause: `playTrack()`'s different-track branch paused the
+outgoing track and reassigned `src` directly, without a full
+`removeAttribute('src')`/`load()` unload first — insufficient to
+force the browser to discard already-decoded audio sitting in the
+native playback buffer on iOS Safari. **Fix E (below) added the same
+day** to close this gap. Fix B/C (the bfcache/backgrounding path)
+real-device confirmation is still PENDING — headless Chromium can't
+reproduce iOS Safari's bfcache lifecycle, so that path remains
+verified by code review + regression tests only. Ask the user to
+retry BOTH the original back-navigation repro and a rapid multi-track
+switch (the Fix E repro) once this redeploys.
 
 ---
 
@@ -201,7 +208,7 @@ audio.src = src;
 audio.currentTime = 0;
 ```
 No `audio.pause()` first, unlike the close button
-(`base.html:809-811`: `audio.pause(); audio.removeAttribute('src');
+(`base.html:842-844`: `audio.pause(); audio.removeAttribute('src');
 audio.load();`), which does this correctly.
 
 **Change**: add `audio.pause();` as the first line of this block,
@@ -212,6 +219,95 @@ current = { src: src, title: title || '', link: link || '/today' };
 audio.src = src;
 audio.currentTime = 0;
 ```
+
+---
+
+## Fix E — full unload before loading a new track (added 2026-07-29, same day, after Fixes A-D were found incomplete)
+
+**Evidence this was still missing**: the user reproduced overlap on a
+real iPhone after Fixes A-D deployed
+(`ScreenRecording_07-29-2026 14-52-51_1.mov`, 34.9s, downloaded and
+independently re-analyzed this session). Frame-by-frame timing of
+that recording: a track switch (tapping a different article's play
+button while another track was mid-playback) at video t≈6s, and a
+second track switch at video t≈12s — both timestamps the user
+specifically flagged as when overlapping voices start. Spectrograms
+of the recording (regenerated this session at
+`/private/tmp/claude-501/-Users-srikant-Projects-Aarva/aac3d432-0e19-483c-a805-6dde8192d06f/scratchpad/audio_bug_diag2/spectrogram_full.png`
+and a zoomed pass over the t=4-14s window at
+`.../audio_bug_diag2/spec_4_14.png`) showed no sustained dense-overlap
+signature of the kind the ORIGINAL bug videos showed. An instrumented
+headless-Chromium reproduction of an equivalent rapid track-switch
+sequence (script + raw 50ms-resolution trace saved at
+`.../audio_bug_diag3/instrument_v2.py` and
+`.../audio_bug_diag3/trace_v2.json`) found 0 divergent samples across
+92 samples — the mini-player and in-page card stayed in lockstep the
+entire time. This means the overlap isn't visible in any
+JS-observable state (`audio.paused`/`currentTime`/`src`), which is
+consistent with it occurring one layer below what JS can see: the
+native decode/output buffer. (These are session-local scratch
+artifacts, not committed to the repo — same convention as the
+spectrogram citation in `docs/diagnosis_audio_overlap_2026-07-29.md`.)
+
+**Problem site**, `base.html:759-762` (as shipped by Fixes A-D):
+```js
+audio.pause();
+current = { src: src, title: title || '', link: link || '/today' };
+audio.src = src;
+audio.currentTime = 0;
+```
+A bare `pause()` followed directly by reassigning `src` stops JS from
+reading the old resource, but per the HTML media element load
+algorithm this is a lighter-weight reset than a full unload — it does
+not guarantee already-decoded audio sitting in the browser's native
+playback buffer is discarded before the new resource starts
+producing output. On iOS Safari specifically, that leftover buffered
+audio can keep emitting from the previous track while the new track's
+audio also starts, audible as an overlap even though every JS-visible
+signal (`audio.paused`, `audio.currentTime`, `current.src`) correctly
+reflects only the NEW track throughout. This also explains why the
+overlap compounds with each successive switch rather than appearing
+once: each switch is an independent opportunity to leave a fresh
+leftover buffer running.
+
+**Change**: insert `audio.removeAttribute('src'); audio.load();`
+between the `pause()` and the new `src` assignment — the same full
+unload sequence the close button already uses correctly
+(`base.html:842-844`, unchanged by this fix):
+```js
+audio.pause();
+audio.removeAttribute('src');
+audio.load();
+current = { src: src, title: title || '', link: link || '/today' };
+audio.src = src;
+audio.currentTime = 0;
+```
+`removeAttribute('src')` + `load()` forces the media element's load
+algorithm to run with NO current resource first, which per spec fully
+resets element state (aborts outstanding fetches, clears buffered
+ranges, resets `readyState` to `HAVE_NOTHING`) before the new
+resource is ever assigned — a materially more thorough reset than a
+direct `src` reassignment on top of a merely-paused element.
+
+**Verified for real**: ran a live local server against a disposable
+DB copy; scripted a rapid A→B→A→B track-switch sequence plus the
+original Fix A toggle-race sequence (8 rounds) in real headless
+Chromium (script + saved result at
+`/private/tmp/claude-501/-Users-srikant-Projects-Aarva/aac3d432-0e19-483c-a805-6dde8192d06f/scratchpad/audio_bug_diag3/verify_fix_e.py`
+and `.../audio_bug_diag3/verify_fix_e_result.json`) — zero console
+errors, exactly one `<audio>` element throughout, final state
+(`readyState=4`, `paused=false`, correct `src`) consistent with the
+last click. All 40 existing repo tests still pass (re-run this
+session, confirmed).
+
+**What this does NOT verify**: whether the native-buffer-leak
+mechanism is the correct explanation, or whether this fix actually
+eliminates the leak on real iOS Safari hardware — headless Chromium
+uses a different media backend and cannot exercise this iOS-Safari-
+specific buffering behavior at all. This is the same category of gap
+already flagged for Fix B/C. Ask the user to specifically retry rapid
+track-switching (not just the original toggle-race or back-navigation
+repros) once this redeploys.
 
 ---
 

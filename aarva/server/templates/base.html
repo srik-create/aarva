@@ -756,7 +756,20 @@
           togglePlayback();
           return;
         }
+        // Full unload (not just pause) before loading the new track.
+        // A bare pause() + src reassignment stops JS from reading the
+        // old resource but doesn't guarantee the browser discards
+        // already-decoded audio sitting in the native playback
+        // buffer — on iOS Safari that leftover buffered audio can
+        // keep emitting from the previous track while the new one
+        // starts, invisible to audio.paused/currentTime (both read
+        // correctly for the NEW track) but audible as an overlap.
+        // removeAttribute + load() forces the media element's load
+        // algorithm to run with no current resource, fully discarding
+        // the old one, matching the close button's existing pattern.
         audio.pause();
+        audio.removeAttribute('src');
+        audio.load();
         current = { src: src, title: title || '', link: link || '/today' };
         audio.src = src;
         audio.currentTime = 0;
