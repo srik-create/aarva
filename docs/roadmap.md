@@ -197,6 +197,46 @@ Most recent first.
   - Spec went through the rule 17f audit-subagent loop before
     landing (2 rounds — round 1 caught two off-by-a-few-lines
     citation errors, both fixed and reconfirmed CLEAN in round 2).
+  - **Second same-day follow-up: the actual root cause, found after
+    Fixes A-E were still insufficient a third time.** The user
+    reproduced overlap again with the back button confirmed as a
+    required precondition, then interchanging between the in-page and
+    mini-player controls. That pointed at htmx's own history-cache
+    mechanism: no page in the app sets `hx-history-elt`, so
+    `getHistoryElement()` (`htmx.js`) falls back to swapping the
+    entire `<body>` on every back/forward navigation instead of just
+    `#main-content` — and htmx's `normalizeScriptTags()` forces every
+    `<script>` tag in swapped content to re-execute. Since the
+    persistent-player script, the shared `<audio>` element, and the
+    mini-player all live inside `<body>` but outside `#main-content`,
+    every history-cache restore was silently spawning a brand-new,
+    independent instance of the entire player — with its own audio
+    element that auto-resumes from `sessionStorage` — while the
+    previous instance's element/listeners could still be attached or
+    playing. This is the real mechanism behind the original bug's
+    mismatched mini-bar/card numbers, the separately-reported
+    "dissonance" between the two controls, and both "partial fix"
+    recurrences; Fixes A-E are all still correct and shipped, they
+    just operate one level above this. **Fix F**: added
+    `hx-history-elt` (presence-only, no value needed) to
+    `<main id="main-content">` in `base.html`, scoping history-cache
+    save/restore to `#main-content` only — the persistent player is
+    now permanently out of scope for this mechanism, matching what
+    normal navigation already assumed. Unlike every other fix in this
+    saga, this one's root mechanism is pure htmx/DOM behavior, not an
+    iOS-Safari-only quirk, so it was verified deterministically in
+    headless Chromium — not just code review: stashed a JS reference
+    to the audio element before a back-navigation and compared object
+    identity after, run once with the fix reverted (confirmed the
+    element/mini-player really do get replaced by new nodes, and the
+    new one auto-starts playing with no click involved) and once with
+    the fix applied (same node, continuous uninterrupted playback
+    across 3 consecutive back/forward cycles). Full regression
+    (normal navigation, the Fix A toggle-race sequence, the Fix E
+    track-switch sequence) all still pass; all 40 tests pass. Full
+    detail, citations, and both before/after evidence artifacts in
+    `docs/session_plan_audio_player_overlap_fix.md`'s "Fix F" section
+    (added same day, 2 rounds of the rule 17f audit).
 
 ### 2026-07-28
 

@@ -1,18 +1,32 @@
-**STATUS: Fixes A-D shipped 2026-07-29, found INCOMPLETE the same
-day** — the user reproduced continued overlap on a real iPhone after
-Fixes A-D deployed (screen recording, 2026-07-29 14:52-14:53 BST).
-Independent frame-by-frame analysis of that recording pinpointed the
-residual cause: `playTrack()`'s different-track branch paused the
-outgoing track and reassigned `src` directly, without a full
-`removeAttribute('src')`/`load()` unload first — insufficient to
-force the browser to discard already-decoded audio sitting in the
-native playback buffer on iOS Safari. **Fix E (below) added the same
-day** to close this gap. Fix B/C (the bfcache/backgrounding path)
-real-device confirmation is still PENDING — headless Chromium can't
-reproduce iOS Safari's bfcache lifecycle, so that path remains
-verified by code review + regression tests only. Ask the user to
-retry BOTH the original back-navigation repro and a rapid multi-track
-switch (the Fix E repro) once this redeploys.
+**STATUS: Fixes A-E (all shipped 2026-07-29) treated symptoms of a
+deeper architectural gap, found and fixed the same day as Fix F.**
+The user reproduced overlap a THIRD time after Fixes A-E deployed,
+this time with the back button confirmed as a required precondition.
+That detail led to the actual root cause: no page sets `hx-history-elt`,
+so htmx's history-cache save/restore (used on every back/forward
+navigation once a page is cached) falls back to swapping the entire
+`<body>` instead of `#main-content` — and htmx's `normalizeScriptTags`
+forces every `<script>` tag in swapped content to re-execute. Since
+the persistent-player `<script>`, the shared `<audio>` element, and
+the mini-player all live inside `<body>` but outside `#main-content`,
+every back/forward navigation was silently re-running the entire
+player script as a brand-new, independent instance — with its own
+audio element that auto-resumes from `sessionStorage` — while the
+previous instance's element/listeners could still be attached or
+referenced. **This is the real mechanism behind the original bug,
+the "dissonance" between the two controls, and both "partial fix"
+recurrences — Fixes A-E were all correct, real, worth keeping, but
+none of them addressed this.** Fix F (below) is a one-line change
+(`hx-history-elt` on `#main-content`) that stops history-cache
+save/restore from ever touching the persistent player at all,
+matching the architecture's original intent. Unlike every other fix
+in this doc, this one's root mechanism is pure htmx/DOM behavior, not
+an iOS-Safari-only quirk — it was verified deterministically in
+headless Chromium (see Fix F's verification section), which is a
+categorically stronger confirmation than anything else here. Real-
+device confirmation from the user is still the final word, but this
+is the first fix in the whole investigation that didn't need to lean
+on "can't verify without a real iPhone."
 
 ---
 
@@ -308,6 +322,163 @@ specific buffering behavior at all. This is the same category of gap
 already flagged for Fix B/C. Ask the user to specifically retry rapid
 track-switching (not just the original toggle-race or back-navigation
 repros) once this redeploys.
+
+---
+
+## Fix F — scope htmx's history-cache to `#main-content` via `hx-history-elt` (added 2026-07-29, same day, after Fixes A-E were found insufficient a third time)
+
+**How this was found**: the user reproduced overlap a third time
+(screen recording `ScreenRecording_07-29-2026 16-30-43_1.mov`, checked
+via `ffprobe` in-session — duration 39.1s, creation_time
+`2026-07-29T15:40:47Z`, after PR #131/Fix E's merge at `15:26:31Z` —
+and confirmed against a fresh close-and-reopen per the user, not stale
+cached JS. The video file itself is no longer present on disk as of
+this writing — the user's own Downloads-folder cleanup, consistent
+with the same file also being absent after the Fix E video — so this
+specific ffprobe reading can't be independently re-verified after the
+fact; noting that rather than re-asserting it as freshly checked) and
+specified the trigger precisely: **"the error initiates once the back button is
+pressed, and then if i interchange between the main play/pause button
+... and the play/pause button on the player bar."** Independent
+spectrogram analysis (regenerated this session at
+`/private/tmp/claude-501/-Users-srikant-Projects-Aarva/aac3d432-0e19-483c-a805-6dde8192d06f/scratchpad/audio_bug_diag5/spec_20_28.png`
+and `.../spec_29_37.png`) confirmed genuine sustained overlap this
+time — a clean silence gap at each track switch (~t=22s, ~t=31.5s,
+matching the user's flagged 24s/33s marks) followed by 5+ seconds of
+dense, continuous spectral energy with none of the normal word-to-
+word pauses, unlike the second video (where the same check had
+correctly found no overlap signature).
+
+**The back-button precondition was the key new fact.** It pointed
+back at htmx's own history-cache mechanism, which this doc had
+already partially investigated (see the original "Agree or disagree
+with Cowork's bfcache hypothesis" section above) — but one detail was
+never checked: WHICH element `restoreHistory()`'s cache-hit path
+actually swaps.
+
+**Root cause, verified against the actual pinned htmx 2.0.10 source**
+(`/private/tmp/claude-501/-Users-srikant-Projects-Aarva/aac3d432-0e19-483c-a805-6dde8192d06f/scratchpad/htmx_2.0.10.js`,
+matching the SRI-pinned CDN version at `base.html:201`):
+
+1. `getHistoryElement()` (`htmx_2.0.10.js:3148-3151`):
+   ```js
+   function getHistoryElement() {
+     const historyElt = getDocument().querySelector('[hx-history-elt],[data-hx-history-elt]')
+     return historyElt || getDocument().body
+   }
+   ```
+   Grepped every template in `aarva/server/templates/`: **no page sets
+   `hx-history-elt` or `data-hx-history-elt` anywhere.** So this always
+   falls back to `document.body`.
+
+2. Both `saveCurrentPageToHistory()` (`htmx_2.0.10.js:3250`) and
+   `restoreHistory()`'s cache-hit path (previously cited in this doc,
+   `htmx_2.0.10.js:3341-3358`) call `getHistoryElement()` — meaning
+   **every history-cache snapshot AND every history-cache restore
+   operates on the whole `<body>`**, not `#main-content`. This is a
+   separate code path from normal AJAX-boosted navigation, which
+   correctly scopes to `#main-content` via the `hx-target`/`hx-select`
+   attributes on `<body>` (`base.html:219-220`) — those attributes
+   have no effect on the history-cache path at all.
+
+3. `swap()`'s cache-hit call (`swap(details.historyElt, cached.content,
+   ...)`, already quoted in this doc's earlier section) therefore
+   replaces the ENTIRE contents of `<body>` on every back/forward
+   navigation that hits htmx's cache — including the persistent-
+   player `<script>` (`base.html:578-1018` at the time this was
+   written, all inside `<body>` but OUTSIDE `<main id="main-content">`,
+   which spans `base.html:338-...`), the shared `<audio>` element, and
+   the mini-player markup.
+
+4. **The mechanism that turns this into a live bug**: htmx's
+   `normalizeScriptTags()` (`htmx_2.0.10.js:577-591`) explicitly
+   duplicates every `<script>` tag found in ANY swapped fragment via
+   `duplicateScript()` (`htmx_2.0.10.js:549-559`,
+   `getDocument().createElement('script')` + copying attributes/text)
+   specifically to force re-execution — the function's own comment:
+   *"we have to make new copies of script tags that we are going to
+   insert because SOME browsers ... don't execute scripts created in
+   `<template>` tags."* This is NOT a bug in htmx; it's intentional,
+   documented behavior. But it means every body-wide history-cache
+   restore **re-runs the entire persistent-player IIFE as a brand-new,
+   independent script execution** — with its own `audio`/`current`/
+   `pendingPlay` closures, its own newly-created `<audio>` element,
+   and (critically) its own "restore state on page load" block
+   (`base.html:993-1017`) that reads `sessionStorage` and
+   calls `audio.play()` on this NEW element, auto-resuming playback —
+   while whatever the PREVIOUS script instance's `<audio>` element and
+   listeners are doing is not necessarily stopped.
+
+**Why this explains every symptom in this investigation, not just
+this video**: the original bug's smoking-gun evidence (mini-player
+and an in-page card showing two different `currentTime` values in
+what should be one synchronous `updateUI()` call) requires two
+independent script contexts — exactly what this mechanism produces.
+The "dissonance" the user asked about separately (mini-bar and
+in-page controls not affecting each other) is explained by different
+generations' listeners attaching to whichever DOM nodes happen to be
+live at the time. And this video's overlap is explained by a freshly
+re-executed generation auto-resuming playback via its own `<audio>`
+element while an earlier generation's element/listeners may still be
+live. Fixes A-E are all still correct and worth keeping (the toggle
+race, the pause-before-hide, the pageshow resync, and the full-unload
+on track switch are all real, independent robustness improvements) —
+none of them could have addressed this, since this operates one level
+below all of them: it creates entirely new script instances, each of
+which independently has the (now-fixed) A-E behaviors.
+
+**Change**: add `hx-history-elt` to `base.html:338`
+(`<main id="main-content">`):
+```html
+<main id="main-content" hx-history-elt class="max-w-3xl mx-auto px-5 py-10">
+```
+This is a presence-only attribute (`getHistoryElement()`'s selector
+doesn't check its value) — no value needed. With this in place,
+`getHistoryElement()` returns `#main-content` for both save and
+restore, so history-cache operations never touch anything outside it.
+The persistent player's `<script>`, `<audio>` element, and mini-player
+markup all live outside `#main-content` and are now permanently out
+of scope for this mechanism, matching what the architecture already
+assumed for every OTHER navigation path.
+
+**Verified for real, deterministically — no real-device gap this
+time**: this is the first fix in the whole investigation whose root
+mechanism is pure htmx/DOM behavior rather than an iOS-Safari-only
+quirk, so it could be fully verified in headless Chromium:
+
+- Ran a live local server against a disposable DB copy. Stashed a
+  JS-side reference to the `<audio>` element and mini-player before a
+  back-navigation, then compared object identity after — run once
+  with the fix temporarily reverted (script + result saved at
+  `/private/tmp/claude-501/-Users-srikant-Projects-Aarva/aac3d432-0e19-483c-a805-6dde8192d06f/scratchpad/backnav_check/check_backnav_before_fix_f.py`
+  and `.../backnav_result_before_fix_f.json`) and again with the fix
+  applied
+  (`.../backnav_check/check_backnav_after_fix_f.py` and
+  `.../backnav_result_after_fix_f.json`). **Before this fix**:
+  `audio_is_same_node: false`, `mini_player_is_same_node: false` —
+  confirming the swap really did replace both with brand-new nodes,
+  and the new audio element was already playing on its own
+  (`new_audio_paused: false`) despite no script in the test ever
+  calling play — direct proof of the spurious re-execution
+  auto-resuming playback. **After this fix**:
+  `audio_is_same_node: true`, `mini_player_is_same_node: true`,
+  `old_audio_still_in_document: true`, and `currentTime` advancing
+  continuously across the navigation (`1.58s` → `3.09s` over the same
+  wait) — the same element, uninterrupted, no second instance.
+- Full regression pass (script + result at `.../backnav_check/full_regression.py`
+  and `.../full_regression_result.json`): normal htmx-boosted
+  navigation still correctly changes page content; the same audio
+  node and continuous playback survive **3 consecutive** back/forward
+  cycles; the Fix A toggle-race sequence (8 rounds) still shows
+  exactly one `<audio>` element with zero errors; the Fix E track-
+  switch sequence still works correctly. All 40 existing repo tests
+  still pass (re-run this session).
+
+**What this does NOT change**: Fixes A-E's code is untouched and
+still shipped. This fix specifically closes the "back button, then
+interchange between the two controls" path; if a future report
+doesn't involve back/forward navigation at all, it's a different
+mechanism and this fix wouldn't be expected to touch it.
 
 ---
 
