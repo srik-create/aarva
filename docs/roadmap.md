@@ -115,9 +115,61 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-28)
+## Recently completed (2026-06-29 → 2026-07-29)
 
 Most recent first.
+
+### 2026-07-29
+
+- **Web player dual-playback overlap — fixed.** Listeners reported
+  aarva.app's web player sometimes playing two tracks (or two
+  positions of the same track) simultaneously on iPhone/mobile
+  Safari. Diagnosed by Claude Code first (`docs/diagnosis_audio_overlap_
+  2026-07-29.md`, diagnosis-only per explicit user instruction, no
+  Cowork spec involved), then — per the user's follow-up instruction
+  to write the spec and ship the fix directly rather than hand off to
+  Cowork — specced and shipped by Claude Code the same day
+  (`docs/session_plan_audio_player_overlap_fix.md`). Two independent
+  root causes fixed in `aarva/server/templates/base.html`, both
+  confirmed real (one directly reproduced by the user, one from
+  independently-verified video evidence):
+  - **Fix A (confirmed reproducible):** the in-page play button and
+    the mini-player bar's toggle button were two separate,
+    uncoordinated click handlers both calling `audio.play()`/`audio.
+    pause()` directly — rapid alternating taps between them raced
+    against `play()`'s asynchronous, promise-based nature. Replaced
+    with one shared `togglePlayback()` that tracks the in-flight
+    `play()` promise and waits for it to settle before issuing a
+    `pause()`, removing the interruption window.
+  - **Fix B/C (targets the original video-evidence bug, real-device
+    confirmation still pending):** `base.html` never paused its own
+    audio before being backgrounded — a page about to be frozen
+    (bfcache) or discarded kept its audio driving independent of
+    whatever page became foreground next, with no `pageshow` handler
+    to resync a thawed page's state either. Added a pause-before-hide
+    on `pagehide` and a resync-on-restore on `pageshow` (checking
+    `event.persisted`).
+  - **Fix D (robustness, not directly evidenced but a real gap):**
+    `playTrack()` swapped `audio.src` without pausing the outgoing
+    track first, unlike the (correct) close-button pattern it should
+    have matched.
+  - **Verified for real:** ran a live local server against a
+    disposable DB copy; a real headless-Chromium Playwright run
+    scripted 12 rounds of rapid alternating taps between the in-page
+    and mini-player buttons — zero console/page errors, exactly one
+    `<audio>` element throughout, correct final paused state; single-
+    tap toggle and cross-track switching both confirmed unaffected
+    (regression check); all 40 existing repo tests still pass. Fix
+    B/C's bfcache-lifecycle path can't be exercised in headless
+    Chromium (iOS-Safari-specific page lifecycle) — flagged in the
+    spec as needing real-device confirmation, same category of gap
+    `docs/session_plan_ios_player_bugs.md` (2026-07-18) already
+    documented. Ask the user to retry the original back-navigation-
+    triggered repro (not just the toggle-tap repro Fix A targets)
+    once this is live.
+  - Spec went through the rule 17f audit-subagent loop before
+    landing (2 rounds — round 1 caught two off-by-a-few-lines
+    citation errors, both fixed and reconfirmed CLEAN in round 2).
 
 ### 2026-07-28
 

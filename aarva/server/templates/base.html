@@ -728,14 +728,35 @@
         });
       }
 
+      // Guards against a race between the in-page play button and the
+      // mini-player toggle: play() is asynchronous and sets
+      // audio.paused = false synchronously, before playback actually
+      // starts natively. Calling pause() while that play() is still
+      // settling is a well-documented trigger for "The play() request
+      // was interrupted by a call to pause()" — swallowing that error
+      // (as the old code did) doesn't prevent the underlying race, it
+      // just hides it. Waiting for the in-flight play() to settle
+      // before issuing pause() removes the overlap window.
+      let pendingPlay = null;
+
+      function togglePlayback() {
+        if (audio.paused) {
+          pendingPlay = audio.play().catch(function(){});
+        } else if (pendingPlay) {
+          pendingPlay.then(function() { audio.pause(); });
+          pendingPlay = null;
+        } else {
+          audio.pause();
+        }
+      }
+
       // Public API the in-page play buttons call.
       function playTrack(src, title, link) {
         if (current.src === src) {
-          // Same track — toggle.
-          if (audio.paused) audio.play().catch(function(){});
-          else audio.pause();
+          togglePlayback();
           return;
         }
+        audio.pause();
         current = { src: src, title: title || '', link: link || '/today' };
         audio.src = src;
         audio.currentTime = 0;
@@ -795,8 +816,7 @@
       // ─── Mini-bar controls ───────────────────────────────────────
       miniToggle.addEventListener('click', function() {
         if (!audio.src) return;
-        if (audio.paused) audio.play().catch(function(){});
-        else audio.pause();
+        togglePlayback();
       });
       miniTrack.addEventListener('click', function(e) {
         if (!audio.duration) return;
@@ -938,9 +958,24 @@
       });
 
       // Final save on nav. pagehide covers iOS Safari which doesn't
-      // reliably fire beforeunload (bfcache).
+      // reliably fire beforeunload (bfcache). Pause first — if this
+      // document is about to be frozen (bfcache) rather than
+      // destroyed, its own audio must not keep emitting once it's no
+      // longer the foreground page.
       window.addEventListener('beforeunload', saveState);
-      window.addEventListener('pagehide',     saveState);
+      window.addEventListener('pagehide', function() {
+        if (!audio.paused) audio.pause();
+        saveState();
+      });
+
+      // If this document is restored from bfcache, resync the UI and
+      // in-page player wiring in case anything is stale.
+      window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+          wireDataPlayers();
+          updateUI();
+        }
+      });
 
       // ─── Restore state on page load ──────────────────────────────
       const saved = loadState();
