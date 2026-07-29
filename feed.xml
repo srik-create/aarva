@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Tue, 28 Jul 2026 19:47:35 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2026 11:39:53 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,189 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: automating the impossible</title>
+      <itunes:title>Crosscut: automating the impossible</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-07-29.html</link>
+      <description><![CDATA[There is a strange echo between a machine pulling cotton from a plant and a computer finding a counterexample in pure math. When automation crosses into territory previously thought impossible, a familiar anxiety follows. An essay in Asterisk looks back at the socialist inventors of the mechanical cotton picker, who desperately tried to control the economic shockwaves of their creation. A recent report from Smithsonian Magazine jumps to the present, where an AI model just disproved a major math conjecture—leaving mathematicians unsettled by a system that solves problems without explaining how. Reading them back-to-back reveals a clear pattern. The dread of a new machine repeats itself, whether the labor is physical or purely intellectual.<br/><br/><em>The first piece leaves a lingering image of John and Mack Rust, two brothers who built a machine to do the impossible and then desperately tried to control the shockwave it would send through the cotton fields. They believed they could socially engineer the fallout of their own invention. Turning to the second piece, the historical echo is hard to ignore, even as the setting shifts from a 1930s farm to a modern artificial intelligence lab. Up next is a report on an AI model casually disproving a century-old math problem—the Jacobian conjecture—while millions watched a soccer match.
+
+What jumps out when reading these stories back-to-back is how the anxiety of automation repeats itself. The first piece centers on physical labor: a machine cleanly pulling cotton fibers from a boll. The second piece tackles cognitive labor: a machine pulling a counterexample out of pure mathematics. Notice how both pieces capture a specific kind of dread. For the Rust brothers, the fear was economic displacement. For today’s mathematicians, the displacement is existential. They face a machine that can solve a problem without explaining how it got the answer. Put together, the panic over automating the impossible looks less like a modern tech crisis and more like a permanent feature of human invention.</em><br/><br/>A metal spindle pulls cotton from a plant. Lines of code generate a mathematical proof. Both machines do exactly what they were designed to do. What lingers is the quiet panic that follows. The inventors of the mechanical picker could not halt the economic upheaval they set in motion, and mathematicians now stare at correct answers they cannot comprehend. When a machine works flawlessly but leaves people powerless to manage the fallout, is it still just a tool?<br/><br/>Sources:<br/><a href="https://asteriskmag.com/issues/15/rust-and-boll">Asterisk: Rust and Boll</a><br/><a href="https://www.smithsonianmag.com/smart-news/ai-disproves-a-decades-old-mathematical-idea-the-biggest-conjecture-that-the-tech-has-played-a-role-in-yet-180989189/">Smithsonian Magazine: A.I. Disproves a Decades-Old Mathematical Idea, the &#x27;Biggest Conjecture&#x27; That the Tech Has Played a Role in Yet</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[There is a strange echo between a machine pulling cotton from a plant and a computer finding a counterexample in pure math. When automation crosses into territory previously thought impossible, a familiar anxiety follows. An essay in Asterisk looks back at the socialist inventors of the mechanical cotton picker, who desperately tried to control the economic shockwaves of their creation. A recent report from Smithsonian Magazine jumps to the present, where an AI model just disproved a major math conjecture—leaving mathematicians unsettled by a system that solves problems without explaining how. Reading them back-to-back reveals a clear pattern. The dread of a new machine repeats itself, whether the labor is physical or purely intellectual.<br/><br/><em>The first piece leaves a lingering image of John and Mack Rust, two brothers who built a machine to do the impossible and then desperately tried to control the shockwave it would send through the cotton fields. They believed they could socially engineer the fallout of their own invention. Turning to the second piece, the historical echo is hard to ignore, even as the setting shifts from a 1930s farm to a modern artificial intelligence lab. Up next is a report on an AI model casually disproving a century-old math problem—the Jacobian conjecture—while millions watched a soccer match.
+
+What jumps out when reading these stories back-to-back is how the anxiety of automation repeats itself. The first piece centers on physical labor: a machine cleanly pulling cotton fibers from a boll. The second piece tackles cognitive labor: a machine pulling a counterexample out of pure mathematics. Notice how both pieces capture a specific kind of dread. For the Rust brothers, the fear was economic displacement. For today’s mathematicians, the displacement is existential. They face a machine that can solve a problem without explaining how it got the answer. Put together, the panic over automating the impossible looks less like a modern tech crisis and more like a permanent feature of human invention.</em><br/><br/>A metal spindle pulls cotton from a plant. Lines of code generate a mathematical proof. Both machines do exactly what they were designed to do. What lingers is the quiet panic that follows. The inventors of the mechanical picker could not halt the economic upheaval they set in motion, and mathematicians now stare at correct answers they cannot comprehend. When a machine works flawlessly but leaves people powerless to manage the fallout, is it still just a tool?<br/><br/>Sources:<br/><a href="https://asteriskmag.com/issues/15/rust-and-boll">Asterisk: Rust and Boll</a><br/><a href="https://www.smithsonianmag.com/smart-news/ai-disproves-a-decades-old-mathematical-idea-the-biggest-conjecture-that-the-tech-has-played-a-role-in-yet-180989189/">Smithsonian Magazine: A.I. Disproves a Decades-Old Mathematical Idea, the &#x27;Biggest Conjecture&#x27; That the Tech Has Played a Role in Yet</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>There is a strange echo between a machine pulling cotton from a plant and a computer finding a counterexample in pure math. When automation crosses into territory previously thought impossible, a familiar anxiety follows. An essay in Asterisk looks back at the socialist inventors of the mechanical cotton picker, who desperately tried to control the economic shockwaves of their creation. A recent report from Smithsonian Magazine jumps to the present, where an AI model just disproved a major math conjecture—leaving mathematicians unsettled by a system that solves problems without explaining how. Reading them back-to-back reveals a clear pattern. The dread of a new machine repeats itself, whether the labor is physical or purely intellectual.
+
+The first piece leaves a lingering image of John and Mack Rust, two brothers who built a machine to do the impossible and then desperately tried to control the shockwave it would send through the cotton fields. They believed they could socially engineer the fallout of their own invention. Turning to the second piece, the historical echo is hard to ignore, even as the setting shifts from a 1930s farm to a modern artificial intelligence lab. Up next is a report on an AI model casually disproving a century-old math problem—the Jacobian conjecture—while millions watched a soccer match.
+
+What jumps out when reading these stories back-to-back is how the anxiety of automation repeats itself. The first piece centers on physical labor: a machine cleanly pulling cotton fibers from a boll. The second piece tackles cognitive labor: a machine pulling a counterexample out of pure mathematics. Notice how both pieces capture a specific kind of dread. For the Rust brothers, the fear was economic displacement. For today’s mathematicians, the displacement is existential. They face a machine that can solve a problem without explaining how it got the answer. Put together, the panic over automating the impossible looks less like a modern tech crisis and more like a permanent feature of human invention.
+
+A metal spindle pulls cotton from a plant. Lines of code generate a mathematical proof. Both machines do exactly what they were designed to do. What lingers is the quiet panic that follows. The inventors of the mechanical picker could not halt the economic upheaval they set in motion, and mathematicians now stare at correct answers they cannot comprehend. When a machine works flawlessly but leaves people powerless to manage the fallout, is it still just a tool?
+
+Sources:
+Asterisk: Rust and Boll
+Smithsonian Magazine: A.I. Disproves a Decades-Old Mathematical Idea, the &#x27;Biggest Conjecture&#x27; That the Tech Has Played a Role in Yet
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 09:06:45 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-111</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/crosscut_0111.mp3" length="19017453" type="audio/mpeg"/>
+      <itunes:duration>39:37</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · automating the impossible</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Beware the Permanent Periphery</title>
+      <itunes:title>Beware the Permanent Periphery</itunes:title>
+      <link>https://asteriskmag.com/issues/15/beware-the-permanent-periphery</link>
+      <description><![CDATA[<em>If artificial intelligence reshapes the global economy, what happens to the countries that build none of it?</em><br/><br/>When tech hubs worry about artificial intelligence, the panic usually centers on displaced workers and a permanent underclass. But an essay published on 28 July 2026 shifts the camera from individuals to entire nations. For the 193 countries without their own top-tier AI labs, the temptation to build protectionist walls and opt out of the race is strong. Asterisk magazine looks at the hidden danger of that retreat. It asks what happens to countries that try to shield themselves from the disruption, and why their safest bet might actually be to lean into it.<br/><br/>An analysis of the economic threat to countries that do not build their own frontier AI models. The essay makes the case that middle powers risk falling into a permanent global periphery if they block foreign technology to build their own inferior systems. To avoid this, it outlines how nations can trade infrastructure for access to American AI and adapt their labor markets to stay competitive.<br/><br/>Read at source: <a href="https://asteriskmag.com/issues/15/beware-the-permanent-periphery">Asterisk</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If artificial intelligence reshapes the global economy, what happens to the countries that build none of it?</em><br/><br/>When tech hubs worry about artificial intelligence, the panic usually centers on displaced workers and a permanent underclass. But an essay published on 28 July 2026 shifts the camera from individuals to entire nations. For the 193 countries without their own top-tier AI labs, the temptation to build protectionist walls and opt out of the race is strong. Asterisk magazine looks at the hidden danger of that retreat. It asks what happens to countries that try to shield themselves from the disruption, and why their safest bet might actually be to lean into it.<br/><br/>An analysis of the economic threat to countries that do not build their own frontier AI models. The essay makes the case that middle powers risk falling into a permanent global periphery if they block foreign technology to build their own inferior systems. To avoid this, it outlines how nations can trade infrastructure for access to American AI and adapt their labor markets to stay competitive.<br/><br/>Read at source: <a href="https://asteriskmag.com/issues/15/beware-the-permanent-periphery">Asterisk</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If artificial intelligence reshapes the global economy, what happens to the countries that build none of it?
+
+When tech hubs worry about artificial intelligence, the panic usually centers on displaced workers and a permanent underclass. But an essay published on 28 July 2026 shifts the camera from individuals to entire nations. For the 193 countries without their own top-tier AI labs, the temptation to build protectionist walls and opt out of the race is strong. Asterisk magazine looks at the hidden danger of that retreat. It asks what happens to countries that try to shield themselves from the disruption, and why their safest bet might actually be to lean into it.
+
+An analysis of the economic threat to countries that do not build their own frontier AI models. The essay makes the case that middle powers risk falling into a permanent global periphery if they block foreign technology to build their own inferior systems. To avoid this, it outlines how nations can trade infrastructure for access to American AI and adapt their labor markets to stay competitive.
+
+Read at source: Asterisk
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-10555</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_10555.mp3" length="15233325" type="audio/mpeg"/>
+      <itunes:duration>31:44</itunes:duration>
+      <itunes:author>Asterisk</itunes:author>
+      <itunes:subtitle>Asterisk</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Mahasweta Devi at 100: Why her greatest legacy lies in the Adivasi movements she helped build</title>
+      <itunes:title>Mahasweta Devi at 100: Why her greatest legacy lies in the Adivasi movements she helped build</itunes:title>
+      <link>https://www.thehindu.com/society/mahasweta-devi-centenary-adivasi-legacy/article71220915.ece</link>
+      <description><![CDATA[<em>If a writer spends her life telling other people&#x27;s stories, what does she actually owe them?</em><br/><br/>Published on 17 July 2026, this piece from The Hindu looks past the towering literary reputation of Bengali writer Mahasweta Devi to examine a rarer kind of legacy. Devi did not simply observe marginalized communities from a distance to gather material for her novels. She fought their legal battles and pushed nomadic hunters to write their own histories. The story asks what happens when a celebrated author decides that putting words on a page is only the first step of the job.<br/><br/>A profile of Bengali writer Mahasweta Devi examines her grassroots activism alongside India&#x27;s Adivasi communities. The account details how she used her literary influence to fight for the legal rights of the Kheria Sabar tribe and encouraged marginalized people to publish their own stories. It traces her decades of work documenting state violence and directly challenging the bureaucracies responsible for it.<br/><br/>Read at source: <a href="https://www.thehindu.com/society/mahasweta-devi-centenary-adivasi-legacy/article71220915.ece">The Hindu</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a writer spends her life telling other people&#x27;s stories, what does she actually owe them?</em><br/><br/>Published on 17 July 2026, this piece from The Hindu looks past the towering literary reputation of Bengali writer Mahasweta Devi to examine a rarer kind of legacy. Devi did not simply observe marginalized communities from a distance to gather material for her novels. She fought their legal battles and pushed nomadic hunters to write their own histories. The story asks what happens when a celebrated author decides that putting words on a page is only the first step of the job.<br/><br/>A profile of Bengali writer Mahasweta Devi examines her grassroots activism alongside India&#x27;s Adivasi communities. The account details how she used her literary influence to fight for the legal rights of the Kheria Sabar tribe and encouraged marginalized people to publish their own stories. It traces her decades of work documenting state violence and directly challenging the bureaucracies responsible for it.<br/><br/>Read at source: <a href="https://www.thehindu.com/society/mahasweta-devi-centenary-adivasi-legacy/article71220915.ece">The Hindu</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a writer spends her life telling other people&#x27;s stories, what does she actually owe them?
+
+Published on 17 July 2026, this piece from The Hindu looks past the towering literary reputation of Bengali writer Mahasweta Devi to examine a rarer kind of legacy. Devi did not simply observe marginalized communities from a distance to gather material for her novels. She fought their legal battles and pushed nomadic hunters to write their own histories. The story asks what happens when a celebrated author decides that putting words on a page is only the first step of the job.
+
+A profile of Bengali writer Mahasweta Devi examines her grassroots activism alongside India&#x27;s Adivasi communities. The account details how she used her literary influence to fight for the legal rights of the Kheria Sabar tribe and encouraged marginalized people to publish their own stories. It traces her decades of work documenting state violence and directly challenging the bureaucracies responsible for it.
+
+Read at source: The Hindu
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-8458</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_8458.mp3" length="5986989" type="audio/mpeg"/>
+      <itunes:duration>12:28</itunes:duration>
+      <itunes:author>The Hindu</itunes:author>
+      <itunes:subtitle>The Hindu</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Psychology Research Is Mostly Fine</title>
+      <itunes:title>Psychology Research Is Mostly Fine</itunes:title>
+      <link>https://www.astralcodexten.com/p/psychology-research-is-mostly-fine</link>
+      <description><![CDATA[<em>If a handful of famous experiments fail, does that mean an entire science is broken?</em><br/><br/>For years, critics have used the replication crisis as a club to beat the field of psychology, writing it off as a broken discipline. But writing in Astral Codex Ten on 28 July 2026, the author notes that this dismissal ignores what psychologists actually do all day. The math simply does not add up between the tiny fraction of social experiments that fell apart and the thousands of researchers quietly measuring brain chemistry or treating addiction. The gap raises a simple question: why did a few flashy mistakes manage to sink an entire science?<br/><br/>An argument that the replication crisis in psychology is much smaller than the public believes. By breaking down the contents of a standard introductory textbook, the author shows that replication failures are mostly confined to a narrow slice of social psychology. The rest of the field, from clinical practice to cognitive research, continues to produce reliable science.<br/><br/>Read at source: <a href="https://www.astralcodexten.com/p/psychology-research-is-mostly-fine">Astral Codex Ten</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a handful of famous experiments fail, does that mean an entire science is broken?</em><br/><br/>For years, critics have used the replication crisis as a club to beat the field of psychology, writing it off as a broken discipline. But writing in Astral Codex Ten on 28 July 2026, the author notes that this dismissal ignores what psychologists actually do all day. The math simply does not add up between the tiny fraction of social experiments that fell apart and the thousands of researchers quietly measuring brain chemistry or treating addiction. The gap raises a simple question: why did a few flashy mistakes manage to sink an entire science?<br/><br/>An argument that the replication crisis in psychology is much smaller than the public believes. By breaking down the contents of a standard introductory textbook, the author shows that replication failures are mostly confined to a narrow slice of social psychology. The rest of the field, from clinical practice to cognitive research, continues to produce reliable science.<br/><br/>Read at source: <a href="https://www.astralcodexten.com/p/psychology-research-is-mostly-fine">Astral Codex Ten</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a handful of famous experiments fail, does that mean an entire science is broken?
+
+For years, critics have used the replication crisis as a club to beat the field of psychology, writing it off as a broken discipline. But writing in Astral Codex Ten on 28 July 2026, the author notes that this dismissal ignores what psychologists actually do all day. The math simply does not add up between the tiny fraction of social experiments that fell apart and the thousands of researchers quietly measuring brain chemistry or treating addiction. The gap raises a simple question: why did a few flashy mistakes manage to sink an entire science?
+
+An argument that the replication crisis in psychology is much smaller than the public believes. By breaking down the contents of a standard introductory textbook, the author shows that replication failures are mostly confined to a narrow slice of social psychology. The rest of the field, from clinical practice to cognitive research, continues to produce reliable science.
+
+Read at source: Astral Codex Ten
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-10574</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_10574.mp3" length="3702381" type="audio/mpeg"/>
+      <itunes:duration>07:43</itunes:duration>
+      <itunes:author>Scott Alexander</itunes:author>
+      <itunes:subtitle>Astral Codex Ten</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Opinion: Ebola outbreak response requires engaging with religious traditions and leaders</title>
+      <itunes:title>Opinion: Ebola outbreak response requires engaging with religious traditions and leaders</itunes:title>
+      <link>https://www.statnews.com/2026/06/12/ebola-response-drc-uganda-religion-burial-rites/?utm_campaign=rss</link>
+      <description><![CDATA[<em>When a disease spreads through funerals, who can convince people to change how they bury their dead?</em><br/><br/>When an Ebola outbreak hits a community, the immediate medical instinct is to ban traditional burials to stop the spread. But in this essay from 12 June 2026, researchers Olivia Wilkinson and Katherine Marshall explain why that approach usually backfires. Ebola is a virus that spreads through acts of care, meaning strict infection control directly collides with how people mourn their loved ones. The piece looks at the friction between global health and local faith, asking how doctors can stop a disease without forcing people to abandon their dead.<br/><br/>An argument for integrating religious and traditional leaders into public health responses during Ebola outbreaks. Using data from the 2014 West African epidemic, the authors show how unsafe burial rites drive transmission and why ignoring local customs causes community resistance. They detail specific steps for aid groups and health authorities to partner with faith leaders, adapt funeral traditions, and slow the spread of the disease.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/12/ebola-response-drc-uganda-religion-burial-rites/?utm_campaign=rss">STAT News</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When a disease spreads through funerals, who can convince people to change how they bury their dead?</em><br/><br/>When an Ebola outbreak hits a community, the immediate medical instinct is to ban traditional burials to stop the spread. But in this essay from 12 June 2026, researchers Olivia Wilkinson and Katherine Marshall explain why that approach usually backfires. Ebola is a virus that spreads through acts of care, meaning strict infection control directly collides with how people mourn their loved ones. The piece looks at the friction between global health and local faith, asking how doctors can stop a disease without forcing people to abandon their dead.<br/><br/>An argument for integrating religious and traditional leaders into public health responses during Ebola outbreaks. Using data from the 2014 West African epidemic, the authors show how unsafe burial rites drive transmission and why ignoring local customs causes community resistance. They detail specific steps for aid groups and health authorities to partner with faith leaders, adapt funeral traditions, and slow the spread of the disease.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/12/ebola-response-drc-uganda-religion-burial-rites/?utm_campaign=rss">STAT News</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When a disease spreads through funerals, who can convince people to change how they bury their dead?
+
+When an Ebola outbreak hits a community, the immediate medical instinct is to ban traditional burials to stop the spread. But in this essay from 12 June 2026, researchers Olivia Wilkinson and Katherine Marshall explain why that approach usually backfires. Ebola is a virus that spreads through acts of care, meaning strict infection control directly collides with how people mourn their loved ones. The piece looks at the friction between global health and local faith, asking how doctors can stop a disease without forcing people to abandon their dead.
+
+An argument for integrating religious and traditional leaders into public health responses during Ebola outbreaks. Using data from the 2014 West African epidemic, the authors show how unsafe burial rites drive transmission and why ignoring local customs causes community resistance. They detail specific steps for aid groups and health authorities to partner with faith leaders, adapt funeral traditions, and slow the spread of the disease.
+
+Read at source: STAT News
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-2479</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_2479.mp3" length="3293229" type="audio/mpeg"/>
+      <itunes:duration>06:52</itunes:duration>
+      <itunes:author>Olivia Wilkinson and Katherine Marshall</itunes:author>
+      <itunes:subtitle>STAT News</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Inside the quirky pub empire where phones and swearing are banned – and why landlords want to keep it that way</title>
+      <itunes:title>Inside the quirky pub empire where phones and swearing are banned – and why landlords want to keep it that way</itunes:title>
+      <link>https://www.independent.co.uk/news/uk/home-news/samuel-smith-pubs-humphrey-death-camra-b3007335.html</link>
+      <description><![CDATA[<em>Can you save the traditional pub just by banning phones, music, and swearing?</em><br/><br/>For decades, the Samuel Smith brewery ran its British pubs on a fiercely enforced code: no televisions, no music, no swearing, and absolutely no mobile phones. Following the recent death of the empire&#x27;s eccentric owner, the obvious question is whether these screen-free pubs will survive under new management. But in this piece from 4 July 2026, the real surprise comes from the bartenders and patrons. They are actively begging to keep the strict rules in place, just so they can sit and talk to one another.<br/><br/>An examination of the Samuel Smith pub empire and the strict rules enforced by its late chairman, Humphrey Smith. Interviews with current managers describe how absolute bans on mobile phones, music, and swearing maintain a traditional, conversation-focused environment. The reporting details the history of these policies and considers whether the brewery&#x27;s new leadership will keep them in place.<br/><br/>Read at source: <a href="https://www.independent.co.uk/news/uk/home-news/samuel-smith-pubs-humphrey-death-camra-b3007335.html">The Independent</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Can you save the traditional pub just by banning phones, music, and swearing?</em><br/><br/>For decades, the Samuel Smith brewery ran its British pubs on a fiercely enforced code: no televisions, no music, no swearing, and absolutely no mobile phones. Following the recent death of the empire&#x27;s eccentric owner, the obvious question is whether these screen-free pubs will survive under new management. But in this piece from 4 July 2026, the real surprise comes from the bartenders and patrons. They are actively begging to keep the strict rules in place, just so they can sit and talk to one another.<br/><br/>An examination of the Samuel Smith pub empire and the strict rules enforced by its late chairman, Humphrey Smith. Interviews with current managers describe how absolute bans on mobile phones, music, and swearing maintain a traditional, conversation-focused environment. The reporting details the history of these policies and considers whether the brewery&#x27;s new leadership will keep them in place.<br/><br/>Read at source: <a href="https://www.independent.co.uk/news/uk/home-news/samuel-smith-pubs-humphrey-death-camra-b3007335.html">The Independent</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Can you save the traditional pub just by banning phones, music, and swearing?
+
+For decades, the Samuel Smith brewery ran its British pubs on a fiercely enforced code: no televisions, no music, no swearing, and absolutely no mobile phones. Following the recent death of the empire&#x27;s eccentric owner, the obvious question is whether these screen-free pubs will survive under new management. But in this piece from 4 July 2026, the real surprise comes from the bartenders and patrons. They are actively begging to keep the strict rules in place, just so they can sit and talk to one another.
+
+An examination of the Samuel Smith pub empire and the strict rules enforced by its late chairman, Humphrey Smith. Interviews with current managers describe how absolute bans on mobile phones, music, and swearing maintain a traditional, conversation-focused environment. The reporting details the history of these policies and considers whether the brewery&#x27;s new leadership will keep them in place.
+
+Read at source: The Independent
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-6193</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_6193.mp3" length="4195245" type="audio/mpeg"/>
+      <itunes:duration>08:44</itunes:duration>
+      <itunes:author>Alex Ross</itunes:author>
+      <itunes:subtitle>The Independent</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>How Cycling Solved Sleep</title>
+      <itunes:title>How Cycling Solved Sleep</itunes:title>
+      <link>https://defector.com/how-cycling-solved-sleep</link>
+      <description><![CDATA[<em>If you can fine-tune every calorie you eat, why can&#x27;t you cheat a good night&#x27;s sleep?</em><br/><br/>To survive the Tour de France, a cyclist has to ride at a grueling pace for nearly a month straight. Recovery is everything. In a piece published on 14 July 2026, Defector follows the extreme lengths elite teams go to for a good night&#x27;s sleep. Beyond the custom pillows and high-tech mattress toppers, the story asks a grounded question about the modern obsession with biohacking. What if the ultimate performance edge isn&#x27;t a magic pill or a secret injection, but simply taking basic rest seriously?<br/><br/>An account of how one professional cycling team manages sleep during the Tour de France, where riders change hotels almost every night for a month. Based on interviews with a team doctor and support staff, the reporting details the daily work of moving custom mattresses, controlling room temperatures, and enforcing strict evening schedules. It uses these extreme athletic measures to argue that the basic rules for physical recovery cannot be bypassed with modern shortcuts.<br/><br/>Read at source: <a href="https://defector.com/how-cycling-solved-sleep">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If you can fine-tune every calorie you eat, why can&#x27;t you cheat a good night&#x27;s sleep?</em><br/><br/>To survive the Tour de France, a cyclist has to ride at a grueling pace for nearly a month straight. Recovery is everything. In a piece published on 14 July 2026, Defector follows the extreme lengths elite teams go to for a good night&#x27;s sleep. Beyond the custom pillows and high-tech mattress toppers, the story asks a grounded question about the modern obsession with biohacking. What if the ultimate performance edge isn&#x27;t a magic pill or a secret injection, but simply taking basic rest seriously?<br/><br/>An account of how one professional cycling team manages sleep during the Tour de France, where riders change hotels almost every night for a month. Based on interviews with a team doctor and support staff, the reporting details the daily work of moving custom mattresses, controlling room temperatures, and enforcing strict evening schedules. It uses these extreme athletic measures to argue that the basic rules for physical recovery cannot be bypassed with modern shortcuts.<br/><br/>Read at source: <a href="https://defector.com/how-cycling-solved-sleep">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If you can fine-tune every calorie you eat, why can&#x27;t you cheat a good night&#x27;s sleep?
+
+To survive the Tour de France, a cyclist has to ride at a grueling pace for nearly a month straight. Recovery is everything. In a piece published on 14 July 2026, Defector follows the extreme lengths elite teams go to for a good night&#x27;s sleep. Beyond the custom pillows and high-tech mattress toppers, the story asks a grounded question about the modern obsession with biohacking. What if the ultimate performance edge isn&#x27;t a magic pill or a secret injection, but simply taking basic rest seriously?
+
+An account of how one professional cycling team manages sleep during the Tour de France, where riders change hotels almost every night for a month. Based on interviews with a team doctor and support staff, the reporting details the daily work of moving custom mattresses, controlling room temperatures, and enforcing strict evening schedules. It uses these extreme athletic measures to argue that the basic rules for physical recovery cannot be bypassed with modern shortcuts.
+
+Read at source: Defector
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 29 Jul 2026 07:57:55 +0000</pubDate>
+      <guid isPermaLink="false">aarva-110-8154</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-07-29/article_8154.mp3" length="5626605" type="audio/mpeg"/>
+      <itunes:duration>11:43</itunes:duration>
+      <itunes:author>Patrick Redford</itunes:author>
+      <itunes:subtitle>Defector</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: womens health gaps</title>
       <itunes:title>Crosscut: womens health gaps</itunes:title>
