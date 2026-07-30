@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Thursday, 30 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-30</div>
+      <div class="edition-meta">7 pieces · Thursday, 30 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">How much of a life goes unlived when a mind is always in two places at once?</p>
+        <h2 class="title">Attention Is a Form of Love</h2>
+        <p class="byline">
+          <span class="publication">Comment Magazine</span>
+          <span class='sep'>·</span><span>Attila Rebak</span>
+        </p>
+        <p class="contextualisation">A father sits in a school gymnasium, clapping when the other parents clap, while secretly tracking the stock market on his phone. Published on 30 July 2026, the essay pauses on the gap between showing up and actually being there. The writer observes how the divided attention that ensures survival at work easily follows a person home. The result is a sharp look at what it costs to live with a split mind, and why giving someone complete focus is the only real currency of love.</p>
+        <p class='show-notes'>A reflection on the difference between physical presence and actual attention, centered on a former investment officer&#x27;s memory of watching a stock ticker during his daughter&#x27;s school play. The author describes how the professional habit of divided focus follows workers home, leaving them physically present but mentally absent. Concludes that giving someone our undivided mind is how we actually experience love and form memories.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_10894.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://comment.org/attention-is-a-form-of-love/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">How does a doctor learn to second-guess a machine that is almost always right?</p>
+        <h2 class="title">How A.I. Will Reshape Radiology—Without Replacing Radiologists</h2>
+        <p class="byline">
+          <span class="publication">Smithsonian Magazine</span>
+          
+        </p>
+        <p class="contextualisation">Ten years ago, tech forecasters predicted computers would soon replace the doctors who read medical scans. Instead, the profession is growing. Published on 29 July 2026, this Smithsonian Magazine story visits hospitals that now share their reading rooms with algorithms. These silicon colleagues can process millions of pixels without ever blinking, moving the tension away from a simple contest of man versus machine. The medical field is now facing a much stranger problem: how a human doctor learns to collaborate with a computer that rarely makes mistakes, but occasionally fails in entirely alien ways.</p>
+        <p class='show-notes'>An overview of how artificial intelligence is changing radiology, focusing on the practical challenges of pairing physicians with medical algorithms. It details the psychological hurdles of this integration, including automation bias and the difficulty of evaluating neural networks. Overcoming these biases requires new training methods that combine machine precision with human experience.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_10769.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>11 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.smithsonianmag.com/innovation/how-ai-will-reshape-radiologywithout-replacing-radiologists-180989220/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">If the canyon itself was part of the medicine, what gets left behind in a clinical trial?</p>
+        <h2 class="title">What ancient art tells us about modern psychedelic medicine</h2>
+        <p class="byline">
+          <span class="publication">Psyche</span>
+          <span class='sep'>·</span><span>William McCarthy</span>
+        </p>
+        <p class="contextualisation">Pharmaceutical companies are rushing to turn magic mushrooms and peyote into clinical treatments for depression. But in an essay published on 21 July 2026, Psyche asks what happens when a substance is stripped of its history. The author uses ancient rock murals in Texas to show how early humans tied these plants directly to the natural world. That history sets up a stubborn medical question. If the ceremony and the community were always part of the cure, can an isolated chemical in a sterile hospital room actually do the same job?</p>
+        <p class='show-notes'>An account of 4,000-year-old rock murals in West Texas and their record of early psychedelic rituals. Contrasting these ancient peyote ceremonies with modern clinical trials for psilocybin, the author outlines how contemporary psychiatry strips these substances of their environmental and social context. Reducing psychedelics to isolated chemical agents ignores their original function as tools for connecting patients to their communities and the natural world.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_9263.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://psyche.co/ideas/what-ancient-art-tells-us-about-modern-psychedelic-medicine' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">Who on the Supreme Court actually wants to end birthright citizenship?</p>
+        <h2 class="title">Counting the Votes in the Supreme Court’s Birthright Citizenship Decision</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>Marty Lederman</span>
+        </p>
+        <p class="contextualisation">Lawmakers are rushing to draft bills that would strip citizenship from babies born in American hospitals to undocumented mothers. They are betting a conservative Supreme Court will back them up. But an essay published on 24 July 2026 pauses to actually count the votes. The political cheering assumes a clear ideological split on the bench. A close reading of the dissenting opinions reveals whether the legal foundation to end birthright citizenship actually exists at all.</p>
+        <p class='show-notes'>A legal breakdown of the dissenting opinions in the Supreme Court’s recent birthright citizenship case, Trump v. Barbara. By tracking how the four dissenting justices define terms like jurisdiction and domicile, the analysis tests the popular claim that the Court is ready to end birthright citizenship. The resulting vote count shows why a clear majority of justices would reject new legislation designed to deny citizenship to the children of undocumented immigrants.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_9903.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>69 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/148991/counting-votes-supreme-court-birthright-citizenship-decision/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=counting-votes-supreme-court-birthright-citizenship-decision' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+
+      <article class="piece">
+        <p class="hook">When a country gets too rich for foreign aid, who pays for its medicine?</p>
+        <h2 class="title">The Middle-Income Health Trap</h2>
+        <p class="byline">
+          <span class="publication">Project Syndicate</span>
+          <span class='sep'>·</span><span>Tom Achoki</span>
+        </p>
+        <p class="contextualisation">When a nation crosses the World Bank’s wealth threshold, the international community celebrates. But this piece from 29 July 2026 points out the quiet disaster that follows the applause. As soon as a country is labeled middle-income, global health aid dries up. The problem is that diseases do not care about gross domestic product. Tom Achoki and Walter O. Ochieng ask what happens when international donors pack up and leave. They find newly promoted countries trapped in a dangerous gap: suddenly too rich to qualify for charity, but still too poor to keep their citizens healthy.</p>
+        <p class='show-notes'>An analysis of the funding gap that opens when developing nations cross the economic threshold from low- to middle-income status. These countries lose access to foreign aid and cheap loans before they can collect enough taxes to fund their own public health systems, leaving them with rising debt and failing medical services. The authors detail how this transition stalls progress and propose new donor rules based on actual disease burdens rather than per-capita income.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_10795.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.project-syndicate.org/commentary/middle-income-health-trap-too-rich-for-aid-still-too-poor-to-support-public-health-by-tom-achoki-and-walter-o-ochieng-2026-07' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">What happens when real outrage becomes just another part of the game?</p>
+        <h2 class="title">Is football still capable of scandal?</h2>
+        <p class="byline">
+          <span class="publication">Africa Is a Country</span>
+          <span class='sep'>·</span><span>Lee Nxumalo</span>
+        </p>
+        <p class="contextualisation">In a piece published on 29 July 2026, Africa Is a Country tracks a familiar cycle in modern football. Fans regularly express intense anger over criminal charges and corruption surrounding star players. Yet the moment the referee blows the whistle, that anger vanishes into tactical debates and cheers. The central question is what this predictable routine actually accomplishes. Public outrage, the writer suggests, rarely functions as a demand for justice. The anger itself has simply become part of the entertainment—a way for spectators to feel moral without having to turn off the screen.</p>
+        <p class='show-notes'>An analysis of how professional football absorbs scandal, focusing on sexual assault allegations against active players. The author explains why fans and institutions treat these crimes as temporary spectacles, routinely setting aside their moral outrage to protect their enjoyment of the game. The argument concludes by outlining ways to demand accountability without relying on sports federations or the courts.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_10789.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://africasacountry.com/2026/07/is-football-still-capable-of-scandal' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">If a man lies about his entire life, what makes his stories feel so true?</p>
+        <h2 class="title">Read the Novels and Forget Everything Else</h2>
+        <p class="byline">
+          <span class="publication">The Hedgehog Review</span>
+          <span class='sep'>·</span><span>Tim Lake</span>
+        </p>
+        <p class="contextualisation">Millions of readers know Patrick O&#x27;Brian as the genius behind the Aubrey-Maturin naval novels—a writer who brought wooden warships and deep friendships to life. Far fewer know that he spent decades faking his own biography, abandoning his family to invent a more glamorous past. Published on 29 July 2026, the essay sits with the strange tension between the man and his work. It asks how an author so entirely disconnected from his own truth could build a fictional world that feels so real.</p>
+        <p class='show-notes'>A critical profile of the Aubrey-Maturin author Patrick O&#x27;Brian, whose fabricated personal history and guarded personality shaped his literary style. The assessment traces his inability to write characters&#x27; inner emotional lives, contrasting this deficit with his command of dialogue, humor, and physical description. It positions him not as a psychological novelist, but as an outward-facing storyteller.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-07-30/article_10776.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>17 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://hedgehogreview.com/web-features/thr/posts/read-the-novels-and-forget-everything-else' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
