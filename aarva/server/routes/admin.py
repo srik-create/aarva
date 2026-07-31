@@ -54,6 +54,7 @@ from pathlib import Path
 import httpx
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from aarva.output.rss_feed import (
     _aarva_app_reference_html,
@@ -266,6 +267,38 @@ async def admin_sync_db(request: Request) -> JSONResponse:
 
     client, bucket = _build_r2_client(request.app.state.pipeline_cfg)
 
+    # Everything from here down is synchronous, blocking work (a boto3
+    # network fetch, gzip decompress, a ~150MB disk write, a sqlite
+    # open+query, an atomic rename) — running it inline on the event
+    # loop starves /health long enough for Render's 5s health-check
+    # timeout to restart the instance mid-sync (verified 2026-07-31,
+    # see docs/roadmap.md). run_in_threadpool bounces it off the event
+    # loop, same pattern already used in aarva/server/routes/create.py
+    # for propose_candidates/find_near_miss. HTTPException raised
+    # inside propagates through normally — it's just an exception, no
+    # special handling needed across the thread boundary.
+    result = await run_in_threadpool(
+        _fetch_decompress_validate_and_replace, client, bucket, r2_key,
+    )
+
+    return JSONResponse({
+        "status": "ok",
+        "articles": result["article_count"],
+        "bytes": result["compressed_bytes"],
+        "lost_episodes_found": lost_episodes,
+    })
+
+
+def _fetch_decompress_validate_and_replace(client, bucket: str, r2_key: str) -> dict:
+    """R2 fetch, decompress, stage, validate, atomic-replace the live DB.
+
+    Split out of admin_sync_db so it can run via run_in_threadpool —
+    see the comment at that call site. Otherwise unchanged from the
+    original inline version, except one incidental fix: the
+    sqlite3.OperationalError/DatabaseError except clauses were
+    reordered (OperationalError is a subclass of DatabaseError, so the
+    "missing expected schema" branch was dead code — found via
+    testing, the status code was already correct either way)."""
     # Fetch object from R2.
     try:
         obj = client.get_object(Bucket=bucket, Key=r2_key)
@@ -313,13 +346,19 @@ async def admin_sync_db(request: Request) -> JSONResponse:
                     "SELECT COUNT(*) FROM articles"
                 ).fetchone()
             article_count = int(row[0])
-        except sqlite3.DatabaseError as e:
-            raise HTTPException(status_code=403, detail=f"not a SQLite DB: {e}")
         except sqlite3.OperationalError as e:
+            # Checked before DatabaseError: OperationalError is a
+            # subclass of it, so the broader clause would otherwise
+            # always win and this branch (e.g. "no such table:
+            # articles") would be unreachable — found via testing
+            # 2026-07-31, pre-existing, status code was still correct
+            # either way (403), only the detail message was wrong.
             raise HTTPException(
                 status_code=403,
                 detail=f"staged DB missing expected schema: {e}",
             )
+        except sqlite3.DatabaseError as e:
+            raise HTTPException(status_code=403, detail=f"not a SQLite DB: {e}")
 
         if article_count <= 0:
             raise HTTPException(
@@ -338,12 +377,7 @@ async def admin_sync_db(request: Request) -> JSONResponse:
             article_count, len(compressed), len(decompressed), r2_key,
         )
 
-        return JSONResponse({
-            "status": "ok",
-            "articles": article_count,
-            "bytes": len(compressed),
-            "lost_episodes_found": lost_episodes,
-        })
+        return {"article_count": article_count, "compressed_bytes": len(compressed)}
     except HTTPException:
         if staging.exists():
             staging.unlink(missing_ok=True)
@@ -673,8 +707,13 @@ async def admin_episode_metadata(request: Request) -> JSONResponse:
 
     package_root = pipeline_cfg.rss_feed_path.resolve().parent.parent
     audio_url_base = _resolve_audio_url_base(pipeline_cfg)
-    byte_length = _stat_or_head_byte_length(
-        cc["audio_url"], package_root, audio_url_base,
+    # For R2-only (older) episodes this falls back to a synchronous
+    # httpx HEAD with a 10s timeout — genuinely capable of blocking the
+    # event loop, unlike the local-disk stat() fast path. Bounced to
+    # the threadpool for both cases; the stat() path is cheap enough
+    # there too.
+    byte_length = await run_in_threadpool(
+        _stat_or_head_byte_length, cc["audio_url"], package_root, audio_url_base,
     )
     if byte_length == 0:
         logger.warning(
