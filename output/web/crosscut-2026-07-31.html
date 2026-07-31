@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Friday, 31 July 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-07-31</div>
+      <div class="edition-meta">2 pieces · Crosscut · Friday, 31 July 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · india student protests</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-07-31/crosscut_0115.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>22 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When angry students force an Indian cabinet minister to resign, it looks like a clear democratic victory. Writing this week, Deepanshu Mohan and Sonakshi Garg trace how these young people bypassed traditional politics entirely to win high-level concessions. But drop down to the street level in Mumbai, and a quieter story emerges. A week earlier, Tabassum Barnagarwala reported on local police knocking on students&#x27; doors, using GPS tracking and silent intimidation to keep them from marching at all. Placing these two reports side by side reveals a striking split screen. Loud political victories are playing out on the national stage, even as local authorities quietly deploy modern surveillance to ensure those crowds never form in the first place.</p>
+        <article class='piece'>
+<p class='hook'>In a report published last week, Tabassum Barnagarwala tracks how Mumbai police are quietly shutting down student protests. Listen for the highly personal tactics used against teenagers like Preeti Kamble. Officers aren&#x27;t just clearing crowds from public parks. They are knocking on family doors and sending legal threats over WhatsApp. They even demand that young people share their live GPS locations to prove they are staying home.</p>
+<h2 class='title'>How Mumbai Police is using surveillance to stop youth from protesting</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Tabassum Barnagarwala</span></p>
+<p class='source'><a href='https://scroll.in/article/1094460/how-mumbai-police-is-using-surveillance-to-stop-youth-from-protesting?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading Tabassum Barnagarwala, what sticks with you is the quiet, localized pressure. A teenager like Preeti Kamble gets a knock on the door from police just for intending to protest. The state&#x27;s response looks like a series of small, invisible intimidations—WhatsApp notices and GPS tracking meant to keep individuals off the streets. 
+
+But turn to Deepanshu Mohan and Sonakshi Garg, up next, and you see the exact same protests from a completely different altitude. Where Barnagarwala focuses on the students the police managed to stop, Mohan and Garg look at the sheer digital mass of the ones they couldn&#x27;t. 
+
+Read together, the two pieces reveal a striking split screen. Mohan and Garg detail how this movement successfully forced the national education minister to resign, bypassing traditional parliament entirely through viral outrage. Yet Barnagarwala’s reporting adds a darker shadow to that victory. The national government might be making high-level political concessions to angry students in public, but down on the ground, local police are still quietly deploying surveillance to keep those same students in check. The success Mohan and Garg point to is real, but Barnagarwala shows exactly what kind of friction it had to overcome.</p>
+        <article class='piece'>
+
+<h2 class='title'>When India’s Youth Tested the Limits of Centralized Governance</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Deepanshu Mohan and Sonakshi Garg</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/07/when-indias-youth-tested-the-limits-of-centralized-governance/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A cabinet minister resigns under pressure, but back in Mumbai, a student watches a police officer log their GPS coordinates. What lingers is the quiet, personal cost of a loud public victory. The split screen reveals a political system willing to hand over high-level concessions while quietly tightening the screws in private. It leaves behind a deeply practical question for anyone trying to force change. When a movement captures the national headline, yet its organizers can no longer walk freely down their own local streets, where does the real power actually sit?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
