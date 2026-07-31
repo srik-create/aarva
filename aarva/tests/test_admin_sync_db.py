@@ -51,11 +51,22 @@ class _FakeRequest:
 
 
 class _FakeR2Body:
+    """Mimics boto3's StreamingBody: read(amt) returns up to `amt`
+    bytes and advances a cursor, matching the real chunked-read
+    interface _fetch_decompress_validate_and_replace now uses (rather
+    than a single all-at-once read())."""
+
     def __init__(self, data: bytes):
         self._data = data
+        self._pos = 0
 
-    def read(self):
-        return self._data
+    def read(self, amt=None):
+        if amt is None:
+            chunk, self._pos = self._data[self._pos:], len(self._data)
+        else:
+            chunk = self._data[self._pos:self._pos + amt]
+            self._pos += len(chunk)
+        return chunk
 
 
 class _FakeR2Client:
@@ -339,5 +350,66 @@ class TestAdminSyncDbSuccess:
             assert conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0] == 7
 
         # No leftover staging file next to the live DB.
+        leftovers = list(sync_env.db_path.parent.glob("aarva-db-staging-*"))
+        assert leftovers == []
+
+    def test_streaming_reassembles_correctly_across_many_small_chunks(
+        self, sync_env, monkeypatch,
+    ):
+        """Force a tiny chunk size so a normal-sized DB is read across
+        dozens of chunks (rather than fitting in the first read) —
+        confirms the streaming decompressor correctly reassembles data
+        split across arbitrary chunk boundaries, not just in the
+        lucky one-chunk case every other test exercises."""
+        from aarva.server.routes import admin
+        from aarva.server.routes.admin import admin_sync_db
+
+        monkeypatch.setattr(admin, "_STREAM_CHUNK_BYTES", 37)  # deliberately awkward size
+
+        compressed = gzip.compress(_make_db_bytes(23, padding_rows=200))
+        assert len(compressed) > 37 * 20  # sanity: this really forces >20 chunks
+        _patch_r2_client(monkeypatch, _FakeR2Client(compressed))
+        req = _FakeRequest(
+            {"Authorization": "Bearer test-token"}, sync_env.app_state,
+            json_body={"r2_key": "x.gz"},
+        )
+        resp = _call(admin_sync_db(req))
+        body = json.loads(resp.body)
+        assert body["status"] == "ok"
+        assert body["articles"] == 23
+        assert body["bytes"] == len(compressed)
+
+        with sqlite3.connect(str(sync_env.db_path)) as conn:
+            assert conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0] == 23
+
+    def test_oversized_payload_detected_mid_stream_is_413(self, sync_env, monkeypatch):
+        """Content-Length can be absent or wrong — the running total
+        during the streaming loop is the defensive backstop. Force a
+        tiny chunk size and a low cap so this triggers well before the
+        whole body would've been read."""
+        from fastapi import HTTPException
+        from aarva.server.routes import admin
+        from aarva.server.routes.admin import admin_sync_db
+
+        monkeypatch.setattr(admin, "_STREAM_CHUNK_BYTES", 37)
+        monkeypatch.setattr(admin, "_MAX_PAYLOAD_BYTES", 500)
+
+        compressed = gzip.compress(_make_db_bytes(23, padding_rows=200))
+        assert len(compressed) > 500  # sanity: really exceeds the lowered cap
+        # No content_length_override — simulates a missing/absent
+        # Content-Length header, so the early ContentLength check
+        # can't catch this; only the streaming running-total can.
+        client = _FakeR2Client(compressed, content_length_override=0)
+        _patch_r2_client(monkeypatch, client)
+        req = _FakeRequest(
+            {"Authorization": "Bearer test-token"}, sync_env.app_state,
+            json_body={"r2_key": "x.gz"},
+        )
+        with pytest.raises(HTTPException) as exc:
+            _call(admin_sync_db(req))
+        assert exc.value.status_code == 413
+
+        # Must not have written a full staging file that then got
+        # left behind — cleanup on the early-abort path.
         leftovers = list(sync_env.db_path.parent.glob("aarva-db-staging-*"))
         assert leftovers == []

@@ -181,10 +181,52 @@ Most recent first.
     on-disk SQLite DBs, confirming the extraction didn't change any
     error-code contract. All 53 repo tests pass (40 pre-existing + 13
     new).
-  - Real Render-deploy confirmation (no restart events, successful
-    `scripts/sync_db_to_render.sh` run) still pending the user's
-    on-device retest after merge, per the hand-off's own verification
-    plan.
+  - **Same-day follow-up: fixing the blocking issue exposed a real,
+    separate OOM.** The user retested on Render post-merge and the
+    instance restarted again — this time an explicit "Ran out of
+    memory (used over 512MB)" event, not a health-check timeout. Root
+    cause: the previous fix correctly stopped the event loop from
+    blocking, but that meant the sync could now run far enough to
+    actually hit a pre-existing memory ceiling the old bug had always
+    prevented it from reaching. `_fetch_decompress_validate_and_replace`
+    read the entire compressed R2 object into memory
+    (`obj["Body"].read()`, ~73MB), then decompressed the entire thing
+    into a second in-memory buffer (`gzip.decompress(...)`, ~148MB) —
+    holding both simultaneously plus write/validation overhead.
+    Measured directly (subprocess, `resource.getrusage().ru_maxrss`,
+    against the real ~148MB main DB): peak RSS hit **507.5MB** — right
+    at the Starter plan's 512MB ceiling — with 370.3MB of that
+    attributable to the sync call alone. Cowork's original "OOM ruled
+    out" finding was accurate for what it measured (Memory never
+    exceeded ~22% during the health-check-timeout failures), but that
+    was because the sync never got far enough to use much memory
+    before being killed — a different failure mode masking this one.
+  - **Fix**: replaced the buffer-everything approach with true
+    streaming — `zlib.decompressobj(zlib.MAX_WBITS | 16)` (the
+    streaming equivalent of `gzip.decompress()`) fed 1MB chunks read
+    directly from R2's `StreamingBody`, writing decompressed chunks
+    straight to the staging file. Neither the full compressed nor full
+    decompressed payload is ever held in memory at once, regardless of
+    DB size. Bonus: the size-cap check now runs on a running total
+    during the stream, so a runaway/oversized response is caught
+    before it's fully downloaded, not after (previously the whole body
+    was read before the cap was checked).
+  - **Verified for real**: re-ran the same subprocess memory
+    measurement against the identical real ~148MB DB — peak RSS
+    dropped from 507.5MB to **163.4MB** (delta attributable to the
+    sync call: 27.1MB, down from 370.3MB — about a 14x reduction),
+    with identical correctness (same article count, same byte counts).
+    Added 2 new tests: one forcing a deliberately awkward 37-byte
+    chunk size against a real ~20+-chunk DB to confirm the streaming
+    decompressor reassembles data correctly across arbitrary chunk
+    boundaries (not just the lucky single-chunk case), and one
+    confirming the mid-stream size-cap abort (simulating a missing/
+    wrong Content-Length header) leaves no leftover staging file. All
+    15 sync-db tests and all 55 repo tests pass.
+  - Real Render-deploy confirmation (no restart events — neither
+    health-check nor OOM — on a real `scripts/sync_db_to_render.sh`
+    run) still pending the user's on-device retest after this second
+    merge.
 
 ### 2026-07-29
 

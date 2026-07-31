@@ -40,7 +40,6 @@ Security model — kept intentionally minimal:
 """
 from __future__ import annotations
 
-import gzip
 import hmac
 import json
 import logging
@@ -48,6 +47,7 @@ import os
 import re
 import sqlite3
 import tempfile
+import zlib
 from datetime import date
 from pathlib import Path
 
@@ -289,33 +289,42 @@ async def admin_sync_db(request: Request) -> JSONResponse:
     })
 
 
+_STREAM_CHUNK_BYTES = 1024 * 1024  # 1 MB
+
+
 def _fetch_decompress_validate_and_replace(client, bucket: str, r2_key: str) -> dict:
     """R2 fetch, decompress, stage, validate, atomic-replace the live DB.
 
     Split out of admin_sync_db so it can run via run_in_threadpool —
     see the comment at that call site. Otherwise unchanged from the
-    original inline version, except one incidental fix: the
+    original inline version, except: (a) one incidental fix — the
     sqlite3.OperationalError/DatabaseError except clauses were
     reordered (OperationalError is a subclass of DatabaseError, so the
     "missing expected schema" branch was dead code — found via
-    testing, the status code was already correct either way)."""
-    # Fetch object from R2.
+    testing, the status code was already correct either way); (b) the
+    fetch+decompress is now streamed in 1MB chunks straight to the
+    staging file instead of buffering the whole compressed AND whole
+    decompressed payload in memory at once. Measured 2026-07-31: the
+    old buffer-everything version peaked at ~370MB of RSS for the real
+    ~150MB DB (73MB compressed + 148MB decompressed + overhead, held
+    simultaneously) — comfortably OOMing Render's Starter 512MB once
+    the earlier event-loop-blocking bug (which killed the instance via
+    health-check timeout before memory could climb this high) was
+    fixed and the sync could actually run to completion. See
+    docs/roadmap.md for the measurement."""
+    # Fetch object from R2 — get_object() itself doesn't transfer the
+    # body; obj["Body"] is a boto3 StreamingBody, read in chunks below.
     try:
         obj = client.get_object(Bucket=bucket, Key=r2_key)
         size = int(obj.get("ContentLength") or 0)
         if size and size > _MAX_PAYLOAD_BYTES:
             raise HTTPException(status_code=413, detail=f"object too large: {size} bytes")
-        compressed = obj["Body"].read()
+        body_stream = obj["Body"]
     except HTTPException:
         raise
     except Exception as e:
         logger.warning("R2 fetch failed key=%s: %s", r2_key, e)
         raise HTTPException(status_code=502, detail=f"R2 fetch failed: {e}")
-
-    if len(compressed) > _MAX_PAYLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="payload too large")
-    if len(compressed) < 1024:
-        raise HTTPException(status_code=403, detail="payload too small")
 
     # Decompress to a staging path next to the live DB so the eventual
     # atomic mv stays on the same filesystem.
@@ -330,12 +339,39 @@ def _fetch_decompress_validate_and_replace(client, bucket: str, r2_key: str) -> 
     staging = Path(staging_str)
 
     try:
+        # zlib.decompressobj with the gzip-header wbits (MAX_WBITS|16)
+        # is the streaming equivalent of gzip.decompress() — feed it
+        # compressed chunks, get decompressed chunks back, without
+        # ever holding the full compressed or decompressed blob in
+        # memory. Bail as soon as the running compressed total exceeds
+        # the cap, rather than reading a runaway response to the end
+        # first (a defensive improvement over the old code, which only
+        # checked size after the entire body had already been read).
+        decompressor = zlib.decompressobj(zlib.MAX_WBITS | 16)
+        compressed_total = 0
+        decompressed_total = 0
         try:
-            decompressed = gzip.decompress(compressed)
-        except (OSError, EOFError) as e:
+            with open(staging, "wb") as out:
+                while True:
+                    chunk = body_stream.read(_STREAM_CHUNK_BYTES)
+                    if not chunk:
+                        break
+                    compressed_total += len(chunk)
+                    if compressed_total > _MAX_PAYLOAD_BYTES:
+                        raise HTTPException(status_code=413, detail="payload too large")
+                    decompressed_chunk = decompressor.decompress(chunk)
+                    decompressed_total += len(decompressed_chunk)
+                    out.write(decompressed_chunk)
+                tail = decompressor.flush()
+                decompressed_total += len(tail)
+                out.write(tail)
+        except HTTPException:
+            raise
+        except (zlib.error, OSError, EOFError) as e:
             raise HTTPException(status_code=403, detail=f"gunzip failed: {e}")
 
-        staging.write_bytes(decompressed)
+        if compressed_total < 1024:
+            raise HTTPException(status_code=403, detail="payload too small")
 
         # Sanity-check the staged DB: it has to (a) open, (b) have an
         # `articles` table, (c) report a plausible article count. If
@@ -374,10 +410,10 @@ def _fetch_decompress_validate_and_replace(client, bucket: str, r2_key: str) -> 
         os.replace(str(staging), str(db_path))
         logger.info(
             "DB sync ok — %d articles, %d bytes (gzipped), %d bytes (raw), key=%s",
-            article_count, len(compressed), len(decompressed), r2_key,
+            article_count, compressed_total, decompressed_total, r2_key,
         )
 
-        return {"article_count": article_count, "compressed_bytes": len(compressed)}
+        return {"article_count": article_count, "compressed_bytes": compressed_total}
     except HTTPException:
         if staging.exists():
             staging.unlink(missing_ok=True)
