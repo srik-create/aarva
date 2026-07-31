@@ -115,9 +115,76 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-29)
+## Recently completed (2026-06-29 → 2026-07-31)
 
 Most recent first.
+
+### 2026-07-31
+
+- **`/admin/sync-db` blocking the event loop, restarting the Render
+  instance mid-sync — fixed.** Cowork diagnosed (hand-off, no spec
+  doc, direct fix per AGENTS.md rule 20a): `bash
+  scripts/sync_db_to_render.sh` was triggering a Render instance
+  restart mid-request — verified via a live daily run where 3
+  consecutive sync attempts each restarted the instance and the sync
+  never completed. Root cause: `admin_sync_db`
+  (`aarva/server/routes/admin.py`) is `async def` but its body ran the
+  R2 fetch, gzip decompress, ~150MB disk write, sqlite validation, and
+  atomic replace entirely synchronously on FastAPI's event loop — long
+  enough on Render's Starter 0.5 CPU to starve `/health` past Render's
+  5s health-check timeout, triggering a restart after 60s of
+  consecutive failures (OOM ruled out — Memory metric never exceeded
+  ~22% of 512MB).
+  - **Took the hand-off's diagnosis but not its exact fix, per the
+    user's explicit instruction to look for something simpler.**
+    Cowork's sketch extracted the blocking work into a helper and
+    called it via `asyncio.to_thread`. Instead, matched an existing
+    convention already in this codebase for the identical problem:
+    `aarva/server/routes/create.py` (`propose_candidates`/
+    `find_near_miss`) already solves the exact same class of bug via
+    `starlette.concurrency.run_in_threadpool` — same effect, but
+    consistent with the codebase's own established pattern rather than
+    introducing a second primitive for the same job. Extracted the
+    blocking tail of `admin_sync_db` into
+    `_fetch_decompress_validate_and_replace` and call it via
+    `await run_in_threadpool(...)`.
+  - **Audited the hand-off's other 3 flagged endpoints, per its own
+    ask.** `admin_promote_bonus`/`admin_unpromote_bonus`: genuinely
+    trivial (1-3 simple SQLite point queries on a small table, no
+    network I/O) — skipped, cited in the PR. `admin_episode_metadata`:
+    real issue found — its byte-length fallback
+    (`_stat_or_head_byte_length`) does a synchronous `httpx` HTTP HEAD
+    with a 10s timeout for R2-only (older) episodes. Fixed the same
+    way, wrapping the existing call in `run_in_threadpool`.
+  - **Incidental bug found and fixed via testing, not part of the
+    original ask**: the staged-DB validation's
+    `except sqlite3.DatabaseError` / `except sqlite3.OperationalError`
+    clauses were ordered so the "missing expected schema" branch was
+    unreachable dead code — `OperationalError` is a subclass of
+    `DatabaseError`, so the broader clause always caught it first. The
+    HTTP status code was already correct either way (403); only the
+    detail message was wrong. Reordered so the more specific exception
+    is checked first.
+  - **Verified for real**: built a fake R2 client serving the actual
+    ~148MB main DB gzipped to ~73MB (matching production size) and ran
+    the extracted blocking function via `run_in_threadpool` alongside
+    a 5ms-resolution async ticker standing in for `/health` polling —
+    confirmed the ticker kept firing continuously throughout (31 ticks
+    across a 0.18s sync) versus the identical work called inline on
+    the event loop (0 ticks fired during the entire 0.16s call — the
+    loop was completely frozen for its full duration, direct proof of
+    the mechanism independent of absolute timing on this faster dev
+    machine vs. Render's Starter plan). New `aarva/tests/
+    test_admin_sync_db.py` (13 tests, all passing) covers every
+    documented status code (400/401/403/413/502/503) through the real
+    route function plus the success path end-to-end against disposable
+    on-disk SQLite DBs, confirming the extraction didn't change any
+    error-code contract. All 53 repo tests pass (40 pre-existing + 13
+    new).
+  - Real Render-deploy confirmation (no restart events, successful
+    `scripts/sync_db_to_render.sh` run) still pending the user's
+    on-device retest after merge, per the hand-off's own verification
+    plan.
 
 ### 2026-07-29
 
