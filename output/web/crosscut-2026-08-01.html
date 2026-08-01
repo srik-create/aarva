@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 01 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-01</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 01 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · women claiming space</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-01/crosscut_0117.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>13 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A Kolkata football pitch and a rural Uttar Pradesh newsroom might seem unrelated. But something striking emerges when looking at them side by side. A piece in The Hindu follows girls as they step onto a mixed-gender soccer field, using the physical lines of the pitch to outrun heavy social expectations. A thousand miles away, Shivani Patel writes in Scroll.in about Dalit women running a journalism collective, showing how their actual presence in the field changes what a reporter is supposed to look like. Putting these stories together reveals a quiet rebellion. Marginalized women are simply showing up, using their physical presence to force open doors that society prefers to keep shut.</p>
+        <article class='piece'>
+<p class='hook'>A mid-July piece in *The Hindu* visits a dirt pitch in Kolkata, where a mixed-gender football team is changing the rules. The writer captures how the physical space of the field helps girls from the Kalighat red-light area escape heavy social expectations. Notice how the team&#x27;s very name—*Meye-Cheleder Khela*—reclaims a common Bengali slur, turning an insult into a demand for an equal game.</p>
+<h2 class='title'>Where football is freedom: A Kolkata mixed-gender team is rewriting rules from margins</h2>
+<p class='byline'><span class='publication'>The Hindu</span></p>
+<p class='source'><a href='https://www.thehindu.com/news/national/west-bengal/where-football-is-freedom-a-kolkata-mixed-gender-team-is-rewriting-rules-from-margins/article71237554.ece' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>The image that sticks from the Kolkata football pitch is the simple, physical act of stepping onto the grass. For the girls playing in Kalighat, just putting their bodies in a space traditionally reserved for boys is a rebellion against everything expected of them. Read alongside Shivani Patel’s piece on the Khabar Lahariya journalists up next, that physical defiance takes on an entirely different weight. Patel writes about Dalit women in rural Uttar Pradesh doing something remarkably similar. But rather than claiming a local playground, they are walking into hostile neighborhoods and upper-caste spaces to report the news. 
+
+The interesting thing is how both stories strip away abstract ideas about equality and focus entirely on physical presence. While the young footballers are fighting for the right to simply exist in public without harassment, Patel shows what happens when marginalized women use that same physical courage to claim professional authority. The reporters in Uttar Pradesh are doing more than just surviving in places society says they do not belong. They are using their presence to decide whose stolen calf actually makes the front page.</p>
+        <article class='piece'>
+
+<h2 class='title'>‘The Good Reporter’: The women journalists of Khabar Lahariya tell their stories on their own terms</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Shivani Patel</span></p>
+<p class='source'><a href='https://scroll.in/article/1094322/the-good-reporter-the-women-journalists-of-khabar-lahariya-tell-their-stories-on-their-own-terms?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the dust of a Kolkata football pitch and the heat of a rural newsroom. A girl laces up cleats. A woman holds up a camera. Just standing where society says someone else belongs forces the world to adjust. But wedging a heavy door open takes a toll on the hands doing the pushing. The question left to sit with is this: once the initial shock of a new face fades, does the world actually change its rules, or does it just learn to tolerate the outsider?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
