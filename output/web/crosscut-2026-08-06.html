@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Thursday, 06 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-06</div>
+      <div class="edition-meta">2 pieces · Crosscut · Thursday, 06 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · policing adult romance</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-06/crosscut_0127.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>15 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A stranger&#x27;s smartphone in an American park and a locked door in a Chinese disciplinary camp might seem unrelated. But reading two recent reports together reveals a striking pattern in how young adults are losing control over their romantic lives. In *The Atlantic*, Faith Hill looks at how the threat of viral shaming makes people afraid to show affection in public. Across the world, that policing takes a physical form. Writing for *The Diplomat*, Lina Ma reports on parents hiring private camps to lock up their grown children over unapproved relationships. The two stories offer a sharp contrast between the invisible pressure of American smartphones and the literal confinement bought by Chinese parents.</p>
+        <article class='piece'>
+<p class='hook'>Writing just last week in The Atlantic, Faith Hill watches a private kiss in Central Park turn into a viral TikTok mob. She argues that the constant threat of social media shaming leaves people terrified to show affection outdoors. Notice how she links the fear of a smartphone camera to a nationwide drop in dating. Romance inherently requires looking a little stupid, she points out, and the risk of a stranger filming that awkwardness is freezing people out of love.</p>
+<h2 class='title'>The Horrible Rise of the Makeout Police</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Faith Hill</span></p>
+<p class='source'><a href='https://www.theatlantic.com/family/2026/07/make-out-public-display-affection/688087/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Faith Hill leaves you with the chilling sense that anyone with a smartphone can now act as the romance police. The threat in her piece is entirely decentralized—strangers in a park armed with TikTok accounts, creating a culture where young adults police themselves out of fear of going viral. Read alongside Lina Ma, that invisible, crowdsourced pressure suddenly looks like just one way to control a young adult&#x27;s romantic life. Ma writes about parents who bypass social shaming entirely and skip straight to physical kidnapping. Instead of strangers filming a kiss in Central Park, you have a father hiring private contractors to drag a 21-year-old music student to a disciplinary camp hundreds of miles away simply because he dislikes her boyfriend. The contrast is sharp. In Hill’s account, the surveillance is digital and driven by the crowd. Turn to Ma, and the control becomes physical, bought and paid for by the family. But put the two together, and you see the exact same impulse at work: a refusal to let young adults make their own messy romantic choices without someone stepping in to punish them.</p>
+        <article class='piece'>
+
+<h2 class='title'>China’s ‘Internet Addiction’ Schools Are Now Locking Up Adults</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Lina Ma</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/08/chinas-internet-addiction-schools-are-now-locking-up-adults/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after hearing these two stories is how easily affection gets boxed in. The tools of control look completely different. On one side of the world, parents pay guards to slide a physical deadbolt across a door. On the other, a stranger simply points a phone camera across a coffee shop. Yet both tactics do the exact same thing, leaving young adults terrified to just be vulnerable. When the invisible threat of a viral video builds a cage just as effectively as brick and steel, where do two people go to finally be left alone?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
