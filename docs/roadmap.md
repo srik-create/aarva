@@ -70,6 +70,26 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Curation signal v1.5: digest-post link extraction + topic-
+   similarity matching.** Full spec at `docs/session_plan_curation_
+   topic_similarity.md`. Follow-up to the curation-platform signal
+   shipped earlier today (2026-08-10, see "Recently completed") —
+   testing the shipped exact-URL-only matcher against a real crawl
+   found just 1 match out of 12,808 real Aarva articles, too low a
+   hit rate to move the `too_niche` rejection rate. Two real findings
+   motivate this: (a) Why Is This Interesting?'s entire feed (and 2/25
+   of Longreads') consists of newsletter-issue container posts, not
+   individual article picks — the real curated links are embedded
+   inside each issue's HTML body, which the crawler currently never
+   opens; (b) even with clean titles, exact-URL matching alone is
+   inherently rare. Real embeddings pulled from a live crawl (131 hits)
+   and compared against the full real catalog (12,808 articles) to
+   empirically ground a topic-similarity floor recommendation (0.80)
+   rather than guessing. AGENTS.md rule 4 sign-off from user
+   2026-08-10 — chose to extend the crawler with digest-link
+   extraction (a real scope increase) rather than rely on the
+   threshold alone.
+
 ---
 
 ## Deferred — to return to (in priority order)
