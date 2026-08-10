@@ -1,3 +1,15 @@
+**STATUS: Shipped 2026-08-10.** See `docs/roadmap.md`'s 2026-08-10 entry
+for what actually landed — the source list changed materially during
+implementation (3 of 5 specced sources turned out broken/inaccessible;
+2 replacement candidates from training memory also turned out stale;
+final list resolved via direct web search + verification), and the
+scoring integration used Option A (persisted on `articles.
+curation_score`) per explicit user choice, not this doc's own Option B
+recommendation. This doc is kept as the historical record of the
+original design — see the roadmap for what shipped.
+
+---
+
 # Session plan — curation-platform cross-check as a "not too niche" signal
 
 Written by Cowork for the next Claude Code session (2026-08-10+).

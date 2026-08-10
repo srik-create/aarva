@@ -26,8 +26,9 @@ from typing import Optional
 import yaml
 
 from aarva.clients.llm import LLMClient, build_llm_client
-from aarva.config import PipelineConfig
+from aarva.config import PipelineConfig, load_curation_sources
 from aarva.db import Database
+from aarva.services.curation_lookup import curation_score_for
 
 logger = logging.getLogger(__name__)
 
@@ -141,6 +142,7 @@ def score_all(
     with db.connect() as conn:
         rows = conn.execute("""
             SELECT a.id, a.title, a.full_text, a.published_date,
+                   a.canonical_url,
                    p.name AS publication_name
               FROM articles a
               JOIN publications p ON p.id = a.publication_id
@@ -159,6 +161,19 @@ def score_all(
     stats = ScoringStats(candidates=len(candidates))
     pass_min_rigour = float(config.scoring.get("rigour_min", 0.5))
     pass_min_posture = float(config.scoring.get("posture_min", 0.5))
+
+    # Curation-platform cross-check ("not too niche" signal) — see
+    # docs/session_plan_curation_platform_signal.md. Loaded once per
+    # score_all() call, not per-article — the source list is static
+    # for the duration of a run. OFF by default (curation.enabled)
+    # so installing this feature doesn't change editorial behaviour
+    # until the operator opts in after inspecting a crawl's output.
+    curation_enabled = bool(config.curation.get("enabled", False))
+    curation_weight = float(config.curation.get("score_weight", 0.10))
+    source_weights = (
+        {s.name: s.weight for s in load_curation_sources() if s.enabled}
+        if curation_enabled else {}
+    )
     # Concurrency: LLM calls are network-bound (~5–10s each). Running
     # them sequentially means a 200-article run takes 20–30 minutes
     # wall-clock; parallelising drops that to a few minutes, capped by
@@ -205,8 +220,15 @@ def score_all(
                     else "FAIL"
                 )
             response["verdict"] = verdict
+            base_ranking_score = 0.45 * rigour + 0.45 * posture + 0.10 * self_imp
+
+            curation_score = 0.0
+            if curation_enabled:
+                curation_score = curation_score_for(
+                    db, article.get("canonical_url"), source_weights,
+                )
             response["ranking_score"] = round(
-                0.45 * rigour + 0.45 * posture + 0.10 * self_imp, 4
+                base_ranking_score + curation_weight * curation_score, 4
             )
 
             _persist_score(db, article_id, response, prompt_version)
@@ -219,10 +241,17 @@ def score_all(
                     (article.get("title") or "")[:60],
                 )
             with db.connect() as conn:
-                conn.execute(
-                    "UPDATE articles SET status = ? WHERE id = ?",
-                    (new_status, article_id),
-                )
+                if curation_enabled:
+                    conn.execute(
+                        "UPDATE articles SET status = ?, curation_score = ? "
+                        "WHERE id = ?",
+                        (new_status, curation_score, article_id),
+                    )
+                else:
+                    conn.execute(
+                        "UPDATE articles SET status = ? WHERE id = ?",
+                        (new_status, article_id),
+                    )
 
             with stats_lock:
                 stats.scored += 1

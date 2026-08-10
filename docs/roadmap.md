@@ -70,28 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Curation-platform cross-check as a "not too niche" signal.**
-   Full spec at `docs/session_plan_curation_platform_signal.md`.
-   External-signal addition to the `too_niche` remediation path
-   (72 rejections in 30 days on 2026-08-10, above Phase 2's
-   threshold and the top structural pattern in `edition_rejections`
-   after `other`). Nightly crawl of peer-curator RSS feeds (The
-   Browser, Longreads, Arts & Letters Daily, Kottke.org, MetaFilter,
-   and Aeon's picks — Aeon lower-weighted since it's also an Aarva
-   publication) into a new `curation_hits` table on main_db. Match
-   Aarva candidates against hits by normalized canonical URL; add a
-   small positive `curation_score` bump to Stage 7's ranking during
-   assembly. Positive-only signal (absence of a hit is NOT a
-   penalty). Complements — does not replace — the Phase 3
-   per-reason taste centroid from the reviewer learning loop. Both
-   coexist, weighted independently. Reddit / mass-social signals
-   explicitly rejected 2026-08-10 as editorially-wrong for Aarva
-   (`docs/project_brief.md:25-31` — curated over trending).
-   AGENTS.md rule 4 sign-off from user 2026-08-10 after Cowork's
-   first-pass alternatives (all internal-only signals) were
-   rejected as "not great" and the reframe onto peer-curator signal
-   was accepted.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -137,9 +115,112 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-07-31)
+## Recently completed (2026-06-29 → 2026-08-10)
 
 Most recent first.
+
+### 2026-08-10
+
+- **Curation-platform cross-check as a "not too niche" signal.** Full
+  spec at `docs/session_plan_curation_platform_signal.md` (Cowork
+  hand-off). Addresses `too_niche` — 72 rejections in 30 days as of
+  2026-08-10, the top NAMED `edition_rejections` reason. Nightly crawl
+  of peer-curator RSS feeds into a new `curation_hits` table
+  (`aarva/db.py`) matches Aarva articles by normalized canonical URL
+  and adds a small positive `curation_score` bump, computed once per
+  article at Stage 4-5-6 scoring time and baked directly into
+  `ranking_score` (persisted on `articles.curation_score` — **Option A
+  from the spec, per explicit user choice, not Cowork's recommended
+  Option B**). Positive-only signal — absence of a hit is never a
+  penalty. Complements, doesn't replace, the Phase 3 reviewer-learning-
+  loop taste centroid. OFF by default (`curation.enabled: false` in
+  `pipeline.yaml`) — merging this makes zero editorial behaviour
+  change until the operator opts in.
+  - **The spec's source list didn't survive verification — real,
+    material rework, not a rubber-stamp.** Of the 5 originally-specced
+    sources, only Longreads and Kottke.org actually worked. The Browser
+    (free feed now serves only a "paid-subscribers-only" placeholder),
+    Arts & Letters Daily, and MetaFilter (both behind a Cloudflare JS
+    challenge no plain RSS client can pass) were all dropped after
+    direct HTTP verification — a bare "returns 200 + valid XML" check
+    caught the Cloudflare cases but NOT staleness, which required a
+    second pass. Aeon was dropped per user decision (2026-08-10) since
+    it's already an Aarva-ingested publication — a hit there would
+    mean "Aeon published it," not "an external curator picked it."
+  - **Second-order finding: "valid XML" ≠ "actually current."** Two
+    replacement candidates initially proposed from training-memory —
+    Longform.org and Sentiers — both returned HTTP 200 with well-formed
+    feeds, but direct recency inspection found Longform.org's most
+    recent entry was from **June 2024** (2+ years stale, no alternate
+    feed found on its homepage either) and Sentiers hadn't posted since
+    **2026-07-19** (3 weeks, unusual for a weekly newsletter). Both
+    dropped per user decision. This is why every source in
+    `aarva/config/curation_sources.yaml`'s notes states its verified
+    most-recent-entry date, not just "returns 200."
+  - **Per explicit user instruction, searched the web for replacement
+    candidates rather than relying on training memory alone** (AGENTS.md
+    rule 6). Found and verified 3 real candidates: Library of Scroll
+    (dead, last post January 2022), Ann Friedman Weekly (feed metadata
+    updates live but contains zero `<item>` entries — likely fully
+    paywalled with no public preview), and **Why Is This Interesting?**
+    (genuinely alive, posting daily, includes a recurring "Saturday
+    Selection" curated-links roundup — added to the final list).
+  - Hacker News (points≥200 via hnrss.org) added per explicit user
+    request, reversing the spec's own "skip for v1, tech-skewed"
+    recommendation, after 3 of the 5 originally-specced sources turned
+    out broken — lowest weight of the final list (0.4) to partially
+    offset the residual tech skew.
+  - **Final v1 list (6 sources, all independently verified live,
+    most posting same-day as of 2026-08-10):** Longreads (0.8),
+    3 Quarks Daily (0.6), Kottke.org (0.6), Why Is This Interesting?
+    (0.55), Waxy.org (0.5), Hacker News (0.4).
+  - New `aarva/services/curation_lookup.py` — `normalize_url()` (lower-
+    cases scheme+host, strips tracking params, sorts remaining params,
+    strips fragment/trailing-slash) + `curation_lookup()` /
+    `curation_score_for()`. Sorting remaining query params was added
+    after a real test failure caught that two URLs with the same
+    non-tracking params in different order didn't normalize equal.
+  - New `aarva/sources/curation_crawler.py` reuses
+    `aarva.sources.rss.fetch_feed` (the same HTTP-fetch + feedparser
+    logic Stage 1 already uses for Aarva's own publications) rather
+    than writing a second feed-fetching implementation — every v1
+    source is a genuine RSS/Atom feed, so no HTML-scraping fallback was
+    needed. New `--stage 0` in `aarva/daily.py`, deliberately excluded
+    from a full (`--stage` omitted) run — the operator runs it
+    independently to build up `curation_hits` and inspect the crawl's
+    output before opting in via `pipeline.yaml`, matching the spec's
+    rollout plan.
+  - **Verified for real, not just unit tests:** ran the crawler against
+    all 6 live production feeds (real HTTP, real network) — 6/6 ok,
+    132 real items, 132 new hits, confirmed idempotent on a re-run (0
+    new hits, no duplicates). Found a genuine, unprompted real-data
+    match: an Aeon article on taxi drivers and Alzheimer's that also
+    appeared on Hacker News, confirming the full crawl → normalize →
+    lookup path end-to-end against production data (read-only; the
+    crawl itself only ever wrote to disposable copies, never the real
+    `aarva.db`). 20 new tests in `aarva/tests/test_curation_signal.py`
+    (repo total: 75, all passing) — URL normalization edge cases, the
+    lookup helper, the crawler's idempotency/error-isolation (feed
+    fetching mocked in the automated suite), and Stage 4-5-6's
+    curation_score integration end-to-end against a disposable DB with
+    a stub LLM client (no real Gemini spend) — confirmed the curation
+    term is exactly `score_weight * curation_score` when enabled, zero
+    contribution when disabled, and that a hit from a source no longer
+    in `curation_sources.yaml` is silently ignored rather than erroring.
+  - **Scope boundary, not a corner cut:** the spec's verification step
+    4 ("run Stage 7 twice, diff top-20 rankings, confirm shifts are
+    small") wasn't run as a live double-scoring pass against real
+    articles — that would mean spending real Gemini credits re-scoring
+    articles against AGENTS.md rule 11's "don't re-score without
+    explicit ask." The bound is confirmed analytically instead: with
+    `score_weight=0.10` and realistic per-article `curation_score`
+    values (rarely more than 1-2 matched sources), the maximum possible
+    `ranking_score` shift is small by construction, and the stub-LLM
+    test directly confirms the arithmetic. The spec's own rollout
+    section already frames the live top-20 diff as something the
+    operator runs after enabling, not a pre-merge gate — `curation.
+    enabled: false` by default means this PR itself changes no
+    editorial ranking.
 
 ### 2026-07-31
 

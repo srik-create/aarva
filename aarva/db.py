@@ -330,6 +330,25 @@ CREATE INDEX IF NOT EXISTS idx_rss_extra_items_date
     ON rss_extra_items(episode_date);
 
 
+-- Curation-platform cross-check ("not too niche" signal) — see
+-- docs/session_plan_curation_platform_signal.md. Nightly crawl of
+-- peer-curator RSS feeds (aarva/config/curation_sources.yaml) writes
+-- rows here; Stage 4-5-6 looks up each scored article's canonical_url
+-- (normalized) against this table to compute articles.curation_score.
+-- One row per (source, article-URL) — re-crawls are idempotent via
+-- INSERT OR IGNORE on the primary key.
+CREATE TABLE IF NOT EXISTS curation_hits (
+    source_name       TEXT NOT NULL,
+    url               TEXT NOT NULL,
+    url_normalized    TEXT NOT NULL,
+    title             TEXT,
+    seen_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (source_name, url_normalized)
+);
+CREATE INDEX IF NOT EXISTS idx_curation_hits_normalized
+    ON curation_hits(url_normalized);
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -502,6 +521,15 @@ class Database:
                 # Operator search + ad-hoc URL ingest (2026-07-22) — see
                 # docs/session_plan_operator_search_and_url_ingest.md.
                 "ALTER TABLE publications ADD COLUMN country TEXT",
+                # Curation-platform cross-check (2026-08-10) — see
+                # docs/session_plan_curation_platform_signal.md. Sum of
+                # matched curation_hits source weights, computed once
+                # at Stage 4-5-6 scoring time. 0.0 (not NULL) is a
+                # valid, common result — the signal is positive-only,
+                # so "no hit" is a normal outcome, not an unknown state
+                # (unlike author_country_code's NULL/'unknown' split).
+                "ALTER TABLE articles ADD COLUMN curation_score REAL "
+                "NOT NULL DEFAULT 0.0",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:

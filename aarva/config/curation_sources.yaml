@@ -1,0 +1,115 @@
+# Aarva curation-platform cross-check sources — v1
+#
+# See docs/session_plan_curation_platform_signal.md. A nightly crawl
+# reads these feeds; any article they've linked to that Aarva also
+# ingests gets a small positive curation_score bump (never a penalty
+# for absence — see the spec's "positive-only signal" decision).
+#
+# Each entry:
+#   name       — display name, also the curation_hits.source_name key
+#   homepage   — for reference / debugging
+#   feed_url   — RSS/Atom URL the crawler actually fetches
+#   weight     — 0.0-1.0, this source's contribution to curation_score
+#   enabled    — true/false, one-line on/off switch
+#   notes      — why this source, or any caveat
+#
+# All feed_urls verified via direct HTTP fetch AND real recency check
+# (most-recent-entry date, not just "returns valid XML") on 2026-08-10.
+# "Valid XML" alone was not a sufficient bar — two sources that passed
+# a bare HTTP-200 check turned out to be dead feeds once recency was
+# checked (see below), which is why every entry here also states its
+# most-recent-entry date at verification time.
+#
+# Dropped after verification:
+#   - The Browser         — free feed now serves only a "paid-
+#                            subscribers-only, update your subscription"
+#                            placeholder, no real picks.
+#   - Arts & Letters Daily — Cloudflare JS challenge, not fetchable by
+#                            a plain RSS client.
+#   - MetaFilter           — same Cloudflare JS challenge.
+#   - Aeon                 — dropped per user decision 2026-08-10; it's
+#                            already an Aarva-ingested publication, so a
+#                            hit there would mean "Aeon published it,"
+#                            not "an external curator picked it."
+#   - Longform.org         — feed returns HTTP 200 but its most recent
+#                            entry is from June 2024 (2+ years stale);
+#                            homepage has no alternate feed link either.
+#                            Confirmed dead, not just quiet.
+#   - Sentiers             — feed is valid but hadn't posted anything
+#                            since 2026-07-19 (3 weeks) as of 2026-08-10.
+#                            Ambiguous rather than confirmed-dead, but
+#                            dropped per user decision pending signs of
+#                            it resuming.
+#   - Library of Scroll    — found via web search as a candidate
+#                            replacement; verified dead (last entry
+#                            January 2022).
+#   - Ann Friedman Weekly  — found via web search; feed metadata updates
+#                            daily but contains ZERO <item> entries
+#                            (likely fully paywalled, no public preview).
+
+sources:
+  - name: Longreads
+    homepage: https://longreads.com/
+    feed_url: https://longreads.com/feed/
+    weight: 0.8
+    enabled: true
+    notes: >
+      Well-established longform curator, includes a weekly "Top 5"
+      picks post. Verified 2026-08-10 — most recent entry same-day.
+
+  - name: 3 Quarks Daily
+    homepage: https://3quarksdaily.com/
+    feed_url: https://3quarksdaily.com/feed
+    weight: 0.6
+    enabled: true
+    notes: >
+      Multi-editor link curation across science, philosophy, culture —
+      broad generalist fit, more eclectic than pure journalism curation.
+      Verified 2026-08-10 — most recent entry same-day.
+
+  - name: Kottke.org
+    homepage: https://kottke.org/
+    feed_url: https://feeds.kottke.org/main
+    weight: 0.6
+    enabled: true
+    notes: >
+      One-person curator, long-running, high aesthetic alignment with
+      Aarva's audience. Verified 2026-08-10 — most recent entry
+      same-day (Atom feed).
+
+  - name: Why Is This Interesting?
+    homepage: https://whyisthisinteresting.substack.com/
+    feed_url: https://whyisthisinteresting.substack.com/feed
+    weight: 0.55
+    enabled: true
+    notes: >
+      Daily newsletter mixing original commentary with a recurring
+      "Saturday Selection" curated-links roundup. Found via web search
+      2026-08-10 (not prior training memory) after Longform.org and
+      Sentiers were dropped; verified independently — posting daily,
+      most recent entry same-day.
+
+  - name: Waxy.org
+    homepage: https://waxy.org/
+    feed_url: https://waxy.org/feed/
+    weight: 0.5
+    enabled: true
+    notes: >
+      Solo-curator internet-culture link blog, similar genre to
+      Kottke.org (some overlap risk). Verified 2026-08-10 — most
+      recent entry 2 days prior.
+
+  - name: Hacker News
+    homepage: https://news.ycombinator.com/
+    feed_url: https://hnrss.org/frontpage?points=200
+    weight: 0.4
+    enabled: true
+    notes: >
+      Front-page stories with >=200 points via the hnrss.org proxy —
+      filters to only the most broadly-upvoted stories to partially
+      offset HN's tech skew. Originally scoped as "skip for v1" in the
+      spec; added back 2026-08-10 per user request after 3 of the 5
+      originally-specced sources turned out to be broken/inaccessible.
+      Lowest weight of the list given the residual tech skew and that
+      this is a popularity-filtered aggregator, not an editor's picks.
+      Verified 2026-08-10 — most recent entry same-day.

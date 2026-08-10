@@ -55,6 +55,18 @@ class Publication:
 
 
 @dataclass(frozen=True)
+class CurationSource:
+    """A peer-curator RSS/Atom feed crawled for the "not too niche"
+    signal — see docs/session_plan_curation_platform_signal.md."""
+    name: str
+    homepage: str | None
+    feed_url: str
+    weight: float
+    enabled: bool
+    notes: str | None
+
+
+@dataclass(frozen=True)
 class IngestionConfig:
     max_entries_per_feed: int = 30
     lookback_days: int = 7
@@ -97,6 +109,10 @@ class PipelineConfig:
     @property
     def consolidation(self) -> dict[str, Any]:
         return self.raw.get("consolidation", {})
+
+    @property
+    def curation(self) -> dict[str, Any]:
+        return self.raw.get("curation", {})
 
 
 def _resolve_path(rel_or_abs: str, project_root: Path) -> Path:
@@ -202,4 +218,22 @@ def load_publications() -> list[Publication]:
             country=p.get("country"),
         )
         for p in raw.get("publications", [])
+    ]
+
+
+def load_curation_sources() -> list[CurationSource]:
+    """Load aarva/config/curation_sources.yaml. Mirrors load_publications.
+    See docs/session_plan_curation_platform_signal.md."""
+    with (CONFIG_DIR / "curation_sources.yaml").open() as f:
+        raw = yaml.safe_load(f)
+    return [
+        CurationSource(
+            name=s["name"],
+            homepage=s.get("homepage"),
+            feed_url=s["feed_url"],
+            weight=float(s.get("weight", 1.0)),
+            enabled=s.get("enabled", True),
+            notes=s.get("notes"),
+        )
+        for s in raw.get("sources", [])
     ]

@@ -23,6 +23,7 @@ import click
 from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
+from aarva.sources import curation_crawler
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_8c_author_provenance,
@@ -183,6 +184,34 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                 "end, so this would otherwise waste the whole run): %s", e,
             )
             sys.exit(1)
+
+    # Stage 0 — Curation-platform crawl (external "not too niche"
+    # signal — see docs/session_plan_curation_platform_signal.md).
+    # Deliberately explicit-only: NOT included in a full (stage=None)
+    # run. The operator runs `--stage 0` on its own schedule to build
+    # up curation_hits and inspect the output before opting in via
+    # pipeline.yaml's curation.enabled — matching the spec's rollout
+    # plan. Once enabled, Stage 4-5-6 reads whatever's already in
+    # curation_hits; it doesn't require Stage 0 to have just run.
+    if stage == 0:
+        log.info("Stage 0 — Curation crawl starting")
+        run_id = db.start_run("stage_0_curation_crawl")
+        try:
+            crstats = curation_crawler.crawl_curation_sources(config, db)
+            db.finish_run(run_id, status="success")
+            log.info(
+                "Stage 0 done — %d/%d sources ok, %d items seen, "
+                "%d new hits, %d already known",
+                crstats.sources_processed,
+                crstats.sources_processed + crstats.sources_failed,
+                crstats.items_seen, crstats.hits_added,
+                crstats.hits_already_seen,
+            )
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 0 failed")
+            sys.exit(1)
+        return
 
     # Stage 1 — Ingestion
     if stage is None or stage == 1:
