@@ -328,6 +328,19 @@ scoring:
   # TPM ceiling.
   concurrent_workers: 4
 
+# Curation-platform cross-check ("not too niche" signal) — see
+# docs/session_plan_curation_platform_signal.md. Nightly crawl of
+# peer-curator RSS feeds (aarva/config/curation_sources.yaml) writes
+# hits to the curation_hits table; Stage 4-5-6 looks each article up
+# and adds a small positive bump to ranking_score. Positive-only —
+# absence of a hit is never a penalty. OFF by default so merging this
+# doesn't change editorial behaviour until the operator inspects the
+# first crawl's output and opts in.
+curation:
+  enabled: false
+  score_weight: 0.10       # multiplier on the sum-of-matched-source-weights
+  crawl_window_days: 14    # only consider each source's last N days of items
+
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────
   # Gemini is the LLM for all production pipeline work — Stage 4+5+6
