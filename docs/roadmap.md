@@ -70,6 +70,28 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Curation-platform cross-check as a "not too niche" signal.**
+   Full spec at `docs/session_plan_curation_platform_signal.md`.
+   External-signal addition to the `too_niche` remediation path
+   (72 rejections in 30 days on 2026-08-10, above Phase 2's
+   threshold and the top structural pattern in `edition_rejections`
+   after `other`). Nightly crawl of peer-curator RSS feeds (The
+   Browser, Longreads, Arts & Letters Daily, Kottke.org, MetaFilter,
+   and Aeon's picks — Aeon lower-weighted since it's also an Aarva
+   publication) into a new `curation_hits` table on main_db. Match
+   Aarva candidates against hits by normalized canonical URL; add a
+   small positive `curation_score` bump to Stage 7's ranking during
+   assembly. Positive-only signal (absence of a hit is NOT a
+   penalty). Complements — does not replace — the Phase 3
+   per-reason taste centroid from the reviewer learning loop. Both
+   coexist, weighted independently. Reddit / mass-social signals
+   explicitly rejected 2026-08-10 as editorially-wrong for Aarva
+   (`docs/project_brief.md:25-31` — curated over trending).
+   AGENTS.md rule 4 sign-off from user 2026-08-10 after Cowork's
+   first-pass alternatives (all internal-only signals) were
+   rejected as "not great" and the reframe onto peer-curator signal
+   was accepted.
+
 ---
 
 ## Deferred — to return to (in priority order)
