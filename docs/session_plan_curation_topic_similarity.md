@@ -1,3 +1,9 @@
+**STATUS: Shipped 2026-08-10.** See `docs/roadmap.md`'s 2026-08-10
+entry for what actually landed, including the real crawl/embedding
+verification performed both before and after implementation.
+
+---
+
 # Session plan — curation signal v1.5: digest-post link extraction + topic-similarity matching
 
 Written by Claude Code, 2026-08-10, as a follow-up to the just-shipped

@@ -340,6 +340,18 @@ curation:
   enabled: false
   score_weight: 0.10       # multiplier on the sum-of-matched-source-weights
   crawl_window_days: 14    # only consider each source's last N days of items
+  # Topic-similarity floor (v1.5, docs/session_plan_curation_topic_
+  # similarity.md) — cosine similarity a scored article's own embedding
+  # must clear against a curated pick's embedding to count as a fuzzy
+  # match. Empirically grounded against a real crawl + the full real
+  # catalog: genuine topical matches held up consistently down to
+  # ~0.80-0.82; below that, matches degraded into title-genre-collision
+  # noise (e.g. two differently-themed "roundup post" titles matching
+  # each other, not real content overlap). Independent of score_weight
+  # — this controls what COUNTS as a match; score_weight controls what
+  # a match is worth. Revisit once digest-link extraction (same spec)
+  # has been live a while and a fresh calibration crawl can be run.
+  topic_similarity_floor: 0.80
 
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────

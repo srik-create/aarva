@@ -530,6 +530,15 @@ class Database:
                 # (unlike author_country_code's NULL/'unknown' split).
                 "ALTER TABLE articles ADD COLUMN curation_score REAL "
                 "NOT NULL DEFAULT 0.0",
+                # Curation signal v1.5 (2026-08-10) — see
+                # docs/session_plan_curation_topic_similarity.md.
+                # Lets Stage 4-5-6 fuzzy-match a scored article's own
+                # embedding against curated picks' embeddings, not just
+                # exact URLs. NULL until a crawl embeds the row (older
+                # rows inserted before this shipped, or a crawl run
+                # while the embedding call failed).
+                "ALTER TABLE curation_hits ADD COLUMN embedding BLOB",
+                "ALTER TABLE curation_hits ADD COLUMN embedding_model TEXT",
             )
             for migration in _LEGACY_COLUMN_ADDS:
                 try:

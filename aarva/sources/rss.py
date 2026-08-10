@@ -54,6 +54,14 @@ class FeedEntry:
     byline: Optional[str]
     summary: Optional[str]            # often a snippet from the feed itself
     published_date: Optional[datetime]
+    # Full HTML body if the feed provides one (feedparser's `content`
+    # field), else the same value as `summary`. None if neither is
+    # present. Added for docs/session_plan_curation_topic_similarity.md
+    # — digest/newsletter-style feed entries (one issue = many picks)
+    # embed their real links in here; `summary` alone is usually too
+    # short to contain them. Optional with a default so this doesn't
+    # break the one existing FeedEntry(...) construction site.
+    raw_content_html: Optional[str] = None
 
 
 def _parse_date(value: Optional[str]) -> Optional[datetime]:
@@ -151,12 +159,20 @@ def fetch_feed(
         if published_date and published_date < cutoff:
             continue
 
+        raw_content = raw_entry.get("content")
+        raw_content_html = (
+            raw_content[0].get("value")
+            if raw_content and isinstance(raw_content, list)
+            else None
+        ) or (raw_entry.get("summary") or raw_entry.get("description") or None)
+
         entries.append(FeedEntry(
             canonical_url=url.strip(),
             title=title.strip(),
             byline=_extract_byline(raw_entry),
             summary=(raw_entry.get("summary") or raw_entry.get("description") or "").strip() or None,
             published_date=published_date,
+            raw_content_html=raw_content_html,
         ))
 
     return entries

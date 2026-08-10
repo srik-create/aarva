@@ -23,12 +23,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
 import yaml
 
+from aarva.clients.embedding import build_embedding_client
 from aarva.clients.llm import LLMClient, build_llm_client
 from aarva.config import PipelineConfig, load_curation_sources
 from aarva.db import Database
-from aarva.services.curation_lookup import curation_score_for
+from aarva.services.curation_lookup import all_hit_embeddings, curation_score_for
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +144,7 @@ def score_all(
     with db.connect() as conn:
         rows = conn.execute("""
             SELECT a.id, a.title, a.full_text, a.published_date,
-                   a.canonical_url,
+                   a.canonical_url, a.embedding, a.embedding_model,
                    p.name AS publication_name
               FROM articles a
               JOIN publications p ON p.id = a.publication_id
@@ -163,16 +165,31 @@ def score_all(
     pass_min_posture = float(config.scoring.get("posture_min", 0.5))
 
     # Curation-platform cross-check ("not too niche" signal) — see
-    # docs/session_plan_curation_platform_signal.md. Loaded once per
-    # score_all() call, not per-article — the source list is static
-    # for the duration of a run. OFF by default (curation.enabled)
-    # so installing this feature doesn't change editorial behaviour
-    # until the operator opts in after inspecting a crawl's output.
+    # docs/session_plan_curation_platform_signal.md (exact-URL match)
+    # and docs/session_plan_curation_topic_similarity.md (topic-
+    # similarity fuzzy match, added same day). All loaded once per
+    # score_all() call, not per-article — the source list and hit
+    # embeddings are static for the duration of a run, and this
+    # function's per-article work runs concurrently across worker
+    # threads (see max_workers below), so anything loaded here must
+    # be loaded ONCE, not re-queried per article. OFF by default
+    # (curation.enabled) so installing this feature doesn't change
+    # editorial behaviour until the operator opts in after inspecting
+    # a crawl's output.
     curation_enabled = bool(config.curation.get("enabled", False))
     curation_weight = float(config.curation.get("score_weight", 0.10))
+    topic_similarity_floor = float(config.curation.get("topic_similarity_floor", 0.80))
     source_weights = (
         {s.name: s.weight for s in load_curation_sources() if s.enabled}
         if curation_enabled else {}
+    )
+    embedding_client = (
+        build_embedding_client(config.raw.get("embedding", {}))
+        if curation_enabled else None
+    )
+    hit_embeddings = (
+        all_hit_embeddings(db, embedding_client.name)
+        if curation_enabled else []
     )
     # Concurrency: LLM calls are network-bound (~5–10s each). Running
     # them sequentially means a 200-article run takes 20–30 minutes
@@ -224,8 +241,17 @@ def score_all(
 
             curation_score = 0.0
             if curation_enabled:
+                article_embedding = (
+                    np.frombuffer(article["embedding"], dtype=np.float32)
+                    if article.get("embedding")
+                    and article.get("embedding_model") == embedding_client.name
+                    else None
+                )
                 curation_score = curation_score_for(
                     db, article.get("canonical_url"), source_weights,
+                    article_embedding=article_embedding,
+                    hit_embeddings=hit_embeddings,
+                    topic_similarity_floor=topic_similarity_floor,
                 )
             response["ranking_score"] = round(
                 base_ranking_score + curation_weight * curation_score, 4
