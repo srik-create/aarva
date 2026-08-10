@@ -149,6 +149,229 @@ class TestCurationScoreFor:
         score = curation_score_for(curation_db, "https://example.com/a", {})
         assert score == 0.0
 
+    # ─── Topic-similarity fuzzy-match path (session_plan_curation_
+    # topic_similarity.md) ────────────────────────────────────────────
+
+    def test_no_embeddings_given_only_exact_match_counts(self, curation_db):
+        """Without article_embedding/hit_embeddings, behavior is
+        identical to the original exact-match-only function — the
+        fuzzy path is purely additive, never required."""
+        score = curation_score_for(
+            curation_db, "https://example.com/x", {"Longreads": 0.8},
+            article_embedding=None, hit_embeddings=None,
+        )
+        assert score == 0.0
+
+    def test_fuzzy_match_above_floor_counts_at_reduced_weight(self, curation_db):
+        import numpy as np
+
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        # cosine similarity with article_vec = 0.9 (well above the 0.80 floor)
+        similar_vec = np.array([0.9, np.sqrt(1 - 0.9**2), 0.0], dtype=np.float32)
+        score = curation_score_for(
+            curation_db, "https://example.com/no-exact-match", {"Longreads": 0.8},
+            article_embedding=article_vec,
+            hit_embeddings=[("Longreads", similar_vec)],
+            topic_similarity_floor=0.80,
+        )
+        assert score == pytest.approx(0.8 * 0.7)  # FUZZY_MATCH_WEIGHT_MULTIPLIER
+
+    def test_fuzzy_match_below_floor_does_not_count(self, curation_db):
+        import numpy as np
+
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        # cosine similarity = 0.5, below the 0.80 floor
+        dissimilar_vec = np.array([0.5, np.sqrt(1 - 0.5**2), 0.0], dtype=np.float32)
+        score = curation_score_for(
+            curation_db, "https://example.com/no-exact-match", {"Longreads": 0.8},
+            article_embedding=article_vec,
+            hit_embeddings=[("Longreads", dissimilar_vec)],
+            topic_similarity_floor=0.80,
+        )
+        assert score == 0.0
+
+    def test_exact_match_takes_priority_over_fuzzy_for_same_source(self, curation_db):
+        """A source that already exact-matched must not ALSO get
+        credited via the fuzzy path — would double-count the same
+        editorial signal from one source."""
+        import numpy as np
+
+        with curation_db.connect() as conn:
+            conn.execute(
+                "INSERT INTO curation_hits "
+                "(source_name, url, url_normalized, title) VALUES (?, ?, ?, ?)",
+                ("Longreads", "https://example.com/a",
+                 "https://example.com/a", "A"),
+            )
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        identical_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        score = curation_score_for(
+            curation_db, "https://example.com/a", {"Longreads": 0.8},
+            article_embedding=article_vec,
+            hit_embeddings=[("Longreads", identical_vec)],
+            topic_similarity_floor=0.80,
+        )
+        # Full weight (exact), NOT full + 0.7*full (would be double-counting).
+        assert score == pytest.approx(0.8)
+
+    def test_best_fuzzy_match_per_source_only_not_summed(self, curation_db):
+        """Two separate fuzzy hits from the SAME source only count
+        once, at the best (highest-similarity) match — stops one
+        prolific source from stacking multiple weak partial credits."""
+        import numpy as np
+
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        hit_a = np.array([0.85, np.sqrt(1 - 0.85**2), 0.0], dtype=np.float32)
+        hit_b = np.array([0.95, np.sqrt(1 - 0.95**2), 0.0], dtype=np.float32)
+        score = curation_score_for(
+            curation_db, "https://example.com/no-exact-match", {"Kottke.org": 0.6},
+            article_embedding=article_vec,
+            hit_embeddings=[("Kottke.org", hit_a), ("Kottke.org", hit_b)],
+            topic_similarity_floor=0.80,
+        )
+        # Only the single best match's weight counts, not both summed.
+        assert score == pytest.approx(0.6 * 0.7)
+
+    def test_fuzzy_matches_from_different_sources_both_count(self, curation_db):
+        import numpy as np
+
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        similar_vec = np.array([0.9, np.sqrt(1 - 0.9**2), 0.0], dtype=np.float32)
+        score = curation_score_for(
+            curation_db, "https://example.com/no-exact-match",
+            {"Longreads": 0.8, "Kottke.org": 0.6},
+            article_embedding=article_vec,
+            hit_embeddings=[("Longreads", similar_vec), ("Kottke.org", similar_vec)],
+            topic_similarity_floor=0.80,
+        )
+        assert score == pytest.approx(0.8 * 0.7 + 0.6 * 0.7)
+
+
+class TestAllHitEmbeddings:
+    def test_returns_only_rows_with_matching_embedding_model(self, curation_db):
+        import numpy as np
+        from aarva.services.curation_lookup import all_hit_embeddings
+
+        vec = np.array([1.0, 2.0, 3.0], dtype=np.float32)
+        with curation_db.connect() as conn:
+            conn.execute(
+                "INSERT INTO curation_hits "
+                "(source_name, url, url_normalized, title, embedding, embedding_model) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                ("Longreads", "https://example.com/a", "https://example.com/a",
+                 "A", vec.tobytes(), "gemini-embedding-001-768"),
+            )
+            # Different model — must be excluded.
+            conn.execute(
+                "INSERT INTO curation_hits "
+                "(source_name, url, url_normalized, title, embedding, embedding_model) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                ("Kottke.org", "https://example.com/b", "https://example.com/b",
+                 "B", vec.tobytes(), "some-other-model"),
+            )
+            # No embedding at all — must be excluded.
+            conn.execute(
+                "INSERT INTO curation_hits "
+                "(source_name, url, url_normalized, title) VALUES (?, ?, ?, ?)",
+                ("Waxy.org", "https://example.com/c", "https://example.com/c", "C"),
+            )
+
+        result = all_hit_embeddings(curation_db, "gemini-embedding-001-768")
+        assert len(result) == 1
+        assert result[0][0] == "Longreads"
+        assert np.array_equal(result[0][1], vec)
+
+
+class TestExtractEmbeddedLinks:
+    """digest-post link extraction (session_plan_curation_topic_
+    similarity.md) — pulling real embedded article links out of a
+    newsletter-issue-style feed entry's HTML body. The extraction was
+    additionally smoke-tested against a real, live WITI feed entry
+    during implementation (see docs/roadmap.md's 2026-08-10 entry)."""
+
+    def _entry(self, html):
+        return FeedEntry(
+            canonical_url="https://whyisthisinteresting.substack.com/p/issue-1",
+            title="The Issue Edition", byline=None, summary=None,
+            published_date=None, raw_content_html=html,
+        )
+
+    def test_extracts_real_external_link_with_anchor_text(self):
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        html = '<p><a href="https://wired.com/story/foo">A Great Wired Story</a></p>'
+        result = _extract_embedded_links(
+            self._entry(html), "whyisthisinteresting.substack.com",
+        )
+        assert result == [("https://wired.com/story/foo", "A Great Wired Story")]
+
+    def test_no_content_html_returns_empty(self):
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        entry = FeedEntry(
+            canonical_url="https://example.com/x", title="X", byline=None,
+            summary=None, published_date=None, raw_content_html=None,
+        )
+        assert _extract_embedded_links(entry, "example.com") == []
+
+    def test_skips_empty_or_short_anchor_text(self):
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        html = (
+            '<a href="https://wired.com/a"></a>'
+            '<a href="https://wired.com/b">here</a>'  # 4 chars, under the 10-char floor
+            '<a href="https://wired.com/c">A Real Article Title</a>'
+        )
+        result = _extract_embedded_links(self._entry(html), "whyisthisinteresting.substack.com")
+        assert result == [("https://wired.com/c", "A Real Article Title")]
+
+    def test_skips_same_domain_self_links(self):
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        html = (
+            '<a href="https://whyisthisinteresting.substack.com/p/issue-1">Read more</a>'
+            '<a href="https://wired.com/story/foo">A Real External Pick</a>'
+        )
+        result = _extract_embedded_links(self._entry(html), "whyisthisinteresting.substack.com")
+        assert result == [("https://wired.com/story/foo", "A Real External Pick")]
+
+    def test_skips_known_non_article_domains(self):
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        html = "".join(
+            f'<a href="https://{domain}/whatever">Some Real Looking Title</a>'
+            for domain in (
+                "substackcdn.com", "youtube.com", "youtu.be", "vimeo.com",
+                "twitter.com", "x.com", "instagram.com",
+            )
+        )
+        result = _extract_embedded_links(self._entry(html), "whyisthisinteresting.substack.com")
+        assert result == []
+
+    def test_caps_at_max_links_per_entry(self):
+        from aarva.sources.curation_crawler import (
+            _extract_embedded_links, _MAX_EXTRACTED_LINKS_PER_ENTRY,
+        )
+
+        html = "".join(
+            f'<a href="https://example{i}.com/x">A Real Looking Article Title {i}</a>'
+            for i in range(_MAX_EXTRACTED_LINKS_PER_ENTRY + 10)
+        )
+        result = _extract_embedded_links(self._entry(html), "whyisthisinteresting.substack.com")
+        assert len(result) == _MAX_EXTRACTED_LINKS_PER_ENTRY
+
+    def test_html_entities_in_anchor_text_are_unescaped_correctly(self):
+        """Real anchor text often contains HTML entities (curly quotes,
+        ampersands) — confirmed against a live WITI feed during
+        implementation (e.g. "the Military&#8217;s Tech"). The current
+        implementation strips tags but does NOT unescape entities —
+        this test documents that as current behavior."""
+        from aarva.sources.curation_crawler import _extract_embedded_links
+
+        html = '<a href="https://wired.com/a">The Military&#8217;s Tech</a>'
+        result = _extract_embedded_links(self._entry(html), "whyisthisinteresting.substack.com")
+        assert result == [("https://wired.com/a", "The Military&#8217;s Tech")]
+
 
 class TestCurationCrawler:
     """Feed fetching is mocked (monkeypatched fetch_feed) — no real
@@ -433,3 +656,86 @@ class TestStage456CurationIntegration:
         # Confirm the curation term actually moved the score versus
         # the disabled case — not just a coincidentally-equal value.
         assert score_row["ranking_score"] > round(expected_base, 4)
+
+    def test_curation_enabled_fuzzy_topic_match_bumps_ranking(
+        self, scoring_env, monkeypatch,
+    ):
+        """End-to-end exercise of the topic-similarity path (session_
+        plan_curation_topic_similarity.md): an article with NO exact-
+        URL hit, but a real stored embedding similar to a curated
+        pick's stored embedding, still gets a curation_score bump —
+        at the reduced 0.7x weight, not full weight. build_embedding_
+        client is stubbed (returns a fixed .name only, never calls
+        .embed()) so this test makes no real network/API calls."""
+        import numpy as np
+        from aarva.config import load_pipeline_config, CurationSource
+        from aarva.stages import stage_4_5_6_score
+
+        db = scoring_env["db"]
+        model_name = "test-embedding-model"
+        article_vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        similar_vec = np.array([0.9, np.sqrt(1 - 0.9**2), 0.0], dtype=np.float32)
+
+        with db.connect() as conn:
+            conn.execute(
+                "INSERT INTO articles "
+                "(canonical_url, title, publication_id, full_text, status, "
+                " embedding, embedding_model) "
+                "SELECT 'https://example.com/fuzzy-only-article', "
+                "'Fuzzy Only Article', publication_id, full_text, 'ingested', "
+                "?, ? FROM articles LIMIT 1",
+                (article_vec.tobytes(), model_name),
+            )
+            fuzzy_article_id = conn.execute(
+                "SELECT id FROM articles WHERE canonical_url = "
+                "'https://example.com/fuzzy-only-article'"
+            ).fetchone()[0]
+            # No exact-URL hit for this article at all — only a
+            # topically-similar embedding on a DIFFERENT URL.
+            conn.execute(
+                "INSERT INTO curation_hits "
+                "(source_name, url, url_normalized, title, embedding, embedding_model) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                ("Longreads", "https://example.com/a-different-curated-pick",
+                 "https://example.com/a-different-curated-pick",
+                 "A Different Curated Pick", similar_vec.tobytes(), model_name),
+            )
+
+        config = load_pipeline_config()
+        monkeypatch.setattr(
+            config.__class__, "curation",
+            property(lambda self: {
+                "enabled": True, "score_weight": 0.10,
+                "topic_similarity_floor": 0.80,
+            }),
+        )
+        monkeypatch.setattr(
+            stage_4_5_6_score, "load_curation_sources",
+            lambda: [CurationSource(
+                name="Longreads", homepage=None, feed_url="x",
+                weight=0.8, enabled=True, notes=None,
+            )],
+        )
+
+        class _StubEmbeddingClient:
+            name = model_name
+
+        monkeypatch.setattr(
+            stage_4_5_6_score, "build_embedding_client",
+            lambda cfg: _StubEmbeddingClient(),
+        )
+
+        stub = _StubLLMClient(CANNED_RESPONSE)
+        stage_4_5_6_score.score_all(
+            config, db, article_filter_ids={fuzzy_article_id}, llm=stub,
+        )
+
+        with db.connect() as conn:
+            row = conn.execute(
+                "SELECT curation_score FROM articles WHERE id = ?",
+                (fuzzy_article_id,),
+            ).fetchone()
+
+        # 0.8 (Longreads' weight) * 0.7 (fuzzy multiplier) — not full
+        # weight, since this was a topic-similarity match, not exact.
+        assert row["curation_score"] == pytest.approx(0.8 * 0.7)

@@ -70,26 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Curation signal v1.5: digest-post link extraction + topic-
-   similarity matching.** Full spec at `docs/session_plan_curation_
-   topic_similarity.md`. Follow-up to the curation-platform signal
-   shipped earlier today (2026-08-10, see "Recently completed") —
-   testing the shipped exact-URL-only matcher against a real crawl
-   found just 1 match out of 12,808 real Aarva articles, too low a
-   hit rate to move the `too_niche` rejection rate. Two real findings
-   motivate this: (a) Why Is This Interesting?'s entire feed (and 2/25
-   of Longreads') consists of newsletter-issue container posts, not
-   individual article picks — the real curated links are embedded
-   inside each issue's HTML body, which the crawler currently never
-   opens; (b) even with clean titles, exact-URL matching alone is
-   inherently rare. Real embeddings pulled from a live crawl (131 hits)
-   and compared against the full real catalog (12,808 articles) to
-   empirically ground a topic-similarity floor recommendation (0.80)
-   rather than guessing. AGENTS.md rule 4 sign-off from user
-   2026-08-10 — chose to extend the crawler with digest-link
-   extraction (a real scope increase) rather than rely on the
-   threshold alone.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -140,6 +120,91 @@ the sequence.
 Most recent first.
 
 ### 2026-08-10
+
+- **Curation signal v1.5: digest-post link extraction + topic-
+  similarity matching.** Full spec at `docs/session_plan_curation_
+  topic_similarity.md`. Same-day follow-up to the curation-platform
+  signal below — testing that signal's exact-URL-only matcher against
+  a real crawl found just 1 match out of 12,808 real Aarva articles,
+  too rare to move the `too_niche` rejection rate. Two extensions,
+  both grounded in real data pulled during the investigation rather
+  than assumed:
+  - **Digest-post link extraction** — confirmed Why Is This
+    Interesting?'s entire feed (and 2/25 of Longreads') consists of
+    newsletter-issue container posts (e.g. "The Saturday Selection,
+    Vol. 116", "The Tax Free Year Edition") whose OWN title/URL don't
+    describe any single article — the real curated picks are embedded
+    as `<a href>` links inside each issue's HTML body, which the
+    crawler previously never opened. `aarva/sources/rss.py`'s
+    `FeedEntry` gained a `raw_content_html` field (optional, defaults
+    to `None` — the one existing construction site was the only
+    caller, confirmed via grep before adding). New
+    `aarva/sources/curation_crawler.py::_extract_embedded_links()`
+    pulls `(url, anchor_text)` pairs out of that HTML, filtering empty/
+    short anchor text, same-domain self-links, and known CDN/video/
+    social domains (`substackcdn.com`, `youtube.com`, `vimeo.com`,
+    `twitter.com`/`x.com`, `instagram.com` — the last one caught by
+    manual spot-check of real extracted output, not planned in
+    advance), capped at 15 links/entry. Purely additive — the entry's
+    own (title, url) row is still recorded exactly as before.
+  - **Topic-similarity fuzzy matching** — `curation_hits` gained
+    `embedding`/`embedding_model` columns (mirroring `articles`'
+    existing storage shape); newly-inserted hits are embedded via the
+    same `aarva.clients.embedding` client Stage 1.5 already uses.
+    `curation_score_for()` (`aarva/services/curation_lookup.py`) now
+    also checks cosine similarity between a scored article's own
+    (already-computed) embedding and every curated pick's embedding,
+    counting anything above `curation.topic_similarity_floor` (0.80)
+    at a reduced 0.7× weight relative to an exact-URL hit. Per source,
+    exact match always takes priority over fuzzy, and only the single
+    best fuzzy match per source counts — prevents one prolific source
+    from stacking weak partial credits. New dependency in
+    `stage_4_5_6_score.py`: builds an embedding client (gated on
+    `curation.enabled`) purely to read its `.name` tag for filtering
+    `curation_hits` by matching model.
+  - **The 0.80 floor is empirically grounded, not guessed**: pulled
+    real embeddings from a live 6-source crawl (131 hits) and compared
+    against the full real catalog (12,808 articles). Manual inspection
+    at different score bands found genuine topical relevance held up
+    consistently down to ~0.80-0.82, degrading into title-genre-
+    collision noise below that (e.g. two differently-themed "roundup
+    post" titles matching each other purely on genre, not content —
+    "The Saturday Selection, Vol. 116" ↔ "Saturday assorted links" at
+    0.756).
+  - **Went through 2 rounds of the rule 17f audit before landing**:
+    round 1 caught a citation error (wrong line number for an existing
+    embedding-readback pattern), a numeric inconsistency (12,908 vs.
+    12,808 — same catalog, transposed digit), and a real design bug in
+    the scoring-integration pseudocode that would have re-run a query
+    once per article across concurrent worker threads instead of once
+    per run. All fixed, reconfirmed CLEAN in round 2.
+  - **Verified for real, twice**: (1) implementation-time — re-ran the
+    crawler against all 6 live production feeds with extraction now
+    live: 127 items → 286 total hits (167 newly extracted), all
+    embedded successfully via 2 real batched Vertex AI calls; spot-
+    checked WITI's extracted output for quality (real, specific
+    article titles like "A Civilian Plane Crashed in New Mexico...",
+    correctly separate from the still-present-but-harmless container
+    titles). (2) post-implementation calibration re-check — re-ran the
+    full similarity-distribution analysis against this new real data
+    and confirmed every known container/digest-title row (Saturday
+    Selection, Monday Media Diet, the "...Edition" posts, Top 5
+    Longreads) scores below 0.79 — safely excluded by the 0.80 floor,
+    exactly as the pre-implementation calibration predicted.
+  - 15 new tests in `aarva/tests/test_curation_signal.py` (repo total:
+    90, all passing) — digest-link extraction filtering rules
+    (including the real HTML-entity-in-anchor-text case seen in live
+    data), the fuzzy-match weight/priority/dedup rules, the hit-
+    embedding loader's model-filtering, and a full Stage 4-5-6
+    integration test exercising the fuzzy path end-to-end (stubbed
+    embedding client, zero real network calls, confirms the exact
+    0.7× weight and that it correctly fires with NO exact-URL match
+    present).
+  - Still `curation.enabled: false` by default — this PR changes no
+    editorial ranking on its own. Real-world validation (does
+    `too_niche`'s rejection rate actually move) is the operator's
+    post-enablement check over the following weeks, per both specs'
+    rollout plan.
 
 - **Curation-platform cross-check as a "not too niche" signal.** Full
   spec at `docs/session_plan_curation_platform_signal.md` (Cowork
