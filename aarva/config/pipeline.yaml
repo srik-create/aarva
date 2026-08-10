@@ -337,7 +337,8 @@ scoring:
 # doesn't change editorial behaviour until the operator inspects the
 # first crawl's output and opts in.
 curation:
-  enabled: false
+  enabled: true  # 2026-08-10: enabled per explicit user request to test
+                 # starting the next daily run — see docs/roadmap.md.
   score_weight: 0.10       # multiplier on the sum-of-matched-source-weights
   crawl_window_days: 14    # only consider each source's last N days of items
   # Topic-similarity floor (v1.5, docs/session_plan_curation_topic_
