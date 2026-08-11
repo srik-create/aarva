@@ -456,18 +456,21 @@
 
       let deferredPrompt = null;
 
-      // Chrome (Android / desktop) fires this when the PWA is installable.
+      // Chrome (Android / desktop) fires this when the PWA is installable;
+      // capture the event so the click handler can trigger the native
+      // prompt instead of falling through to the instructions modal.
       window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
         deferredPrompt = e;
-        wrapper.classList.remove('hidden');
       });
 
-      // iOS Safari never fires beforeinstallprompt — show the footer
-      // link immediately so iPhone listeners can find the instructions.
-      if (isIOS) {
-        wrapper.classList.remove('hidden');
-      }
+      // Show the install link on every non-standalone platform. Aarva
+      // ships no service worker, so beforeinstallprompt never fires on
+      // Chrome/Android/desktop — waiting for it left the link
+      // permanently hidden there. The click handler already routes to
+      // the right instructions modal (or the native prompt, if one
+      // arrived) per platform below.
+      wrapper.classList.remove('hidden');
 
       function hideAllHelp() {
         Object.values(helps).forEach(el => el && el.classList.add('hidden'));
