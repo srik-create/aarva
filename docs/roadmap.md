@@ -115,9 +115,25 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-10)
+## Recently completed (2026-06-29 → 2026-08-11)
 
 Most recent first.
+
+### 2026-08-11
+
+- **PWA install link fixed on Chrome/Android/desktop.** The footer
+  "Add to Home Screen" link (`base.html`'s PWA install controller)
+  only revealed itself on iOS Safari or once `beforeinstallprompt`
+  fired. Aarva ships no service worker (see `docs/project_brief.md`'s
+  2026-06-29 decision log row), so that event never fires on Chrome/
+  Android/desktop — the link was permanently hidden on every platform
+  except iOS. Reveal is now unconditional (still gated on
+  `!isStandalone`, so an already-installed session still hides it);
+  the click handler's existing per-platform branching (native prompt
+  if `beforeinstallprompt` did fire, else iOS/Android/other modal) is
+  unchanged. Verified for real with headless Chromium across desktop-
+  Chrome, iOS-Safari, Android-Chrome, and standalone UAs — link
+  visibility and the correct modal/prompt path confirmed in all four.
 
 ### 2026-08-10
 
