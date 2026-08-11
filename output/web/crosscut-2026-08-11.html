@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 11 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-11</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 11 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · managing childhood emotions</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-11/crosscut_0137.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>28 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When a child sits down with a tablet, they face a screen built to keep them clicking. Writing late last month in The Atlantic, Connie Chang looks at the slot-machine mechanics of popular video games, showing how these systems intentionally overwhelm young players. Something interesting emerges when pairing that investigation with a clinical primer published last week in The Conversation by Jessica Griffin, Associate Professor of Psychiatry and Peditrics, UMass Chan Medical School. She outlines the slow process of how humans learn to pause and handle intense feelings. Reading the two together makes it clear how heavily modern platforms tax a developing brain, demanding a level of emotional control that children are only barely starting to build.</p>
+        <article class='piece'>
+<p class='hook'>A nine-year-old boy smashes three tablets and cries that his life is horrible because he can&#x27;t hatch a rare digital pet. In an essay published late last month, Connie Chang investigates exactly why platforms like Roblox trigger these meltdowns. Listen for how she breaks down the actual mechanics of the games. A parent might see a harmless cartoon obstacle course, but the design is pure Vegas slot machine, built to intentionally overwhelm a young player.</p>
+<h2 class='title'>Why Kids Can’t Quit Roblox</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Connie Chang</span></p>
+<p class='source'><a href='https://www.theatlantic.com/family/2026/07/roblox-kids-gaming-mechanics-gambling/688095/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Connie Chang leaves you picturing a nine-year-old boy smashing a tablet in tears because a video game operates like a Las Vegas casino. The sheer mismatch between a child and a slot machine feels like an unfair fight. Then you turn to Jessica Griffin. She breaks down exactly how humans learn to handle frustration and anger. Put the two together, and something specific jumps out. 
+
+Griffin explains that emotional regulation takes years of practice and adult help to build. Read alongside Chang, that clinical reality puts those video game tantrums in a sharp new light. Developers are throwing adult-level psychological triggers—gambling loops and manufactured unfairness—at kids who are barely starting to figure out how to calm down when they drop a toy. The meltdowns Chang describes start to look less like bad behavior and more like a simple biological limit. A child&#x27;s developing brain is completely short-circuiting under a load it was never built to carry.</p>
+        <article class='piece'>
+
+<h2 class='title'>What is emotional regulation? A child psychologist explains</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>Jessica Griffin, Associate Professor of Psychiatry and Peditrics, UMass Chan Medical School</span></p>
+<p class='source'><a href='https://theconversation.com/what-is-emotional-regulation-a-child-psychologist-explains-280443' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A ten-year-old staring at a flashing loot box is up against teams of engineers paid to shatter human focus. On the other side of the screen, that same child is still trying to master the quiet, clumsy skill of taking a deep breath when frustrated. What lingers is the staggering gap between the relentless pressure of the software and the slow, physical work of growing up. If a digital space is engineered specifically to bypass a child&#x27;s emotional brakes, is it fair to expect the child to just try harder to stop?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
