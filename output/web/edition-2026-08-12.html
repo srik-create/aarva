@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Wednesday, 12 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-12</div>
+      <div class="edition-meta">6 pieces · Wednesday, 12 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Can a town actually slow down artificial intelligence by blocking the warehouses that power it?</p>
+        <h2 class="title">Americans don’t know how to fight AI. So they’re fighting data centers.</h2>
+        <p class="byline">
+          <span class="publication">Vox</span>
+          <span class='sep'>·</span><span>Marina Bolotnikova</span>
+        </p>
+        <p class="contextualisation">Across the country, neighborhoods are fighting new data centers over water use and noise. But as this Vox essay published on 2 June 2026 observes, these disputes are actually proxy wars over artificial intelligence. With no way to shape national tech policy, people are using local zoning laws to block the massive warehouses that power it. The insight holds up perfectly today as a clear way to understand why the biggest technological shift of a generation is being fought in local planning meetings.</p>
+        <p class='show-notes'>An examination of the growing local opposition to new AI data centers across the United States. The author argues that environmental and zoning disputes serve as a stand-in for broader public fears about artificial intelligence and job loss. These town-by-town fights over physical infrastructure distract from a larger political failure to regulate the technology and manage its economic impact.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_1047.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.vox.com/future-perfect/490350/data-center-moratoria-ai-backlash' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">If a machine can make anything, where do your personal tastes actually come from?</p>
+        <h2 class="title">Why We Like Things</h2>
+        <p class="byline">
+          <span class="publication">Asterisk</span>
+          
+        </p>
+        <p class="contextualisation">In this piece from 11 August 2026, Asterisk magazine looks at the tech industry&#x27;s sudden obsession with a very old concept. As artificial intelligence gets better at generating code and copy, executives are claiming that human taste is the ultimate competitive moat. But the essay pauses to ask what taste actually is, and whether it can really be reduced to a business advantage. Moving from the Industrial Revolution to the Bauhaus design school, it treats aesthetic judgment as something far more interesting than a talent for picking the right font. It asks how personal preferences connect people to one another.</p>
+        <p class='show-notes'>An examination of how people develop their tastes, treating aesthetic judgment as a learned social habit rather than an innate talent. Drawing on the history of the Bauhaus movement, theories of class and desire, and Hannah Arendt&#x27;s political philosophy, it traces how individuals form and share their preferences. Taste emerges not as a private competitive asset, but as a way to communicate and participate in a shared world.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_13135.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>31 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://asteriskmag.com/issues/15/why-we-like-things' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">If a political party changes its values, how does it win back the voters who didn&#x27;t?</p>
+        <h2 class="title">Democrats have a working-class voter problem that progressives like Abdul El-Sayed are still struggling to solve</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Nicholas Jacobs, Goldfarb Family Distinguished Chair in American Government, Colby College; Institute for Humane Studies</span>
+        </p>
+        <p class="contextualisation">Progressive politicians keep trying to win back the working class with promises to fight the oligarchy and rebuild the economy. But seventy years of voter surveys, laid out in a 7 August 2026 essay, point to a gap that wage policies cannot fix. The numbers map a slow, decades-long cultural drift between blue-collar voters and the Democrats hoping to represent them. The tension centers on entirely different views of personal effort and whether government institutions actually work. It forces an uncomfortable question about who really abandoned whom.</p>
+        <p class='show-notes'>A review of 70 years of polling data tracking the steady split between working-class voters and the Democratic Party. The research measures shifts in public opinion on trade, social values, and trust in government since the 1950s, showing that the divide stems from the party moving left rather than workers moving right. The findings challenge the theory that economic populism alone can rebuild a blue-collar coalition.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_12535.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>11 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/democrats-have-a-working-class-voter-problem-that-progressives-like-abdul-el-sayed-are-still-struggling-to-solve-289294' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">When experts tell parents to limit screen time, how much does that advice actually cost?</p>
+        <h2 class="title">The Best Parenting Hack Is Being Rich</h2>
+        <p class="byline">
+          <span class="publication">The Atlantic</span>
+          <span class='sep'>·</span><span>Olga Khazan</span>
+        </p>
+        <p class="contextualisation">Keeping a toddler away from a television screen takes an enormous amount of energy. A 3 August 2026 story in The Atlantic skips past the usual guilt trip to ask a more practical question: who actually has the resources to pull that off? The answer points to an unspoken reality behind most parenting advice. When researchers measure the benefits of banning iPads or serving organic food, they usually end up measuring something much simpler: the daily advantages of a wealthy household.</p>
+        <p class='show-notes'>An examination of how household wealth determines a family&#x27;s ability to follow expert parenting advice. Draws on economic and child-development research to show how studies struggle to separate the effects of specific parenting choices, like limiting screen time, from the general benefits of money and education. Ultimately makes a case for affordable childcare and flexible work rather than more rules for parents to follow.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_11756.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theatlantic.com/family/2026/08/parenting-advice-education-income/688138/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">Why would a spider spend hours building a spring-loaded catapult to catch just one kind of ant?</p>
+        <h2 class="title">This Newly Discovered Spider Builds a Unique Web That Catapults Ants Through the Air</h2>
+        <p class="byline">
+          <span class="publication">Smithsonian Magazine</span>
+          
+        </p>
+        <p class="contextualisation">Deep in the rainforests of northern Australia, a newly discovered spider spends four hours every night building a spring-loaded trap. On 24 June 2026, Smithsonian Magazine reported on this web, which functions as a catapult designed for exactly one target: the aggressive green tree ant. The sheer physics of the trap command attention. Yet the real puzzle is evolutionary. Why spend so much energy building a complex weapon just to catch a single ant? The answer reveals a clever biological workaround for tapping into an abundant food source without angering a colony of five million.</p>
+        <p class='show-notes'>A report on a newly discovered Australian spider that builds a spring-loaded silk trap to catapult green tree ants into its web. Using high-speed cameras, biologists documented how the spider combines tensioned silk and suspected pheromones to capture a single aggressive prey species. The findings detail the physical mechanics of the trap, which exerts more power per gram than any other known biological catapult.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_4309.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>7 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.smithsonianmag.com/smart-news/this-newly-discovered-spider-builds-a-unique-web-that-sends-ants-catapulting-through-the-air-180989003/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">Where does the sports-comedy man-child go when the world around him finally grows up?</p>
+        <h2 class="title">The Sports Idiot Is Dead, Long Live The Sports Idiot</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Annie Berke</span>
+        </p>
+        <p class="contextualisation">The classic sports idiot used to be a reliable Hollywood fixture: a man brilliant at a game, terrible at life, and usually desperate for a father&#x27;s approval. Published on 11 August 2026, the piece finds that exact archetype suddenly returning to modern screens. The central question is what happens when a comedy genre built entirely on arrested development tries to grow up. It asks how studios are updating the slacker playbook for an era of self-awareness, and whether the joke still lands when the bad behavior is left behind.</p>
+        <p class='show-notes'>An overview of the sports idiot comedy genre and its recent revival, using the Apple TV movie The Dink to track how the format has changed since its 1990s peak. The modern version of the man-child trope updates the formula of films like Dodgeball, trading the mean-spirited jokes of earlier decades for self-awareness and a gentler path to adulthood.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/article_13326.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/the-sports-idiot-is-dead-long-live-the-sports-idiot' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

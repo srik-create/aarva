@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 12 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-12</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 12 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · gender and intimacy</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-12/crosscut_0139.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>69 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A strange quiet is settling over the dating scene. Writing in *The Atlantic*, Faith Hill looks at a growing &quot;romance slump,&quot; where women are walking away from the search for a partner rather than accepting an unequal deal. It feels like a strictly modern shift, but a look backward changes the picture. In *Aeon*, Rosa Campbell revisits the sexual revolution of the 1970s, tracking how early feminist researchers realized that throwing out the old rulebook for sex did not actually make women happier. Read side by side, a sharper question surfaces. What happens when society strips away the traditional rules around intimacy, but leaves the actual power balance between men and women completely untouched?</p>
+        <article class='piece'>
+<p class='hook'>Writing last week, Faith Hill begins ninety seconds into a three-minute hug with a complete stranger. She uses this hundred-dollar singles event in a candlelit loft to point out a modern contradiction. Despite having phones full of dating apps, young adults are going on fewer dates and having less sex. Notice how Hill explains this romance slump, arguing that many women are choosing to opt out entirely rather than settle for unequal partnerships.</p>
+<h2 class='title'>The Great Romance Slump</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Faith Hill</span></p>
+<p class='source'><a href='https://www.theatlantic.com/magazine/2026/09/modern-romance-recession/687968/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Faith Hill leaves the listener staring at a phone with hundreds of unread messages, exhausted by a dating market that offers endless options but very little actual connection. Young people opting out of romance entirely looks like a brand-new problem, driven by apps and awkward singles events. But turn to Rosa Campbell, and that modern exhaustion starts to look like the echo of an older disappointment. Campbell looks back at the researcher Shere Hite handing out surveys in 1970s Manhattan. Back then, the old rules around intimacy were vanishing. Women had the birth control pill and no-fault divorce. But as Campbell points out, removing those barriers just meant women were expected to have more sex on male terms, leaving them frustrated. Notice how the two writers pinpoint the exact same trap, fifty years apart. Tearing down traditional rules—whether it&#x27;s the stigma around premarital sex in the seventies, or the pressure to marry today—doesn&#x27;t automatically build better relationships. Read alongside Campbell, Hill&#x27;s modern dating slump looks less like a tech problem and more like an unfinished revolution. If the basic power dynamic between men and women goes untouched, endless freedom just becomes another exhausting chore.</p>
+        <article class='piece'>
+
+<h2 class='title'>A second sexual revolution</h2>
+<p class='byline'><span class='publication'>Aeon</span><span class='sep'>·</span><span>Rosa Campbell</span></p>
+<p class='source'><a href='https://aeon.co/essays/how-shere-hite-listened-to-womens-sexual-desires-and-dislikes' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A deleted dating app and a discarded 1970s marriage manual share the same promise of freedom. But clearing out traditional expectations doesn&#x27;t automatically build a better connection. As both eras show, the old power imbalances between men and women just slip into new clothes. What lingers is the sense that stripping away the restrictions on intimacy is only the easy part. The question left to sit with is much harder: if rewriting the rules of romance isn&#x27;t enough to fix the imbalance, what does an equal partnership actually look like?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
