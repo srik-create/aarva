@@ -70,6 +70,31 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Trend-signal layer for delight + timeliness.** Full spec at
+   `docs/session_plan_trend_signal_for_delight.md`. Adds an
+   external-signal layer that watches Google Trends (multi-region),
+   YouTube Trending (multi-region), and GDELT into a new
+   `trend_hits` table on main_db. Each trend gets LLM query-expanded
+   and semantically matched against Aarva's existing
+   `articles.embedding` vector space (`aarva/db.py:35`); matches
+   surface in `python -m aarva.review` as candidates for the
+   delight/bonus slot with operator add/dismiss actions. For
+   trends with no in-catalog match, a GDELT DOC-API fallback
+   searches for coverage across Aarva's publication allowlist
+   domains — surfacing URLs the operator can pull in via existing
+   `aarva.ingest_url`. Positive-only signal; semi-automatic
+   (operator picks per trend, never auto-added). Guardrails: 48h
+   article-age minimum, JTBD filter (`delight` / `curiosity` /
+   `smart_escape` / `keep_ahead` only — excludes
+   `keep_up_to_date`), trend-phrase blacklist. Reddit / Weibo / X
+   explicitly rejected 2026-08-13 (Western skew / scraping
+   fragility / API cost). Complements — does not replace — the
+   peer-curator signal at `docs/session_plan_curation_platform_signal.md`;
+   both compose additively via `add_article_to_todays_edition`.
+   AGENTS.md rule 4 sign-off from user 2026-08-13; rule 6a
+   verification of sources delegated to Claude Code at
+   implementation time.
+
 ---
 
 ## Deferred — to return to (in priority order)
