@@ -217,9 +217,10 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
     # Stage 3 — Trend-signal crawl + match (external delight/timeliness
     # signal — see docs/session_plan_trend_signal_for_delight.md).
     # Deliberately explicit-only, same posture as Stage 0's curation
-    # crawl: NOT included in a full (stage=None) run. The operator runs
-    # `--stage 3` on its own schedule to build up trend_hits and inspect
-    # the output before opting in via pipeline.yaml's trends.enabled.
+    # crawl: NOT included in a full (stage=None) run. Running `--stage 3`
+    # IS the opt-in — no separate pipeline.yaml flag (removed 2026-08-13
+    # per user decision); whatever it finds always surfaces in the next
+    # `python -m aarva.review` run's "Trending" section.
     if stage == 3:
         log.info("Stage 3 — Trend crawl starting")
         run_id = db.start_run("stage_3_trend_crawl")

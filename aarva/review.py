@@ -778,15 +778,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         ).fetchone()
     today_iso = str(row["edition_date"]) if row else "?"
 
-    # Gate on trends.enabled — mirrors the curation-signal feature's
-    # pattern: the crawl/match stage runs and populates trend_hits
-    # regardless (harmless), but nothing surfaces to the operator, and
-    # no editorial behaviour changes, until this is explicitly turned
-    # on. Bug fixed 2026-08-13: this gate was missing entirely at
-    # first ship — trending_items was loaded and shown unconditionally.
-    trending_items = (
-        _load_trending(db) if config.trends.get("enabled", False) else []
-    )
+    # No separate enabled flag (removed 2026-08-13 per user decision) —
+    # running `--stage 3` is itself the opt-in gesture; whatever it
+    # finds always surfaces here. Still never auto-added to an
+    # edition — the operator picks add/dismiss per trend below.
+    trending_items = _load_trending(db)
     _print_trending(trending_items)
 
     _print_header(edition_id, today_iso, len(pieces), _approved_count(db, edition_id))

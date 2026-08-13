@@ -355,13 +355,14 @@ curation:
   topic_similarity_floor: 0.80
 
 # Trend-signal layer for the delight/bonus slot — see
-# docs/session_plan_trend_signal_for_delight.md. OFF by default so
-# merging this doesn't change daily behaviour; enable after inspecting
-# a `--stage 3` crawl + match run's output. Positive-only, semi-
-# automatic — surfaced in `python -m aarva.review`'s "Trending"
-# section, never auto-added to an edition.
+# docs/session_plan_trend_signal_for_delight.md. No separate enabled
+# flag (removed 2026-08-13 per user decision) — running
+# `python -m aarva.daily --stage 3` is itself the opt-in: it's
+# explicit-only (not part of a full pipeline run, same as Stage 0's
+# curation crawl), and whatever it finds always surfaces in
+# `python -m aarva.review`'s "Trending" section. Still never
+# auto-added to an edition — the operator picks add/dismiss per trend.
 trends:
-  enabled: false
   vector_match_threshold: 3.5   # LLM re-rank 1-5; below this, GDELT fallback runs
   # Guardrails (locked with user 2026-08-13) — keep Aarva's "curated
   # slow, not breaking news" posture (docs/project_brief.md) even

@@ -202,20 +202,20 @@ Most recent first.
     (all mocked — no real API spend in the automated suite), the
     review CLI's trend-token parsing, and `_apply_trend_decisions`
     against a disposable on-disk DB.
-  - `trends.enabled: false` by default — this PR changes no editorial
-    ranking on its own, matching the curation-signal feature's own
-    rollout pattern.
-  - **Follow-up fix, same day**: `trends.enabled` was read by
+  - **No separate `trends.enabled` flag — settled same day, twice.**
+    First shipped with `enabled: false` (mirroring the curation-signal
+    rollout pattern), then a bug surfaced: `trends.enabled` was read by
     `trend_matcher.py` for its threshold sub-values but nothing
-    actually checked the flag itself — the Trending section would
-    have shown up in `python -m aarva.review` regardless of the flag.
-    Caught by the user asking "will `--stage 3` automatically turn
-    `trends.enabled` on?" — the honest answer surfaced that nothing
-    gated it either way. Fixed by gating `_load_trending`'s call in
-    `review.py::main()` on `config.trends.get("enabled", False)`,
-    mirroring the curation-signal pattern where the crawl runs freely
-    but only the CONSUMPTION step is gated. 2 new tests drive `main()`
-    end-to-end with the flag both off and on (repo total: 128).
+    actually checked the flag itself, so the Trending section would
+    have shown up in `python -m aarva.review` regardless of it — caught
+    by the user asking "will `--stage 3` automatically turn
+    `trends.enabled` on?". Fixed to properly gate on it — then the user
+    decided the flag was redundant anyway: running `--stage 3` is
+    itself an explicit, manual opt-in gesture (same posture as Stage
+    0's curation crawl), so a second config toggle on top of that adds
+    nothing. Removed `trends.enabled` from `pipeline.yaml` entirely —
+    whatever `--stage 3` finds now always surfaces in the next review
+    run. Tests updated to match (repo total: 128).
 
 ### 2026-08-11
 
