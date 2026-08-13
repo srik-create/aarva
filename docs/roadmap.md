@@ -205,6 +205,17 @@ Most recent first.
   - `trends.enabled: false` by default — this PR changes no editorial
     ranking on its own, matching the curation-signal feature's own
     rollout pattern.
+  - **Follow-up fix, same day**: `trends.enabled` was read by
+    `trend_matcher.py` for its threshold sub-values but nothing
+    actually checked the flag itself — the Trending section would
+    have shown up in `python -m aarva.review` regardless of the flag.
+    Caught by the user asking "will `--stage 3` automatically turn
+    `trends.enabled` on?" — the honest answer surfaced that nothing
+    gated it either way. Fixed by gating `_load_trending`'s call in
+    `review.py::main()` on `config.trends.get("enabled", False)`,
+    mirroring the curation-signal pattern where the crawl runs freely
+    but only the CONSUMPTION step is gated. 2 new tests drive `main()`
+    end-to-end with the flag both off and on (repo total: 128).
 
 ### 2026-08-11
 

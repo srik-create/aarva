@@ -778,7 +778,15 @@ def main(argv: Optional[list[str]] = None) -> int:
         ).fetchone()
     today_iso = str(row["edition_date"]) if row else "?"
 
-    trending_items = _load_trending(db)
+    # Gate on trends.enabled — mirrors the curation-signal feature's
+    # pattern: the crawl/match stage runs and populates trend_hits
+    # regardless (harmless), but nothing surfaces to the operator, and
+    # no editorial behaviour changes, until this is explicitly turned
+    # on. Bug fixed 2026-08-13: this gate was missing entirely at
+    # first ship — trending_items was loaded and shown unconditionally.
+    trending_items = (
+        _load_trending(db) if config.trends.get("enabled", False) else []
+    )
     _print_trending(trending_items)
 
     _print_header(edition_id, today_iso, len(pieces), _approved_count(db, edition_id))

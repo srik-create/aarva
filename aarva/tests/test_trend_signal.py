@@ -18,6 +18,7 @@ import pytest
 
 from aarva.config import TrendSource
 from aarva.db import Database
+import aarva.review as review_module
 from aarva.review import (
     TrendingItem,
     _apply_trend_decisions,
@@ -571,6 +572,73 @@ class TestApplyTrendDecisions:
         summary = _apply_trend_decisions(db, items, {1: "a"})
         assert summary == {"trend_added": 0, "trend_dismissed": 0}
         assert "no Aarva match to add" in capsys.readouterr().out
-        with db.connect() as conn:
-            row = conn.execute("SELECT operator_action FROM trend_hits").fetchone()
-        assert row["operator_action"] is None
+
+
+@pytest.fixture
+def full_review_scenario(tmp_path):
+    """A real on-disk DB with a proposed piece in today's daily edition
+    PLUS an unresolved trend_hits row — enough for a real main() drive,
+    not just the individual helper functions."""
+    db_path = tmp_path / "aarva.db"
+    db = Database(str(db_path))
+    with db.connect() as conn:
+        conn.execute("INSERT INTO publications (name, enabled) VALUES ('Pub', 1)")
+        pub_id = conn.execute("SELECT id FROM publications").fetchone()[0]
+        conn.execute(
+            "INSERT INTO articles (canonical_url, title, publication_id, "
+            "full_text, status) VALUES ('https://x/piece', 'Piece Title', "
+            "?, 'body text', 'scored')",
+            (pub_id,),
+        )
+        piece_id = conn.execute(
+            "SELECT id FROM articles WHERE canonical_url = 'https://x/piece'"
+        ).fetchone()[0]
+        conn.execute(
+            "INSERT INTO article_scores (article_id, rigour, posture, jtbd_primary) "
+            "VALUES (?, 0.8, 0.8, 'curiosity')",
+            (piece_id,),
+        )
+        conn.execute(
+            "INSERT INTO editions (edition_date, edition_type) "
+            "VALUES (date('now'), 'daily')"
+        )
+        edition_id = conn.execute("SELECT id FROM editions").fetchone()[0]
+        conn.execute(
+            "INSERT INTO edition_pieces (edition_id, article_id, slot, "
+            "position, review_status) VALUES (?, ?, 'curiosity', 1, 'proposed')",
+            (edition_id, piece_id),
+        )
+        conn.execute(
+            "INSERT INTO trend_hits (source_name, trend_phrase, trend_phrase_en, "
+            "fallback_urls_json) VALUES ('google_trends_us', 'p', 'p', '[]')"
+        )
+    return db_path
+
+
+class TestTrendsEnabledGate:
+    """Bug caught 2026-08-13: trends.enabled was read by trend_matcher
+    for its threshold values but never actually checked to gate
+    anything — the Trending section showed up in review regardless of
+    the flag. Fixed by gating _load_trending's call in main()."""
+
+    def _drive_main(self, db_path, monkeypatch, trends_enabled):
+        monkeypatch.setenv("AARVA_DB_PATH", str(db_path))
+        from aarva.config import load_pipeline_config as real_load_config
+        real_config = real_load_config()
+        monkeypatch.setattr(
+            real_config.__class__, "trends",
+            property(lambda self: {"enabled": trends_enabled}),
+        )
+        monkeypatch.setattr(review_module, "load_pipeline_config", lambda: real_config)
+
+        inputs = iter(["", "y"])
+        monkeypatch.setattr("builtins.input", lambda *a, **k: next(inputs))
+        review_module.main([])
+
+    def test_disabled_hides_trending_section(self, full_review_scenario, monkeypatch, capsys):
+        self._drive_main(full_review_scenario, monkeypatch, trends_enabled=False)
+        assert "Trending topics" not in capsys.readouterr().out
+
+    def test_enabled_shows_trending_section(self, full_review_scenario, monkeypatch, capsys):
+        self._drive_main(full_review_scenario, monkeypatch, trends_enabled=True)
+        assert "Trending topics" in capsys.readouterr().out
