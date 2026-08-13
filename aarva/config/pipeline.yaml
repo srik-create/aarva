@@ -354,6 +354,29 @@ curation:
   # has been live a while and a fresh calibration crawl can be run.
   topic_similarity_floor: 0.80
 
+# Trend-signal layer for the delight/bonus slot — see
+# docs/session_plan_trend_signal_for_delight.md. OFF by default so
+# merging this doesn't change daily behaviour; enable after inspecting
+# a `--stage 3` crawl + match run's output. Positive-only, semi-
+# automatic — surfaced in `python -m aarva.review`'s "Trending"
+# section, never auto-added to an edition.
+trends:
+  enabled: false
+  vector_match_threshold: 3.5   # LLM re-rank 1-5; below this, GDELT fallback runs
+  # Guardrails (locked with user 2026-08-13) — keep Aarva's "curated
+  # slow, not breaking news" posture (docs/project_brief.md) even
+  # though this signal is sourced from mainstream popularity indices.
+  article_age_min_hours: 48
+  allowed_jtbds: [delight, curiosity, smart_escape, keep_ahead]
+  # Trend phrases to never surface (substring match, case-insensitive).
+  # Empty at ship-time is fine — grow as needed during first-week tuning.
+  blacklist_phrases: []
+  # GDELT DOC-API fallback search (only runs for a trend with no
+  # in-catalog vector match) — restricted to publications.yaml's
+  # allowlist domains.
+  gdelt_max_records: 25
+  gdelt_timespan: 14d
+
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────
   # Gemini is the LLM for all production pipeline work — Stage 4+5+6

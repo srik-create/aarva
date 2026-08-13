@@ -67,6 +67,17 @@ class CurationSource:
 
 
 @dataclass(frozen=True)
+class TrendSource:
+    """A Google Trends region crawled for the delight/bonus trend
+    signal — see docs/session_plan_trend_signal_for_delight.md."""
+    name: str
+    region: str
+    weight: float
+    enabled: bool
+    notes: str | None
+
+
+@dataclass(frozen=True)
 class IngestionConfig:
     max_entries_per_feed: int = 30
     lookback_days: int = 7
@@ -113,6 +124,10 @@ class PipelineConfig:
     @property
     def curation(self) -> dict[str, Any]:
         return self.raw.get("curation", {})
+
+    @property
+    def trends(self) -> dict[str, Any]:
+        return self.raw.get("trends", {})
 
 
 def _resolve_path(rel_or_abs: str, project_root: Path) -> Path:
@@ -231,6 +246,23 @@ def load_curation_sources() -> list[CurationSource]:
             name=s["name"],
             homepage=s.get("homepage"),
             feed_url=s["feed_url"],
+            weight=float(s.get("weight", 1.0)),
+            enabled=s.get("enabled", True),
+            notes=s.get("notes"),
+        )
+        for s in raw.get("sources", [])
+    ]
+
+
+def load_trend_sources() -> list[TrendSource]:
+    """Load aarva/config/trend_sources.yaml. Mirrors load_curation_sources.
+    See docs/session_plan_trend_signal_for_delight.md."""
+    with (CONFIG_DIR / "trend_sources.yaml").open() as f:
+        raw = yaml.safe_load(f)
+    return [
+        TrendSource(
+            name=s["name"],
+            region=s["region"],
             weight=float(s.get("weight", 1.0)),
             enabled=s.get("enabled", True),
             notes=s.get("notes"),

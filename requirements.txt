@@ -20,6 +20,8 @@ feedparser>=6.0            # RSS/Atom feed parsing (Stage 1)
 httpx>=0.27                # HTTP client (RSS fetching + article extraction)
 trafilatura>=2.0           # Article-body extraction; v2 API for favor_recall / no_fallback
 python-dateutil>=2.8       # Lenient date parsing in RSS entries
+trendspyg>=1.5             # Google Trends RSS path (trend signal, Stage 3 crawl —
+                           # pytrends is archived/unmaintained, verified 2026-08-13)
 
 # ─── Stage 1.5 consolidation ──────────────────────────────────────────────
 numpy>=1.26                # Embedding vector math

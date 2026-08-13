@@ -349,6 +349,41 @@ CREATE INDEX IF NOT EXISTS idx_curation_hits_normalized
     ON curation_hits(url_normalized);
 
 
+-- Trend signal for the delight/bonus slot — see
+-- docs/session_plan_trend_signal_for_delight.md. Nightly crawl of
+-- Google Trends (aarva/config/trend_sources.yaml) writes rows here;
+-- aarva.services.trend_matcher then tries a semantic match against
+-- articles.embedding (see the guardrail filter in that module), and
+-- falls back to a GDELT DOC-API search restricted to the publication
+-- allowlist when no match clears the threshold. Surfaced to the
+-- operator in `python -m aarva.review`'s "Trending" section — always
+-- semi-automatic, never auto-added to an edition.
+CREATE TABLE IF NOT EXISTS trend_hits (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_name         TEXT NOT NULL,
+    trend_phrase        TEXT NOT NULL,
+    trend_phrase_en     TEXT,
+    region              TEXT,
+    seen_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    raw_metadata_json   TEXT,
+    matched_article_id  INTEGER REFERENCES articles(id),
+    match_score         REAL,
+    fallback_urls_json  TEXT,
+    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed') OR operator_action IS NULL),
+    resolved_at         TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_trend_hits_seen_at
+    ON trend_hits(seen_at);
+CREATE INDEX IF NOT EXISTS idx_trend_hits_action
+    ON trend_hits(operator_action, seen_at);
+-- Same-day idempotency: a re-crawl the same day skips a trend phrase
+-- it already recorded for that source. Expression index on date(seen_at)
+-- lets the crawler use a plain INSERT OR IGNORE, same pattern as
+-- curation_hits' primary-key-based idempotency.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_trend_hits_dedup
+    ON trend_hits(source_name, trend_phrase, date(seen_at));
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,

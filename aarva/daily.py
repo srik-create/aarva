@@ -23,7 +23,8 @@ import click
 from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
-from aarva.sources import curation_crawler
+from aarva.sources import curation_crawler, trend_crawler
+from aarva.services import trend_matcher
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_8c_author_provenance,
@@ -210,6 +211,38 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
         except Exception as e:
             db.finish_run(run_id, status="failed", error_message=str(e))
             log.exception("Stage 0 failed")
+            sys.exit(1)
+        return
+
+    # Stage 3 — Trend-signal crawl + match (external delight/timeliness
+    # signal — see docs/session_plan_trend_signal_for_delight.md).
+    # Deliberately explicit-only, same posture as Stage 0's curation
+    # crawl: NOT included in a full (stage=None) run. The operator runs
+    # `--stage 3` on its own schedule to build up trend_hits and inspect
+    # the output before opting in via pipeline.yaml's trends.enabled.
+    if stage == 3:
+        log.info("Stage 3 — Trend crawl starting")
+        run_id = db.start_run("stage_3_trend_crawl")
+        try:
+            crstats = trend_crawler.crawl_trend_sources(config, db)
+            log.info(
+                "Stage 3 crawl done — %d/%d sources ok, %d trends seen, "
+                "%d new hits, %d already known",
+                crstats.sources_processed,
+                crstats.sources_processed + crstats.sources_failed,
+                crstats.trends_seen, crstats.hits_added,
+                crstats.hits_already_seen,
+            )
+            mstats = trend_matcher.match_trends(config, db)
+            log.info(
+                "Stage 3 match done — %d processed, %d matched, "
+                "%d fallback searches run",
+                mstats.trends_processed, mstats.matched, mstats.fallback_ran,
+            )
+            db.finish_run(run_id, status="success")
+        except Exception as e:
+            db.finish_run(run_id, status="failed", error_message=str(e))
+            log.exception("Stage 3 failed")
             sys.exit(1)
         return
 
