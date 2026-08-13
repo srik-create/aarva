@@ -70,31 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Trend-signal layer for delight + timeliness.** Full spec at
-   `docs/session_plan_trend_signal_for_delight.md`. Adds an
-   external-signal layer that watches Google Trends (multi-region),
-   YouTube Trending (multi-region), and GDELT into a new
-   `trend_hits` table on main_db. Each trend gets LLM query-expanded
-   and semantically matched against Aarva's existing
-   `articles.embedding` vector space (`aarva/db.py:35`); matches
-   surface in `python -m aarva.review` as candidates for the
-   delight/bonus slot with operator add/dismiss actions. For
-   trends with no in-catalog match, a GDELT DOC-API fallback
-   searches for coverage across Aarva's publication allowlist
-   domains — surfacing URLs the operator can pull in via existing
-   `aarva.ingest_url`. Positive-only signal; semi-automatic
-   (operator picks per trend, never auto-added). Guardrails: 48h
-   article-age minimum, JTBD filter (`delight` / `curiosity` /
-   `smart_escape` / `keep_ahead` only — excludes
-   `keep_up_to_date`), trend-phrase blacklist. Reddit / Weibo / X
-   explicitly rejected 2026-08-13 (Western skew / scraping
-   fragility / API cost). Complements — does not replace — the
-   peer-curator signal at `docs/session_plan_curation_platform_signal.md`;
-   both compose additively via `add_article_to_todays_edition`.
-   AGENTS.md rule 4 sign-off from user 2026-08-13; rule 6a
-   verification of sources delegated to Claude Code at
-   implementation time.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -140,9 +115,96 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-11)
+## Recently completed (2026-06-29 → 2026-08-13)
 
 Most recent first.
+
+### 2026-08-13
+
+- **Trend-signal layer for delight + timeliness.** Full spec at
+  `docs/session_plan_trend_signal_for_delight.md`. Adds an external
+  popularity-signal layer — "the wider world is paying attention to
+  this," distinct from the peer-curator signal's "other editors picked
+  this" — that surfaces candidates for the delight/bonus slot during
+  `python -m aarva.review`. Positive-only, semi-automatic: the operator
+  picks add/dismiss per trend; nothing is ever auto-added to an
+  edition.
+  - **Scope changed materially from the spec during rule 6a
+    verification**, all confirmed with the user before building:
+    - `pytrends` (the library the spec named) turned out to be
+      archived since 2026-04-17 with unpredictable rate-limiting —
+      switched to `trendspyg` instead (actively maintained, MIT,
+      verified against real live data for US/IN/GB before wiring).
+    - GDELT's DOC 2.0 API turned out to be purely search-driven — no
+      "what's trending" endpoint exists, contrary to the spec's
+      `gdelt_global` source entry. Dropped as an independent crawled
+      source; GDELT still does its other job — the fallback search
+      once a trend phrase is already known — exactly as designed.
+    - YouTube Trending dropped from v1 entirely (not deferred) — the
+      new `AARVA_YOUTUBE_API_KEY` GCP setup step it would have needed
+      wasn't worth it for v1, per user decision.
+    - Net effect: v1 ships with exactly one crawled trend source
+      (Google Trends, 3 real regions — US/IN/GB; the spec's 4th
+      "global" region doesn't exist as a real Google Trends concept
+      and was dropped rather than invented) plus GDELT as fallback
+      search.
+  - New `trend_hits` table (`aarva/db.py`) + `aarva/config/
+    trend_sources.yaml` + `TrendSource`/`load_trend_sources()`
+    (`aarva/config/__init__.py`), mirroring the curation-signal
+    feature's existing shape.
+  - New `aarva/sources/trend_crawler.py` — nightly Google Trends crawl
+    via trendspyg's RSS path; non-English trend phrases (confirmed
+    real in India's feed — Hindi/Tamil script mixed with English) get
+    translated via Gemini, cached by phrase. Idempotent same-day
+    re-crawls via a `date(seen_at)`-expression unique index.
+  - New `aarva/services/trend_matcher.py` — per unresolved trend:
+    blacklist check, LLM query-expansion (locked prompt), semantic
+    retrieval against `articles.embedding` with the editorial
+    guardrail applied at SQL time (48h min age, JTBD in
+    delight/curiosity/smart_escape/keep_ahead, `status='scored'` —
+    note this guardrail needs a JOIN to `article_scores`, since
+    `jtbd_primary` lives there, not on `articles`; the spec's
+    illustrative SQL omitted this), LLM re-rank (threshold 3.5/5),
+    GDELT fallback search restricted to `publications.yaml`'s
+    allowlist domains for trends with no match.
+  - New `--stage 3` in `aarva/daily.py`, same explicit-only posture as
+    Stage 0's curation crawl (not part of a full pipeline run).
+  - `aarva/review.py` gained a "Trending topics" section rendered
+    above the usual per-piece list, with `tNa`/`tNd`/`tNi` batch
+    commands parsed in the same input line as piece commands
+    (`t1a t2d 3a` all in one go). A trend added via `tNa`/`tNi` enters
+    the edition the normal way (`review_status='proposed'`, `slot=
+    'delight'` if the matched article's JTBD is delight else
+    `'bonus'`) — it still goes through ordinary review, doesn't
+    bypass it.
+  - **A real bug caught only by driving the actual interactive CLI
+    with simulated stdin** (not just unit tests): adding (`tNa`) a
+    trend that had no vector match — only a GDELT fallback — silently
+    no-opped with zero operator feedback. Fixed to print an explicit
+    warning suggesting `tNi` (ingest the fallback URL) or `tNd`
+    (dismiss) instead.
+  - **Verified for real** at every layer: real trendspyg crawls across
+    3 live regions (confirmed non-English trends genuinely occur, not
+    just a theoretical case); a full real matcher run against Aarva's
+    actual catalog found 11-12 out of 30 real trends had a genuine
+    thematic match (e.g. "susza" — Polish for "drought" — correctly
+    matched to a Central Asia water-crisis piece via the query-
+    expansion step bridging language and specificity); real GDELT
+    calls made (rate-limited from this sandbox's shared IP — handled
+    gracefully, logged and degraded to "no fallback candidates," never
+    crashed); a real `--stage 3` CLI run end-to-end; and the full
+    interactive review flow driven with simulated stdin against a
+    constructed edition + trend fixture, confirming add/dismiss/
+    approve all persist correctly together in one batch command.
+  - 36 new tests (repo total: 126, all passing) covering the
+    translation heuristic, blacklist matching, crawler idempotency,
+    the guardrail SQL, semantic retrieval, re-rank, GDELT fallback
+    (all mocked — no real API spend in the automated suite), the
+    review CLI's trend-token parsing, and `_apply_trend_decisions`
+    against a disposable on-disk DB.
+  - `trends.enabled: false` by default — this PR changes no editorial
+    ranking on its own, matching the curation-signal feature's own
+    rollout pattern.
 
 ### 2026-08-11
 

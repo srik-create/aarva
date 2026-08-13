@@ -1,3 +1,50 @@
+**STATUS: Shipped 2026-08-13.** See `docs/roadmap.md`'s 2026-08-13
+entry for what actually landed, including the scope changes surfaced
+during rule 6a verification and the real crawl/match/review-CLI
+verification performed.
+
+---
+
+**NOTE (Claude Code, 2026-08-13):** Cowork flagged three items below as
+needing rule 6a web-verification / rule 4 sign-off before
+implementation. All three are now resolved — decisions below
+supersede the corresponding sections further down (those sections are
+left as historical context, not rewritten in place per rule 17c):
+
+1. **`pytrends` is archived** (GitHub, since 2026-04-17) and
+   unmaintained, with unpredictable rate-limiting reported by users.
+   Not safe to build on. Using **`trendspyg`** instead (MIT, actively
+   maintained, github.com/flack0x/trendspyg) — same Google Trends data,
+   via its RSS path (`download_google_trends_rss()`), which is fast and
+   not rate-limit-sensitive (only its separate "Explore" path carries
+   that warning, and v1 doesn't use the Explore path).
+2. **GDELT dropped as an independent trend source.** Verified GDELT's
+   DOC 2.0 API is purely search-driven — there is no documented,
+   HTTP-reachable "what's trending right now, no query" endpoint. The
+   `gdelt_global` row in the sources config below (and the `gdelt`
+   ingestion `kind` handler) do not get built. GDELT's OTHER job in
+   this spec — the fallback search once a trend phrase is already
+   known — is unaffected and works exactly as designed.
+3. **YouTube Trending dropped from v1 entirely** (user decision
+   2026-08-13, given the new `AARVA_YOUTUBE_API_KEY` GCP setup step
+   it would require) — not just deferred pending a key. No
+   `youtube_trending` handler, no new env var, no YouTube Data API
+   dependency in this PR. Candidate for a follow-up spec if wanted
+   later.
+4. **Guardrails locked exactly as specced**: 48h minimum article age,
+   JTBD limited to `delight`/`curiosity`/`smart_escape`/`keep_ahead`.
+   Confirmed with user 2026-08-13 (Cowork's note below said these were
+   "discussed in principle" but not verbally locked as exact values —
+   now they are).
+
+Net effect: v1 ships with exactly ONE crawled trend source (Google
+Trends, 4 regions, via trendspyg) plus GDELT as fallback search. The
+sources config, ingestion flow, and cost estimate sections below
+describe the ORIGINAL (larger) design; treat every `youtube_trending`
+and standalone-`gdelt` reference in them as not-built-in-v1.
+
+---
+
 # Session plan — trend-signal layer for delight + timeliness
 
 Written by Cowork for the next Claude Code session (2026-08-13+).

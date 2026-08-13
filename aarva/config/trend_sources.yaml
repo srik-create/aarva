@@ -1,0 +1,59 @@
+# Aarva trend sources — v1
+#
+# See docs/session_plan_trend_signal_for_delight.md. A nightly crawl
+# reads Google Trends per region; each trend gets query-expanded and
+# semantically matched against Aarva's article catalog, surfacing hits
+# to the operator in `python -m aarva.review`'s "Trending" section as
+# candidates for the delight/bonus slot. Never auto-added.
+#
+# Each entry:
+#   name    — display name, also the trend_hits.source_name key
+#   region  — Google Trends region code ('US', 'IN', 'GB') or a synthetic
+#             'global' pseudo-region — see aarva/sources/trend_crawler.py
+#   weight  — 0.0-1.0, display-order hint only (no auto-add logic)
+#   enabled — true/false, one-line on/off switch
+#   notes   — why this region, or any caveat
+#
+# v1 scope note (2026-08-13): the original spec proposed YouTube
+# Trending and GDELT as additional crawled sources alongside Google
+# Trends. Both dropped from v1 — GDELT's DOC 2.0 API turned out to be
+# purely search-driven (no "what's trending" endpoint exists), and
+# YouTube Trending was dropped by user decision given the new API-key
+# setup it would require. GDELT is still used, just not as a crawled
+# source here — see aarva/services/trend_matcher.py's fallback search.
+# pytrends (the library the spec named) is archived/unmaintained as of
+# 2025-04-17; using trendspyg instead (verified 2026-08-13).
+#
+# There is no "global" region — trendspyg's geo param is a real country
+# code (125 countries + 51 US states, verified 2026-08-13 against live
+# data); the spec's `google_trends_global` row was never a real Google
+# Trends concept and is dropped rather than invented.
+
+sources:
+  - name: google_trends_us
+    region: US
+    weight: 0.7
+    enabled: true
+    notes: >
+      Largest English-language trend volume; broad generalist signal.
+      Verified 2026-08-13 — real trendspyg RSS call returned 10 current
+      US trends.
+
+  - name: google_trends_in
+    region: IN
+    weight: 0.8
+    enabled: true
+    notes: >
+      Aarva's likely core audience geography — weighted highest.
+      Verified 2026-08-13 — real call returned a mix of English and
+      Hindi/Tamil-script trends, confirming the crawler's per-trend
+      translation step is genuinely needed here (not just a
+      theoretical case).
+
+  - name: google_trends_gb
+    region: GB
+    weight: 0.7
+    enabled: true
+    notes: >
+      Secondary English-language market. Verified 2026-08-13 — real
+      call returned 10 current GB trends.

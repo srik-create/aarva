@@ -50,6 +50,7 @@ if __package__ is None or __package__ == "":
 
 from aarva.config import load_pipeline_config
 from aarva.db import Database
+from aarva.services.edition_ops import add_article_to_todays_edition
 from aarva.services.review_reasons import REJECTION_REASONS
 
 
@@ -82,6 +83,102 @@ class ReviewPiece:
     def estimated_minutes(self) -> float:
         """Rough audio length estimate at ~150 wpm narration."""
         return (self.word_count or 0) / 150.0
+
+
+@dataclass
+class TrendingItem:
+    """One unresolved trend_hits row — see docs/session_plan_trend_
+    signal_for_delight.md. Either matched (matched_article_id set) or
+    fallback (fallback_urls_json set, populated by the GDELT search) —
+    never both; the matcher only runs the fallback when no vector
+    match cleared the threshold."""
+    index: int               # 1-based for display, distinct from ReviewPiece's
+    trend_id: int
+    trend_phrase_en: str
+    source_name: str
+    matched_article_id: Optional[int]
+    matched_title: Optional[str]
+    matched_url: Optional[str]
+    match_score: Optional[float]
+    matched_jtbd: Optional[str]
+    fallback_urls: list[dict]   # [{"url", "title", "domain"}, ...] — [] if none
+
+
+def _load_trending(db: Database) -> list[TrendingItem]:
+    """Unresolved trends (operator_action IS NULL), newest first. Shown
+    regardless of age — unlike edition pieces, a trend nobody has
+    looked at yet shouldn't silently disappear from view.
+
+    One display row per trend_hits row, NOT grouped by phrase text —
+    each source's crawl already inserts its own distinct row per
+    (source_name, trend_phrase, date) via the DB's idempotency index,
+    so there's no real "same row from multiple sources" case to merge.
+    An earlier version GROUPed BY trend_phrase_en to collapse the rare
+    case of two different sources producing the same translated
+    phrase, but SQLite's bare-column selection under GROUP BY is
+    non-deterministic — dismissing the merged display row could
+    silently leave one underlying trend_hits row stuck unresolved
+    forever. Showing them as separate, independently resolvable rows
+    is both simpler and correct."""
+    with db.connect() as conn:
+        rows = conn.execute("""
+            SELECT th.id, th.trend_phrase_en, th.trend_phrase, th.source_name,
+                   th.matched_article_id, th.match_score, th.fallback_urls_json,
+                   a.title AS matched_title, a.canonical_url AS matched_url,
+                   s.jtbd_primary AS matched_jtbd
+              FROM trend_hits th
+              LEFT JOIN articles a ON a.id = th.matched_article_id
+              LEFT JOIN article_scores s ON s.article_id = th.matched_article_id
+             WHERE th.operator_action IS NULL
+             ORDER BY th.id DESC
+        """).fetchall()
+
+    items = []
+    for i, r in enumerate(rows, start=1):
+        fallback_urls = json.loads(r["fallback_urls_json"] or "[]")
+        items.append(TrendingItem(
+            index=i,
+            trend_id=r["id"],
+            trend_phrase_en=r["trend_phrase_en"] or r["trend_phrase"],
+            source_name=r["source_name"],
+            matched_article_id=r["matched_article_id"],
+            matched_title=r["matched_title"],
+            matched_url=r["matched_url"],
+            match_score=r["match_score"],
+            matched_jtbd=r["matched_jtbd"],
+            fallback_urls=fallback_urls,
+        ))
+    return items
+
+
+def _print_trending(items: list[TrendingItem]) -> None:
+    if not items:
+        return
+    print(BOLD("═" * 70))
+    print(BOLD("  Trending topics"))
+    print(BOLD("═" * 70))
+    for t in items:
+        print()
+        print(f"  {BOLD(f'[t{t.index}]')}  {BOLD(t.trend_phrase_en)}  "
+              f"{DIM('(' + t.source_name + ')')}")
+        if t.matched_article_id:
+            tags = f"  {DIM('JTBD=' + t.matched_jtbd)}" if t.matched_jtbd else ""
+            print(f"       {GREEN('-> Aarva match:')} #{t.matched_article_id} "
+                  f"{BOLD(t.matched_title)} {DIM(f'(score {t.match_score:.1f})')}{tags}")
+            print(f"       {BLUE(t.matched_url)}")
+            print(DIM(f"       [t{t.index}a=add / t{t.index}d=dismiss]"))
+        elif t.fallback_urls:
+            print(f"       {YELLOW('-> No Aarva match.')} "
+                  f"GDELT fallback: {len(t.fallback_urls)} candidate URL(s)")
+            for u in t.fallback_urls[:5]:
+                print(f"          {DIM('-')} {u.get('title') or u.get('url')}")
+                print(f"            {BLUE(u.get('url'))}")
+            print(DIM(f"       [t{t.index}i=ingest first URL / t{t.index}d=dismiss]"))
+        else:
+            print(f"       {DIM('-> No Aarva match; GDELT fallback found nothing.')}")
+            print(DIM(f"       [t{t.index}d=dismiss]"))
+    print()
+    print(DIM("─" * 70))
 
 
 def _find_edition_to_review(db: Database, edition_id: Optional[int]) -> Optional[int]:
@@ -239,6 +336,7 @@ KNOWN_SLOT_ALIASES = {
 
 def _parse_decisions(
     raw: str, n_pieces: int, proposed_indices: Optional[set[int]] = None,
+    n_trends: int = 0,
 ) -> dict:
     """Parse the review-CLI command line into a structured decisions dict.
 
@@ -257,6 +355,10 @@ def _parse_decisions(
       <N>s            reject piece N, refill prefer SHORTER
       <N>d            drop piece N entirely; no refill
       <N>u            un-approve piece N (approved → proposed)
+      t<N>a           add trending-topic match N to today's edition
+      t<N>d           dismiss trending-topic N
+      t<N>i           ingest trending-topic N's GDELT-fallback first URL,
+                      then add it to today's edition
       +behind         add a lens_card_behind slot
       +humans         add a lens_card_humans slot
       +future, +feature, +curiosity, +escape, +delight  (other aliases)
@@ -289,6 +391,7 @@ def _parse_decisions(
     decisions = {
         "piece_actions": {},   # type: dict[int, tuple[str, Optional[str]]]
         "add_slots": [],       # type: list[str]
+        "trend_actions": {},   # type: dict[int, str] -- {trend_index: 'a'|'d'|'i'}
     }
 
     if cleaned in ("", "all-a", "alla", "a"):
@@ -331,6 +434,27 @@ def _parse_decisions(
                     f"or +pub:<name> / +topic:<keyword>"
                 )
             decisions["add_slots"].append(alias)
+            continue
+
+        # "t<N><a|d|i>" — trend-row action (add / dismiss / ingest
+        # GDELT fallback's first URL). Checked before the piece-index
+        # branch below since a leading 't' would fail int()-parsing there.
+        if tok[0] == "t" and len(tok) >= 3:
+            trend_action_char = tok[-1]
+            if trend_action_char not in ("a", "d", "i"):
+                raise ValueError(
+                    f"'{tok}': unknown trend action '{trend_action_char}' "
+                    f"— use t<N>a / t<N>d / t<N>i"
+                )
+            try:
+                trend_idx = int(tok[1:-1])
+            except ValueError as e:
+                raise ValueError(
+                    f"can't parse '{tok}' as t<number><a|d|i>"
+                ) from e
+            if trend_idx < 1 or trend_idx > n_trends:
+                raise ValueError(f"trend t{trend_idx} out of range (1-{n_trends})")
+            decisions["trend_actions"][trend_idx] = trend_action_char
             continue
 
         # "<N>" or "<N><action_char>"
@@ -554,6 +678,76 @@ def _apply_decisions(
     return summary
 
 
+def _apply_trend_decisions(
+    db: Database, items: list[TrendingItem], trend_actions: dict[int, str],
+) -> dict:
+    """Apply trend-row decisions. Returns {'trend_added': n, 'trend_dismissed': n}.
+
+    'a' (add): calls add_article_to_todays_edition for the matched
+    article, slot='delight' if its JTBD is delight else 'bonus' (no
+    new slot type for v1 — see the spec's Review CLI section).
+    'i' (ingest): ingests the fallback list's first URL via the same
+    aarva.ingest_url machinery the CLI tool itself uses, then adds it
+    the same way as 'a'.
+    'd' (dismiss): just marks operator_action, no side effects.
+    Any trend not mentioned in trend_actions is left unresolved —
+    it'll show up again next time review runs."""
+    summary = {"trend_added": 0, "trend_dismissed": 0}
+    by_index = {t.index: t for t in items}
+
+    for idx, action in trend_actions.items():
+        item = by_index.get(idx)
+        if item is None:
+            continue
+
+        if action == "d":
+            with db.connect() as conn:
+                conn.execute(
+                    "UPDATE trend_hits SET operator_action = 'dismissed', "
+                    "resolved_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (item.trend_id,),
+                )
+            summary["trend_dismissed"] += 1
+            continue
+
+        article_id = item.matched_article_id
+        if action == "i":
+            if not item.fallback_urls:
+                print(YELLOW(f"  t{idx}: no fallback URL to ingest, skipping."))
+                continue
+            from aarva.ingest_url import _ingest_one
+            config = load_pipeline_config()
+            url = item.fallback_urls[0]["url"]
+            article_id = _ingest_one(config, db, url, dry_run=False)
+            if article_id is None:
+                print(RED(f"  t{idx}: ingest failed for {url}, skipping."))
+                continue
+
+        if article_id is None:
+            print(YELLOW(
+                f"  t{idx}: no Aarva match to add — use t{idx}i to ingest a "
+                f"fallback URL instead, or t{idx}d to dismiss. Skipping."
+            ))
+            continue
+
+        slot = "delight" if item.matched_jtbd == "delight" else "bonus"
+        result = add_article_to_todays_edition(db, article_id, slot=slot)
+        if result == "added":
+            with db.connect() as conn:
+                conn.execute(
+                    "UPDATE trend_hits SET operator_action = 'added', "
+                    "resolved_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (item.trend_id,),
+                )
+            summary["trend_added"] += 1
+        elif result == "no_edition":
+            print(YELLOW(f"  t{idx}: no daily edition exists for today, skipping."))
+        elif result == "already_present":
+            print(DIM(f"  t{idx}: article already in today's edition."))
+
+    return summary
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--edition-id", type=int, default=None,
@@ -584,6 +778,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         ).fetchone()
     today_iso = str(row["edition_date"]) if row else "?"
 
+    trending_items = _load_trending(db)
+    _print_trending(trending_items)
+
     _print_header(edition_id, today_iso, len(pieces), _approved_count(db, edition_id))
 
     for p in pieces:
@@ -598,6 +795,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         decisions = {
             "piece_actions": {i: ("a", None) for i in proposed_indices},
             "add_slots": [],
+            "trend_actions": {},   # trends are never auto-decided — always operator-picked
         }
         print(GREEN(f"Auto-approving all {len(proposed_indices)} proposed piece(s)."))
     else:
@@ -606,13 +804,17 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(DIM("  Nr  reject piece N         Nl  reject + prefer LONGER replacement"))
         print(DIM("                             Ns  reject + prefer SHORTER replacement"))
         print(DIM("  Nu  un-approve piece N (approved -> proposed, re-decide next round)"))
+        if trending_items:
+            print(BOLD("Trending commands:"))
+            print(DIM("  tNa  add trend N's match      tNd  dismiss trend N"))
+            print(DIM("  tNi  ingest trend N's GDELT-fallback URL and add it"))
         print(BOLD("Edition-level commands:"))
         print(DIM("  +behind  +humans  +future  +feature  +curiosity  +escape"))
         print(DIM("    add another slot of that type for refill"))
         print(BOLD("Shortcuts:"))
         print(DIM("  all-a    approve everything proposed (approved pieces untouched)"))
         print(DIM("  (empty)  approve everything proposed (approved pieces untouched)"))
-        print(DIM("  Example: '1a 2l 3a 4d 5a 6s +behind'"))
+        print(DIM("  Example: '1a 2l 3a 4d 5a 6s +behind t1a t2d'"))
         print()
         while True:
             try:
@@ -622,7 +824,9 @@ def main(argv: Optional[list[str]] = None) -> int:
                 print(YELLOW("Cancelled. No changes made."))
                 return 1
             try:
-                decisions = _parse_decisions(raw, len(pieces), proposed_indices)
+                decisions = _parse_decisions(
+                    raw, len(pieces), proposed_indices, n_trends=len(trending_items),
+                )
                 break
             except ValueError as e:
                 print(RED(f"  Couldn't parse that: {e}"))
@@ -654,6 +858,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         parts.append(BLUE(f"un-approve {n_unapprove}"))
     if n_added:
         parts.append(BLUE(f"+{n_added} slot{'s' if n_added > 1 else ''}"))
+    trend_actions = decisions.get("trend_actions", {})
+    n_trend_add = sum(1 for a in trend_actions.values() if a in ("a", "i"))
+    n_trend_dismiss = sum(1 for a in trend_actions.values() if a == "d")
+    if n_trend_add:
+        parts.append(GREEN(f"add {n_trend_add} trend{'s' if n_trend_add > 1 else ''}"))
+    if n_trend_dismiss:
+        parts.append(YELLOW(f"dismiss {n_trend_dismiss} trend{'s' if n_trend_dismiss > 1 else ''}"))
     print(f"  About to: {'  ·  '.join(parts)}")
 
     if not args.auto_approve:
@@ -668,6 +879,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             return 1
 
     summary = _apply_decisions(db, edition_id, pieces, decisions)
+    trend_summary = _apply_trend_decisions(db, trending_items, trend_actions)
     s_approved = summary["approved"]
     s_rejected = summary["rejected"]
     s_dropped = summary["dropped"]
@@ -679,6 +891,10 @@ def main(argv: Optional[list[str]] = None) -> int:
           f"{YELLOW(f'⊘ {s_dropped} dropped')}, "
           f"{BLUE(f'↺ {s_unapproved} un-approved')}, "
           f"{BLUE(f'+ {s_added} slots added')}")
+    if trend_summary["trend_added"] or trend_summary["trend_dismissed"]:
+        added_str = GREEN(f"+ {trend_summary['trend_added']} trend(s) added")
+        dismissed_str = YELLOW(f"⊘ {trend_summary['trend_dismissed']} trend(s) dismissed")
+        print(f"  {added_str}, {dismissed_str}")
 
     # Print next-step guidance.
     print()
