@@ -23,8 +23,9 @@ def add_article_to_todays_edition(
     article_id: int,
     slot: str = "manual_addition",
     position: int | None = None,
+    review_status: str = "proposed",
 ) -> AddResult:
-    """Insert `article_id` as a proposed piece in today's daily edition.
+    """Insert `article_id` as a piece in today's daily edition.
 
     Does NOT auto-create today's edition — that's Stage 7's job, and
     an operator adding an article manually before Stage 7 has run
@@ -33,13 +34,24 @@ def add_article_to_todays_edition(
     what's worth adding; this primitive only handles the mechanics of
     getting it into edition_pieces.
 
+    review_status defaults to 'proposed' — the piece then goes through
+    the ordinary review pass, same as every Stage-7-proposed piece.
+    Callers where the add IS ITSELF the operator's approval gesture
+    (trend adds via `python -m aarva.review`'s `tNa`/`tNi` — see
+    docs/session_plan_trend_adds_auto_approve.md) pass 'approved'
+    explicitly, since a `'proposed'` trend-added piece would otherwise
+    get silently deleted by Stage 7's rebuild
+    (`DELETE FROM edition_pieces WHERE review_status != 'approved'`,
+    aarva/stages/stage_7_assemble.py) before a second review pass ever
+    ran — this happened for real in production 2026-08-15.
+
     Returns:
       "no_edition"       — no daily edition exists for today yet.
       "already_present"  — article_id is already in this edition's
                             edition_pieces (any review_status) — no-op,
                             not an error. Matches the spec's explicit
                             non-goal of dedup beyond exact-article-id.
-      "added"            — inserted as review_status='proposed',
+      "added"            — inserted with the given review_status,
                             hook/contextualisation NULL (Stage 8's next
                             run fills them — it already skips only
                             pieces that HAVE a hook, so NULL-hook
@@ -77,9 +89,9 @@ def add_article_to_todays_edition(
             INSERT INTO edition_pieces
                 (edition_id, article_id, slot, position,
                  hook, contextualisation, audio_url, review_status)
-            VALUES (?, ?, ?, ?, NULL, NULL, NULL, 'proposed')
+            VALUES (?, ?, ?, ?, NULL, NULL, NULL, ?)
             """,
-            (edition_id, article_id, slot, position),
+            (edition_id, article_id, slot, position, review_status),
         )
         conn.execute(
             "UPDATE articles SET status = 'in_edition' WHERE id = ?",

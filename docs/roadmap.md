@@ -70,22 +70,6 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Trend adds should auto-approve so they survive Stage 7
-   rebuilds.** Full spec at
-   `docs/session_plan_trend_adds_auto_approve.md`. Follow-up to the
-   2026-08-13 trend-signal ship. Bug caught 2026-08-15: operator
-   picked 2 trends via `tNa` in review, re-ran Stage 7 to refill
-   empty slots (standard iterative-review workflow), and Stage 7's
-   `DELETE FROM edition_pieces WHERE review_status != 'approved'` at
-   `stage_7_assemble.py:842-846` wiped the trend-added pieces
-   because they were still `'proposed'`. Fix: `_apply_trend_decisions`
-   at `review.py:734` passes `review_status='approved'` explicitly
-   into an extended `add_article_to_todays_edition` signature — the
-   `tNa` keystroke IS the operator's approval gesture, propose-then-
-   approve is redundant for trend adds. Backwards-compatible for
-   existing `aarva.search` / `aarva.ingest_url` callers (default stays
-   `'proposed'`). AGENTS.md rule 4 sign-off from user 2026-08-15.
-
 ---
 
 ## Deferred — to return to (in priority order)
@@ -131,9 +115,56 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-13)
+## Recently completed (2026-06-29 → 2026-08-15)
 
 Most recent first.
+
+### 2026-08-15
+
+- **Trend adds now auto-approve so they survive Stage 7 rebuilds.**
+  Full spec at `docs/session_plan_trend_adds_auto_approve.md`. Bug
+  fix, follow-up to the 2026-08-13 trend-signal ship — real
+  production incident, not a hypothetical: operator picked 2 trends
+  via `tNa` in `python -m aarva.review`, re-ran `--stage 7` to refill
+  empty slots (a completely normal iterative-review step), and Stage
+  7's rebuild-refill (`_refill_for_review` in
+  `aarva/stages/stage_7_assemble.py`, which `DELETE`s every
+  `edition_pieces` row with `review_status != 'approved'` to make
+  room for re-picks) silently wiped both trend-added pieces, because
+  `_apply_trend_decisions` had inserted them as `'proposed'` — the
+  default the shared `add_article_to_todays_edition` primitive always
+  used. Neither trend article made it into the published edition;
+  caught by checking `trend_hits.operator_action='added'` against
+  the actual `edition_pieces` for that day and finding them absent.
+  - **Fix**: `add_article_to_todays_edition`
+    (`aarva/services/edition_ops.py`) gained a `review_status: str =
+    "proposed"` parameter (backward-compatible default — verified
+    `aarva.search` and `aarva.ingest_url`'s call sites both still
+    call it with no `review_status` argument, so their behavior is
+    unchanged). `_apply_trend_decisions` (`aarva/review.py`) now
+    passes `review_status="approved"` explicitly — covers both the
+    `tNa` (direct match) and `tNi` (GDELT-fallback ingest) paths,
+    since both fall through to the same call site.
+  - **Rationale**: a trend add is structurally different from a
+    normal Stage-7 slot-pick. Stage 7's picks are the pipeline's
+    proposal — review is where the operator first sees and judges
+    them. A trend add is the OPPOSITE: the operator already saw the
+    trend + its matched article and explicitly typed `tNa` — that
+    keystroke IS the approval. Propose-then-approve added a
+    redundant second review pass with no editorial benefit, and
+    silently dropped the piece if that second pass never happened
+    before Stage 7 ran again.
+  - **4 new tests** (repo total: 131) — 2 confirming the new
+    parameter's backward-compatible default and explicit override in
+    a new `aarva/tests/test_edition_ops.py`, including a **real
+    regression test** that drives the actual
+    `_refill_for_review` function (the exact code that caused the
+    incident) against a constructed edition with one approved
+    trend-added piece and one still-proposed regular piece — confirms
+    the trend piece survives and the regular one is correctly wiped,
+    exactly reproducing and then verifying the fix for the 2026-08-15
+    timeline. 2 more tests added to the existing trend-signal suite
+    confirming both `tNa` and `tNi` land as `'approved'`.
 
 ### 2026-08-13
 
