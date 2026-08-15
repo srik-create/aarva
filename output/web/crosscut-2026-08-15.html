@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 15 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-15</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 15 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · discovering hidden species</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-15/crosscut_0145.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>9 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Finding an unknown creature usually conjures images of dusty bones pulled from the earth. But the frontier of biological discovery has shifted away from physical fossils and into the genetic code of organisms alive right now. A recent piece in Smithsonian Magazine shows researchers skipping the archaeological dig to find extinct ancestors. Instead, they are tracing ancient &quot;ghost&quot; populations by reading the DNA of living people. Meanwhile, Benji Jones writes in Vox about scientists scanning the genetic barcodes of insects buzzing around New York City to identify entirely new species. Putting these two approaches together reveals something surprising. The most mysterious creatures aren&#x27;t always buried in ancient rock. Sometimes, they are hiding in plain sight.</p>
+        <article class='piece'>
+<p class='hook'>Published just last week in Smithsonian Magazine, this piece looks at how scientists are tracking down extinct human ancestors without digging up a single bone. Instead of relying on rare fossils, researchers are mapping our family tree using the DNA of people walking around today. Listen for the exact moment the article explains how a new technique spotted a 1.8-million-year-old genetic ghost hiding right inside modern genomes.</p>
+<h2 class='title'>Traces of Two Extinct &#x27;Ghost&#x27; Ancestors Were Found Hiding in Modern Human DNA, Hinting at Our Extremely Complex Family Tree</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/smart-news/traces-of-two-extinct-ghost-ancestors-were-found-hiding-in-modern-human-dna-hinting-at-our-extremely-complex-family-tree-180989250/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading the genetic code of 500 living people, the Smithsonian piece leaves you with a strange image: the ghosts of extinct ancestors are still walking around inside the modern human body. You don&#x27;t necessarily need to dig up a million-year-old bone to find a lost branch of the family tree. 
+
+That shift—from digging in the dirt to reading the genes of the living—is exactly where Benji Jones picks up the thread. But instead of looking backward at human history, Jones looks outward at the modern city. He sets up a five-foot bug trap right in the middle of New York, catching thousands of flies and wasps. By reading their DNA barcodes, he realizes that entirely unknown species are likely buzzing around Central Park right now. 
+
+Read alongside the Smithsonian article, Jones’s urban experiment changes how you might picture a biological frontier. The undiscovered world is simply hiding in plain sight, written into the DNA of the people waiting on a subway platform, and the insects flying past the streetlamps above them.</p>
+        <article class='piece'>
+
+<h2 class='title'>We think we just discovered some new species living in New York City</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Benji Jones</span></p>
+<p class='source'><a href='https://www.vox.com/climate/498807/new-species-project-update' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after these two stories is the image of an unmapped insect buzzing past a coffee shop, or an ancient ancestor hiding inside a modern drop of blood. The frontier of discovery has moved from dusty dig sites right into the middle of the city. The unknown isn&#x27;t far away anymore. It&#x27;s alive, and it&#x27;s sharing the sidewalk. That leaves a quiet question to sit with. If so much history and wild biology are already hiding in plain sight, what else is waiting to be found right underfoot?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
