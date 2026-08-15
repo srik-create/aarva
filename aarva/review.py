@@ -731,7 +731,16 @@ def _apply_trend_decisions(
             continue
 
         slot = "delight" if item.matched_jtbd == "delight" else "bonus"
-        result = add_article_to_todays_edition(db, article_id, slot=slot)
+        # review_status='approved' (not the default 'proposed') — the
+        # tNa/tNi keystroke IS the operator's approval decision, and a
+        # 'proposed' trend-added piece gets silently deleted by Stage
+        # 7's rebuild (DELETE ... WHERE review_status != 'approved')
+        # before any second review pass runs. Happened for real in
+        # production 2026-08-15 — see docs/session_plan_trend_adds_
+        # auto_approve.md.
+        result = add_article_to_todays_edition(
+            db, article_id, slot=slot, review_status="approved",
+        )
         if result == "added":
             with db.connect() as conn:
                 conn.execute(

@@ -466,13 +466,19 @@ class TestApplyTrendDecisions:
 
         with db.connect() as conn:
             piece = conn.execute(
-                "SELECT slot FROM edition_pieces WHERE article_id = ?", (article_id,),
+                "SELECT slot, review_status FROM edition_pieces WHERE article_id = ?",
+                (article_id,),
             ).fetchone()
             resolved = conn.execute(
                 "SELECT operator_action FROM trend_hits",
             ).fetchone()
         assert piece["slot"] == "delight"
         assert resolved["operator_action"] == "added"
+        # Bug fixed 2026-08-15 (docs/session_plan_trend_adds_auto_approve.md):
+        # a trend add must land as 'approved', not the primitive's default
+        # 'proposed' — otherwise Stage 7's rebuild-refill silently deletes
+        # it before a second review pass ever runs.
+        assert piece["review_status"] == "approved"
 
     def test_dismiss_action_marks_resolved_without_edition_write(self, review_db_with_edition):
         db = review_db_with_edition["db"]
@@ -538,9 +544,12 @@ class TestApplyTrendDecisions:
         assert summary["trend_added"] == 1
         with db.connect() as conn:
             piece = conn.execute(
-                "SELECT article_id FROM edition_pieces",
+                "SELECT article_id, review_status FROM edition_pieces",
             ).fetchone()
         assert piece["article_id"] == new_article_id
+        # tNi falls through to the same add_article_to_todays_edition
+        # call as tNa — must also land as 'approved', not 'proposed'.
+        assert piece["review_status"] == "approved"
 
     def test_unmentioned_trend_stays_unresolved(self, review_db_with_edition):
         db = review_db_with_edition["db"]
