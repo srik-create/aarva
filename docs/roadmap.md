@@ -70,6 +70,22 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Trend adds should auto-approve so they survive Stage 7
+   rebuilds.** Full spec at
+   `docs/session_plan_trend_adds_auto_approve.md`. Follow-up to the
+   2026-08-13 trend-signal ship. Bug caught 2026-08-15: operator
+   picked 2 trends via `tNa` in review, re-ran Stage 7 to refill
+   empty slots (standard iterative-review workflow), and Stage 7's
+   `DELETE FROM edition_pieces WHERE review_status != 'approved'` at
+   `stage_7_assemble.py:842-846` wiped the trend-added pieces
+   because they were still `'proposed'`. Fix: `_apply_trend_decisions`
+   at `review.py:734` passes `review_status='approved'` explicitly
+   into an extended `add_article_to_todays_edition` signature — the
+   `tNa` keystroke IS the operator's approval gesture, propose-then-
+   approve is redundant for trend adds. Backwards-compatible for
+   existing `aarva.search` / `aarva.ingest_url` callers (default stays
+   `'proposed'`). AGENTS.md rule 4 sign-off from user 2026-08-15.
+
 ---
 
 ## Deferred — to return to (in priority order)
