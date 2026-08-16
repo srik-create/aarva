@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Sunday, 16 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-16</div>
+      <div class="edition-meta">2 pieces · Crosscut · Sunday, 16 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · weight loss drugs</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-16/crosscut_0147.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>28 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A beauty salon hands out a syringe as casually as a facial treatment. That detail, from a Scroll.in investigation published earlier this month by Tabassum Barnagarwala, captures the cosmetic frenzy surrounding GLP-1 drugs. But treating these injections as unregulated slimming packages obscures what is happening in clinical trials. Writing for Vox just yesterday, Bryan Walsh looks at the medical reality behind the vanity hype. These medications are treating sleep apnea and kidney disease, doing far more than altering a waistline. What emerges from these two pieces is a strange friction. It is worth pausing on the gap between how a culture turns a medication into a beauty product, and the life-saving work that drug performs inside the body.</p>
+        <article class='piece'>
+<p class='hook'>Powerful weight-loss drugs are quietly slipping out of doctors&#x27; offices and into Indian beauty salons and online pharmacies. In an investigation published last week, Tabassum Barnagarwala tracks how these GLP-1 injections are being dangerously dispensed as unregulated slimming packages. Listen for the moment a woman realizes she paid Rs 1.5 lakh at a Ludhiana salon that never actually assessed her health. It exposes exactly what happens when a medical breakthrough becomes a cosmetic commodity.</p>
+<h2 class='title'>The dark side of the booming Indian market for weight-loss drugs</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Tabassum Barnagarwala</span></p>
+<p class='source'><a href='https://scroll.in/article/1094838/the-dark-side-of-the-booming-indian-market-for-weight-loss-drugs?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading Tabassum Barnagarwala, the image that sticks is a customer paying thousands of rupees at a local beauty salon for a serious hormone injection. She leaves you with a sharp sense of the danger that comes from treating a heavy-duty medical tool like a cosmetic quick fix. Bryan Walsh, up next, looks at that exact same cultural obsession with weight loss, but he takes it in a completely different direction. Where Barnagarwala focuses on the physical harm of handing out these drugs like beauty treatments, Walsh points out how that cosmetic hype is actually blinding people to the real story. He argues that focusing so intensely on waistlines means ignoring the fact that these medications are now treating everything from sleep apnea to kidney disease. Put the two together, and a striking picture emerges. The cultural fixation on getting thin isn&#x27;t just driving people to make dangerous choices at unregulated clinics. It is also drowning out the quieter, life-saving medical realities of what these drugs actually do to the human body.</p>
+        <article class='piece'>
+
+<h2 class='title'>Ozempic is not just a weight-loss story anymore</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Bryan Walsh</span></p>
+<p class='source'><a href='https://www.vox.com/future-perfect/499434/ozempic-glp1-wegovy-obesity-overweight-diabetes' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the image of that same clear liquid sitting in two very different rooms. Next to a salon chair, a syringe promises a thinner waist. Inside a clinical trial, it heals a failing kidney. The friction sits right there. A powerful medication is handed out like a spray tan, while its ability to treat sleep apnea gets buried under the noise of getting thin. When a medical breakthrough is permanently branded as a cosmetic luxury, who gets left waiting for an actual cure?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
