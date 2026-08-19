@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Tue, 18 Aug 2026 15:09:52 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 12:00:54 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,195 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: ai and biology</title>
+      <itunes:title>Crosscut: ai and biology</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-08-19.html</link>
+      <description><![CDATA[Writing just days apart this August, two authors watch computer code collide with physical biology. In *Knowable Magazine*, Ben Deighton observes automated laboratories treating algorithms as a factory tool, turning the creation of new drugs into a pure software problem. But look at the same technology through another lens, and it stops being a factory and becomes a mirror. In *Noema*, Daniel Freeman shows how the arrival of thinking machines is pushing neuroscientists to hunt for human consciousness deep inside ancient brain structures. Side by side, a sharp contrast emerges—using artificial intelligence to manufacture new cells and molecules, versus using it to figure out the minds that built the machines in the first place.<br/><br/><em>Daniel Freeman leaves you in that fluorescent-lit office, staring at a chatbot and realizing that reasoning and language do not actually require a biological brain. By separating the mechanics of intelligence from the physical reality of human feeling, his argument changes how you look at a silicon chip. 
+
+Then you turn to Ben Deighton. If Freeman treats artificial intelligence as a philosophical mirror to rethink human biology, Deighton watches it operate as a literal factory tool to manufacture it. Deighton takes you inside a former brewery in London where algorithms are doing something entirely different. They are designing cancer-killing molecules and programming yeast cells. 
+
+Notice what happens when you put the two side by side. Freeman pulls cognition out of the biological brain to show that intelligence is just signal processing. Deighton takes that exact same signal processing and uses it to hack back into biology, turning the creation of living cells and medicines into an automated software loop. Read alongside Freeman, Deighton’s report from the biofoundry feels less like a standard technology update and more like the closing of a circle. Code is no longer just imitating biological life. It is actively engineering it.</em><br/><br/>What lingers after these pieces is the sharp contrast between a robotic arm mixing synthetic molecules and the ancient, soft tissue inside a human skull. In the automated lab, biology is treated as just another line of code waiting to be optimized. Yet in the brain, the rise of those same algorithms is forcing a search for the raw, unprogrammable ability to feel. The collision leaves a quiet uncertainty behind. If the physical body can be mastered as a software problem, what happens to the parts of a living mind that refuse to be engineered?<br/><br/>Sources:<br/><a href="https://www.noemamag.com/the-tantalizing-possibility-of-locating-consciousness-in-the-brain">Noema: The Tantalizing Possibility Of Locating Consciousness In The Brain</a><br/><a href="https://knowablemagazine.org/content/article/technology/2026/ai-boosts-biofoundries-synthetic-biology">Knowable Magazine: Artificial intelligence boosts automated biolabs</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[Writing just days apart this August, two authors watch computer code collide with physical biology. In *Knowable Magazine*, Ben Deighton observes automated laboratories treating algorithms as a factory tool, turning the creation of new drugs into a pure software problem. But look at the same technology through another lens, and it stops being a factory and becomes a mirror. In *Noema*, Daniel Freeman shows how the arrival of thinking machines is pushing neuroscientists to hunt for human consciousness deep inside ancient brain structures. Side by side, a sharp contrast emerges—using artificial intelligence to manufacture new cells and molecules, versus using it to figure out the minds that built the machines in the first place.<br/><br/><em>Daniel Freeman leaves you in that fluorescent-lit office, staring at a chatbot and realizing that reasoning and language do not actually require a biological brain. By separating the mechanics of intelligence from the physical reality of human feeling, his argument changes how you look at a silicon chip. 
+
+Then you turn to Ben Deighton. If Freeman treats artificial intelligence as a philosophical mirror to rethink human biology, Deighton watches it operate as a literal factory tool to manufacture it. Deighton takes you inside a former brewery in London where algorithms are doing something entirely different. They are designing cancer-killing molecules and programming yeast cells. 
+
+Notice what happens when you put the two side by side. Freeman pulls cognition out of the biological brain to show that intelligence is just signal processing. Deighton takes that exact same signal processing and uses it to hack back into biology, turning the creation of living cells and medicines into an automated software loop. Read alongside Freeman, Deighton’s report from the biofoundry feels less like a standard technology update and more like the closing of a circle. Code is no longer just imitating biological life. It is actively engineering it.</em><br/><br/>What lingers after these pieces is the sharp contrast between a robotic arm mixing synthetic molecules and the ancient, soft tissue inside a human skull. In the automated lab, biology is treated as just another line of code waiting to be optimized. Yet in the brain, the rise of those same algorithms is forcing a search for the raw, unprogrammable ability to feel. The collision leaves a quiet uncertainty behind. If the physical body can be mastered as a software problem, what happens to the parts of a living mind that refuse to be engineered?<br/><br/>Sources:<br/><a href="https://www.noemamag.com/the-tantalizing-possibility-of-locating-consciousness-in-the-brain">Noema: The Tantalizing Possibility Of Locating Consciousness In The Brain</a><br/><a href="https://knowablemagazine.org/content/article/technology/2026/ai-boosts-biofoundries-synthetic-biology">Knowable Magazine: Artificial intelligence boosts automated biolabs</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Writing just days apart this August, two authors watch computer code collide with physical biology. In *Knowable Magazine*, Ben Deighton observes automated laboratories treating algorithms as a factory tool, turning the creation of new drugs into a pure software problem. But look at the same technology through another lens, and it stops being a factory and becomes a mirror. In *Noema*, Daniel Freeman shows how the arrival of thinking machines is pushing neuroscientists to hunt for human consciousness deep inside ancient brain structures. Side by side, a sharp contrast emerges—using artificial intelligence to manufacture new cells and molecules, versus using it to figure out the minds that built the machines in the first place.
+
+Daniel Freeman leaves you in that fluorescent-lit office, staring at a chatbot and realizing that reasoning and language do not actually require a biological brain. By separating the mechanics of intelligence from the physical reality of human feeling, his argument changes how you look at a silicon chip. 
+
+Then you turn to Ben Deighton. If Freeman treats artificial intelligence as a philosophical mirror to rethink human biology, Deighton watches it operate as a literal factory tool to manufacture it. Deighton takes you inside a former brewery in London where algorithms are doing something entirely different. They are designing cancer-killing molecules and programming yeast cells. 
+
+Notice what happens when you put the two side by side. Freeman pulls cognition out of the biological brain to show that intelligence is just signal processing. Deighton takes that exact same signal processing and uses it to hack back into biology, turning the creation of living cells and medicines into an automated software loop. Read alongside Freeman, Deighton’s report from the biofoundry feels less like a standard technology update and more like the closing of a circle. Code is no longer just imitating biological life. It is actively engineering it.
+
+What lingers after these pieces is the sharp contrast between a robotic arm mixing synthetic molecules and the ancient, soft tissue inside a human skull. In the automated lab, biology is treated as just another line of code waiting to be optimized. Yet in the brain, the rise of those same algorithms is forcing a search for the raw, unprogrammable ability to feel. The collision leaves a quiet uncertainty behind. If the physical body can be mastered as a software problem, what happens to the parts of a living mind that refuse to be engineered?
+
+Sources:
+Noema: The Tantalizing Possibility Of Locating Consciousness In The Brain
+Knowable Magazine: Artificial intelligence boosts automated biolabs
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 10:25:21 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-152</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/crosscut_0152.mp3" length="17298861" type="audio/mpeg"/>
+      <itunes:duration>36:02</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · ai and biology</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Worm munch matters</title>
+      <itunes:title>Worm munch matters</itunes:title>
+      <link>https://aeon.co/essays/worm-munch-matters-the-new-acoustic-ecology-of-the-soil</link>
+      <description><![CDATA[<em>If you bury a microphone in the ground, what does healthy soil sound like?</em><br/><br/>Biologists have long dropped microphones into ocean trenches to track whales, or pointed them at the dark sky to map the flight of bats. In this essay published on 17 August 2026, the microphone gets buried in the dirt. The piece asks a strange and surprisingly practical question: what does a healthy ecosystem actually sound like underground? By treating soil as a noisy, living habitat rather than a silent foundation, it offers a completely different way to measure the recovery of the natural world.<br/><br/>An introduction to soil ecoacoustics, a method that uses buried microphones to record the movements of earthworms and other underground animals. Building on the history of acoustic monitoring used to track whales and bats, researchers are testing whether these audio recordings can serve as a reliable metric for soil health. The work requires isolating faint biological noises from human interference and creating a new reference library of soil sounds.<br/><br/>Read at source: <a href="https://aeon.co/essays/worm-munch-matters-the-new-acoustic-ecology-of-the-soil">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If you bury a microphone in the ground, what does healthy soil sound like?</em><br/><br/>Biologists have long dropped microphones into ocean trenches to track whales, or pointed them at the dark sky to map the flight of bats. In this essay published on 17 August 2026, the microphone gets buried in the dirt. The piece asks a strange and surprisingly practical question: what does a healthy ecosystem actually sound like underground? By treating soil as a noisy, living habitat rather than a silent foundation, it offers a completely different way to measure the recovery of the natural world.<br/><br/>An introduction to soil ecoacoustics, a method that uses buried microphones to record the movements of earthworms and other underground animals. Building on the history of acoustic monitoring used to track whales and bats, researchers are testing whether these audio recordings can serve as a reliable metric for soil health. The work requires isolating faint biological noises from human interference and creating a new reference library of soil sounds.<br/><br/>Read at source: <a href="https://aeon.co/essays/worm-munch-matters-the-new-acoustic-ecology-of-the-soil">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If you bury a microphone in the ground, what does healthy soil sound like?
+
+Biologists have long dropped microphones into ocean trenches to track whales, or pointed them at the dark sky to map the flight of bats. In this essay published on 17 August 2026, the microphone gets buried in the dirt. The piece asks a strange and surprisingly practical question: what does a healthy ecosystem actually sound like underground? By treating soil as a noisy, living habitat rather than a silent foundation, it offers a completely different way to measure the recovery of the natural world.
+
+An introduction to soil ecoacoustics, a method that uses buried microphones to record the movements of earthworms and other underground animals. Building on the history of acoustic monitoring used to track whales and bats, researchers are testing whether these audio recordings can serve as a reliable metric for soil health. The work requires isolating faint biological noises from human interference and creating a new reference library of soil sounds.
+
+Read at source: Aeon
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-14083</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_14083.mp3" length="10163373" type="audio/mpeg"/>
+      <itunes:duration>21:10</itunes:duration>
+      <itunes:author>Ella Browning</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>What draws well-meaning parents to authoritarian parenting?</title>
+      <itunes:title>What draws well-meaning parents to authoritarian parenting?</itunes:title>
+      <link>https://psyche.co/ideas/what-draws-well-meaning-parents-to-authoritarian-parenting</link>
+      <description><![CDATA[<em>When does preparing a child for the world turn into erasing who they are?</em><br/><br/>Most people know the damage caused by strict parenting, yet the urge to control a child&#x27;s every move keeps taking new forms. Writing for Psyche on 15 July 2026, the author looks past the familiar stereotypes of drill-sergeant fathers and tiger mothers to ask a harder question: why do deeply loving parents still fall back on rigid authority? The answer points straight to the quiet anxiety driving modern families. It captures the exact moment a desperate desire to keep a child safe hardens into a demand to reshape who they actually are.<br/><br/>An examination of authoritarian parenting and the underlying anxieties that drive adults to strictly control their children. Traces this parenting style from 20th-century religious discipline to modern helicopter parenting, detailing the emotional costs of demanding strict obedience. Contrasts these rigid methods with psychological models based on unconditional support and emotional connection.<br/><br/>Read at source: <a href="https://psyche.co/ideas/what-draws-well-meaning-parents-to-authoritarian-parenting">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When does preparing a child for the world turn into erasing who they are?</em><br/><br/>Most people know the damage caused by strict parenting, yet the urge to control a child&#x27;s every move keeps taking new forms. Writing for Psyche on 15 July 2026, the author looks past the familiar stereotypes of drill-sergeant fathers and tiger mothers to ask a harder question: why do deeply loving parents still fall back on rigid authority? The answer points straight to the quiet anxiety driving modern families. It captures the exact moment a desperate desire to keep a child safe hardens into a demand to reshape who they actually are.<br/><br/>An examination of authoritarian parenting and the underlying anxieties that drive adults to strictly control their children. Traces this parenting style from 20th-century religious discipline to modern helicopter parenting, detailing the emotional costs of demanding strict obedience. Contrasts these rigid methods with psychological models based on unconditional support and emotional connection.<br/><br/>Read at source: <a href="https://psyche.co/ideas/what-draws-well-meaning-parents-to-authoritarian-parenting">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When does preparing a child for the world turn into erasing who they are?
+
+Most people know the damage caused by strict parenting, yet the urge to control a child&#x27;s every move keeps taking new forms. Writing for Psyche on 15 July 2026, the author looks past the familiar stereotypes of drill-sergeant fathers and tiger mothers to ask a harder question: why do deeply loving parents still fall back on rigid authority? The answer points straight to the quiet anxiety driving modern families. It captures the exact moment a desperate desire to keep a child safe hardens into a demand to reshape who they actually are.
+
+An examination of authoritarian parenting and the underlying anxieties that drive adults to strictly control their children. Traces this parenting style from 20th-century religious discipline to modern helicopter parenting, detailing the emotional costs of demanding strict obedience. Contrasts these rigid methods with psychological models based on unconditional support and emotional connection.
+
+Read at source: Psyche
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-7935</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_7935.mp3" length="7170477" type="audio/mpeg"/>
+      <itunes:duration>14:56</itunes:duration>
+      <itunes:author>Hope Bastine</itunes:author>
+      <itunes:subtitle>Psyche</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Court That Removed Its Own Prosecutor</title>
+      <itunes:title>The Court That Removed Its Own Prosecutor</itunes:title>
+      <link>https://www.justsecurity.org/153766/icc-court-new-prosecutor/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=icc-court-new-prosecutor</link>
+      <description><![CDATA[<em>How does a court that judges the world go about removing its own top prosecutor?</em><br/><br/>When the International Criminal Court voted to fire its top prosecutor, critics quickly called the move a political hit job that would derail ongoing war crimes cases. Writing on 18 August 2026, the authors point to a much quieter story. They ask what happens when a global body, currently facing heavy pressure and sanctions from the United States, actually decides to police its own leadership. The argument lands on a sharp political truth: an institution that refuses to discipline itself simply hands its enemies their best weapon.<br/><br/>A defense of the International Criminal Court’s decision to remove its chief prosecutor for misconduct. Reviews the internal failures that complicated the initial inquiry and explains why the dismissal will not affect ongoing cases in Palestine and Ukraine. Concludes with recommendations for fixing the court&#x27;s accountability rules and choosing a successor.<br/><br/>Read at source: <a href="https://www.justsecurity.org/153766/icc-court-new-prosecutor/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=icc-court-new-prosecutor">Just Security</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How does a court that judges the world go about removing its own top prosecutor?</em><br/><br/>When the International Criminal Court voted to fire its top prosecutor, critics quickly called the move a political hit job that would derail ongoing war crimes cases. Writing on 18 August 2026, the authors point to a much quieter story. They ask what happens when a global body, currently facing heavy pressure and sanctions from the United States, actually decides to police its own leadership. The argument lands on a sharp political truth: an institution that refuses to discipline itself simply hands its enemies their best weapon.<br/><br/>A defense of the International Criminal Court’s decision to remove its chief prosecutor for misconduct. Reviews the internal failures that complicated the initial inquiry and explains why the dismissal will not affect ongoing cases in Palestine and Ukraine. Concludes with recommendations for fixing the court&#x27;s accountability rules and choosing a successor.<br/><br/>Read at source: <a href="https://www.justsecurity.org/153766/icc-court-new-prosecutor/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=icc-court-new-prosecutor">Just Security</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How does a court that judges the world go about removing its own top prosecutor?
+
+When the International Criminal Court voted to fire its top prosecutor, critics quickly called the move a political hit job that would derail ongoing war crimes cases. Writing on 18 August 2026, the authors point to a much quieter story. They ask what happens when a global body, currently facing heavy pressure and sanctions from the United States, actually decides to police its own leadership. The argument lands on a sharp political truth: an institution that refuses to discipline itself simply hands its enemies their best weapon.
+
+A defense of the International Criminal Court’s decision to remove its chief prosecutor for misconduct. Reviews the internal failures that complicated the initial inquiry and explains why the dismissal will not affect ongoing cases in Palestine and Ukraine. Concludes with recommendations for fixing the court&#x27;s accountability rules and choosing a successor.
+
+Read at source: Just Security
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-14400</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_14400.mp3" length="6862509" type="audio/mpeg"/>
+      <itunes:duration>14:18</itunes:duration>
+      <itunes:author>Andreas Motzfeldt Kravik</itunes:author>
+      <itunes:subtitle>Just Security</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>What Do Gödel’s Incompleteness Theorems Truly Mean?</title>
+      <itunes:title>What Do Gödel’s Incompleteness Theorems Truly Mean?</itunes:title>
+      <link>https://www.quantamagazine.org/what-do-godels-incompleteness-theorems-truly-mean-20260518/</link>
+      <description><![CDATA[<em>How can something be mathematically true if no set of rules can ever prove it?</em><br/><br/>Almost a century ago, Kurt Gödel proved that mathematics can never be perfectly complete. He showed that no matter the rules, there will always be true statements that cannot be proven. In this piece from 18 May 2026, Quanta Magazine asks what that actually means for the people doing math and physics today. Instead of leaving Gödel’s proof as a historical footnote, the article treats it as a living problem. It looks at what happens when the exact sciences rest on a stubbornly unfinished foundation, and asks whether that uncertainty is a boundary, or an invitation.<br/><br/>A survey of how mathematicians, philosophers, and physicists understand Kurt Gödel&#x27;s incompleteness theorems today. The discussions track the practical effects of unprovable statements, from the limits of formal logic to the possibility that physical space and time are discrete rather than continuous. Contributors debate whether Gödel&#x27;s proof means some mathematical questions will never have answers, or if it simply requires new logical systems.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/what-do-godels-incompleteness-theorems-truly-mean-20260518/">Quanta Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How can something be mathematically true if no set of rules can ever prove it?</em><br/><br/>Almost a century ago, Kurt Gödel proved that mathematics can never be perfectly complete. He showed that no matter the rules, there will always be true statements that cannot be proven. In this piece from 18 May 2026, Quanta Magazine asks what that actually means for the people doing math and physics today. Instead of leaving Gödel’s proof as a historical footnote, the article treats it as a living problem. It looks at what happens when the exact sciences rest on a stubbornly unfinished foundation, and asks whether that uncertainty is a boundary, or an invitation.<br/><br/>A survey of how mathematicians, philosophers, and physicists understand Kurt Gödel&#x27;s incompleteness theorems today. The discussions track the practical effects of unprovable statements, from the limits of formal logic to the possibility that physical space and time are discrete rather than continuous. Contributors debate whether Gödel&#x27;s proof means some mathematical questions will never have answers, or if it simply requires new logical systems.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/what-do-godels-incompleteness-theorems-truly-mean-20260518/">Quanta Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How can something be mathematically true if no set of rules can ever prove it?
+
+Almost a century ago, Kurt Gödel proved that mathematics can never be perfectly complete. He showed that no matter the rules, there will always be true statements that cannot be proven. In this piece from 18 May 2026, Quanta Magazine asks what that actually means for the people doing math and physics today. Instead of leaving Gödel’s proof as a historical footnote, the article treats it as a living problem. It looks at what happens when the exact sciences rest on a stubbornly unfinished foundation, and asks whether that uncertainty is a boundary, or an invitation.
+
+A survey of how mathematicians, philosophers, and physicists understand Kurt Gödel&#x27;s incompleteness theorems today. The discussions track the practical effects of unprovable statements, from the limits of formal logic to the possibility that physical space and time are discrete rather than continuous. Contributors debate whether Gödel&#x27;s proof means some mathematical questions will never have answers, or if it simply requires new logical systems.
+
+Read at source: Quanta Magazine
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-121</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_0121.mp3" length="8549421" type="audio/mpeg"/>
+      <itunes:duration>17:49</itunes:duration>
+      <itunes:author>Natalie Wolchover</itunes:author>
+      <itunes:subtitle>Quanta Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>AI &amp; Drones: Eric Schmidt On The Biggest Revolution In The History Of Warfare</title>
+      <itunes:title>AI &amp; Drones: Eric Schmidt On The Biggest Revolution In The History Of Warfare</itunes:title>
+      <link>https://www.noemamag.com/ai-drones-eric-schmidt-on-the-biggest-revolution-in-the-history-of-warfare</link>
+      <description><![CDATA[<em>When robots are sent into battle first, what happens to the humans left watching the screens?</em><br/><br/>Former Google CEO Eric Schmidt spent years watching drone combat in Ukraine before sitting down for this Noema interview on 16 June 2026. What he describes is a quiet but total revolution in how wars are fought. Schmidt realized that the era of expensive military hardware and human-first combat is already over, replaced by cheap, automated systems where robots take the first fire. The conversation remains essential because it names a structural reality that most Western militaries are still refusing to accept: the basic arithmetic of modern conflict has permanently changed.<br/><br/>An interview with former Google executive Eric Schmidt on how artificial intelligence and cheap drones are altering military strategy. Drawing on recent warfare in Ukraine and Iran, the discussion outlines a shift toward mass-produced precision weapons that push human soldiers further from the front lines. The conversation also covers the vulnerabilities of expensive traditional defense systems and the strict limits required for nuclear command.<br/><br/>Read at source: <a href="https://www.noemamag.com/ai-drones-eric-schmidt-on-the-biggest-revolution-in-the-history-of-warfare">Noema</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When robots are sent into battle first, what happens to the humans left watching the screens?</em><br/><br/>Former Google CEO Eric Schmidt spent years watching drone combat in Ukraine before sitting down for this Noema interview on 16 June 2026. What he describes is a quiet but total revolution in how wars are fought. Schmidt realized that the era of expensive military hardware and human-first combat is already over, replaced by cheap, automated systems where robots take the first fire. The conversation remains essential because it names a structural reality that most Western militaries are still refusing to accept: the basic arithmetic of modern conflict has permanently changed.<br/><br/>An interview with former Google executive Eric Schmidt on how artificial intelligence and cheap drones are altering military strategy. Drawing on recent warfare in Ukraine and Iran, the discussion outlines a shift toward mass-produced precision weapons that push human soldiers further from the front lines. The conversation also covers the vulnerabilities of expensive traditional defense systems and the strict limits required for nuclear command.<br/><br/>Read at source: <a href="https://www.noemamag.com/ai-drones-eric-schmidt-on-the-biggest-revolution-in-the-history-of-warfare">Noema</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When robots are sent into battle first, what happens to the humans left watching the screens?
+
+Former Google CEO Eric Schmidt spent years watching drone combat in Ukraine before sitting down for this Noema interview on 16 June 2026. What he describes is a quiet but total revolution in how wars are fought. Schmidt realized that the era of expensive military hardware and human-first combat is already over, replaced by cheap, automated systems where robots take the first fire. The conversation remains essential because it names a structural reality that most Western militaries are still refusing to accept: the basic arithmetic of modern conflict has permanently changed.
+
+An interview with former Google executive Eric Schmidt on how artificial intelligence and cheap drones are altering military strategy. Drawing on recent warfare in Ukraine and Iran, the discussion outlines a shift toward mass-produced precision weapons that push human soldiers further from the front lines. The conversation also covers the vulnerabilities of expensive traditional defense systems and the strict limits required for nuclear command.
+
+Read at source: Noema
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-2548</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_2548.mp3" length="5367789" type="audio/mpeg"/>
+      <itunes:duration>11:11</itunes:duration>
+      <itunes:author>Eric Schmidt</itunes:author>
+      <itunes:subtitle>Noema</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Spidey’s Sense for Success</title>
+      <itunes:title>Spidey’s Sense for Success</itunes:title>
+      <link>https://www.theatlantic.com/culture/2026/08/spider-man-superhero-movies-box-office-records/688296/?utm_source=feed</link>
+      <description><![CDATA[<em>If people are tired of superheroes, why does a teenager in a spider suit keep breaking records?</em><br/><br/>Moviegoers are clearly exhausted by superheroes, with recent big-budget comic adaptations playing to half-empty theaters. Yet the newest Spider-Man film just shattered opening-weekend records. In a piece published on 14 August 2026, The Atlantic asks what makes this specific character immune to the fatigue dragging down the rest of the genre. The answer comes down to a mix of grounded storytelling and the massive star power of its lead actors. It suggests that while the broader era of caped crusaders might be fading, Peter Parker operates by an entirely different set of rules.<br/><br/>An analysis of why the new Spider-Man movie, Brand New Day, is breaking box-office records despite a general decline in superhero films. It links the franchise&#x27;s endurance to the character&#x27;s grounded appeal, cross-generational marketing, and the star power of actors Tom Holland and Zendaya. Finally, it details how Marvel plans to use this success to restructure its upcoming release slate.<br/><br/>Read at source: <a href="https://www.theatlantic.com/culture/2026/08/spider-man-superhero-movies-box-office-records/688296/?utm_source=feed">The Atlantic</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If people are tired of superheroes, why does a teenager in a spider suit keep breaking records?</em><br/><br/>Moviegoers are clearly exhausted by superheroes, with recent big-budget comic adaptations playing to half-empty theaters. Yet the newest Spider-Man film just shattered opening-weekend records. In a piece published on 14 August 2026, The Atlantic asks what makes this specific character immune to the fatigue dragging down the rest of the genre. The answer comes down to a mix of grounded storytelling and the massive star power of its lead actors. It suggests that while the broader era of caped crusaders might be fading, Peter Parker operates by an entirely different set of rules.<br/><br/>An analysis of why the new Spider-Man movie, Brand New Day, is breaking box-office records despite a general decline in superhero films. It links the franchise&#x27;s endurance to the character&#x27;s grounded appeal, cross-generational marketing, and the star power of actors Tom Holland and Zendaya. Finally, it details how Marvel plans to use this success to restructure its upcoming release slate.<br/><br/>Read at source: <a href="https://www.theatlantic.com/culture/2026/08/spider-man-superhero-movies-box-office-records/688296/?utm_source=feed">The Atlantic</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If people are tired of superheroes, why does a teenager in a spider suit keep breaking records?
+
+Moviegoers are clearly exhausted by superheroes, with recent big-budget comic adaptations playing to half-empty theaters. Yet the newest Spider-Man film just shattered opening-weekend records. In a piece published on 14 August 2026, The Atlantic asks what makes this specific character immune to the fatigue dragging down the rest of the genre. The answer comes down to a mix of grounded storytelling and the massive star power of its lead actors. It suggests that while the broader era of caped crusaders might be fading, Peter Parker operates by an entirely different set of rules.
+
+An analysis of why the new Spider-Man movie, Brand New Day, is breaking box-office records despite a general decline in superhero films. It links the franchise&#x27;s endurance to the character&#x27;s grounded appeal, cross-generational marketing, and the star power of actors Tom Holland and Zendaya. Finally, it details how Marvel plans to use this success to restructure its upcoming release slate.
+
+Read at source: The Atlantic
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Wed, 19 Aug 2026 07:13:25 +0000</pubDate>
+      <guid isPermaLink="false">aarva-151-13910</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-08-19/article_13910.mp3" length="3301293" type="audio/mpeg"/>
+      <itunes:duration>06:53</itunes:duration>
+      <itunes:author>David Sims</itunes:author>
+      <itunes:subtitle>The Atlantic</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: women and state power</title>
       <itunes:title>Crosscut: women and state power</itunes:title>
