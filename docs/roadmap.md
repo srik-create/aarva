@@ -70,6 +70,33 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **Trend-signal v2 — Bluesky + HN sources, reverse lookup, and
+   lens-aware max-age guardrail.** Full spec at
+   `docs/session_plan_trend_signal_v2.md`. Extends the 2026-08-13
+   trend-signal ship in three directions:
+   (a) new trend sources — Bluesky `getTrends` (verified
+   2026-08-20 as free/no-auth/public) and HN Algolia by-date
+   front-page (verified same day);
+   (b) reverse lookup — for Aarva's already-scored articles,
+   detect current external attention via HN Algolia URL-search +
+   Reddit URL-search + Bluesky post-search; surface hits in the
+   review CLI as "Trending Aarva articles" boost candidates via
+   new `vNa`/`vNd` batch commands;
+   (c) lens-aware max-age guardrail on forward matching —
+   `_load_candidate_articles` gains a filter that mirrors Stage
+   7's `slot_max_age_days` (6-day cap on `lens=future_gazing` and
+   `lens=behind_the_news`), reading from the same
+   `assembly.slot_max_age_days` config so both stages share one
+   source of truth.
+   Asymmetric guardrails locked 2026-08-20: forward matching adds
+   the new max-age (news-y lenses go stale) on top of the
+   existing 48h min + JTBD filter; reverse lookup applies JTBD
+   filter ONLY — no age constraints, because external virality
+   is trusted signal and Aarva's editorial bar already ran when
+   the article was scored. Ships as two PRs: PR 1 = concept C
+   (small, urgent bug fix); PR 2 = concepts A+B (bigger design).
+   AGENTS.md rule 4 sign-off from user 2026-08-20.
+
 ---
 
 ## Deferred — to return to (in priority order)
