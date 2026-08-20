@@ -181,6 +181,97 @@ def _print_trending(items: list[TrendingItem]) -> None:
     print(DIM("─" * 70))
 
 
+@dataclass
+class ViralityItem:
+    """One unresolved article_virality_hits row — see docs/session_
+    plan_trend_signal_v2.md concept B. HN only for now (Reddit
+    confirmed dead, Bluesky deferred pending a bot account — see
+    docs/roadmap.md's 2026-08-20 entry)."""
+    index: int               # 1-based for display, distinct from ReviewPiece's/TrendingItem's
+    hit_id: int
+    article_id: int
+    article_title: str
+    article_url: str
+    source_name: str
+    score: Optional[int]
+    num_comments: Optional[int]
+    external_url: Optional[str]
+    jtbd_primary: Optional[str]
+    lens: Optional[str]
+    age_days: Optional[int]
+
+
+def _load_virality(db: Database) -> list[ViralityItem]:
+    """Unresolved virality hits (operator_action IS NULL), newest
+    first — same "shown regardless of age, never silently lost"
+    posture as _load_trending."""
+    with db.connect() as conn:
+        rows = conn.execute("""
+            SELECT v.id, v.article_id, v.source_name, v.external_url,
+                   v.score, v.num_comments,
+                   a.title AS article_title, a.canonical_url AS article_url,
+                   CAST(julianday('now') - julianday(a.published_date) AS INTEGER) AS age_days,
+                   s.jtbd_primary, s.lens
+              FROM article_virality_hits v
+              JOIN articles a ON a.id = v.article_id
+              LEFT JOIN article_scores s ON s.article_id = v.article_id
+             WHERE v.operator_action IS NULL
+             ORDER BY v.id DESC
+        """).fetchall()
+
+    items = []
+    for i, r in enumerate(rows, start=1):
+        items.append(ViralityItem(
+            index=i,
+            hit_id=r["id"],
+            article_id=r["article_id"],
+            article_title=r["article_title"],
+            article_url=r["article_url"],
+            source_name=r["source_name"],
+            score=r["score"],
+            num_comments=r["num_comments"],
+            external_url=r["external_url"],
+            jtbd_primary=r["jtbd_primary"],
+            lens=r["lens"],
+            age_days=r["age_days"],
+        ))
+    return items
+
+
+def _print_virality(items: list[ViralityItem]) -> None:
+    if not items:
+        return
+    print(BOLD("═" * 70))
+    print(BOLD("  Trending Aarva articles (external virality)"))
+    print(BOLD("═" * 70))
+    for v in items:
+        print()
+        print(f"  {BOLD(f'[v{v.index}]')}  {BOLD(v.article_title)}  "
+              f"{DIM(f'(article #{v.article_id})')}")
+        source_label = v.source_name.upper()
+        stats_bits = []
+        if v.score is not None:
+            stats_bits.append(f"{v.score} points")
+        if v.num_comments is not None:
+            stats_bits.append(f"{v.num_comments} comments")
+        stats = ", ".join(stats_bits)
+        print(f"       {GREEN(f'-> {source_label}:')} {stats}")
+        if v.external_url:
+            print(f"       {BLUE(v.external_url)}")
+        tags_parts = []
+        if v.jtbd_primary:
+            tags_parts.append(f"JTBD={v.jtbd_primary}")
+        if v.lens:
+            tags_parts.append(f"lens={v.lens}")
+        if v.age_days is not None:
+            tags_parts.append(f"age={v.age_days}d")
+        if tags_parts:
+            print(f"       {DIM('  '.join(tags_parts))}")
+        print(DIM(f"       [v{v.index}a=add to today / v{v.index}d=dismiss]"))
+    print()
+    print(DIM("─" * 70))
+
+
 def _find_edition_to_review(db: Database, edition_id: Optional[int]) -> Optional[int]:
     """If edition_id was given, return it. Otherwise find the most recent
     edition that has at least one 'proposed' piece."""
@@ -336,7 +427,7 @@ KNOWN_SLOT_ALIASES = {
 
 def _parse_decisions(
     raw: str, n_pieces: int, proposed_indices: Optional[set[int]] = None,
-    n_trends: int = 0,
+    n_trends: int = 0, n_virality: int = 0,
 ) -> dict:
     """Parse the review-CLI command line into a structured decisions dict.
 
@@ -359,6 +450,8 @@ def _parse_decisions(
       t<N>d           dismiss trending-topic N
       t<N>i           ingest trending-topic N's GDELT-fallback first URL,
                       then add it to today's edition
+      v<N>a           add virality-hit N's article to today's edition
+      v<N>d           dismiss virality-hit N
       +behind         add a lens_card_behind slot
       +humans         add a lens_card_humans slot
       +future, +feature, +curiosity, +escape, +delight  (other aliases)
@@ -389,9 +482,10 @@ def _parse_decisions(
     )
 
     decisions = {
-        "piece_actions": {},   # type: dict[int, tuple[str, Optional[str]]]
-        "add_slots": [],       # type: list[str]
-        "trend_actions": {},   # type: dict[int, str] -- {trend_index: 'a'|'d'|'i'}
+        "piece_actions": {},    # type: dict[int, tuple[str, Optional[str]]]
+        "add_slots": [],        # type: list[str]
+        "trend_actions": {},    # type: dict[int, str] -- {trend_index: 'a'|'d'|'i'}
+        "virality_actions": {}, # type: dict[int, str] -- {virality_index: 'a'|'d'}
     }
 
     if cleaned in ("", "all-a", "alla", "a"):
@@ -455,6 +549,27 @@ def _parse_decisions(
             if trend_idx < 1 or trend_idx > n_trends:
                 raise ValueError(f"trend t{trend_idx} out of range (1-{n_trends})")
             decisions["trend_actions"][trend_idx] = trend_action_char
+            continue
+
+        # "v<N><a|d>" — virality-hit action (add matched article to
+        # today's edition / dismiss). Same checked-before-int()-parse
+        # reasoning as the "t" branch above.
+        if tok[0] == "v" and len(tok) >= 3:
+            virality_action_char = tok[-1]
+            if virality_action_char not in ("a", "d"):
+                raise ValueError(
+                    f"'{tok}': unknown virality action '{virality_action_char}' "
+                    f"— use v<N>a / v<N>d"
+                )
+            try:
+                virality_idx = int(tok[1:-1])
+            except ValueError as e:
+                raise ValueError(
+                    f"can't parse '{tok}' as v<number><a|d>"
+                ) from e
+            if virality_idx < 1 or virality_idx > n_virality:
+                raise ValueError(f"virality v{virality_idx} out of range (1-{n_virality})")
+            decisions["virality_actions"][virality_idx] = virality_action_char
             continue
 
         # "<N>" or "<N><action_char>"
@@ -757,6 +872,55 @@ def _apply_trend_decisions(
     return summary
 
 
+def _apply_virality_decisions(
+    db: Database, items: list[ViralityItem], virality_actions: dict[int, str],
+) -> dict:
+    """Apply virality-hit decisions. Returns {'virality_added': n,
+    'virality_dismissed': n}. Mirrors _apply_trend_decisions —
+    review_status='approved' for the same reason (the vNa keystroke IS
+    the operator's approval; see docs/session_plan_trend_adds_auto_
+    approve.md). Slot inference matches the trend-matcher convention:
+    'delight' if JTBD is delight, else 'bonus'. Any hit not mentioned
+    in virality_actions is left unresolved — it'll show up again next
+    time review runs."""
+    summary = {"virality_added": 0, "virality_dismissed": 0}
+    by_index = {v.index: v for v in items}
+
+    for idx, action in virality_actions.items():
+        item = by_index.get(idx)
+        if item is None:
+            continue
+
+        if action == "d":
+            with db.connect() as conn:
+                conn.execute(
+                    "UPDATE article_virality_hits SET operator_action = 'dismissed', "
+                    "resolved_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (item.hit_id,),
+                )
+            summary["virality_dismissed"] += 1
+            continue
+
+        slot = "delight" if item.jtbd_primary == "delight" else "bonus"
+        result = add_article_to_todays_edition(
+            db, item.article_id, slot=slot, review_status="approved",
+        )
+        if result == "added":
+            with db.connect() as conn:
+                conn.execute(
+                    "UPDATE article_virality_hits SET operator_action = 'added', "
+                    "resolved_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (item.hit_id,),
+                )
+            summary["virality_added"] += 1
+        elif result == "no_edition":
+            print(YELLOW(f"  v{idx}: no daily edition exists for today, skipping."))
+        elif result == "already_present":
+            print(DIM(f"  v{idx}: article already in today's edition."))
+
+    return summary
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--edition-id", type=int, default=None,
@@ -793,6 +957,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     # edition — the operator picks add/dismiss per trend below.
     trending_items = _load_trending(db)
     _print_trending(trending_items)
+    virality_items = _load_virality(db)
+    _print_virality(virality_items)
 
     _print_header(edition_id, today_iso, len(pieces), _approved_count(db, edition_id))
 
@@ -808,7 +974,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         decisions = {
             "piece_actions": {i: ("a", None) for i in proposed_indices},
             "add_slots": [],
-            "trend_actions": {},   # trends are never auto-decided — always operator-picked
+            "trend_actions": {},      # trends are never auto-decided — always operator-picked
+            "virality_actions": {},   # same for virality hits
         }
         print(GREEN(f"Auto-approving all {len(proposed_indices)} proposed piece(s)."))
     else:
@@ -821,13 +988,16 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(BOLD("Trending commands:"))
             print(DIM("  tNa  add trend N's match      tNd  dismiss trend N"))
             print(DIM("  tNi  ingest trend N's GDELT-fallback URL and add it"))
+        if virality_items:
+            print(BOLD("Trending-Aarva-article commands:"))
+            print(DIM("  vNa  add virality-hit N's article    vNd  dismiss virality-hit N"))
         print(BOLD("Edition-level commands:"))
         print(DIM("  +behind  +humans  +future  +feature  +curiosity  +escape"))
         print(DIM("    add another slot of that type for refill"))
         print(BOLD("Shortcuts:"))
         print(DIM("  all-a    approve everything proposed (approved pieces untouched)"))
         print(DIM("  (empty)  approve everything proposed (approved pieces untouched)"))
-        print(DIM("  Example: '1a 2l 3a 4d 5a 6s +behind t1a t2d'"))
+        print(DIM("  Example: '1a 2l 3a 4d 5a 6s +behind t1a t2d v1a'"))
         print()
         while True:
             try:
@@ -838,7 +1008,8 @@ def main(argv: Optional[list[str]] = None) -> int:
                 return 1
             try:
                 decisions = _parse_decisions(
-                    raw, len(pieces), proposed_indices, n_trends=len(trending_items),
+                    raw, len(pieces), proposed_indices,
+                    n_trends=len(trending_items), n_virality=len(virality_items),
                 )
                 break
             except ValueError as e:
@@ -878,6 +1049,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         parts.append(GREEN(f"add {n_trend_add} trend{'s' if n_trend_add > 1 else ''}"))
     if n_trend_dismiss:
         parts.append(YELLOW(f"dismiss {n_trend_dismiss} trend{'s' if n_trend_dismiss > 1 else ''}"))
+    virality_actions = decisions.get("virality_actions", {})
+    n_virality_add = sum(1 for a in virality_actions.values() if a == "a")
+    n_virality_dismiss = sum(1 for a in virality_actions.values() if a == "d")
+    if n_virality_add:
+        parts.append(GREEN(f"add {n_virality_add} virality hit{'s' if n_virality_add > 1 else ''}"))
+    if n_virality_dismiss:
+        parts.append(YELLOW(f"dismiss {n_virality_dismiss} virality hit{'s' if n_virality_dismiss > 1 else ''}"))
     print(f"  About to: {'  ·  '.join(parts)}")
 
     if not args.auto_approve:
@@ -893,6 +1071,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     summary = _apply_decisions(db, edition_id, pieces, decisions)
     trend_summary = _apply_trend_decisions(db, trending_items, trend_actions)
+    virality_summary = _apply_virality_decisions(db, virality_items, virality_actions)
     s_approved = summary["approved"]
     s_rejected = summary["rejected"]
     s_dropped = summary["dropped"]
@@ -908,6 +1087,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         added_str = GREEN(f"+ {trend_summary['trend_added']} trend(s) added")
         dismissed_str = YELLOW(f"⊘ {trend_summary['trend_dismissed']} trend(s) dismissed")
         print(f"  {added_str}, {dismissed_str}")
+    if virality_summary["virality_added"] or virality_summary["virality_dismissed"]:
+        v_added_str = GREEN(f"+ {virality_summary['virality_added']} virality hit(s) added")
+        v_dismissed_str = YELLOW(f"⊘ {virality_summary['virality_dismissed']} virality hit(s) dismissed")
+        print(f"  {v_added_str}, {v_dismissed_str}")
 
     # Print next-step guidance.
     print()

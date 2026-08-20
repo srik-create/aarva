@@ -1,18 +1,27 @@
-# Aarva trend sources — v1
+# Aarva trend sources — v2
 #
-# See docs/session_plan_trend_signal_for_delight.md. A nightly crawl
-# reads Google Trends per region; each trend gets query-expanded and
-# semantically matched against Aarva's article catalog, surfacing hits
-# to the operator in `python -m aarva.review`'s "Trending" section as
-# candidates for the delight/bonus slot. Never auto-added.
+# See docs/session_plan_trend_signal_for_delight.md (v1, Google
+# Trends only) and docs/session_plan_trend_signal_v2.md (v2, adds
+# Bluesky + HN). A nightly crawl reads each enabled source; each trend
+# gets query-expanded and semantically matched against Aarva's article
+# catalog, surfacing hits to the operator in `python -m aarva.review`'s
+# "Trending" section as candidates for the delight/bonus slot. Never
+# auto-added.
 #
 # Each entry:
 #   name    — display name, also the trend_hits.source_name key
-#   region  — Google Trends region code ('US', 'IN', 'GB') or a synthetic
-#             'global' pseudo-region — see aarva/sources/trend_crawler.py
+#   kind    — selects the crawler handler in aarva/sources/trend_crawler.py:
+#             'google_trends' | 'bluesky_trends' | 'hn_frontpage'
+#   region  — Google Trends region code ('US', 'IN', 'GB') for kind=
+#             google_trends; 'global' for the other two kinds (both are
+#             inherently global, no per-region variant)
 #   weight  — 0.0-1.0, display-order hint only (no auto-add logic)
-#   enabled — true/false, one-line on/off switch
-#   notes   — why this region, or any caveat
+#   enabled — true/false, one-line on/off switch. This is the ONLY
+#             on/off toggle for a source — no parallel pipeline.yaml
+#             flag (2026-08-20 decision: a second toggle on top of
+#             this one would repeat the exact redundant-flag mistake
+#             already corrected once for the old blanket trends.enabled).
+#   notes   — why this source, or any caveat
 #
 # v1 scope note (2026-08-13): the original spec proposed YouTube
 # Trending and GDELT as additional crawled sources alongside Google
@@ -24,13 +33,20 @@
 # pytrends (the library the spec named) is archived/unmaintained as of
 # 2025-04-17; using trendspyg instead (verified 2026-08-13).
 #
-# There is no "global" region — trendspyg's geo param is a real country
-# code (125 countries + 51 US states, verified 2026-08-13 against live
-# data); the spec's `google_trends_global` row was never a real Google
-# Trends concept and is dropped rather than invented.
+# There is no "global" Google Trends region — trendspyg's geo param is
+# a real country code (125 countries + 51 US states, verified
+# 2026-08-13 against live data); the original spec's
+# `google_trends_global` row was never a real Google Trends concept
+# and is dropped rather than invented.
+#
+# v2 scope note (2026-08-20): Bluesky getTrends and HN Algolia
+# search_by_date both verified live before wiring (rule 6a) — public,
+# no auth required. Both YouTube-alternative sources the original v1
+# spec never considered.
 
 sources:
   - name: google_trends_us
+    kind: google_trends
     region: US
     weight: 0.7
     enabled: true
@@ -40,6 +56,7 @@ sources:
       US trends.
 
   - name: google_trends_in
+    kind: google_trends
     region: IN
     weight: 0.8
     enabled: true
@@ -51,9 +68,35 @@ sources:
       theoretical case).
 
   - name: google_trends_gb
+    kind: google_trends
     region: GB
     weight: 0.7
     enabled: true
     notes: >
       Secondary English-language market. Verified 2026-08-13 — real
       call returned 10 current GB trends.
+
+  # ─── v2 additions (2026-08-20) ──────────────────────────────────
+  - name: bluesky_trends_global
+    kind: bluesky_trends
+    region: global
+    weight: 0.7
+    enabled: true
+    notes: >
+      Covers viral cultural moments that don't translate to a distinct
+      Google Trends search query. Verified 2026-08-20 — real call
+      returned 10 trends with a heavy political skew (7/10); the
+      trends.bluesky_allowed_categories allowlist in pipeline.yaml
+      filters those out before they reach the matcher, but the crawl
+      itself still records them (in raw_metadata_json) for visibility.
+
+  - name: hn_frontpage
+    kind: hn_frontpage
+    region: global
+    weight: 0.8
+    enabled: true
+    notes: >
+      Highest audience-fit for Aarva of the three sources — HN's
+      readership overlaps heavily with Aarva's target listener.
+      Verified 2026-08-20 — real call to Algolia's search_by_date
+      returned high-scoring last-24h stories exactly as expected.

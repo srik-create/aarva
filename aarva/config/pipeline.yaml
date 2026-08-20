@@ -378,6 +378,30 @@ trends:
   gdelt_max_records: 25
   gdelt_timespan: 14d
 
+  # v2 (2026-08-20, docs/session_plan_trend_signal_v2.md) — Bluesky +
+  # HN as additional crawled trend sources, no separate enabled flag
+  # (same "running --stage 3 is the opt-in" reasoning as above; the
+  # per-source enabled:true/false in trend_sources.yaml is the only
+  # switch). Bluesky category vocab verified live 2026-08-20 —
+  # 'politics' dominated a real sample (7/10 trends), hence the
+  # allowlist excluding it by default.
+  bluesky_allowed_categories: [culture, science-tech, entertainment, sports, education]
+  hn_points_threshold: 200
+  hn_lookback_hours: 24
+
+  # Reverse lookup (v2 concept B) — for Aarva's already-scored
+  # articles, detect current external attention. Folds into the same
+  # --stage 3 run as the forward crawl, no separate flag/stage (same
+  # 2026-08-20 decision as above). HN only for now — Reddit confirmed
+  # dead (OAuth closed Nov 2025, unauthenticated .json shut down May
+  # 2026) and dropped entirely; Bluesky needs authentication as of
+  # mid-2026 and is deferred pending the operator setting up a bot
+  # account (see docs/roadmap.md's 2026-08-20 entry).
+  reverse_lookup_hn_points_threshold: 100
+  reverse_lookup_lookback_days: 14
+  reverse_lookup_scan_window_days: 90
+  reverse_lookup_allowed_jtbds: [delight, curiosity, smart_escape, keep_ahead]
+
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────
   # Gemini is the LLM for all production pipeline work — Stage 4+5+6

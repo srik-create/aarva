@@ -24,7 +24,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
 from aarva.sources import curation_crawler, trend_crawler
-from aarva.services import trend_matcher
+from aarva.services import article_virality, trend_matcher
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_8c_author_provenance,
@@ -214,13 +214,17 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
             sys.exit(1)
         return
 
-    # Stage 3 — Trend-signal crawl + match (external delight/timeliness
-    # signal — see docs/session_plan_trend_signal_for_delight.md).
-    # Deliberately explicit-only, same posture as Stage 0's curation
-    # crawl: NOT included in a full (stage=None) run. Running `--stage 3`
-    # IS the opt-in — no separate pipeline.yaml flag (removed 2026-08-13
-    # per user decision); whatever it finds always surfaces in the next
-    # `python -m aarva.review` run's "Trending" section.
+    # Stage 3 — Trend-signal crawl + match + reverse-lookup (external
+    # delight/timeliness signal — see docs/session_plan_trend_signal_
+    # for_delight.md and, for reverse lookup, docs/session_plan_trend_
+    # signal_v2.md concept B). Deliberately explicit-only, same posture
+    # as Stage 0's curation crawl: NOT included in a full (stage=None)
+    # run. Running `--stage 3` IS the opt-in — no separate pipeline.yaml
+    # flag (removed 2026-08-13, reaffirmed 2026-08-20 for the v2
+    # additions per the same user decision); whatever it finds always
+    # surfaces in the next `python -m aarva.review` run's "Trending"
+    # sections. Reverse lookup runs in this SAME stage, not a separate
+    # one — same 2026-08-20 decision as the sources themselves.
     if stage == 3:
         log.info("Stage 3 — Trend crawl starting")
         run_id = db.start_run("stage_3_trend_crawl")
@@ -239,6 +243,13 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
                 "Stage 3 match done — %d processed, %d matched, "
                 "%d fallback searches run",
                 mstats.trends_processed, mstats.matched, mstats.fallback_ran,
+            )
+            vstats = article_virality.scan_for_virality(config, db)
+            log.info(
+                "Stage 3 virality scan done — %d articles scanned, "
+                "%d new hits, %d already known, %d errors",
+                vstats.articles_scanned, vstats.hits_added,
+                vstats.hits_already_seen, vstats.scan_errors,
             )
             db.finish_run(run_id, status="success")
         except Exception as e:
