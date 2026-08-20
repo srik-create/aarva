@@ -83,15 +83,41 @@ def _load_candidate_articles(
     allowed_jtbds: list[str],
     embedding_model: str,
     exclude_ids: set[int],
+    lens_max_age_days: dict[str, int] | None = None,
 ) -> list[dict]:
     """Guardrail #6: age >= age_min_hours, JTBD in allowed_jtbds,
     status='scored' (excludes anything already 'in_edition'), has a
     usable embedding. jtbd_primary lives on article_scores, not
     articles — a JOIN is required (the spec's illustrative SQL omitted
-    this; verified via aarva/db.py's article_scores schema)."""
+    this; verified via aarva/db.py's article_scores schema).
+
+    lens_max_age_days (v2, docs/session_plan_trend_signal_v2.md
+    concept C): mirrors Stage 7's own news-y-lens freshness cap
+    (stage_7_assemble.py's SlotSpec.max_age_days for lens_card_future/
+    lens_card_behind) so a trend match can't surface an article Stage
+    7 itself would already treat as stale for that lens. Keyed by
+    LENS value (e.g. 'future_gazing'), not slot name — only lenses
+    present in the dict get an age cap; everything else is unaffected."""
     if not allowed_jtbds:
         return []
     placeholders = ",".join("?" for _ in allowed_jtbds)
+    params = [embedding_model, f"-{age_min_hours} hours", *allowed_jtbds]
+
+    lens_filter_sql = ""
+    if lens_max_age_days:
+        lens_names = list(lens_max_age_days.keys())
+        not_in_placeholders = ",".join("?" for _ in lens_names)
+        lens_clauses = ["(s.lens = ? AND a.published_date >= datetime('now', ?))"] * len(lens_names)
+        lens_filter_sql = (
+            f"AND (s.lens IS NULL OR s.lens NOT IN ({not_in_placeholders}) "
+            f"OR {' OR '.join(lens_clauses)})"
+        )
+        # Param order must match the SQL text order: the NOT-IN list first,
+        # then one (lens_name, cutoff) pair per OR clause.
+        params.extend(lens_names)
+        for lens_name, days in lens_max_age_days.items():
+            params.extend([lens_name, f"-{days} days"])
+
     with db.connect() as conn:
         rows = conn.execute(
             f"""
@@ -103,8 +129,9 @@ def _load_candidate_articles(
                AND a.embedding_model = ?
                AND a.published_date <= datetime('now', ?)
                AND s.jtbd_primary IN ({placeholders})
+               {lens_filter_sql}
             """,
-            (embedding_model, f"-{age_min_hours} hours", *allowed_jtbds),
+            params,
         ).fetchall()
     return [
         {"id": r["id"], "title": r["title"],
@@ -250,6 +277,32 @@ def _gdelt_fallback_search(
         return []
 
 
+# Slot name -> lens value, for the news-y lenses that get a max-age cap.
+# Mirrors stage_7_assemble.py's SlotSpec("lens_card_future", lens=
+# "future_gazing", max_age_days=6) and SlotSpec("lens_card_behind",
+# lens="behind_the_news", max_age_days=6) — the slot name is what
+# assembly.slot_max_age_days is keyed by in pipeline.yaml (matching
+# Stage 7's own override mechanism), the lens value is what
+# article_scores.lens actually contains.
+_NEWS_Y_SLOT_TO_LENS = {
+    "lens_card_future": "future_gazing",
+    "lens_card_behind": "behind_the_news",
+}
+_DEFAULT_LENS_MAX_AGE_DAYS = 6
+
+
+def _lens_max_age_days_from_config(config: PipelineConfig) -> dict[str, int]:
+    """One source of truth for both Stage 7 and the trend matcher:
+    reads assembly.slot_max_age_days (the same config Stage 7's
+    SlotSpec overrides read from), falling back to Stage 7's own
+    hardcoded default (6 days) for any slot not explicitly overridden."""
+    overrides = config.assembly.get("slot_max_age_days", {}) or {}
+    return {
+        lens: int(overrides.get(slot, _DEFAULT_LENS_MAX_AGE_DAYS))
+        for slot, lens in _NEWS_Y_SLOT_TO_LENS.items()
+    }
+
+
 def match_trends(
     config: PipelineConfig,
     db: Database,
@@ -265,6 +318,7 @@ def match_trends(
     blacklist = [p.lower() for p in trends_cfg.get("blacklist_phrases", [])]
     gdelt_max_records = int(trends_cfg.get("gdelt_max_records", 25))
     gdelt_timespan = trends_cfg.get("gdelt_timespan", "14d")
+    lens_max_age_days = _lens_max_age_days_from_config(config)
 
     if llm is None:
         llm = build_llm_client(config.llm)
@@ -279,6 +333,7 @@ def match_trends(
     exclude_ids = _recently_surfaced_article_ids(db)
     candidates = _load_candidate_articles(
         db, age_min_hours, allowed_jtbds, embedding_client.name, exclude_ids,
+        lens_max_age_days=lens_max_age_days,
     )
     domains = _allowlist_domains()
 

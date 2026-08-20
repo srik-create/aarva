@@ -70,32 +70,39 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
-4. **Trend-signal v2 — Bluesky + HN sources, reverse lookup, and
-   lens-aware max-age guardrail.** Full spec at
-   `docs/session_plan_trend_signal_v2.md`. Extends the 2026-08-13
-   trend-signal ship in three directions:
-   (a) new trend sources — Bluesky `getTrends` (verified
-   2026-08-20 as free/no-auth/public) and HN Algolia by-date
-   front-page (verified same day);
-   (b) reverse lookup — for Aarva's already-scored articles,
-   detect current external attention via HN Algolia URL-search +
-   Reddit URL-search + Bluesky post-search; surface hits in the
-   review CLI as "Trending Aarva articles" boost candidates via
-   new `vNa`/`vNd` batch commands;
-   (c) lens-aware max-age guardrail on forward matching —
-   `_load_candidate_articles` gains a filter that mirrors Stage
-   7's `slot_max_age_days` (6-day cap on `lens=future_gazing` and
-   `lens=behind_the_news`), reading from the same
-   `assembly.slot_max_age_days` config so both stages share one
-   source of truth.
-   Asymmetric guardrails locked 2026-08-20: forward matching adds
-   the new max-age (news-y lenses go stale) on top of the
-   existing 48h min + JTBD filter; reverse lookup applies JTBD
-   filter ONLY — no age constraints, because external virality
-   is trusted signal and Aarva's editorial bar already ran when
-   the article was scored. Ships as two PRs: PR 1 = concept C
-   (small, urgent bug fix); PR 2 = concepts A+B (bigger design).
-   AGENTS.md rule 4 sign-off from user 2026-08-20.
+4. **Trend-signal v2, PR 2 remaining — Bluesky + HN sources,
+   reverse lookup.** Full spec at
+   `docs/session_plan_trend_signal_v2.md`. PR 1 (concept C, the
+   lens-aware max-age guardrail) shipped 2026-08-20 — see "Recently
+   completed". Remaining scope, narrowed from the original spec by
+   real rule-6a verification the same day:
+   - **Reddit dropped entirely** — confirmed dead, not just
+     unverified: OAuth access closed November 2025, and the
+     unauthenticated `.json` fallback the spec relied on was shut
+     down May 30, 2026. No viable path.
+   - **Bluesky's `searchPosts`** (needed for reverse lookup) now
+     also requires authentication (confirmed via direct test +
+     independent verification — changed mid-2026); `getTrends` (the
+     forward-source endpoint) is unaffected and still fully public.
+     Per user decision 2026-08-20, Bluesky reverse-lookup is
+     deferred — the user is setting up a dedicated Bluesky bot
+     account + app password themselves (Claude Code can't get past
+     the signup CAPTCHA + email verification), and will come back to
+     wire it in once that exists. **Reminder for next session: check
+     whether the user has that account ready before re-scoping
+     reverse lookup.**
+   - Net effect: PR 2 ships with Bluesky + HN as new forward trend
+     sources (both fully verified, no auth), and reverse lookup with
+     HN only for now.
+   - Per user decision 2026-08-20: no new `pipeline.yaml` toggle
+     flags for any of this — Bluesky/HN sources use the SAME
+     per-source `enabled: true/false` mechanism `trend_sources.yaml`
+     already has (a second flag would be the same redundant-toggle
+     mistake already corrected once for `trends.enabled`); reverse
+     lookup folds into the same `--stage 3` invocation as the
+     forward crawl+match, no separate flag or stage.
+   AGENTS.md rule 4 sign-off from user 2026-08-20 (original 3-concept
+   direction); rule 6a re-verification narrowed the scope the same day.
 
 ---
 
@@ -142,9 +149,47 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-15)
+## Recently completed (2026-06-29 → 2026-08-20)
 
 Most recent first.
+
+### 2026-08-20
+
+- **Trend-signal v2 PR 1 — lens-aware max-age guardrail on forward
+  trend matching.** Full spec at
+  `docs/session_plan_trend_signal_v2.md`, concept C. Small, urgent
+  fix (shipped first, per the spec's own PR-sequencing decision):
+  the trend matcher's `_load_candidate_articles`
+  (`aarva/services/trend_matcher.py`) never applied Stage 7's own
+  6-day max-age cap for news-y lenses (`future_gazing`,
+  `behind_the_news` — see `stage_7_assemble.py`'s `SlotSpec`
+  definitions), so a trend match could surface an article Stage 7
+  itself would already reject as stale for that lens.
+  - New `lens_max_age_days: dict[str, int] | None` parameter on
+    `_load_candidate_articles`, keyed by LENS value (not slot name).
+    New `_lens_max_age_days_from_config()` reads
+    `assembly.slot_max_age_days` — the SAME config key Stage 7's own
+    `SlotSpec` overrides already read — so both stages share one
+    source of truth; falls back to Stage 7's hardcoded default (6
+    days) for any slot not explicitly overridden in `pipeline.yaml`
+    (verified real: no override currently set, so the fallback path
+    is what's actually in effect today).
+  - Inclusive boundary (`>=`) matches Stage 7's own SQL exactly —
+    verified with a dedicated test at exactly the 6-day cutoff.
+    Non-news-y lenses and NULL lens are both correctly unaffected
+    even when old. Omitting the new parameter entirely is a pure
+    no-op (backward compatible with every existing caller).
+  - **Verified against real production data**: of 3,554 `scored`
+    `behind_the_news` articles, 3,409 (96%) are already stale (>6
+    days) and were vulnerable to incorrect trend-matching before
+    this fix; same for 74 of 78 `future_gazing` articles — this was
+    a real, high-incidence gap, not a rare edge case.
+  - 12 new tests (repo total: 140).
+- **Trend-signal v2 rule 6a re-verification narrowed PR 2's scope**
+  before any of it was built — see the "In progress" section above
+  for what's still pending (Bluesky/HN as new forward sources, HN-
+  only reverse lookup) and why Reddit was dropped entirely and
+  Bluesky reverse-lookup deferred.
 
 ### 2026-08-15
 

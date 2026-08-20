@@ -1,3 +1,14 @@
+**STATUS: PARTIALLY SHIPPED.** PR 1 (concept C, the lens-aware
+max-age guardrail) shipped 2026-08-20 — see `docs/roadmap.md`'s
+2026-08-20 entry. PR 2 (concepts A + B) still pending, with real
+scope narrowing found during rule 6a re-verification the same day:
+Reddit dropped entirely (confirmed dead — see `docs/project_brief.md`'s
+2026-08-20 decision log), Bluesky reverse-lookup deferred pending the
+user setting up a bot account. See `docs/roadmap.md`'s "In progress"
+section for current PR 2 scope before resuming this spec.
+
+---
+
 # Session plan — trend-signal layer v2 (Bluesky + HN sources, reverse lookup, lens-aware max age)
 
 Written by Cowork for the next Claude Code session (2026-08-20+).
