@@ -1,11 +1,13 @@
-**STATUS: PARTIALLY SHIPPED.** PR 1 (concept C, the lens-aware
-max-age guardrail) shipped 2026-08-20 — see `docs/roadmap.md`'s
-2026-08-20 entry. PR 2 (concepts A + B) still pending, with real
-scope narrowing found during rule 6a re-verification the same day:
-Reddit dropped entirely (confirmed dead — see `docs/project_brief.md`'s
-2026-08-20 decision log), Bluesky reverse-lookup deferred pending the
-user setting up a bot account. See `docs/roadmap.md`'s "In progress"
-section for current PR 2 scope before resuming this spec.
+**STATUS: SHIPPED, minus Bluesky reverse-lookup (deferred).** PR 1
+(concept C) and PR 2 (concepts A + B) both shipped 2026-08-20 — see
+`docs/roadmap.md`'s 2026-08-20 entry. Real rule 6a re-verification
+narrowed scope before either PR was built: Reddit dropped entirely
+(confirmed dead — see `docs/project_brief.md`'s 2026-08-20 decision
+log), Bluesky reverse-lookup deferred pending the user setting up a
+bot account (Bluesky's `getTrends` forward-source is unaffected and
+shipped in PR 2; only `searchPosts`, needed for reverse lookup, needs
+auth). See `docs/roadmap.md`'s "Deferred" section for the Bluesky
+reverse-lookup follow-up trigger.
 
 ---
 

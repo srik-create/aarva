@@ -384,6 +384,37 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_trend_hits_dedup
     ON trend_hits(source_name, trend_phrase, date(seen_at));
 
 
+-- Reverse-lookup virality signal (v2, 2026-08-20) — see
+-- docs/session_plan_trend_signal_v2.md concept B. For articles Aarva
+-- has ALREADY scored, detects current external attention (HN only for
+-- now — Reddit confirmed dead, Bluesky deferred pending a bot
+-- account) and surfaces hits in `python -m aarva.review`'s "Trending
+-- Aarva articles" section as boost candidates. Unlike trend_hits, a
+-- row here is tied to one persistent external post, not a daily
+-- phrase — the unique index below is NOT date-scoped, so the same
+-- (article, source, URL) is never re-inserted once seen, whichever
+-- day it was first found.
+CREATE TABLE IF NOT EXISTS article_virality_hits (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    article_id          INTEGER NOT NULL REFERENCES articles(id),
+    source_name         TEXT NOT NULL,
+    external_url        TEXT,
+    score               INTEGER,
+    num_comments        INTEGER,
+    external_created_at TIMESTAMP,
+    seen_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    raw_metadata_json   TEXT,
+    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed') OR operator_action IS NULL),
+    resolved_at         TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_article_virality_hits_action
+    ON article_virality_hits(operator_action, seen_at);
+CREATE INDEX IF NOT EXISTS idx_article_virality_hits_article
+    ON article_virality_hits(article_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_article_virality_hits_dedup
+    ON article_virality_hits(article_id, source_name, external_url);
+
+
 -- Pipeline run log: one row per invocation.
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id                              INTEGER PRIMARY KEY AUTOINCREMENT,

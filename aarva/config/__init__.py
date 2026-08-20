@@ -68,13 +68,20 @@ class CurationSource:
 
 @dataclass(frozen=True)
 class TrendSource:
-    """A Google Trends region crawled for the delight/bonus trend
-    signal — see docs/session_plan_trend_signal_for_delight.md."""
+    """A source crawled for the delight/bonus trend signal — see
+    docs/session_plan_trend_signal_for_delight.md and, for the
+    Bluesky/HN sources, docs/session_plan_trend_signal_v2.md.
+
+    kind selects the crawler handler in aarva/sources/trend_crawler.py
+    ('google_trends' | 'bluesky_trends' | 'hn_frontpage'). Defaults to
+    'google_trends' for backward compatibility with the v1 config
+    shape (no kind field existed before v2)."""
     name: str
     region: str
     weight: float
     enabled: bool
     notes: str | None
+    kind: str = "google_trends"
 
 
 @dataclass(frozen=True)
@@ -256,7 +263,8 @@ def load_curation_sources() -> list[CurationSource]:
 
 def load_trend_sources() -> list[TrendSource]:
     """Load aarva/config/trend_sources.yaml. Mirrors load_curation_sources.
-    See docs/session_plan_trend_signal_for_delight.md."""
+    See docs/session_plan_trend_signal_for_delight.md and, for the
+    'kind' field, docs/session_plan_trend_signal_v2.md."""
     with (CONFIG_DIR / "trend_sources.yaml").open() as f:
         raw = yaml.safe_load(f)
     return [
@@ -266,6 +274,7 @@ def load_trend_sources() -> list[TrendSource]:
             weight=float(s.get("weight", 1.0)),
             enabled=s.get("enabled", True),
             notes=s.get("notes"),
+            kind=s.get("kind", "google_trends"),
         )
         for s in raw.get("sources", [])
     ]

@@ -21,8 +21,11 @@ from aarva.db import Database
 import aarva.review as review_module
 from aarva.review import (
     TrendingItem,
+    ViralityItem,
     _apply_trend_decisions,
+    _apply_virality_decisions,
     _load_trending,
+    _load_virality,
     _parse_decisions,
 )
 from aarva.services.trend_matcher import (
@@ -155,6 +158,155 @@ class TestTrendCrawler:
         assert stats.sources_failed == 1
         assert stats.sources_processed == 1
         assert stats.hits_added == 1
+
+
+class TestBlueskyTrendsHandler:
+    """docs/session_plan_trend_signal_v2.md concept A. All httpx calls
+    mocked — no real Bluesky spend in the automated suite; the real
+    endpoint was live-tested by hand during implementation (2026-08-20)."""
+
+    def _fake_response(self, trends):
+        class _Resp:
+            def raise_for_status(self): pass
+            def json(self): return {"trends": trends}
+        return _Resp()
+
+    def test_filters_by_status_and_category(self, trend_db, monkeypatch):
+        from aarva.sources import trend_crawler as module
+        trends = [
+            {"displayName": "A trending culture item", "status": "trending",
+             "category": "culture", "postCount": 100, "topic": "t1"},
+            {"displayName": "A cooling sports item", "status": "cooling",
+             "category": "sports", "postCount": 50, "topic": "t2"},
+            # Excluded: stale status.
+            {"displayName": "A stale item", "status": "stale",
+             "category": "culture", "postCount": 10, "topic": "t3"},
+            # Excluded: real-but-undocumented 'saturating' status
+            # (verified live 2026-08-20) — treated like 'stale'.
+            {"displayName": "A saturating item", "status": "saturating",
+             "category": "culture", "postCount": 10, "topic": "t4"},
+            # Excluded: category not in the allowlist.
+            {"displayName": "A political item", "status": "trending",
+             "category": "politics", "postCount": 500, "topic": "t5"},
+        ]
+        monkeypatch.setattr(
+            module.httpx, "get",
+            lambda url, params=None, timeout=None: self._fake_response(trends),
+        )
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        sources = [TrendSource(name="bluesky_trends_global", region="global",
+                                weight=0.7, enabled=True, notes=None,
+                                kind="bluesky_trends")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.hits_added == 2
+        with trend_db.connect() as conn:
+            phrases = {r["trend_phrase"] for r in
+                       conn.execute("SELECT trend_phrase FROM trend_hits").fetchall()}
+        assert phrases == {"A trending culture item", "A cooling sports item"}
+
+    def test_uses_configured_category_allowlist(self, trend_db, monkeypatch):
+        from aarva.sources import trend_crawler as module
+        trends = [
+            {"displayName": "A custom-category item", "status": "trending",
+             "category": "custom-cat", "postCount": 100, "topic": "t1"},
+        ]
+        monkeypatch.setattr(
+            module.httpx, "get",
+            lambda url, params=None, timeout=None: self._fake_response(trends),
+        )
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        monkeypatch.setattr(
+            config.__class__, "trends",
+            property(lambda self: {"bluesky_allowed_categories": ["custom-cat"]}),
+        )
+        sources = [TrendSource(name="bluesky_trends_global", region="global",
+                                weight=0.7, enabled=True, notes=None,
+                                kind="bluesky_trends")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.hits_added == 1
+
+    def test_network_failure_is_handled_gracefully(self, trend_db, monkeypatch):
+        from aarva.sources import trend_crawler as module
+        def fake_get(*a, **k):
+            raise RuntimeError("boom")
+        monkeypatch.setattr(module.httpx, "get", fake_get)
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        sources = [TrendSource(name="bluesky_trends_global", region="global",
+                                weight=0.7, enabled=True, notes=None,
+                                kind="bluesky_trends")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.sources_failed == 1
+
+
+class TestHnFrontpageHandler:
+    """docs/session_plan_trend_signal_v2.md concept A. Points
+    threshold is enforced server-side (verified live 2026-08-20), not
+    re-checked client-side — this test just confirms parsing."""
+
+    def _fake_response(self, hits):
+        class _Resp:
+            def raise_for_status(self): pass
+            def json(self): return {"hits": hits}
+        return _Resp()
+
+    def test_parses_hits_into_trend_hits_rows(self, trend_db, monkeypatch):
+        from aarva.sources import trend_crawler as module
+        hits = [
+            {"title": "A good story", "url": "https://example.com/a",
+             "points": 400, "num_comments": 100, "objectID": "111"},
+            {"title": "Another story", "url": "https://example.com/b",
+             "points": 250, "num_comments": 50, "objectID": "222"},
+        ]
+        monkeypatch.setattr(
+            module.httpx, "get",
+            lambda url, params=None, timeout=None: self._fake_response(hits),
+        )
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        sources = [TrendSource(name="hn_frontpage", region="global",
+                                weight=0.8, enabled=True, notes=None,
+                                kind="hn_frontpage")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.hits_added == 2
+        with trend_db.connect() as conn:
+            row = conn.execute(
+                "SELECT raw_metadata_json FROM trend_hits WHERE trend_phrase = ?",
+                ("A good story",),
+            ).fetchone()
+        meta = json.loads(row["raw_metadata_json"])
+        assert meta["points"] == 400
+        assert meta["story_id"] == "111"
+
+    def test_skips_hits_with_no_title(self, trend_db, monkeypatch):
+        from aarva.sources import trend_crawler as module
+        hits = [{"title": "", "url": "https://x", "points": 300,
+                 "num_comments": 1, "objectID": "1"}]
+        monkeypatch.setattr(
+            module.httpx, "get",
+            lambda url, params=None, timeout=None: self._fake_response(hits),
+        )
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        sources = [TrendSource(name="hn_frontpage", region="global",
+                                weight=0.8, enabled=True, notes=None,
+                                kind="hn_frontpage")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.hits_added == 0
+
+
+class TestUnknownSourceKind:
+    def test_unknown_kind_is_skipped_and_counted_as_failed(self, trend_db):
+        from aarva.config import load_pipeline_config
+        config = load_pipeline_config()
+        sources = [TrendSource(name="mystery_source", region="global",
+                                weight=0.5, enabled=True, notes=None,
+                                kind="not_a_real_kind")]
+        stats = crawl_trend_sources(config, trend_db, sources=sources)
+        assert stats.sources_failed == 1
+        assert stats.sources_processed == 0
 
 
 class TestGdeltFallbackSearch:
@@ -571,6 +723,37 @@ class TestParseDecisionsTrendTokens:
             _parse_decisions("t1x", n_pieces=0, proposed_indices=set(), n_trends=2)
 
 
+class TestParseDecisionsVirailityTokens:
+    def test_add_action_parses(self):
+        decisions = _parse_decisions(
+            "v1a", n_pieces=0, proposed_indices=set(), n_virality=3,
+        )
+        assert decisions["virality_actions"] == {1: "a"}
+
+    def test_dismiss_action_parses(self):
+        decisions = _parse_decisions(
+            "v2d", n_pieces=0, proposed_indices=set(), n_virality=3,
+        )
+        assert decisions["virality_actions"] == {2: "d"}
+
+    def test_mixed_piece_trend_and_virality_tokens_in_one_line(self):
+        decisions = _parse_decisions(
+            "1a t1d v1a 2r", n_pieces=2, proposed_indices={1, 2},
+            n_trends=2, n_virality=2,
+        )
+        assert decisions["piece_actions"] == {1: ("a", None), 2: ("r", None)}
+        assert decisions["trend_actions"] == {1: "d"}
+        assert decisions["virality_actions"] == {1: "a"}
+
+    def test_out_of_range_virality_index_raises(self):
+        with pytest.raises(ValueError, match="out of range"):
+            _parse_decisions("v5a", n_pieces=0, proposed_indices=set(), n_virality=2)
+
+    def test_unknown_virality_action_char_raises(self):
+        with pytest.raises(ValueError, match="unknown virality action"):
+            _parse_decisions("v1x", n_pieces=0, proposed_indices=set(), n_virality=2)
+
+
 @pytest.fixture
 def review_db_with_edition(tmp_path):
     db = Database(str(tmp_path / "aarva.db"))
@@ -728,6 +911,93 @@ class TestApplyTrendDecisions:
         summary = _apply_trend_decisions(db, items, {1: "a"})
         assert summary == {"trend_added": 0, "trend_dismissed": 0}
         assert "no Aarva match to add" in capsys.readouterr().out
+
+
+class TestApplyViralityDecisions:
+    """docs/session_plan_trend_signal_v2.md concept B — mirrors
+    TestApplyTrendDecisions; review_status='approved' for the same
+    reason (docs/session_plan_trend_adds_auto_approve.md)."""
+
+    def test_add_action_adds_to_edition_as_approved(self, review_db_with_edition):
+        db = review_db_with_edition["db"]
+        article_id = review_db_with_edition["article_id"]
+        with db.connect() as conn:
+            conn.execute(
+                "INSERT INTO article_virality_hits (article_id, source_name, "
+                "external_url, score, num_comments) VALUES "
+                "(?, 'hn', 'https://news.ycombinator.com/item?id=1', 321, 45)",
+                (article_id,),
+            )
+        items = _load_virality(db)
+        assert len(items) == 1
+
+        summary = _apply_virality_decisions(db, items, {1: "a"})
+        assert summary == {"virality_added": 1, "virality_dismissed": 0}
+
+        with db.connect() as conn:
+            piece = conn.execute(
+                "SELECT slot, review_status FROM edition_pieces WHERE article_id = ?",
+                (article_id,),
+            ).fetchone()
+            resolved = conn.execute(
+                "SELECT operator_action FROM article_virality_hits",
+            ).fetchone()
+        assert piece["slot"] == "delight"   # review_db_with_edition's article is JTBD=delight
+        assert piece["review_status"] == "approved"
+        assert resolved["operator_action"] == "added"
+
+    def test_dismiss_action_marks_resolved_without_edition_write(self, review_db_with_edition):
+        db = review_db_with_edition["db"]
+        article_id = review_db_with_edition["article_id"]
+        with db.connect() as conn:
+            conn.execute(
+                "INSERT INTO article_virality_hits (article_id, source_name, "
+                "external_url, score) VALUES (?, 'hn', 'https://x/1', 200)",
+                (article_id,),
+            )
+        items = _load_virality(db)
+        summary = _apply_virality_decisions(db, items, {1: "d"})
+        assert summary == {"virality_added": 0, "virality_dismissed": 1}
+        with db.connect() as conn:
+            n_pieces = conn.execute("SELECT COUNT(*) AS n FROM edition_pieces").fetchone()["n"]
+        assert n_pieces == 0
+
+    def test_non_delight_jtbd_uses_bonus_slot(self, review_db_with_edition):
+        db = review_db_with_edition["db"]
+        article_id = review_db_with_edition["article_id"]
+        with db.connect() as conn:
+            conn.execute(
+                "UPDATE article_scores SET jtbd_primary = 'curiosity' WHERE article_id = ?",
+                (article_id,),
+            )
+            conn.execute(
+                "INSERT INTO article_virality_hits (article_id, source_name, "
+                "external_url, score) VALUES (?, 'hn', 'https://x/1', 200)",
+                (article_id,),
+            )
+        items = _load_virality(db)
+        _apply_virality_decisions(db, items, {1: "a"})
+        with db.connect() as conn:
+            piece = conn.execute(
+                "SELECT slot FROM edition_pieces WHERE article_id = ?", (article_id,),
+            ).fetchone()
+        assert piece["slot"] == "bonus"
+
+    def test_unmentioned_hit_stays_unresolved(self, review_db_with_edition):
+        db = review_db_with_edition["db"]
+        article_id = review_db_with_edition["article_id"]
+        with db.connect() as conn:
+            conn.execute(
+                "INSERT INTO article_virality_hits (article_id, source_name, "
+                "external_url, score) VALUES (?, 'hn', 'https://x/1', 200)",
+                (article_id,),
+            )
+        items = _load_virality(db)
+        summary = _apply_virality_decisions(db, items, {})
+        assert summary == {"virality_added": 0, "virality_dismissed": 0}
+        with db.connect() as conn:
+            row = conn.execute("SELECT operator_action FROM article_virality_hits").fetchone()
+        assert row["operator_action"] is None
 
 
 @pytest.fixture
