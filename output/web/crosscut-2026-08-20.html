@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Thursday, 20 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-20</div>
+      <div class="edition-meta">2 pieces · Crosscut · Thursday, 20 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · surviving financial distress</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-20/crosscut_0154.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>23 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When money gets tight, the first instinct is often to pull out a calculator and start cutting. Writing for Vox this month, Anna North looks back at early-2000s frugality bloggers who turned extreme budgeting into a tool for taking back control. There is a natural impulse to try and spreadsheet away economic fear. But a stark contrast emerges when that desire meets the cold reality of 2026. A recent piece in The Conversation tracks the sudden spike in personal bankruptcy filings happening right now. Put these two perspectives together, and a clear tension appears between the comforting belief that a tighter belt fixes everything, and the absolute legal finality of what happens when the math simply breaks down.</p>
+        <article class='piece'>
+<p class='hook'>Writing this August as the price of a median home nears half a million dollars, Anna North looks back at a specific internet subculture from the Great Recession. She revisits the &quot;frugalsphere&quot;—early-2000s bloggers who mixed homemade laundry detergent recipes with extreme budgeting advice. Listen for how she frames these early coupon-clippers. They weren&#x27;t just sharing financial tips; they treated radical thrift as a way to reclaim personal agency against a bleak economy.</p>
+<h2 class='title'>The early-2000s money trend that’s still relevant today</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Anna North</span></p>
+<p class='source'><a href='https://www.vox.com/life/498268/inflation-prices-frugality-great-recession-money-finance' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Anna North leaves you with an appealing vision from the early 2000s internet: the idea that personal discipline can shield you from a terrifying economy. If you just make your own laundry detergent and track every penny, you can budget your way to freedom. But what happens when the math simply breaks down? Jay L. Zagorsky picks up right at the edge of that financial cliff. Where North looks at a cultural mindset of taking back control, Zagorsky points at the stark legal machinery of losing it. He tracks the surging rate of personal bankruptcy, a system completely indifferent to how hard you tried to save. The interesting thing about reading these two back-to-back is how they expose the limits of personal responsibility. Next to North&#x27;s optimistic coupon-clippers, Zagorsky&#x27;s breakdown of state property rules—like how Arkansas lets you keep just eight hundred dollars of your home&#x27;s value after a filing—acts as a cold reality check. It suggests that surviving financial distress eventually stops being a lifestyle choice and turns into a brutal negotiation with the courts.</p>
+        <article class='piece'>
+
+<h2 class='title'>Personal bankruptcy filings are soaring in 2026, signaling growing economic distress</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>Jay L. Zagorsky, Associate Professor of Business, Boston University</span></p>
+<p class='source'><a href='https://theconversation.com/personal-bankruptcy-filings-are-soaring-in-2026-signaling-growing-economic-distress-288982' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is a collision between hope and arithmetic. There is a very human urge to tame an unforgiving economy by tracking every penny or washing out old Ziploc bags. That kind of extreme budgeting feels like a promise: if you just try hard enough, you will be safe. But then the math simply breaks down, leaving a bankruptcy judge to clear away the wreckage. The question left sitting in the room is this: when the money stops stretching, how much of survival actually comes down to personal discipline, and how much is just luck?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
