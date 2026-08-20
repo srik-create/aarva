@@ -222,7 +222,7 @@ def matcher_db(tmp_path):
         conn.execute("INSERT INTO publications (name, enabled) VALUES ('Pub', 1)")
         pub_id = conn.execute("SELECT id FROM publications").fetchone()[0]
 
-        def make_article(url, hours_old, jtbd, status, has_embedding=True):
+        def make_article(url, hours_old, jtbd, status, has_embedding=True, lens=None):
             vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
             conn.execute(
                 "INSERT INTO articles (canonical_url, title, publication_id, "
@@ -236,8 +236,9 @@ def matcher_db(tmp_path):
                 "SELECT id FROM articles WHERE canonical_url = ?", (url,),
             ).fetchone()[0]
             conn.execute(
-                "INSERT INTO article_scores (article_id, jtbd_primary) VALUES (?, ?)",
-                (article_id, jtbd),
+                "INSERT INTO article_scores (article_id, jtbd_primary, lens) "
+                "VALUES (?, ?, ?)",
+                (article_id, jtbd, lens),
             )
             return article_id
 
@@ -274,6 +275,152 @@ class TestLoadCandidateArticles:
         assert _load_candidate_articles(
             matcher_db["db"], 48, [], "test-model", set(),
         ) == []
+
+
+@pytest.fixture
+def lens_age_db(tmp_path):
+    """Real on-disk DB for the v2 lens-aware max-age guardrail
+    (docs/session_plan_trend_signal_v2.md concept C) — articles at
+    various ages, some with news-y lenses, some without, all well
+    past the 48h min-age floor so only the NEW lens cap is under test."""
+    db = Database(str(tmp_path / "aarva.db"))
+    with db.connect() as conn:
+        conn.execute("INSERT INTO publications (name, enabled) VALUES ('Pub', 1)")
+        pub_id = conn.execute("SELECT id FROM publications").fetchone()[0]
+
+        def make(url, days_old, jtbd, lens):
+            vec = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+            conn.execute(
+                "INSERT INTO articles (canonical_url, title, publication_id, "
+                "full_text, status, published_date, embedding, embedding_model) "
+                "VALUES (?, 'Title', ?, 'body', 'scored', "
+                "datetime('now', ?), ?, 'test-model')",
+                (url, pub_id, f"-{days_old} days", vec.tobytes()),
+            )
+            article_id = conn.execute(
+                "SELECT id FROM articles WHERE canonical_url = ?", (url,),
+            ).fetchone()[0]
+            conn.execute(
+                "INSERT INTO article_scores (article_id, jtbd_primary, lens) "
+                "VALUES (?, ?, ?)",
+                (article_id, jtbd, lens),
+            )
+            return article_id
+
+        ids = {
+            "future_fresh": make("https://x/future-fresh", 3, "keep_ahead", "future_gazing"),
+            "future_stale": make("https://x/future-stale", 10, "keep_ahead", "future_gazing"),
+            "behind_fresh": make("https://x/behind-fresh", 3, "curiosity", "behind_the_news"),
+            "behind_stale": make("https://x/behind-stale", 10, "curiosity", "behind_the_news"),
+            "behind_boundary": make("https://x/behind-boundary", 6, "curiosity", "behind_the_news"),
+            "non_newsy_old": make("https://x/non-newsy-old", 10, "delight", "humans_and_humanity"),
+            "no_lens_old": make("https://x/no-lens-old", 10, "delight", None),
+        }
+    return {"db": db, "ids": ids}
+
+
+class TestLensAwareMaxAge:
+    """Concept C, docs/session_plan_trend_signal_v2.md — mirrors Stage
+    7's own news-y-lens freshness cap so a trend match can't surface an
+    article Stage 7 itself would already reject as stale for that lens."""
+
+    LENS_MAX_AGE = {"future_gazing": 6, "behind_the_news": 6}
+    ALL_JTBDS = ["delight", "curiosity", "smart_escape", "keep_ahead"]
+
+    def test_future_gazing_within_cap_passes(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["future_fresh"] in ids
+
+    def test_future_gazing_beyond_cap_excluded(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["future_stale"] not in ids
+
+    def test_behind_the_news_within_cap_passes(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["behind_fresh"] in ids
+
+    def test_behind_the_news_beyond_cap_excluded(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["behind_stale"] not in ids
+
+    def test_exactly_at_boundary_is_inclusive(self, lens_age_db):
+        """Stage 7's own SQL uses >= for its age check (verified in
+        stage_7_assemble.py) — the trend matcher must match that
+        inclusive behavior at exactly the cutoff, not silently exclude it."""
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["behind_boundary"] in ids
+
+    def test_non_newsy_lens_unaffected_by_cap_even_when_old(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["non_newsy_old"] in ids
+
+    def test_null_lens_unaffected_by_cap(self, lens_age_db):
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+            lens_max_age_days=self.LENS_MAX_AGE,
+        )
+        ids = {c["id"] for c in candidates}
+        assert lens_age_db["ids"]["no_lens_old"] in ids
+
+    def test_no_lens_max_age_dict_is_a_pure_noop(self, lens_age_db):
+        """Backward compat: omitting lens_max_age_days (or passing None,
+        the default) must behave exactly like the pre-v2 matcher —
+        every article here would otherwise be excluded by SOME lens cap,
+        so with no cap dict at all, everything passes on age alone."""
+        candidates = _load_candidate_articles(
+            lens_age_db["db"], age_min_hours=48, allowed_jtbds=self.ALL_JTBDS,
+            embedding_model="test-model", exclude_ids=set(),
+        )
+        ids = {c["id"] for c in candidates}
+        assert ids == set(lens_age_db["ids"].values())
+
+
+def test_lens_max_age_days_from_config_reads_assembly_override(monkeypatch):
+    """assembly.slot_max_age_days is Stage 7's own override key — the
+    trend matcher must read the SAME key so both stages share one
+    source of truth, and fall back to Stage 7's hardcoded default (6)
+    for any slot the operator hasn't overridden."""
+    from aarva.config import load_pipeline_config
+    from aarva.services.trend_matcher import _lens_max_age_days_from_config
+
+    config = load_pipeline_config()
+    monkeypatch.setattr(
+        config.__class__, "assembly",
+        property(lambda self: {"slot_max_age_days": {"lens_card_future": 10}}),
+    )
+    result = _lens_max_age_days_from_config(config)
+    assert result == {"future_gazing": 10, "behind_the_news": 6}
 
 
 class TestRecentlySurfacedArticleIds:
