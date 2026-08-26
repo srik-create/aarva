@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 26 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-26</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 26 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · tracking ocean giants</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-08-26/crosscut_0164.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>18 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Far beneath the surface, whales travel thousands of miles along ancient, invisible routes. Tracking these ocean giants usually means catching them when they sing or breach. But a piece published earlier this month in Smithsonian Magazine reveals a surprising trick: turning existing deep-sea internet cables into vast sensors that detect whales even when they are completely silent. Knowing where a whale swims, though, is only half the puzzle. Writing this week in The Diplomat, Dermot O’Gorman and Alfred Ralifo map the diplomatic fight to protect those massive, cross-border corridors. Putting these angles together creates an interesting tension between the raw engineering used to find these animals in the dark, and the fragile human treaties required to keep them safe.</p>
+        <article class='piece'>
+<p class='hook'>Nearly a thousand feet below the surface off the coast of Norway, a glass internet cable the width of a human hair rests on the seabed. Published earlier this month in Smithsonian Magazine, this piece explains how scientists are using these everyday telecommunication lines to track blue whales. Notice how researchers no longer rely on catching a whale&#x27;s song. Instead, they measure the physical weight of displaced water as a silent giant swims past.</p>
+<h2 class='title'>The Global Web of Subsea Cables That Connects the World Can Now Detect Whales—Even When They&#x27;re Silent</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/innovation/the-global-web-of-subsea-cables-that-connects-the-world-can-now-detect-whales-even-when-theyre-silent-180989326/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>A thousand feet below the surface, a single blue whale stretches a glass cable just enough to register on a computer screen. The Smithsonian piece leaves you marveling at the sheer ingenuity required just to notice these animals passing by in the dark. 
+
+But mapping a whale&#x27;s path creates a new problem. Once you can trace a humpback swimming from the coast of Queensland all the way to Antarctica, you realize that animal is crossing through a dozen different legal territories. 
+
+Read alongside that first article, Dermot O’Gorman and Alfred Ralifo offer a completely different way to look at the water. Where the first piece zooms in on a microscopic imperfection in a glass thread, O’Gorman and Ralifo zoom out to the scale of global diplomacy. They argue that tracking technology only matters if governments actually use that data to protect the massive, cross-border corridors these animals rely on. 
+
+You start to see that the scientific breakthrough is only the first step. The real challenge is convincing rival nations to treat the ocean exactly the way a whale does—as a single, unbroken system.</p>
+        <article class='piece'>
+
+<h2 class='title'>A Golden Chance to Protect the Pacific’s ‘Blue Corridors’</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Dermot O’Gorman and Alfred Ralifo</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/08/a-golden-chance-to-protect-the-pacifics-blue-corridors/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Glass threads resting on the ocean floor can now pick up the faint vibrations of a fin whale in the dark. Those signals map out journeys stretching across thousands of miles, ignoring every border drawn by human governments. What lingers is a sudden, sharp picture of exactly how much room a whale actually needs to survive. The technology exists to watch them move, and the treaties exist to clear their path. But when the data finally shows exactly where these animals need to go, will competing nations actually surrender the water to let them pass?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
