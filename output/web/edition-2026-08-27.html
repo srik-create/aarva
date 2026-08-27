@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Thursday, 27 August 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-08-27</div>
+      <div class="edition-meta">7 pieces · Thursday, 27 August 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If a health plan is only affordable until you get sick, what exactly are you paying for?</p>
+        <h2 class="title">Affordable to Buy, Costly to Use</h2>
+        <p class="byline">
+          <span class="publication">The American Prospect</span>
+          <span class='sep'>·</span><span>Thom Walsh</span>
+        </p>
+        <p class="contextualisation">When politicians talk about fixing healthcare, they usually point to monthly premiums. If that monthly bill drops, they call the system more affordable. But in this essay published on 4 June 2026, The American Prospect points out the catch. Lower premiums usually just shift the financial risk of actual illness onto the patient through high deductibles. The piece holds up because its central distinction is still the sharpest way to judge new policies. It asks whether a law actually lowers the cost of medicine, or simply changes who gets stuck with the bill.</p>
+        <p class='show-notes'>An examination of the difference between lowering health insurance premiums and actually making medical care cheaper to use. High-deductible plans and Medicaid cuts often transfer financial risk to sick patients instead of reducing treatment costs. Alternative policies, like capping hospital rates and regulating billing middlemen, offer a way to lower the underlying price of health care directly.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-27/article_1361.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://prospect.org/2026/06/04/health-insurance-affordable-to-buy-costly-to-use/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">Could an eighteen-story skyscraper be grown in a forest instead of built from concrete?</p>
+        <h2 class="title">The flat-pack skyscraper: how wood can shape the cities of the future</h2>
+        <p class="byline">
+          <span class="publication">The Guardian (Long Read)</span>
+          <span class='sep'>·</span><span>James Crawford</span>
+        </p>
+        <p class="contextualisation">Published on 27 August 2026, the story anchors itself in an 18-story wooden skyscraper rising above a Norwegian lake. The tower offers a glimpse of a different kind of city. Right now, urban centers rely on concrete and steel, materials that generate massive carbon emissions. Replacing them with timber could theoretically turn skylines into giant carbon sinks. But scaling that vision requires harvesting millions of trees. The piece pauses on a quiet tension: what happens when the push to build a greener future collides with the physical limits of the forests meant to sustain it?</p>
+        <p class='show-notes'>A report from an 18-story wooden skyscraper in Norway detailing the mechanics and economics of mass timber construction. Interviews with the building&#x27;s developer and structural engineer explain how glued timber can support high-rises while turning cities into carbon sinks. The reporting also covers the logistics of flat-pack assembly, how thick wood resists fire, and the ecological limits of expanding commercial logging.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-27/article_15903.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>23 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theguardian.com/news/ng-interactive/2026/aug/27/the-flat-pack-skyscraper-how-wood-can-shape-the-cities-of-the-future' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">If a doctor can help you die, does staying alive become a choice you have to justify?</p>
+        <h2 class="title">Opinion: Medical aid in dying and the burden of choosing to live</h2>
+        <p class="byline">
+          <span class="publication">STAT News</span>
+          <span class='sep'>·</span><span>Monika Piotrowska</span>
+        </p>
+        <p class="contextualisation">New York recently allowed terminally ill patients to request life-ending medication. Advocates treat the extra option as a clear win for personal freedom. But an essay published on 26 August 2026 pauses on a heavier problem. Once a doctor officially presents death as a medical option, staying alive stops being the default. Living suddenly becomes a choice that requires a reason. The question then is what happens to a patient when simply existing turns into a decision they have to actively justify.</p>
+        <p class='show-notes'>An examination of the psychological burden created when medical aid in dying becomes a legal option. Drawing on philosopher David Velleman, the argument shows how offering death as a medical treatment changes living from a default state into a choice that requires justification. This creates a practical tension between ensuring patients have access to end-of-life care and forcing them to actively decide whether to keep living.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-27/article_15966.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.statnews.com/2026/08/26/medical-aid-in-dying-new-york-choice-burden-philosophy-ethics/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you read the history of an ancient star system from a passing chunk of ice?</p>
+        <h2 class="title">A Rare Comet Made History as the Third Known Interstellar Object to Fly Through Our Solar System. Studies Are Now Revealing the Mysterious Conditions in Which It Formed</h2>
+        <p class="byline">
+          <span class="publication">Smithsonian Magazine</span>
+          
+        </p>
+        <p class="contextualisation">A chunk of rock and ice from another star is currently flying past Jupiter, heading back into the dark. Published on 29 June 2026, this Smithsonian Magazine story catches the comet just before it disappears forever. The dust trailing behind it offers a rare physical sample of a completely alien planetary system. The frozen water and minerals inside this rock point to an ancient, quiet origin, entirely missing the violent turbulence that forged Earth&#x27;s solar system. It raises a simple question about how unusual this specific corner of the galaxy might actually be.</p>
+        <p class='show-notes'>A review of the telescope data gathered from 3I/ATLAS, the third interstellar object detected in our solar system. By analyzing the comet&#x27;s chemical makeup and dust structure, astronomers have reconstructed its origins. The measurements indicate the icy body formed billions of years ago in the freezing, quiet outer edges of an ancient planetary system.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-27/article_5203.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.smithsonianmag.com/science-nature/a-rare-comet-made-history-as-the-third-known-interstellar-object-to-fly-through-our-solar-system-studies-are-now-revealing-the-mysterious-the-mysterious-conditions-in-which-it-formed-180989037/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">How does a homemade orange cake become a prayer for the things you have lost?</p>
+        <h2 class="title">For everything from troubled hearts to lost keys, Greeks bake cakes for a wish-granting saint</h2>
+        <p class="byline">
+          <span class="publication">The Independent</span>
+          <span class='sep'>·</span><span>Theodora Tongas and Derek Gatopoulos</span>
+        </p>
+        <p class="contextualisation">When someone in Greece loses a set of keys, or perhaps their own courage, they might just bake an orange-flavored cake. In this piece published on 27 August 2026, the story follows thousands of people gathering near Athens to share these cakes and their private hopes. They are honoring Saint Fanourios, the Orthodox patron of lost things. The reporting looks past the baking instructions to ask a gentler question about how communities handle everyday despair, and where ordinary people find comfort when something important goes missing.</p>
+        <p class='show-notes'>An account of the Greek Orthodox tradition of baking orange-flavored cakes for Saint Fanourios, the patron saint of lost things. During his annual August feast, thousands of worshippers bring homemade cakes to church to be blessed by priests, asking for help finding misplaced objects or fulfilling private wishes. Includes a traditional recipe and interviews with local parishioners about their faith.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-08-27/article_15942.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.independent.co.uk/news/greeks-greek-people-greece-rhodes-b3040054.html' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
