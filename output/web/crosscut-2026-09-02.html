@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 02 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-02</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 02 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · bridging partisan divides</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-02/crosscut_0178.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>24 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When a massive corporate project rolls into town, national political labels often vanish. Two recent articles show how communities bypass the usual partisan shouting matches, though they do it in completely different ways. In *The Independent*, Will Weissert and Susan Montoya Bryan capture how the sudden arrival of giant AI data centers is forcing conservatives and environmentalists into an unexpected, organic alliance. An essay by Martin Carcasson in *The Conversation* looks at what happens when cooperation has to be carefully engineered instead. He follows trained college students who guide thorny local debates, keeping neighbors from springing familiar political traps. Putting these together reveals a striking picture of how people actually solve problems when the national cameras look away.</p>
+        <article class='piece'>
+<p class='hook'>Inside a firehouse in Murdock, Nebraska, an unusual political alliance is gathering. Writing last week, Will Weissert and Susan Montoya Bryan report on how massive artificial intelligence data centers are uniting conservative corn farmers and the Sierra Club. Both groups share a sudden fear of tech companies paving over rural America. Listen for the moment a fifth-generation farmer named Judy Stroy explains her opposition. She sees these sprawling computing warehouses as a direct danger to the nation&#x27;s food supply.</p>
+<h2 class='title'>In a divided America, the left and right unite to oppose artificial intelligence data centers</h2>
+<p class='byline'><span class='publication'>The Independent</span><span class='sep'>·</span><span>Will Weissert and Susan Montoya Bryan</span></p>
+<p class='source'><a href='https://www.independent.co.uk/news/new-mexico-america-democratic-donald-trump-republican-b3039294.html' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Will Weissert and Susan Montoya Bryan leave you in a firehouse in Murdock, Nebraska, watching conservative farmers and environmentalists find common ground against a massive AI data center. It happens organically. A shared threat to land and water simply overrides the usual political labels. Read alongside Martin Carcasson, up next, that kind of spontaneous unity starts to look like a lucky exception. Carcasson looks at local problem-solving from a completely different starting point. He points out that human brains are basically hardwired to fail at exactly the kind of cooperation happening in Nebraska. Instead of waiting for a shared enemy to force people together, Carcasson focuses on engineering the conversation itself. Notice what happens when those two-minute microphone rants are replaced with structured, student-led discussions. Suddenly, communities can untangle messy issues like marijuana zoning without falling back on identity politics. Read together, a sharp contrast surfaces: Weissert and Bryan show people uniting against a clear corporate threat, while Carcasson asks how to get people talking when the obstacle is just human nature.</p>
+        <article class='piece'>
+
+<h2 class='title'>How students at Colorado State helped teach their community to stop talking past each other and manage complex problems</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>Martin Carcasson, Director, Center for Public Deliberation, Colorado State University</span></p>
+<p class='source'><a href='https://theconversation.com/how-students-at-colorado-state-helped-teach-their-community-to-stop-talking-past-each-other-and-manage-complex-problems-288679' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A bulldozer breaking ground for a massive server farm and a student setting up folding chairs in a high school gym both force a town to drop national political labels. What lingers is how quickly those bitter divisions fade when local reality takes over. Whether driven by a shared threat to the water supply or a strictly timed town hall, the result is neighbors actually talking to neighbors. The question left behind is this: Does finding common ground always require an outside threat or a trained mediator, or can a town learn to do this on its own?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
