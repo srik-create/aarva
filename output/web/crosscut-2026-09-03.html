@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Thursday, 03 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-03</div>
+      <div class="edition-meta">2 pieces · Crosscut · Thursday, 03 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · optimizing children</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-03/crosscut_0180.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>43 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A parent studying a genetic report card to predict a child&#x27;s height is acting on the same impulse as one enrolling a second-grader in an AI school that claims to hack education in two hours a day. Both chase the promise of a perfectly engineered kid. What emerges from two pieces published this week—Brigida D&#x27;Agostino in Noema and Lexi Churchill in ProPublica—is how eagerly companies step up to profit from that desire. D&#x27;Agostino looks at the pricey market for embryo screening before birth, while Churchill tracks a private school chain tapping into taxpayer vouchers after state regulators rejected it. Read together, they reveal a market built on bypassing rules to sell the illusion of control.</p>
+        <article class='piece'>
+<p class='hook'>In an essay published just days ago, Brigida D&#x27;Agostino tracks a new kind of high-end shopping. Parents are now paying tens of thousands of dollars for genetic report cards on their future children. Listen for the moment she describes a screening company&#x27;s mobile app. It displays an embryo&#x27;s traits like settings on a smartphone menu, predicting a height of five-foot-eight and an IQ bump of exactly two points.</p>
+<h2 class='title'>Optimized Offspring</h2>
+<p class='byline'><span class='publication'>Noema</span><span class='sep'>·</span><span>Brigida D&#x27;Agostino</span></p>
+<p class='source'><a href='https://www.noemamag.com/optimized-offspring' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Brigida D&#x27;Agostino leaves you staring at a strange image: a mobile phone displaying a genetic report card for an embryo, treating a future child&#x27;s height and IQ like settings on a thermostat. It is a striking picture of how companies sell parents the illusion of total control. Turning to Lexi Churchill’s reporting up next, you see that exact same sales pitch applied to the next stage of childhood. Churchill tracks a chain of private schools promising to hack education using artificial intelligence, claiming kids can finish their academics in just two hours a day. The technology changes from DNA screening to AI tutors, but the underlying assumption is identical: childhood is a product you can optimize for maximum efficiency.
+
+What really jumps out when you put these two stories together is how these businesses operate when experts push back. D&#x27;Agostino points out that medical boards call embryo screening unproven, a warning the clinics simply ignore. Churchill tracks a nearly identical pattern. When state charter boards rejected the AI school for being experimental, the founders didn&#x27;t change their curriculum. They just found a backdoor through taxpayer-funded vouchers. Read alongside each other, the pieces reveal a market that treats regulatory rejection not as a stop sign, but as a minor detour on the way to cashing in on parental anxiety.</p>
+        <article class='piece'>
+
+<h2 class='title'>Several States Rejected This Private School Chain as a Charter. Now It’s Eligible for Texas’ Taxpayer-Funded Vouchers.</h2>
+<p class='byline'><span class='publication'>ProPublica</span><span class='sep'>·</span><span>Lexi Churchill</span></p>
+<p class='source'><a href='https://www.propublica.org/article/alpha-school-texas-vouchers-ai' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers here is the sheer exhaustion of trying to buy certainty. Whether it&#x27;s a genetic report card predicting a future child&#x27;s height or an algorithm promising a genius in two hours a day, the market is eager to sell the illusion that a life can be perfectly engineered. It turns raising kids into a high-stakes purchase, a race to bypass chance entirely. But if every trait is selected in a lab and every lesson is optimized for maximum efficiency, what room is left for a child to just be ordinary?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
