@@ -24,7 +24,7 @@ from aarva.config import load_pipeline_config
 from aarva.db import Database
 from aarva.output import web_renderer, rss_feed, audio_converter, r2_uploader
 from aarva.sources import curation_crawler, trend_crawler
-from aarva.services import article_virality, trend_matcher
+from aarva.services import article_virality, trend_maintenance, trend_matcher
 from aarva.stages import (
     stage_1_ingest, stage_1_5_consolidate, stage_2_filter, stage_4_5_6_score,
     stage_7_assemble, stage_8_hook_context, stage_8c_author_provenance,
@@ -229,6 +229,18 @@ def main(stage: Optional[int], pubs: tuple[str, ...], crosscut_detect: bool,
         log.info("Stage 3 — Trend crawl starting")
         run_id = db.start_run("stage_3_trend_crawl")
         try:
+            # Auto-dismiss stale unresolved hits BEFORE the fresh crawl —
+            # see docs/session_plan_trend_hits_auto_dismiss_stale.md.
+            # Real 2026-08-20 incident: with no time filter, every day's
+            # crawl only ever added unresolved rows, so review's
+            # "Trending" sections grew to an 800+ backlog. Must run
+            # first so today's freshly-inserted rows are never touched.
+            dstats = trend_maintenance.dismiss_stale_hits(config, db)
+            log.info(
+                "Stage 3 auto-dismiss done — %d stale trends, "
+                "%d stale virality hits dismissed",
+                dstats.trends_dismissed, dstats.virality_dismissed,
+            )
             crstats = trend_crawler.crawl_trend_sources(config, db)
             log.info(
                 "Stage 3 crawl done — %d/%d sources ok, %d trends seen, "
