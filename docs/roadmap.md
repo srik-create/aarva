@@ -54,7 +54,23 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-3. **OOM-frequency investigation (Section 3 of
+3. **Auto-dismiss stale trend_hits + article_virality_hits.** Full
+   spec at `docs/session_plan_trend_hits_auto_dismiss_stale.md`.
+   Follow-up to the 2026-08-20 trend-signal v2 ship. Real production
+   incident 2026-08-20: operator's review CLI is showing 800+
+   unresolved trend/virality suggestions because every day's crawl
+   adds hits but no mechanism sweeps yesterday's un-decided rows.
+   Fix: at start of every `--stage 3` run, `UPDATE ... SET
+   operator_action='auto_dismissed_stale'` for any `operator_action
+   IS NULL` row older than a configurable cutoff (default 24h,
+   locked with user 2026-08-20; tunable via
+   `trends.stale_after_hours` in `pipeline.yaml`). Rows preserved
+   (not deleted) — soft-supersede posture matching rule 12. Review
+   CLI + trend matcher queries unchanged (they already filter on
+   `operator_action IS NULL`, which now naturally excludes stale
+   rows). AGENTS.md rule 4 sign-off from user 2026-08-20.
+
+4. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
