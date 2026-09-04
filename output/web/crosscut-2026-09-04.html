@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Friday, 04 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-04</div>
+      <div class="edition-meta">2 pieces · Crosscut · Friday, 04 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · studying aquatic life</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-04/crosscut_0182.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>26 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Observing aquatic life rarely means just looking through a camera. Often, researchers have to build entirely new environments to coax nature into revealing its habits. What&#x27;s striking is the strange architecture required to make that happen. In one piece, K. R. Prathyusha tracks aquatic worms through tiny plastic channels, discovering something unexpected about how they move in tight spaces. In another, Byrd Pinkerton follows marine biologists who sink makeshift PVC hotels deep into the ocean, leaving them for years to see what eventually moves in. Side by side, these stories reveal the unusual physical tools scientists have to invent just to get a clear look at how living things operate.</p>
+        <article class='piece'>
+<p class='hook'>You might expect a wide, open path to be the fastest route. But in an essay published just this past week, K. R. Prathyusha, Research Associate, BioFrontiers Institute, University of Colorado Boulder, proves the opposite is true for aquatic worms. Notice how the computer simulation strips away muscles and nerves to understand the physics. It treats a living worm as a simple string of tiny beads, each with its own little battery pushing the chain forward.</p>
+<h2 class='title'>Worms navigate narrow paths faster than wide ones – these findings could inform robot design</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>K. R. Prathyusha, Research Associate, BioFrontiers Institute, University of Colorado Boulder</span></p>
+<p class='source'><a href='https://theconversation.com/worms-navigate-narrow-paths-faster-than-wide-ones-these-findings-could-inform-robot-design-289127' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>K. R. Prathyusha leaves the reader staring at a simulated aquatic worm zooming through a tight space, completely upending the assumption that a wide-open path is always the fastest route. But to even see that counterintuitive rule in action, her team had to invent a highly controlled, artificial environment. That exact problem drives the next story by Byrd Pinkerton: how to get a clear look at living things in places where humans can&#x27;t easily follow. 
+
+Pinkerton heads to the waters off Palau, where scientists are trying to understand the deep, dimly lit coral reefs known as the twilight zone. Notice how the researchers in Pinkerton’s piece face the same basic hurdle as Prathyusha. They can&#x27;t just sit and watch these ecosystems function. Instead, they have to build custom physical tools. Where Prathyusha uses tiny, stripped-down channels in a lab, the biologists in Palau drop artificial PVC structures deep into the ocean and leave them there for a decade to see what decides to move in. 
+
+Read side by side, these stories reveal something surprising about how aquatic science actually happens. It rarely involves just looking at nature. Instead, it requires building clever, artificial stages—whether a microscopic plastic track or an underwater PVC hotel—just to coax the natural world into showing its hand.</p>
+        <article class='piece'>
+
+<h2 class='title'>Inside a quest to learn about the ocean’s mysterious “deep reefs”</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Byrd Pinkerton</span></p>
+<p class='source'><a href='https://www.vox.com/the-highlight/500853/inside-a-quest-to-learn-about-the-oceans-mysterious-deep-reefs' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after hearing these stories is the sight of plastic in the water. To understand how wild things actually behave, researchers often have to build something completely unnatural. A narrow plastic track or a sunken PVC pipe is left behind just to coax nature into plain view. The tools of discovery are entirely man-made. Which leaves an open question to sit with: when a worm races through a synthetic tunnel or a reef creature settles into a plastic tube, how much of what gets recorded is the animal itself, and how much is just its reaction to the architecture?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
