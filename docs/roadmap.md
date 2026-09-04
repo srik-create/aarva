@@ -54,23 +54,7 @@ GitHub Pages.
    running; Phase 3 is a rolling stream of small enablement PRs
    after that.
 
-3. **Auto-dismiss stale trend_hits + article_virality_hits.** Full
-   spec at `docs/session_plan_trend_hits_auto_dismiss_stale.md`.
-   Follow-up to the 2026-08-20 trend-signal v2 ship. Real production
-   incident 2026-08-20: operator's review CLI is showing 800+
-   unresolved trend/virality suggestions because every day's crawl
-   adds hits but no mechanism sweeps yesterday's un-decided rows.
-   Fix: at start of every `--stage 3` run, `UPDATE ... SET
-   operator_action='auto_dismissed_stale'` for any `operator_action
-   IS NULL` row older than a configurable cutoff (default 24h,
-   locked with user 2026-08-20; tunable via
-   `trends.stale_after_hours` in `pipeline.yaml`). Rows preserved
-   (not deleted) — soft-supersede posture matching rule 12. Review
-   CLI + trend matcher queries unchanged (they already filter on
-   `operator_action IS NULL`, which now naturally excludes stale
-   rows). AGENTS.md rule 4 sign-off from user 2026-08-20.
-
-4. **OOM-frequency investigation (Section 3 of
+3. **OOM-frequency investigation (Section 3 of
    `docs/session_plan_worker_resumability.md`) — still open.**
    Separate from resumability (fixed 2026-07-14 — see "Recently
    completed"): why does the Render container keep getting SIGKILLed
@@ -148,6 +132,57 @@ the sequence.
 Most recent first.
 
 ### 2026-08-20
+
+- **Auto-dismiss stale trend_hits + article_virality_hits.** Full
+  spec at `docs/session_plan_trend_hits_auto_dismiss_stale.md`.
+  Real production incident, same day as the trend-signal v2 ship
+  below: the review CLI's "Trending" sections had grown to a 776-row
+  backlog of unresolved trend_hits (+1 unresolved article_virality_hits)
+  because every day's `--stage 3` crawl only ever ADDED unresolved
+  rows — nothing swept yesterday's un-decided ones, and both review
+  queries (`aarva/review.py`) and the matcher's own unresolved-trends
+  query (`trend_matcher.py`) filter on `operator_action IS NULL` with
+  no time bound.
+  - New `aarva/services/trend_maintenance.py::dismiss_stale_hits()`
+    runs at the very start of every `--stage 3` invocation (before
+    the forward crawl, before the reverse-lookup scan): marks any
+    still-unresolved row older than `trends.stale_after_hours`
+    (default 24, tunable in `pipeline.yaml`) as
+    `'auto_dismissed_stale'` — never deleted, and a distinct marker
+    from operator-intent `'dismissed'`, matching rule 12's
+    soft-supersede posture. A topic that's still genuinely trending
+    gets re-inserted fresh by that same crawl (idempotent per
+    source+phrase+date), so nothing real is lost.
+  - **Real schema gap caught by the test suite, not just spec
+    review**: the spec claimed `operator_action` had "no CHECK
+    constraint," but both `trend_hits` and `article_virality_hits`
+    actually have `CHECK (operator_action IN ('added', 'dismissed')
+    OR operator_action IS NULL)` (added when each table shipped)
+    — inserting `'auto_dismissed_stale'` against the real schema
+    failed immediately in a real test run. SQLite has no `ALTER
+    ... DROP CONSTRAINT`, so this needed the same table-rebuild
+    migration recipe `db.py` already uses for `editions`'
+    edition_type CHECK (`_migrate_editions_uniqueness`) — new
+    `_migrate_operator_action_check()` rebuilds either table via a
+    `_new` table + copy + drop + rename, gated on whether
+    `'auto_dismissed_stale'` is already in the live schema (a no-op
+    once migrated). Verified against a real copy of production data:
+    817 `trend_hits` and 2 `article_virality_hits` rows survived the
+    rebuild with identical counts, all 3 indexes per table recreated
+    correctly, and a second `Database()` init confirmed idempotent.
+  - No editorial-review-code changes needed at all — `review.py` and
+    `trend_matcher.py`'s existing `operator_action IS NULL` filters
+    automatically exclude the newly-marked rows.
+  - 7 new tests (repo total: 176) covering all 6 of the spec's
+    verification cases: mixed-age dismissal for both tables,
+    idempotency, already-resolved rows left untouched, the config
+    override, the 24h default, and a full `--stage 3`-shaped
+    end-to-end run (100-row simulated backlog + a mocked fresh
+    crawl) confirming only today's fresh row stays unresolved.
+  - Real production backlog (776 trend_hits, 1 article_virality_hit)
+    will be swept on the operator's next real `--stage 3` run —
+    per the spec's own rollout plan, not something this PR runs
+    itself against the live DB.
 
 - **Trend-signal v2 PR 1 — lens-aware max-age guardrail on forward
   trend matching.** Full spec at

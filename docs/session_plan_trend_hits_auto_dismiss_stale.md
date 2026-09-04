@@ -1,3 +1,10 @@
+**STATUS: Shipped 2026-08-20.** See `docs/roadmap.md`'s 2026-08-20
+entry for what landed, including a real schema gap this spec's own
+"no CHECK constraint" claim missed (both tables actually had one) —
+required a table-rebuild migration not described here.
+
+---
+
 # Session plan — auto-dismiss stale trend_hits and article_virality_hits
 
 Small direct fix. Follow-up to `docs/session_plan_trend_signal_v2.md`

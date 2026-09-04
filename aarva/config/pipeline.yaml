@@ -402,6 +402,20 @@ trends:
   reverse_lookup_scan_window_days: 90
   reverse_lookup_allowed_jtbds: [delight, curiosity, smart_escape, keep_ahead]
 
+  # Auto-dismiss unresolved trend_hits + article_virality_hits older
+  # than this many hours, at the start of every --stage 3 run, BEFORE
+  # the fresh crawl. Fixes a real 2026-08-20 incident: with no time
+  # filter, every day's crawl only ever ADDED unresolved rows, so
+  # review's "Trending"/"Trending Aarva articles" sections grew to
+  # 800+ backlogged suggestions. Marked 'auto_dismissed_stale' (not
+  # deleted, not 'dismissed') — soft-supersede per rule 12, and a
+  # distinct marker from operator-intent dismissal for future
+  # analysis. Still-genuinely-trending topics get re-inserted fresh
+  # by the same day's crawl (idempotent per source+phrase+date), so
+  # nothing real is lost. Tune upward (48/72h) if --stage 3 runs less
+  # than daily.
+  stale_after_hours: 24
+
 llm:
   # ─── PROJECT POLICY ────────────────────────────────────────────────────
   # Gemini is the LLM for all production pipeline work — Stage 4+5+6

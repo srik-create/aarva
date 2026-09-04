@@ -369,7 +369,7 @@ CREATE TABLE IF NOT EXISTS trend_hits (
     matched_article_id  INTEGER REFERENCES articles(id),
     match_score         REAL,
     fallback_urls_json  TEXT,
-    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed') OR operator_action IS NULL),
+    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed', 'auto_dismissed_stale') OR operator_action IS NULL),
     resolved_at         TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_trend_hits_seen_at
@@ -404,7 +404,7 @@ CREATE TABLE IF NOT EXISTS article_virality_hits (
     external_created_at TIMESTAMP,
     seen_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     raw_metadata_json   TEXT,
-    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed') OR operator_action IS NULL),
+    operator_action     TEXT CHECK (operator_action IN ('added', 'dismissed', 'auto_dismissed_stale') OR operator_action IS NULL),
     resolved_at         TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_article_virality_hits_action
@@ -624,6 +624,82 @@ class Database:
             # checking whether the composite index exists.
             self._migrate_editions_uniqueness(conn)
 
+            # Same "SQLite can't ALTER a CHECK constraint" problem —
+            # see docs/session_plan_trend_hits_auto_dismiss_stale.md.
+            # Both trend_hits and article_virality_hits' operator_action
+            # CHECK predates 'auto_dismissed_stale'; on any DB that
+            # already has these tables (i.e. every real DB, since both
+            # shipped 2026-08-13/2026-08-20), inserting that value
+            # would violate the old CHECK until rebuilt.
+            self._migrate_operator_action_check(
+                conn, table="trend_hits",
+                create_sql="""
+                    CREATE TABLE trend_hits_new (
+                        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                        source_name         TEXT NOT NULL,
+                        trend_phrase        TEXT NOT NULL,
+                        trend_phrase_en     TEXT,
+                        region              TEXT,
+                        seen_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        raw_metadata_json   TEXT,
+                        matched_article_id  INTEGER REFERENCES articles(id),
+                        match_score         REAL,
+                        fallback_urls_json  TEXT,
+                        operator_action     TEXT CHECK (operator_action IN
+                            ('added', 'dismissed', 'auto_dismissed_stale')
+                            OR operator_action IS NULL),
+                        resolved_at         TIMESTAMP
+                    );
+                """,
+                copy_columns=(
+                    "id, source_name, trend_phrase, trend_phrase_en, region, "
+                    "seen_at, raw_metadata_json, matched_article_id, "
+                    "match_score, fallback_urls_json, operator_action, "
+                    "resolved_at"
+                ),
+                recreate_indexes_sql="""
+                    CREATE INDEX IF NOT EXISTS idx_trend_hits_seen_at
+                        ON trend_hits(seen_at);
+                    CREATE INDEX IF NOT EXISTS idx_trend_hits_action
+                        ON trend_hits(operator_action, seen_at);
+                    CREATE UNIQUE INDEX IF NOT EXISTS idx_trend_hits_dedup
+                        ON trend_hits(source_name, trend_phrase, date(seen_at));
+                """,
+            )
+            self._migrate_operator_action_check(
+                conn, table="article_virality_hits",
+                create_sql="""
+                    CREATE TABLE article_virality_hits_new (
+                        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                        article_id          INTEGER NOT NULL REFERENCES articles(id),
+                        source_name         TEXT NOT NULL,
+                        external_url        TEXT,
+                        score               INTEGER,
+                        num_comments        INTEGER,
+                        external_created_at TIMESTAMP,
+                        seen_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        raw_metadata_json   TEXT,
+                        operator_action     TEXT CHECK (operator_action IN
+                            ('added', 'dismissed', 'auto_dismissed_stale')
+                            OR operator_action IS NULL),
+                        resolved_at         TIMESTAMP
+                    );
+                """,
+                copy_columns=(
+                    "id, article_id, source_name, external_url, score, "
+                    "num_comments, external_created_at, seen_at, "
+                    "raw_metadata_json, operator_action, resolved_at"
+                ),
+                recreate_indexes_sql="""
+                    CREATE INDEX IF NOT EXISTS idx_article_virality_hits_action
+                        ON article_virality_hits(operator_action, seen_at);
+                    CREATE INDEX IF NOT EXISTS idx_article_virality_hits_article
+                        ON article_virality_hits(article_id);
+                    CREATE UNIQUE INDEX IF NOT EXISTS idx_article_virality_hits_dedup
+                        ON article_virality_hits(article_id, source_name, external_url);
+                """,
+            )
+
             # Idempotent composite index. Created here (after migrations)
             # rather than in SCHEMA_SQL so we don't try to reference the
             # edition_type column before ALTER TABLE has added it on
@@ -754,6 +830,50 @@ class Database:
                 ON editions(edition_date, edition_type)
                 WHERE edition_type IN ('daily', 'crosscut');
         """
+
+        conn.execute("PRAGMA foreign_keys = OFF")
+        try:
+            conn.executescript(migration_sql)
+        finally:
+            conn.execute("PRAGMA foreign_keys = ON")
+
+    def _migrate_operator_action_check(
+        self,
+        conn: sqlite3.Connection,
+        table: str,
+        create_sql: str,
+        copy_columns: str,
+        recreate_indexes_sql: str,
+    ) -> None:
+        """Rebuild `table` if its operator_action CHECK constraint
+        doesn't yet include 'auto_dismissed_stale' — see docs/session_
+        plan_trend_hits_auto_dismiss_stale.md. No-op once migrated (or
+        on a table that doesn't exist yet — fresh init uses SCHEMA_SQL,
+        which already has the widened CHECK).
+
+        SQLite has no DROP CONSTRAINT / ALTER CHECK, so this is the
+        same table-rebuild recipe as `_migrate_editions_uniqueness`:
+        create `{table}_new` with the widened CHECK, copy rows across,
+        drop the old table, rename, recreate indexes."""
+        sql_row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name=?",
+            (table,),
+        ).fetchone()
+        if not sql_row:
+            return  # no table yet — fresh init will use SCHEMA_SQL
+        table_sql = sql_row[0] or ""
+        if "auto_dismissed_stale" in table_sql:
+            return  # already migrated
+
+        new_table = f"{table}_new"
+        migration_sql = (
+            create_sql
+            + f"INSERT INTO {new_table} ({copy_columns}) "
+            + f"SELECT {copy_columns} FROM {table};\n"
+            + f"DROP TABLE {table};\n"
+            + f"ALTER TABLE {new_table} RENAME TO {table};\n"
+            + recreate_indexes_sql
+        )
 
         conn.execute("PRAGMA foreign_keys = OFF")
         try:
