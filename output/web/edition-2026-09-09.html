@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Wednesday, 09 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-09</div>
+      <div class="edition-meta">5 pieces · Wednesday, 09 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If ten thousand machines finish a math problem that humans started, whose discovery is it?</p>
+        <h2 class="title">AI Has Solved One of Math’s $1 Million Millennium Prize Problems</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Konstantin Kakaes</span>
+        </p>
+        <p class="contextualisation">In this piece from 8 September 2026, a century-old question about fluid dynamics finally breaks open. OpenAI announced that a swarm of ten thousand autonomous agents solved one of the hardest problems in mathematics. But the technical achievement takes a back seat to the human drama surrounding it. The machine breakthrough relies entirely on a framework built by two researchers working with just pen and paper. The event forces a sudden question about the future of discovery: what happens when computers can finish the final steps of human intuition, and who gets the credit?</p>
+        <p class='show-notes'>A report on how artificial intelligence agents solved a Millennium Prize math problem by finding a singularity in the Navier-Stokes equations. It explains the fluid dynamics behind the proof and traces how competing research groups used large language models to complete theoretical work started by human mathematicians. The account also covers the priority dispute that broke out between the teams over the final discovery.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-09/article_18087.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/ai-has-solved-one-of-maths-1-million-millennium-prize-problems-20260908/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">If a machine is just a giant list of numbers, why is its mind so hard to read?</p>
+        <h2 class="title">God Help Us, Let’s Try To Learn About Mechanistic Interpretability Techniques</h2>
+        <p class="byline">
+          <span class="publication">Astral Codex Ten</span>
+          <span class='sep'>·</span><span>Scott Alexander</span>
+        </p>
+        <p class="contextualisation">Computer scientists once hoped to read an artificial mind by mapping digital neurons to human concepts, isolating the exact circuit for a cat or a lie. An 8 September 2026 essay from Astral Codex Ten tracks how completely that dream has collapsed. What remains is a toolbox of makeshift methods that act less like elegant code and more like blunt surgery. The piece pauses on an uncomfortable question about the race to build smarter machines: as these systems grow more capable, is the science of understanding them keeping pace, or is the industry fumbling in the dark?</p>
+        <p class='show-notes'>A catalog of the current techniques used in mechanistic interpretability, the science of reading the internal states of artificial intelligence. Explains how researchers use methods like linear probes and sparse autoencoders to map how a model processes information and to alter its behavior. Details the practical limits of each approach, showing how neural networks often route around these interventions.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-09/article_18085.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>30 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.astralcodexten.com/p/god-help-us-lets-try-to-learn-about' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">When doctors check the lines on a newborn&#x27;s palm, what are they actually reading?</p>
+        <h2 class="title">Our eloquent hands</h2>
+        <p class="byline">
+          <span class="publication">Aeon</span>
+          <span class='sep'>·</span><span>Alison Bashford</span>
+        </p>
+        <p class="contextualisation">Published on 8 September 2026, the essay begins with a strange artifact from 1938: the ink palm print of a dead gorilla. That single piece of paper connects the carnival tent to the modern genetics lab. Palm reading is usually dismissed as a parlor trick. Yet the ancient habit of decoding lines on a hand actually laid the groundwork for how doctors diagnose patients today. The history here asks a quiet question about clinical medicine. When a physician checks a body for physical clues, aren&#x27;t they just practicing a highly evolved form of palmistry?</p>
+        <p class='show-notes'>A history of medical palmistry that tracks how doctors and geneticists have studied the creases on human and primate hands to diagnose conditions like Down syndrome. Moving from 17th-century magic to 20th-century chromosomal science, it shows how a single fold known as the simian line became a standard clinical marker. It connects the ancient practice of fortune-telling to the modern medical routine of reading physical signs on the body.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-09/article_18054.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>21 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://aeon.co/essays/what-palmistry-and-medicine-have-always-had-in-common' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">If you wrote care instructions for a grown adult, would they read like a pet-sitting guide?</p>
+        <h2 class="title">Instructions for Watching My Girlfriend While I’m Out of Town</h2>
+        <p class="byline">
+          <span class="publication">New Yorker Shouts &amp; Murmurs</span>
+          <span class='sep'>·</span><span>Blythe Roberson</span>
+        </p>
+        <p class="contextualisation">A printed list of feeding times and approved treats usually sits on the kitchen counter for an anxious rescue dog. In a humor piece published on 8 September 2026, that familiar instruction manual gets turned on an adult human instead. The joke lands by treating the daily upkeep of a modern partner with the clinical detachment of a dog walker. From managing iced coffee dependencies to intervening during online shopping sprees, the instructions capture the slightly absurd routines required to keep a person functioning through the day.</p>
+        <p class='show-notes'>A humor piece formatted as a set of pet-sitting instructions for a human girlfriend left at home for the weekend. The guide outlines her daily care requirements, from managing her iced coffee intake and exercise routines to stopping her from buying expensive vintage shirts. The dog-care manual structure frames the daily habits and minor anxieties of a modern adult.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-09/article_18255.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>5 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://www.newyorker.com/humor/shouts-murmurs/instructions-for-watching-my-girlfriend-while-im-out-of-town' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

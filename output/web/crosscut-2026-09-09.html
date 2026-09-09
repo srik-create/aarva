@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 09 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-09</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 09 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · us deterrence in asia</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-09/crosscut_0191.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>53 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A standoff in the Middle East is quietly rewriting the political math in Taipei. Two articles published just days apart this September trace a surprising domino effect across the globe. Writing in The Diplomat, Alexandru Filip looks at how Washington&#x27;s reluctance to penalize China for supporting Tehran leaves Asian allies doubting American promises. Simon Shuster takes that anxiety to the ground level in The Atlantic, observing how the sheer cost of the Iran conflict makes Taiwanese politicians wonder if surrendering to Beijing is their safest bet. What&#x27;s striking is how these separate crises snap together. An American distraction in one hemisphere might become the exact reason leaders in another lose the will to fight.</p>
+        <article class='piece'>
+<p class='hook'>While Chinese companies ship drone parts and missile chemicals to Iran, Washington mostly looks the other way. Writing last week, Alexandru Filip argues that this refusal to punish Beijing leaves American allies in Asia footing the bill. Notice how Filip tracks the exact workarounds keeping Tehran armed. The detail to catch is how quickly Beijing shifts its discounted oil shipments to overland routes through Pakistan the moment US sanctions threaten its tankers.</p>
+<h2 class='title'>US Allies in Asia Are Paying for the Iran Stalemate</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Alexandru Filip</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/09/us-allies-in-asia-are-paying-for-the-iran-stalemate/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Alexandru Filip leaves you looking at a map where Washington is so tangled up managing the Iran crisis that it lets Beijing off the hook. He points out exactly how pulling punches with China over Middle Eastern oil and drone factories leaves American allies in Asia footing the bill—and wondering if Washington actually has the stomach for a fight. 
+
+Turning the page to Simon Shuster, that geopolitical warning suddenly looks like an active, on-the-ground political crisis. Shuster takes you straight into a luncheon in Beijing, where Taiwanese politicians are sitting down to chicken broth and sea clams with Xi Jinping. What jumps out when you put these two writers together is a quiet, devastating domino effect. Filip outlines the structural failure of American deterrence, explaining the math of a distracted superpower. Shuster shows how that same math is changing the psychology of the people who actually live in the crosshairs. 
+
+Read alongside Filip, the friendly meetings between Taiwanese leaders and Chinese officials in Shuster’s piece take on a darker meaning. They read as a direct reaction to Washington&#x27;s hesitation. If the United States won&#x27;t risk a trade dispute to punish Beijing today, the politicians in Taipei are starting to calculate that America certainly won&#x27;t risk a war to save them tomorrow.</p>
+        <article class='piece'>
+
+<h2 class='title'>Will Taiwan Just Give Up?</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Simon Shuster</span></p>
+<p class='source'><a href='https://www.theatlantic.com/magazine/2026/10/trump-taiwan-sovereignty-china/688356/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers here is the direct line between an empty warehouse and a broken promise. Missiles fired at drones in the Middle East drain the exact stockpiles meant to protect Taipei. As those weapons disappear, so does the belief that help will actually arrive. The distance between distraction and defeat is closing fast. If the sheer cost of fighting distant proxy wars is enough to make an ally consider surrendering before a single shot is fired, how does a superpower convince anyone its protection still means anything?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
