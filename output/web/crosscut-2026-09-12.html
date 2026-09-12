@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 12 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-12</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 12 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · fear and security</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-12/crosscut_0197.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>20 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When disaster feels imminent, the instinct is usually to build a wall. Writing for The Marshall Project just ahead of the September 11th anniversary, Wilbert L. Cooper looks at how the U.S. government reacted to the 2001 attacks by transforming immigration into a militarized defense operation. On the anniversary itself, Alex Sujong Laughlin writes in Defector about a much quieter panic—an expectant mother tempted to hoard freeze-dried food and embrace the doomsday prepper lifestyle, before deciding to trust her neighbors instead. Looking at a multi-billion-dollar border agency next to a private stash of survival gear reveals something striking. Both fortresses rely on the exact same dark assumptions about human nature.</p>
+        <article class='piece'>
+<p class='hook'>Before 2001, federal agencies like ICE did not exist. In an essay published just last week, Wilbert L. Cooper tracks how the September 11th attacks permanently transformed American immigration from a civilian administrative task into a militarized national security operation. Listen for a specific detail Cooper pulls from the chaotic months after the towers fell: the old immigration agency mailing flight-school paperwork for two of the dead hijackers, a full six months after the attacks.</p>
+<h2 class='title'>How 9/11 Supercharged Immigration Enforcement</h2>
+<p class='byline'><span class='publication'>The Marshall Project</span><span class='sep'>·</span><span>Wilbert L. Cooper</span></p>
+<p class='source'><a href='https://www.themarshallproject.org/2026/09/05/911-attack-ice-trump-immigration' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Wilbert L. Cooper leaves you staring at a massive government machine built out of pure panic. After the shock of 9/11, the immediate impulse was to pull up the drawbridge. A quiet department that mostly processed visas suddenly morphed into a militarized border force. 
+
+Up next, Alex Sujong Laughlin captures that exact same defensive reflex, but inside a single apartment. She is five months pregnant, reading about electrical grid failures, and suddenly wondering if she needs to buy a gun. 
+
+Read together, these two writers show how the instinct to build a fortress against disaster—whether it is a multi-billion dollar border agency or a basement full of freeze-dried food—relies on the exact same dark assumptions about human nature. Whether the threat is a terrorist attack or a two-week blackout in Indiana, the underlying fear is identical. It is the belief that when the normal rules vanish, the people outside your door instantly become a threat. Notice how Laughlin’s private anxiety spiral mirrors the national one Cooper describes. The scale shrinks from an entire country down to a single family, but the desperate urge to arm yourself against the unknown looks exactly the same.</p>
+        <article class='piece'>
+
+<h2 class='title'>How Do I Avoid Becoming A Doomsday Prepper?</h2>
+<p class='byline'><span class='publication'>Defector</span><span class='sep'>·</span><span>Alex Sujong Laughlin</span></p>
+<p class='source'><a href='https://defector.com/how-do-i-avoid-becoming-a-doomsday-prepper' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A basement stacked with canned beans and a border lined with armed guards both grow from the exact same seed. They assume that when things fall apart, anyone on the outside becomes a threat. What&#x27;s left to sit with is the alternative: turning away from that fortress mentality to rely on the people next door instead. It is a terrifying gamble. When the next crisis actually arrives, how much of survival depends on the walls built to keep danger out, and how much depends on the people standing on the other side?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
