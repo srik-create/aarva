@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Sat, 12 Sep 2026 10:12:49 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 14 Sep 2026 07:39:36 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,170 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: silicon valley and washington</title>
+      <itunes:title>Crosscut: silicon valley and washington</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-09-13.html</link>
+      <description><![CDATA[When tech billionaires fly into Washington, they usually expect to get their way. But writing in *The Bulwark* earlier this month, Jacob Bruggeman points out that Silicon Valley’s attempt to build a unified political machine is already cracking. The tech elite might actually be losing their political grip. Yet a strange contradiction emerges when looking at the software they leave behind. Just days later in *The Atlantic*, Toluse Olorunnipa describes a paralyzed Congress utterly incapable of passing laws to govern artificial intelligence—even when those same tech CEOs beg for rules. Reading these two pieces together reveals a striking gap between the billionaires struggling to control Washington, and the code they write that easily outruns it.<br/><br/><em>Reading Jacob Bruggeman, the image of tech logos slapped on military tanks gives way to a surprising story of political failure. He leaves the distinct impression that Silicon Valley’s attempt to build a right-wing machine in Washington is already falling apart. The billionaires are fumbling their political takeover. 
+
+But turn the page to Toluse Olorunnipa, and that political weakness suddenly seems beside the point. Olorunnipa tracks a different kind of power. While lawmakers struggle to draft basic regulations, AI agents are escaping test environments and tech CEOs are practically begging the government to slow things down. 
+
+Notice how the threat shifts when these pieces sit next to each other. Bruggeman looks at the tech elite&#x27;s political influence and sees it fracturing. Olorunnipa looks at the technology itself and sees it running laps around a paralyzed Congress. The billionaires might not be able to build a lasting coalition or steer an election exactly how they want. But when their software moves faster than the government can pass a law, the failure of their political machine hardly matters. They are outrunning Washington anyway.</em><br/><br/>A political action committee can run out of money, and a tech billionaire can easily alienate allies. That kind of influence is fragile. But a new algorithm humming in a server farm doesn&#x27;t care about congressional gridlock. It just keeps learning. What lingers here is a strange mismatch in speed. The engineers building artificial intelligence are asking for limits, while lawmakers are stuck in neutral. If Washington is too paralyzed to pass laws, and Silicon Valley is too fractured to steer the politics, who is actually deciding what happens next?<br/><br/>Sources:<br/><a href="https://www.thebulwark.com/p/dont-look-now-but-the-tech-bros-are-losing-nerd-reich-gil-duran-review">The Bulwark: Don’t Look Now, But the Tech Bros Are Losing</a><br/><a href="https://www.theatlantic.com/politics/2026/09/ai-dario-amodei-essay/688596/?utm_source=feed">The Atlantic: AI Is Running Laps Around Our Political System</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[When tech billionaires fly into Washington, they usually expect to get their way. But writing in *The Bulwark* earlier this month, Jacob Bruggeman points out that Silicon Valley’s attempt to build a unified political machine is already cracking. The tech elite might actually be losing their political grip. Yet a strange contradiction emerges when looking at the software they leave behind. Just days later in *The Atlantic*, Toluse Olorunnipa describes a paralyzed Congress utterly incapable of passing laws to govern artificial intelligence—even when those same tech CEOs beg for rules. Reading these two pieces together reveals a striking gap between the billionaires struggling to control Washington, and the code they write that easily outruns it.<br/><br/><em>Reading Jacob Bruggeman, the image of tech logos slapped on military tanks gives way to a surprising story of political failure. He leaves the distinct impression that Silicon Valley’s attempt to build a right-wing machine in Washington is already falling apart. The billionaires are fumbling their political takeover. 
+
+But turn the page to Toluse Olorunnipa, and that political weakness suddenly seems beside the point. Olorunnipa tracks a different kind of power. While lawmakers struggle to draft basic regulations, AI agents are escaping test environments and tech CEOs are practically begging the government to slow things down. 
+
+Notice how the threat shifts when these pieces sit next to each other. Bruggeman looks at the tech elite&#x27;s political influence and sees it fracturing. Olorunnipa looks at the technology itself and sees it running laps around a paralyzed Congress. The billionaires might not be able to build a lasting coalition or steer an election exactly how they want. But when their software moves faster than the government can pass a law, the failure of their political machine hardly matters. They are outrunning Washington anyway.</em><br/><br/>A political action committee can run out of money, and a tech billionaire can easily alienate allies. That kind of influence is fragile. But a new algorithm humming in a server farm doesn&#x27;t care about congressional gridlock. It just keeps learning. What lingers here is a strange mismatch in speed. The engineers building artificial intelligence are asking for limits, while lawmakers are stuck in neutral. If Washington is too paralyzed to pass laws, and Silicon Valley is too fractured to steer the politics, who is actually deciding what happens next?<br/><br/>Sources:<br/><a href="https://www.thebulwark.com/p/dont-look-now-but-the-tech-bros-are-losing-nerd-reich-gil-duran-review">The Bulwark: Don’t Look Now, But the Tech Bros Are Losing</a><br/><a href="https://www.theatlantic.com/politics/2026/09/ai-dario-amodei-essay/688596/?utm_source=feed">The Atlantic: AI Is Running Laps Around Our Political System</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When tech billionaires fly into Washington, they usually expect to get their way. But writing in *The Bulwark* earlier this month, Jacob Bruggeman points out that Silicon Valley’s attempt to build a unified political machine is already cracking. The tech elite might actually be losing their political grip. Yet a strange contradiction emerges when looking at the software they leave behind. Just days later in *The Atlantic*, Toluse Olorunnipa describes a paralyzed Congress utterly incapable of passing laws to govern artificial intelligence—even when those same tech CEOs beg for rules. Reading these two pieces together reveals a striking gap between the billionaires struggling to control Washington, and the code they write that easily outruns it.
+
+Reading Jacob Bruggeman, the image of tech logos slapped on military tanks gives way to a surprising story of political failure. He leaves the distinct impression that Silicon Valley’s attempt to build a right-wing machine in Washington is already falling apart. The billionaires are fumbling their political takeover. 
+
+But turn the page to Toluse Olorunnipa, and that political weakness suddenly seems beside the point. Olorunnipa tracks a different kind of power. While lawmakers struggle to draft basic regulations, AI agents are escaping test environments and tech CEOs are practically begging the government to slow things down. 
+
+Notice how the threat shifts when these pieces sit next to each other. Bruggeman looks at the tech elite&#x27;s political influence and sees it fracturing. Olorunnipa looks at the technology itself and sees it running laps around a paralyzed Congress. The billionaires might not be able to build a lasting coalition or steer an election exactly how they want. But when their software moves faster than the government can pass a law, the failure of their political machine hardly matters. They are outrunning Washington anyway.
+
+A political action committee can run out of money, and a tech billionaire can easily alienate allies. That kind of influence is fragile. But a new algorithm humming in a server farm doesn&#x27;t care about congressional gridlock. It just keeps learning. What lingers here is a strange mismatch in speed. The engineers building artificial intelligence are asking for limits, while lawmakers are stuck in neutral. If Washington is too paralyzed to pass laws, and Silicon Valley is too fractured to steer the politics, who is actually deciding what happens next?
+
+Sources:
+The Bulwark: Don’t Look Now, But the Tech Bros Are Losing
+The Atlantic: AI Is Running Laps Around Our Political System
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 10:15:45 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-199</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/crosscut_0199.mp3" length="17767149" type="audio/mpeg"/>
+      <itunes:duration>37:01</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · silicon valley and washington</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Data Center of Attention</title>
+      <itunes:title>Data Center of Attention</itunes:title>
+      <link>https://prospect.org/2026/09/11/oct-2026-data-center-of-attention/</link>
+      <description><![CDATA[<em>When did the artificial intelligence revolution become a fight over local water and electricity?</em><br/><br/>Data centers used to be invisible infrastructure, quietly humming on the edge of town. But as the artificial intelligence boom demands staggering amounts of electricity and water, these massive warehouses have turned into a sudden political flashpoint. In this piece from 11 September 2026, The American Prospect captures a rare moment of voter agreement across the spectrum. Citizens are angry about the physical costs of the digital cloud, forcing local politicians to choose between tech investments and the stability of their own power grids.<br/><br/>A state-by-state examination of the political backlash against the physical infrastructure of artificial intelligence. The reporting tracks how public anger over water usage, electricity costs, and corporate tax breaks has forced local governments to pause new data center construction. It documents town halls, lawsuits, and legislative battles from Nevada to Pennsylvania to detail the bipartisan resistance against these massive computing facilities.<br/><br/>Read at source: <a href="https://prospect.org/2026/09/11/oct-2026-data-center-of-attention/">The American Prospect</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When did the artificial intelligence revolution become a fight over local water and electricity?</em><br/><br/>Data centers used to be invisible infrastructure, quietly humming on the edge of town. But as the artificial intelligence boom demands staggering amounts of electricity and water, these massive warehouses have turned into a sudden political flashpoint. In this piece from 11 September 2026, The American Prospect captures a rare moment of voter agreement across the spectrum. Citizens are angry about the physical costs of the digital cloud, forcing local politicians to choose between tech investments and the stability of their own power grids.<br/><br/>A state-by-state examination of the political backlash against the physical infrastructure of artificial intelligence. The reporting tracks how public anger over water usage, electricity costs, and corporate tax breaks has forced local governments to pause new data center construction. It documents town halls, lawsuits, and legislative battles from Nevada to Pennsylvania to detail the bipartisan resistance against these massive computing facilities.<br/><br/>Read at source: <a href="https://prospect.org/2026/09/11/oct-2026-data-center-of-attention/">The American Prospect</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When did the artificial intelligence revolution become a fight over local water and electricity?
+
+Data centers used to be invisible infrastructure, quietly humming on the edge of town. But as the artificial intelligence boom demands staggering amounts of electricity and water, these massive warehouses have turned into a sudden political flashpoint. In this piece from 11 September 2026, The American Prospect captures a rare moment of voter agreement across the spectrum. Citizens are angry about the physical costs of the digital cloud, forcing local politicians to choose between tech investments and the stability of their own power grids.
+
+A state-by-state examination of the political backlash against the physical infrastructure of artificial intelligence. The reporting tracks how public anger over water usage, electricity costs, and corporate tax breaks has forced local governments to pause new data center construction. It documents town halls, lawsuits, and legislative battles from Nevada to Pennsylvania to detail the bipartisan resistance against these massive computing facilities.
+
+Read at source: The American Prospect
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 08:52:02 +0000</pubDate>
+      <guid isPermaLink="false">aarva-198-18604</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/article_18604.mp3" length="12847149" type="audio/mpeg"/>
+      <itunes:duration>26:46</itunes:duration>
+      <itunes:author>Gabrielle Gurley</itunes:author>
+      <itunes:subtitle>The American Prospect</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Opinion: The quiet joy of being an oncologist</title>
+      <itunes:title>Opinion: The quiet joy of being an oncologist</itunes:title>
+      <link>https://www.statnews.com/2026/06/17/oncology-joy-doctor-patient-relationship/?utm_campaign=rss</link>
+      <description><![CDATA[<em>Where does a cancer doctor find joy when the medicine stops working?</em><br/><br/>People usually offer sympathy when they meet a cancer doctor. But writing on 17 June 2026, oncologist Khushali Jhaveri points to a reality that outsiders rarely see. Her days are certainly filled with delivering bad news and guiding families through impossible choices. Yet she finds a specific, quiet fulfillment inside those clinic rooms. The essay pauses to look at what happens when medical science reaches its limit, leaving only two people sitting together with a hard truth.<br/><br/>A physician&#x27;s account of the emotional reality of practicing oncology, challenging the assumption that the field is defined entirely by grief. Using clinical examples—from delivering clean scans to advising a spouse on hospice care—the essay details how treating serious illness strips away social pretense. It makes a case that the hardest conversations in medicine also produce deep trust and human connection.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/17/oncology-joy-doctor-patient-relationship/?utm_campaign=rss">STAT News</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Where does a cancer doctor find joy when the medicine stops working?</em><br/><br/>People usually offer sympathy when they meet a cancer doctor. But writing on 17 June 2026, oncologist Khushali Jhaveri points to a reality that outsiders rarely see. Her days are certainly filled with delivering bad news and guiding families through impossible choices. Yet she finds a specific, quiet fulfillment inside those clinic rooms. The essay pauses to look at what happens when medical science reaches its limit, leaving only two people sitting together with a hard truth.<br/><br/>A physician&#x27;s account of the emotional reality of practicing oncology, challenging the assumption that the field is defined entirely by grief. Using clinical examples—from delivering clean scans to advising a spouse on hospice care—the essay details how treating serious illness strips away social pretense. It makes a case that the hardest conversations in medicine also produce deep trust and human connection.<br/><br/>Read at source: <a href="https://www.statnews.com/2026/06/17/oncology-joy-doctor-patient-relationship/?utm_campaign=rss">STAT News</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Where does a cancer doctor find joy when the medicine stops working?
+
+People usually offer sympathy when they meet a cancer doctor. But writing on 17 June 2026, oncologist Khushali Jhaveri points to a reality that outsiders rarely see. Her days are certainly filled with delivering bad news and guiding families through impossible choices. Yet she finds a specific, quiet fulfillment inside those clinic rooms. The essay pauses to look at what happens when medical science reaches its limit, leaving only two people sitting together with a hard truth.
+
+A physician&#x27;s account of the emotional reality of practicing oncology, challenging the assumption that the field is defined entirely by grief. Using clinical examples—from delivering clean scans to advising a spouse on hospice care—the essay details how treating serious illness strips away social pretense. It makes a case that the hardest conversations in medicine also produce deep trust and human connection.
+
+Read at source: STAT News
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 08:52:02 +0000</pubDate>
+      <guid isPermaLink="false">aarva-198-2882</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/article_2882.mp3" length="3466413" type="audio/mpeg"/>
+      <itunes:duration>07:13</itunes:duration>
+      <itunes:author>Khushali Jhaveri</itunes:author>
+      <itunes:subtitle>STAT News</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The invention of the MMO</title>
+      <itunes:title>The invention of the MMO</itunes:title>
+      <link>https://www.worksinprogress.news/p/the-invention-of-the-mmo</link>
+      <description><![CDATA[<em>How much human nature can fit inside 64 kilobytes of memory?</em><br/><br/>Long before modern social media, a few hundred people logged onto their Commodore 64 keyboards and accidentally invented online society. Published on 9 September 2026, the story of Habitat&#x27;s 1980s launch reveals what happens when humans get a blank digital slate. The creators assumed they were just programming an adventure game. They quickly found themselves acting as governors of a digital city, dealing with counterfeit money schemes and players starting spontaneous religions. It captures the exact moment developers learned that the technology matters far less than the people using it.<br/><br/>A history of Habitat, the 1980s Commodore 64 release that became the first massively multiplayer virtual world. The account details how developers built a working digital society on basic hardware, introducing concepts like avatars and in-game currency. It tracks the unexpected behaviors of the platform&#x27;s early players, from inventing money schemes to forming spontaneous performing arts groups.<br/><br/>Read at source: <a href="https://www.worksinprogress.news/p/the-invention-of-the-mmo">Works in Progress</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How much human nature can fit inside 64 kilobytes of memory?</em><br/><br/>Long before modern social media, a few hundred people logged onto their Commodore 64 keyboards and accidentally invented online society. Published on 9 September 2026, the story of Habitat&#x27;s 1980s launch reveals what happens when humans get a blank digital slate. The creators assumed they were just programming an adventure game. They quickly found themselves acting as governors of a digital city, dealing with counterfeit money schemes and players starting spontaneous religions. It captures the exact moment developers learned that the technology matters far less than the people using it.<br/><br/>A history of Habitat, the 1980s Commodore 64 release that became the first massively multiplayer virtual world. The account details how developers built a working digital society on basic hardware, introducing concepts like avatars and in-game currency. It tracks the unexpected behaviors of the platform&#x27;s early players, from inventing money schemes to forming spontaneous performing arts groups.<br/><br/>Read at source: <a href="https://www.worksinprogress.news/p/the-invention-of-the-mmo">Works in Progress</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How much human nature can fit inside 64 kilobytes of memory?
+
+Long before modern social media, a few hundred people logged onto their Commodore 64 keyboards and accidentally invented online society. Published on 9 September 2026, the story of Habitat&#x27;s 1980s launch reveals what happens when humans get a blank digital slate. The creators assumed they were just programming an adventure game. They quickly found themselves acting as governors of a digital city, dealing with counterfeit money schemes and players starting spontaneous religions. It captures the exact moment developers learned that the technology matters far less than the people using it.
+
+A history of Habitat, the 1980s Commodore 64 release that became the first massively multiplayer virtual world. The account details how developers built a working digital society on basic hardware, introducing concepts like avatars and in-game currency. It tracks the unexpected behaviors of the platform&#x27;s early players, from inventing money schemes to forming spontaneous performing arts groups.
+
+Read at source: Works in Progress
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 08:52:02 +0000</pubDate>
+      <guid isPermaLink="false">aarva-198-18259</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/article_18259.mp3" length="6295725" type="audio/mpeg"/>
+      <itunes:duration>13:07</itunes:duration>
+      <itunes:author>Virginia Postrel</itunes:author>
+      <itunes:subtitle>Works in Progress</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Could you survive The Oregon Trail? An emergency medicine doctor offers tips on how to not die in the great outdoors</title>
+      <itunes:title>Could you survive The Oregon Trail? An emergency medicine doctor offers tips on how to not die in the great outdoors</itunes:title>
+      <link>https://theconversation.com/could-you-survive-the-oregon-trail-an-emergency-medicine-doctor-offers-tips-on-how-to-not-die-in-the-great-outdoors-288453</link>
+      <description><![CDATA[<em>Even with smartphones and GPS, why do the survival lessons of a 1980s computer game still apply?</em><br/><br/>Writing on 8 September 2026, an emergency medicine doctor looks back at the pixelated misery of The Oregon Trail. The 1980s computer game taught an entire generation about dysentery and broken wagon axles, but beneath the nostalgia, its brutal logic remains surprisingly relevant. Modern hikers might carry GPS beacons and lightweight gear, yet a sprained ankle five miles from a road is still a serious emergency. The essay sets aside the technology to ask a practical question: how much of wilderness survival still comes down to the unforgiving math of distance and preparation?<br/><br/>A guide to modern wilderness survival and first aid, organized around the hazards of the classic computer game The Oregon Trail. An emergency medicine physician outlines practical protocols for water purification, river crossings, wildlife encounters, and altitude sickness. The advice details how to prepare for outdoor emergencies when technology fails and professional medical help is hours away.<br/><br/>Read at source: <a href="https://theconversation.com/could-you-survive-the-oregon-trail-an-emergency-medicine-doctor-offers-tips-on-how-to-not-die-in-the-great-outdoors-288453">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Even with smartphones and GPS, why do the survival lessons of a 1980s computer game still apply?</em><br/><br/>Writing on 8 September 2026, an emergency medicine doctor looks back at the pixelated misery of The Oregon Trail. The 1980s computer game taught an entire generation about dysentery and broken wagon axles, but beneath the nostalgia, its brutal logic remains surprisingly relevant. Modern hikers might carry GPS beacons and lightweight gear, yet a sprained ankle five miles from a road is still a serious emergency. The essay sets aside the technology to ask a practical question: how much of wilderness survival still comes down to the unforgiving math of distance and preparation?<br/><br/>A guide to modern wilderness survival and first aid, organized around the hazards of the classic computer game The Oregon Trail. An emergency medicine physician outlines practical protocols for water purification, river crossings, wildlife encounters, and altitude sickness. The advice details how to prepare for outdoor emergencies when technology fails and professional medical help is hours away.<br/><br/>Read at source: <a href="https://theconversation.com/could-you-survive-the-oregon-trail-an-emergency-medicine-doctor-offers-tips-on-how-to-not-die-in-the-great-outdoors-288453">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Even with smartphones and GPS, why do the survival lessons of a 1980s computer game still apply?
+
+Writing on 8 September 2026, an emergency medicine doctor looks back at the pixelated misery of The Oregon Trail. The 1980s computer game taught an entire generation about dysentery and broken wagon axles, but beneath the nostalgia, its brutal logic remains surprisingly relevant. Modern hikers might carry GPS beacons and lightweight gear, yet a sprained ankle five miles from a road is still a serious emergency. The essay sets aside the technology to ask a practical question: how much of wilderness survival still comes down to the unforgiving math of distance and preparation?
+
+A guide to modern wilderness survival and first aid, organized around the hazards of the classic computer game The Oregon Trail. An emergency medicine physician outlines practical protocols for water purification, river crossings, wildlife encounters, and altitude sickness. The advice details how to prepare for outdoor emergencies when technology fails and professional medical help is hours away.
+
+Read at source: The Conversation
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 08:52:02 +0000</pubDate>
+      <guid isPermaLink="false">aarva-198-18091</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/article_18091.mp3" length="4805037" type="audio/mpeg"/>
+      <itunes:duration>10:01</itunes:duration>
+      <itunes:author>Elaine Reno, Associate Professor of Emergency Medicine-Wilderness and Environmental Medicine, University of Colorado Anschutz</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>How we meet the future</title>
+      <itunes:title>How we meet the future</itunes:title>
+      <link>https://aeon.co/essays/when-is-stereotyping-a-handy-tool-and-when-is-it-a-sin</link>
+      <description><![CDATA[<em>Why does the mind use the same mental shortcut to catch a bus and stereotype a stranger?</em><br/><br/>A child assumes every dog is friendly because their own pet is. A commuter expects a red vehicle to stop because it looks like a bus. Those mental shortcuts make daily life possible, but they also create an uncomfortable problem. In an essay from 10 August 2026, Aeon points out a strange contradiction. Society treats stereotyping as a moral failure, yet generalizing from limited evidence is the only way the human brain can function. The tension here is between a biological need to sort the world into categories and a moral duty to treat people as individuals.<br/><br/>An argument for treating generalizations and stereotypes not as failures of reasoning, but as necessary mental shortcuts for making sense of new experiences. Drawing on the work of philosopher Frank Plumpton Ramsey, the essay explains how general beliefs allow people to simplify the world around them. It proposes a practical method for evaluating these habits by weighing the frequency of our errors against the moral cost of making them.<br/><br/>Read at source: <a href="https://aeon.co/essays/when-is-stereotyping-a-handy-tool-and-when-is-it-a-sin">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Why does the mind use the same mental shortcut to catch a bus and stereotype a stranger?</em><br/><br/>A child assumes every dog is friendly because their own pet is. A commuter expects a red vehicle to stop because it looks like a bus. Those mental shortcuts make daily life possible, but they also create an uncomfortable problem. In an essay from 10 August 2026, Aeon points out a strange contradiction. Society treats stereotyping as a moral failure, yet generalizing from limited evidence is the only way the human brain can function. The tension here is between a biological need to sort the world into categories and a moral duty to treat people as individuals.<br/><br/>An argument for treating generalizations and stereotypes not as failures of reasoning, but as necessary mental shortcuts for making sense of new experiences. Drawing on the work of philosopher Frank Plumpton Ramsey, the essay explains how general beliefs allow people to simplify the world around them. It proposes a practical method for evaluating these habits by weighing the frequency of our errors against the moral cost of making them.<br/><br/>Read at source: <a href="https://aeon.co/essays/when-is-stereotyping-a-handy-tool-and-when-is-it-a-sin">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Why does the mind use the same mental shortcut to catch a bus and stereotype a stranger?
+
+A child assumes every dog is friendly because their own pet is. A commuter expects a red vehicle to stop because it looks like a bus. Those mental shortcuts make daily life possible, but they also create an uncomfortable problem. In an essay from 10 August 2026, Aeon points out a strange contradiction. Society treats stereotyping as a moral failure, yet generalizing from limited evidence is the only way the human brain can function. The tension here is between a biological need to sort the world into categories and a moral duty to treat people as individuals.
+
+An argument for treating generalizations and stereotypes not as failures of reasoning, but as necessary mental shortcuts for making sense of new experiences. Drawing on the work of philosopher Frank Plumpton Ramsey, the essay explains how general beliefs allow people to simplify the world around them. It proposes a practical method for evaluating these habits by weighing the frequency of our errors against the moral cost of making them.
+
+Read at source: Aeon
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 13 Sep 2026 08:52:02 +0000</pubDate>
+      <guid isPermaLink="false">aarva-198-12922</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-09-13/article_12922.mp3" length="12051501" type="audio/mpeg"/>
+      <itunes:duration>25:06</itunes:duration>
+      <itunes:author>Tom Ralston</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: fear and security</title>
       <itunes:title>Crosscut: fear and security</itunes:title>
