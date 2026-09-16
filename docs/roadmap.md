@@ -70,6 +70,33 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **TTS scratch on `/data` + stream-concat + worker kill switch
+   (`docs/session_plan_tts_scratch_persist.md`) — active.** Full
+   spec awaiting Claude Code. 2026-09-16: operator watched a
+   listener-created crosscut loop OOM → restart → re-synthesize all
+   six sections from scratch, repeatedly, in production. Root cause
+   verified: the 2026-07-14 per-section scratch dir sits on the
+   container's ephemeral filesystem (`aarva/output/audio/...` — env
+   var `AARVA_AUDIO_DIR` never wired into `render.yaml`), so Render
+   OOM-restart wipes all six scratch WAVs and the resumed build
+   sees an empty scratch dir → all six sections re-synthesize. The
+   2026-07-14 verification was `kill -9` locally, which doesn't
+   simulate an ephemeral-filesystem wipe. Fix: (a) new
+   `AARVA_TTS_SCRATCH_DIR` env var pointing at `/data/tts_scratch/`
+   on Render (scratch is bounded to ~30 MB per in-flight edition,
+   cleaned on success — fits comfortably in the ~700 MB headroom
+   on the 1 GB disk); (b) stream-concat replaces the
+   `section_pcms` + `combined` two-list buffering that was causing
+   the concat-time OOM in the first place, cutting peak RAM by ~60
+   MB; (c) `AARVA_WORKER_DISABLED` env-var gate at `start_worker`
+   as a one-click operator kill switch for future regressions.
+   Verification must include an ephemeral-fs simulation
+   (`shutil.rmtree` the "audio_dir" between runs while leaving the
+   `/data` scratch alone), not just `kill -9` — that oversight is
+   what let the 2026-07-14 fix ship broken. Partially closes item
+   3 above by removing concat-time buffering as the OOM culprit;
+   remaining per-step RSS profiling still open.
+
 ---
 
 ## Deferred — to return to (in priority order)
