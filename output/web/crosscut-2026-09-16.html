@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 16 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-16</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 16 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · american democratic guardrails</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-09-16/crosscut_0204.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>53 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When Americans worry about a president going too far, the mind often jumps to a dramatic standoff, picturing a four-star general stepping in to say no. Writing in Just Security, Paul Rasmussen points out that voters increasingly view the military as an emergency brake on executive power. But looking up at the Pentagon misses the quiet rooms where the actual machinery of voting is being rewired. In The Atlantic, Toluse Olorunnipa tracks how partisan activists are taking over local county election boards. Something interesting emerges when reading these pieces together. The dramatic military fail-safes voters hope for do not actually exist, while the everyday civilian offices designed to protect the system are quietly being dismantled.</p>
+        <article class='piece'>
+<p class='hook'>Right after the 2020 election, political insiders brushed off attempts to overturn the results as just a defeated president blowing off steam. Writing last week, Toluse Olorunnipa shows exactly how poorly that excuse aged. Notice how the reporting tracks a quiet, deliberate takeover of local county boards across the country. A grassroots movement of election deniers has spent six years training as poll workers and local officials, preparing to execute at the county level what failed nationally.</p>
+<h2 class='title'>The Election Deniers’ Long Game</h2>
+<p class='byline'><span class='publication'>The Atlantic</span><span class='sep'>·</span><span>Toluse Olorunnipa</span></p>
+<p class='source'><a href='https://www.theatlantic.com/magazine/2026/10/big-lie-local-elections-midterms/688359/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Toluse Olorunnipa leaves you staring at the quiet, bureaucratic machinery of county election boards in places like Georgia. The chilling takeaway is that the real threat to the voting system isn&#x27;t coming from a dramatic White House decree. Instead, it is a slow, methodical takeover by local activists trained to dispute results from the ground up.
+
+That hyper-local focus makes the shift to Paul Rasmussen so striking. If Olorunnipa shows where the actual democratic guardrails are being dismantled, Rasmussen points out where frustrated voters are desperately, and mistakenly, hoping to find new ones. Rasmussen writes about the growing public expectation that military generals will step in to block a president&#x27;s worst impulses. People want a four-star savior to act as a fail-safe against executive overreach.
+
+Put the two together, and a strange tension surfaces. Americans are increasingly looking up at the Pentagon, hoping military brass will violate constitutional norms to save the republic. But while they wait for a dramatic rescue from the top, the civilian system actually designed to protect elections is being quietly taken apart right down the street.</p>
+        <article class='piece'>
+
+<h2 class='title'>Who Checks the President? Not the Military</h2>
+<p class='byline'><span class='publication'>Just Security</span><span class='sep'>·</span><span>Paul Rasmussen</span></p>
+<p class='source'><a href='https://www.justsecurity.org/155464/who-checks-president-not-military/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=who-checks-president-not-military' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>People keep looking to the Pentagon for rescue while the neighborhood voting center gets quietly rewired. What lingers from these two stories is a massive mismatch in attention. Voters are waiting for a four-star general to step in and save the day, staring up at the highest levels of power. Meanwhile, the actual mechanics of the system are being dismantled from folding chairs at local county board meetings. The question left to sit with is simple: If everyone keeps staring at the ceiling for a hero, who is watching the floor?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

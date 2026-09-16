@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Wednesday, 16 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-16</div>
+      <div class="edition-meta">5 pieces · Wednesday, 16 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If a passport is just a travel document, what actually proves you are a citizen?</p>
+        <h2 class="title">Explained: Why an Indian passport is not proof of citizenship – and no single document is</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>KBS Sidhu</span>
+        </p>
+        <p class="contextualisation">When India’s foreign ministry confirmed that a passport does not legally prove citizenship, it caused a brief public panic. Writing on 25 June 2026, former civil servant Karan Bir Singh Sidhu explains why lawyers weren&#x27;t surprised at all. He shows how India quietly dismantled birthright citizenship over the last forty years, replacing it with a strict descent-based system. The insight holds up months later because the underlying problem hasn&#x27;t gone away. The country still lacks a single document that conclusively proves who belongs, leaving an administrative mess the government still has to untangle.</p>
+        <p class='show-notes'>A historical review of Indian citizenship law, tracing the country&#x27;s shift from granting citizenship by birth to requiring citizenship by descent. It outlines how three parliamentary amendments narrowed eligibility and created risks of statelessness for children of undocumented migrants, and explains why no single document can conclusively prove Indian citizenship.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-16/article_4389.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>20 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1093814/explained-why-an-indian-passports-is-not-proof-of-citizenship-and-no-single-document-is?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you perfectly describe the universe when you are standing inside it?</p>
+        <h2 class="title">The Myth of Perfect Knowledge</h2>
+        <p class="byline">
+          <span class="publication">The Atlantic</span>
+          <span class='sep'>·</span><span>Carlo Rovelli</span>
+        </p>
+        <p class="contextualisation">In an 8 September 2026 essay for The Atlantic, a working physicist points out a strange contradiction. For centuries, western thinkers treated the human mind like a camera sitting outside of reality, capturing a perfectly objective picture of the universe. But as quantum mechanics gets better at measuring the physical world, it keeps proving that this detached camera does not exist. Losing perfect objectivity sounds like a scientific defeat, until a quieter possibility emerges. Accepting that absolute truth is a fiction might be the only way to stop treating different perspectives as enemy threats.</p>
+        <p class='show-notes'>An argument against the possibility of pure, objective knowledge, grounded in the limits of modern physics. Uses quantum mechanics to explain how physical properties exist only as relations between things, meaning all human observation is partial and uncertain. Frames this lack of absolute certainty not as a scientific failure, but as a practical case for humility and tolerance.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-16/article_18187.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theatlantic.com/ideas/2026/09/science-objectivity-myth-physics/688532/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
