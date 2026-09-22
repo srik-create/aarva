@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Tuesday, 22 September 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-09-22</div>
+      <div class="edition-meta">6 pieces · Tuesday, 22 September 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Why is a woman asking for an abortion the scariest scene in a movie about the Antichrist?</p>
+        <h2 class="title">Diabolical Motherhood</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Emily C. Hughes</span>
+        </p>
+        <p class="contextualisation">In this essay from 25 June 2026, the writer maps the slow collapse of American reproductive rights through an unexpected lens: the horror franchise The Omen. By comparing the 1976 original with its 2024 prequel, the piece tracks how cinema shifted from punishing female characters for wanting bodily autonomy to giving them the space to fight back. The framework holds up well past the daily news cycle, capturing exactly how political dread eventually shapes the monsters on the movie screen.</p>
+        <p class='show-notes'>An analysis of the horror franchise The Omen and its treatment of pregnancy and abortion. The essay contrasts a mother&#x27;s passive suffering in the 1976 original with a young nun&#x27;s violent resistance in the 2024 prequel. It connects these fictional plots to the real-world loss of reproductive rights after the end of Roe v. Wade.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-22/article_4720.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>23 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/diabolical-motherhood' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">If European subways are just as safe, why do American ones need twice as many escape tunnels?</p>
+        <h2 class="title">US Subways Build Too Many Cross Passages</h2>
+        <p class="byline">
+          <span class="publication">Construction Physics</span>
+          <span class='sep'>·</span><span>Brian Potter</span>
+        </p>
+        <p class="contextualisation">When American transit projects run over budget, the public usually blames vague bureaucratic bloat. Published on 25 June 2026, this piece from Construction Physics names a much more concrete culprit: a single, outdated fire safety rule. The diagnosis holds up because it abandons the usual broad complaints about infrastructure to isolate one specific, fixable regulation—a code that forces American cities to dig twice as many underground escape tunnels as European ones, without actually making anyone safer.</p>
+        <p class='show-notes'>An examination of how fire safety standards inflate the cost of building new subways in the United States. A comparison of US and European regulations shows that American projects mandate twice as many connecting tunnels without achieving better safety outcomes. The analysis outlines specific policy mechanisms for transit agencies and federal regulators to adopt international spacing rules and reduce construction expenses.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-22/article_4687.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.construction-physics.com/p/us-subways-build-too-many-cross-passages' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">When a baby&#x27;s sex is left to chance, what makes a debunked book feel worth a try?</p>
+        <h2 class="title">The Book Claiming to Teach Couples How to Select Their Baby’s Sex</h2>
+        <p class="byline">
+          <span class="publication">The Atlantic</span>
+          <span class='sep'>·</span><span>Olga Khazan</span>
+        </p>
+        <p class="contextualisation">Scientists settled the debate over choosing a baby’s sex naturally back in the 1990s: it simply does not work. Yet a self-published guide called the Babydust Method has convinced tens of thousands of expectant parents otherwise. A 21 September 2026 story from The Atlantic treats the trend less as a science problem and more as a human one. Why are people so eager to buy into an internet myth? The answer points straight toward the overwhelming uncertainty of pregnancy, and the quiet, often unspoken taboo of gender disappointment.</p>
+        <p class='show-notes'>A report on the Babydust Method, a popular online trend claiming parents can choose their baby&#x27;s sex by timing intercourse. Drawing on interviews with fertility doctors and the method&#x27;s creator, the reporting explains why the underlying science was debunked decades ago. It also outlines the psychological reasons behind the practice, showing how the uncertainty of pregnancy leads parents to seek control through magical thinking.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-22/article_20634.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>14 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theatlantic.com/family/2026/09/babydust-boy-girl/688722/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">How does a city absorb centuries of borrowed words and still sound entirely like itself?</p>
+        <h2 class="title">Madras, a city that has always expanded its language to welcome words into its fold</h2>
+        <p class="byline">
+          <span class="publication">The Hindu</span>
+          
+        </p>
+        <p class="contextualisation">A 1 September 2026 piece from The Hindu treats the street slang of Chennai as a living archaeological record. The local dialect, known as Madras bashai, is built entirely from the people who passed through the city over centuries, dropping Urdu nouns and Dutch coin names into the daily vocabulary. A shared language has to come from somewhere when a dozen different communities share a single map. The resulting slang constantly updates itself, moving from colonial trading posts to the digital shorthand of modern college students.</p>
+        <p class='show-notes'>An account of how Chennai’s local dialect, Madras bashai, developed by absorbing words from Dutch, Urdu, and other languages. Tracks the dialect&#x27;s spread through Tamil cinema and working-class music, then compares this history to how modern youth in the city adopt internet slang. Draws on interviews with historians, linguists, and residents to show how the city&#x27;s vocabulary takes in new words.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-09-22/article_16731.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.thehindu.com/news/cities/chennai/madras-a-city-that-has-always-expanded-its-language-to-welcome-words-into-its-fold/article71393097.ece' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
