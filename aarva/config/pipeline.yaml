@@ -655,6 +655,14 @@ tts:
   # backoff with jitter.
   retries: 4
 
+  # Per-request HTTP timeout, in seconds. Real incident (2026-09-26):
+  # a chunk synthesis call hung indefinitely — no timeout was ever set,
+  # so a stalled connection (server-side already closed, client still
+  # waiting to read) blocked forever instead of raising and letting the
+  # retry-with-backoff logic above actually run. 120s gives generous
+  # headroom over the ~25-60s a normal chunk takes in production.
+  request_timeout_seconds: 120
+
   speed: 1.0   # used only by some fallback providers; gemini ignores it
 
   # — Chatterbox fallback (used when provider: chatterbox) —

@@ -154,9 +154,39 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-20)
+## Recently completed (2026-06-29 → 2026-09-26)
 
 Most recent first.
+
+### 2026-09-26
+
+- **Fix: Gemini TTS chunk synthesis could hang forever with no
+  timeout.** Real production incident: today's daily run got stuck
+  in Stage 9 on the same chunk of the same article across multiple
+  restarts. Diagnosis: the stuck process's socket to Google's infra
+  showed `CLOSE_WAIT` (the server had already closed its side; the
+  client was still blocked waiting to read) — `GeminiTTSClient`
+  (`aarva/clients/tts.py`) never set an HTTP timeout on its
+  `genai.Client`, so a stalled connection blocked indefinitely
+  instead of raising and letting the existing retry-with-backoff
+  logic in `_synthesize_chunk` actually run. Every OTHER TTS backend
+  in the same file (`ChatterboxClient`, `MacSayClient`,
+  `PiperClient`) already had a `timeout_seconds` guard — Gemini,
+  the one actually in production use, was the one gap.
+  - New `request_timeout_seconds` (default 120s — generous headroom
+    over the ~25-60s a normal chunk takes per real production logs)
+    threaded through `build_tts_client()` → `GeminiTTSClient.__init__`
+    → `genai.types.HttpOptions(timeout=...)` passed to `genai.Client`
+    on both the ADC/Vertex and api_key auth paths. `HttpOptions.timeout`
+    is in milliseconds — verified against the installed SDK's actual
+    field, not assumed. Configurable via `tts.request_timeout_seconds`
+    in `pipeline.yaml`.
+  - 5 new tests confirming the config default/override flows through
+    and that the millisecond conversion is correct on both auth paths
+    (genai.Client mocked — no real network calls). Repo total: 181.
+  - Verified for real: constructed a real `GeminiTTSClient` against
+    real ADC credentials and confirmed `_load()` succeeds with the
+    timeout wired through end-to-end.
 
 ### 2026-08-20
 
