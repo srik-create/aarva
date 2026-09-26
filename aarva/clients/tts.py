@@ -188,6 +188,16 @@ class GeminiTTSClient(TTSClient):
     DEFAULT_MAX_CHUNK_CHARS = 2500
     INTER_CHUNK_PAUSE_MS = 250
     DEFAULT_RETRIES = 4               # 500s do happen; Google's docs warn
+    # Real incident (2026-09-26): a chunk synthesis call hung indefinitely
+    # — the socket showed CLOSE_WAIT (Google's side had already closed the
+    # connection, but the google-genai SDK had no read timeout, so our
+    # process just sat there forever, never reaching the retry logic
+    # below). No timeout was ever set on the genai.Client — every other
+    # TTS backend in this file (Chatterbox/MacSay/Piper) has one; this
+    # was the gap. 120s gives generous headroom over the ~25-60s a normal
+    # chunk takes (per real production logs) while still recovering
+    # within about two minutes instead of hanging forever.
+    DEFAULT_REQUEST_TIMEOUT_SECONDS = 120
 
     # Defensive silence detection. Google's docs warn that Gemini TTS can
     # drift on longer outputs — in practice we've observed chunks where
@@ -236,12 +246,14 @@ class GeminiTTSClient(TTSClient):
         auth_mode: str | None = None,
         gcp_project: str | None = None,
         gcp_location: str | None = None,
+        request_timeout_seconds: int = DEFAULT_REQUEST_TIMEOUT_SECONDS,
     ):
         self.voice_map = dict(voice_map)
         self._default = default_voice
         self.model = model or self.DEFAULT_MODEL
         self.max_chunk_chars = int(max_chunk_chars)
         self.retries = int(retries)
+        self.request_timeout_seconds = int(request_timeout_seconds)
         # Optional style direction prepended to every chunk. Useful for
         # consistent editorial tone — e.g., "Read in a calm, editorial
         # register, like a thoughtful longform podcast host."
@@ -299,6 +311,13 @@ class GeminiTTSClient(TTSClient):
                 "Install with: pip install google-genai"
             ) from e
 
+        # Real incident (2026-09-26): without an explicit timeout, a
+        # hung read on the underlying HTTP connection blocks forever —
+        # google-genai's HttpOptions.timeout is in MILLISECONDS.
+        http_options = genai.types.HttpOptions(
+            timeout=self.request_timeout_seconds * 1000,
+        )
+
         if self._auth_mode == "adc":
             # Vertex AI path — credentials picked up from
             # ~/.config/gcloud/application_default_credentials.json.
@@ -306,12 +325,14 @@ class GeminiTTSClient(TTSClient):
                 vertexai=True,
                 project=self._gcp_project,
                 location=self._gcp_location,
+                http_options=http_options,
             )
             logger.info(
                 "GeminiTTS client ready (ADC/Vertex) — model=%s, "
-                "project=%s, location=%s, voices=%s",
+                "project=%s, location=%s, voices=%s, "
+                "request_timeout=%ds",
                 self.model, self._gcp_project, self._gcp_location,
-                list(self.voice_map.items()),
+                list(self.voice_map.items()), self.request_timeout_seconds,
             )
             return
 
@@ -328,9 +349,11 @@ class GeminiTTSClient(TTSClient):
                 "tts.auth_mode='adc' in pipeline.yaml to use Vertex AI "
                 "credentials."
             )
-        self._client = genai.Client(api_key=api_key)
-        logger.info("GeminiTTS client ready — model=%s, voices=%s",
-                    self.model, list(self.voice_map.items()))
+        self._client = genai.Client(api_key=api_key, http_options=http_options)
+        logger.info(
+            "GeminiTTS client ready — model=%s, voices=%s, request_timeout=%ds",
+            self.model, list(self.voice_map.items()), self.request_timeout_seconds,
+        )
 
     def _chunk_text(self, text: str) -> list[str]:
         """Split text into chunks targeting ≤ max_chunk_chars each.
@@ -1079,6 +1102,10 @@ def build_tts_client(config: dict) -> TTSClient:
         auth_mode = (config or {}).get("auth_mode")
         gcp_project = (config or {}).get("gcp_project")
         gcp_location = (config or {}).get("gcp_location")
+        request_timeout_seconds = int((config or {}).get(
+            "request_timeout_seconds",
+            GeminiTTSClient.DEFAULT_REQUEST_TIMEOUT_SECONDS,
+        ))
         return GeminiTTSClient(
             voice_map=voice_map,
             default_voice=default,
@@ -1089,6 +1116,7 @@ def build_tts_client(config: dict) -> TTSClient:
             auth_mode=auth_mode,
             gcp_project=gcp_project,
             gcp_location=gcp_location,
+            request_timeout_seconds=request_timeout_seconds,
         )
 
     if provider == "kokoro":

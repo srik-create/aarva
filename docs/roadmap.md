@@ -70,6 +70,33 @@ GitHub Pages.
    completed"), so future OOM evidence should stay intact between
    syncs.
 
+4. **TTS scratch on `/data` + stream-concat + worker kill switch
+   (`docs/session_plan_tts_scratch_persist.md`) — active.** Full
+   spec awaiting Claude Code. 2026-09-16: operator watched a
+   listener-created crosscut loop OOM → restart → re-synthesize all
+   six sections from scratch, repeatedly, in production. Root cause
+   verified: the 2026-07-14 per-section scratch dir sits on the
+   container's ephemeral filesystem (`aarva/output/audio/...` — env
+   var `AARVA_AUDIO_DIR` never wired into `render.yaml`), so Render
+   OOM-restart wipes all six scratch WAVs and the resumed build
+   sees an empty scratch dir → all six sections re-synthesize. The
+   2026-07-14 verification was `kill -9` locally, which doesn't
+   simulate an ephemeral-filesystem wipe. Fix: (a) new
+   `AARVA_TTS_SCRATCH_DIR` env var pointing at `/data/tts_scratch/`
+   on Render (scratch is bounded to ~30 MB per in-flight edition,
+   cleaned on success — fits comfortably in the ~700 MB headroom
+   on the 1 GB disk); (b) stream-concat replaces the
+   `section_pcms` + `combined` two-list buffering that was causing
+   the concat-time OOM in the first place, cutting peak RAM by ~60
+   MB; (c) `AARVA_WORKER_DISABLED` env-var gate at `start_worker`
+   as a one-click operator kill switch for future regressions.
+   Verification must include an ephemeral-fs simulation
+   (`shutil.rmtree` the "audio_dir" between runs while leaving the
+   `/data` scratch alone), not just `kill -9` — that oversight is
+   what let the 2026-07-14 fix ship broken. Partially closes item
+   3 above by removing concat-time buffering as the OOM culprit;
+   remaining per-step RSS profiling still open.
+
 ---
 
 ## Deferred — to return to (in priority order)
@@ -127,9 +154,39 @@ the sequence.
 
 ---
 
-## Recently completed (2026-06-29 → 2026-08-20)
+## Recently completed (2026-06-29 → 2026-09-26)
 
 Most recent first.
+
+### 2026-09-26
+
+- **Fix: Gemini TTS chunk synthesis could hang forever with no
+  timeout.** Real production incident: today's daily run got stuck
+  in Stage 9 on the same chunk of the same article across multiple
+  restarts. Diagnosis: the stuck process's socket to Google's infra
+  showed `CLOSE_WAIT` (the server had already closed its side; the
+  client was still blocked waiting to read) — `GeminiTTSClient`
+  (`aarva/clients/tts.py`) never set an HTTP timeout on its
+  `genai.Client`, so a stalled connection blocked indefinitely
+  instead of raising and letting the existing retry-with-backoff
+  logic in `_synthesize_chunk` actually run. Every OTHER TTS backend
+  in the same file (`ChatterboxClient`, `MacSayClient`,
+  `PiperClient`) already had a `timeout_seconds` guard — Gemini,
+  the one actually in production use, was the one gap.
+  - New `request_timeout_seconds` (default 120s — generous headroom
+    over the ~25-60s a normal chunk takes per real production logs)
+    threaded through `build_tts_client()` → `GeminiTTSClient.__init__`
+    → `genai.types.HttpOptions(timeout=...)` passed to `genai.Client`
+    on both the ADC/Vertex and api_key auth paths. `HttpOptions.timeout`
+    is in milliseconds — verified against the installed SDK's actual
+    field, not assumed. Configurable via `tts.request_timeout_seconds`
+    in `pipeline.yaml`.
+  - 5 new tests confirming the config default/override flows through
+    and that the millisecond conversion is correct on both auth paths
+    (genai.Client mocked — no real network calls). Repo total: 181.
+  - Verified for real: constructed a real `GeminiTTSClient` against
+    real ADC credentials and confirmed `_load()` succeeds with the
+    timeout wired through end-to-end.
 
 ### 2026-08-20
 
