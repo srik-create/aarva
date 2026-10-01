@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Thu, 01 Oct 2026 00:44:45 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 01 Oct 2026 20:40:49 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,56 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Reason is more than a tool</title>
+      <itunes:title>Reason is more than a tool</itunes:title>
+      <link>https://aeon.co/essays/why-real-intelligence-is-something-more-than-optimisation</link>
+      <description><![CDATA[<em>If a machine can find the fastest route, who decides if the destination is worth reaching?</em><br/><br/>When computer scientists define intelligence simply as the ability to optimize toward a goal, they quietly revive an old argument about human nature. In an essay published on 1 October 2026, the writer asks what happens to freedom when a society accepts this mechanical definition. If a culture builds its foundation entirely on efficiency and metrics, people might forget how to ask if their goals are actually worth pursuing. The piece suggests the real threat of artificial intelligence goes beyond rogue machines, pointing instead to humans treating themselves as nothing more than tools.<br/><br/>An examination of how defining intelligence as optimization revives an old philosophical dispute over the purpose of reason. Contrasts David Hume’s view of the mind as a calculating tool with Immanuel Kant’s defense of moral autonomy to outline the danger of applying mechanical standards to human thought. Argues that reducing reason to mere problem-solving erodes the human capacity to judge which goals are worth pursuing.<br/><br/>Read at source: <a href="https://aeon.co/essays/why-real-intelligence-is-something-more-than-optimisation">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a machine can find the fastest route, who decides if the destination is worth reaching?</em><br/><br/>When computer scientists define intelligence simply as the ability to optimize toward a goal, they quietly revive an old argument about human nature. In an essay published on 1 October 2026, the writer asks what happens to freedom when a society accepts this mechanical definition. If a culture builds its foundation entirely on efficiency and metrics, people might forget how to ask if their goals are actually worth pursuing. The piece suggests the real threat of artificial intelligence goes beyond rogue machines, pointing instead to humans treating themselves as nothing more than tools.<br/><br/>An examination of how defining intelligence as optimization revives an old philosophical dispute over the purpose of reason. Contrasts David Hume’s view of the mind as a calculating tool with Immanuel Kant’s defense of moral autonomy to outline the danger of applying mechanical standards to human thought. Argues that reducing reason to mere problem-solving erodes the human capacity to judge which goals are worth pursuing.<br/><br/>Read at source: <a href="https://aeon.co/essays/why-real-intelligence-is-something-more-than-optimisation">Aeon</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a machine can find the fastest route, who decides if the destination is worth reaching?
+
+When computer scientists define intelligence simply as the ability to optimize toward a goal, they quietly revive an old argument about human nature. In an essay published on 1 October 2026, the writer asks what happens to freedom when a society accepts this mechanical definition. If a culture builds its foundation entirely on efficiency and metrics, people might forget how to ask if their goals are actually worth pursuing. The piece suggests the real threat of artificial intelligence goes beyond rogue machines, pointing instead to humans treating themselves as nothing more than tools.
+
+An examination of how defining intelligence as optimization revives an old philosophical dispute over the purpose of reason. Contrasts David Hume’s view of the mind as a calculating tool with Immanuel Kant’s defense of moral autonomy to outline the danger of applying mechanical standards to human thought. Argues that reducing reason to mere problem-solving erodes the human capacity to judge which goals are worth pursuing.
+
+Read at source: Aeon
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 01 Oct 2026 15:59:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-231-22345</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-01/article_22345.mp3" length="13204845" type="audio/mpeg"/>
+      <itunes:duration>27:31</itunes:duration>
+      <itunes:author>Sasha Mudd</itunes:author>
+      <itunes:subtitle>Aeon</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The human frequency</title>
+      <itunes:title>The human frequency</itunes:title>
+      <link>https://psyche.co/portraits/dj-william-goldsmith-on-the-human-art-of-internet-radio</link>
+      <description><![CDATA[<em>If a machine can build a playlist in seconds, why spend decades mixing one by hand?</em><br/><br/>Streaming services absorb a hundred thousand new tracks every day, instantly sorting and serving them through automated algorithms. But this essay from Psyche, published on 31 August 2026, pauses on a single internet radio station run by one man in a desert RV, who sequences songs entirely by ear. The story asks a quiet question about modern media: as software optimizes the background noise of daily life, why do listeners still crave the friction and emotional logic of human taste?<br/><br/>A profile of William Goldsmith and Radio Paradise, the internet radio station he launched in 2000 as a human alternative to algorithmic playlists. Goldsmith sequences tracks by musical key to build seamless transitions across genres, relying on his own ear rather than automated software. The station operates entirely on a listener-funded model, keeping the broadcast commercial-free for nearly a quarter century.<br/><br/>Read at source: <a href="https://psyche.co/portraits/dj-william-goldsmith-on-the-human-art-of-internet-radio">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a machine can build a playlist in seconds, why spend decades mixing one by hand?</em><br/><br/>Streaming services absorb a hundred thousand new tracks every day, instantly sorting and serving them through automated algorithms. But this essay from Psyche, published on 31 August 2026, pauses on a single internet radio station run by one man in a desert RV, who sequences songs entirely by ear. The story asks a quiet question about modern media: as software optimizes the background noise of daily life, why do listeners still crave the friction and emotional logic of human taste?<br/><br/>A profile of William Goldsmith and Radio Paradise, the internet radio station he launched in 2000 as a human alternative to algorithmic playlists. Goldsmith sequences tracks by musical key to build seamless transitions across genres, relying on his own ear rather than automated software. The station operates entirely on a listener-funded model, keeping the broadcast commercial-free for nearly a quarter century.<br/><br/>Read at source: <a href="https://psyche.co/portraits/dj-william-goldsmith-on-the-human-art-of-internet-radio">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a machine can build a playlist in seconds, why spend decades mixing one by hand?
+
+Streaming services absorb a hundred thousand new tracks every day, instantly sorting and serving them through automated algorithms. But this essay from Psyche, published on 31 August 2026, pauses on a single internet radio station run by one man in a desert RV, who sequences songs entirely by ear. The story asks a quiet question about modern media: as software optimizes the background noise of daily life, why do listeners still crave the friction and emotional logic of human taste?
+
+A profile of William Goldsmith and Radio Paradise, the internet radio station he launched in 2000 as a human alternative to algorithmic playlists. Goldsmith sequences tracks by musical key to build seamless transitions across genres, relying on his own ear rather than automated software. The station operates entirely on a listener-funded model, keeping the broadcast commercial-free for nearly a quarter century.
+
+Read at source: Psyche
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 01 Oct 2026 15:59:14 +0000</pubDate>
+      <guid isPermaLink="false">aarva-231-16624</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-01/article_16624.mp3" length="14903853" type="audio/mpeg"/>
+      <itunes:duration>31:03</itunes:duration>
+      <itunes:author>Greg Easley</itunes:author>
+      <itunes:subtitle>Psyche</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: military obedience and democracy</title>
       <itunes:title>Crosscut: military obedience and democracy</itunes:title>
