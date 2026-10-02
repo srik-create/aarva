@@ -97,6 +97,26 @@ GitHub Pages.
    3 above by removing concat-time buffering as the OOM culprit;
    remaining per-step RSS profiling still open.
 
+5. **GH Pages publish strips MP3s (`scripts/publish.sh`) — active.**
+   2026-10-02: `pages-build-deployment` workflow run `37040408038`
+   failed with "Timeout reached, aborting!" downstream of the yellow
+   warning "Uploaded artifact size of 6021471459 bytes exceeds the
+   allowed size of 1 GB." The gh-pages tree had accumulated 5.69 GB
+   across 776 MP3s (crossing the 1 GB cap sometime between 2026-06-11
+   and 2026-07-03 — probably marginal uploads succeeded for months
+   until today tipped over the timeout). MP3s on gh-pages are dead
+   weight: audio has been served from R2 (`audio.aarva.app`,
+   `pipeline.yaml:721`) since the R2 cutover; `feed.xml`'s enclosures
+   point there. The leak is `scripts/publish.sh:47-50`, which still
+   `rsync`'d MP3s into the gh-pages worktree on every publish.
+   Fix: (a) one-off cleanup commit on gh-pages (`git rm -rf audio
+   output/audio`) to unblock today's deploy; (b)
+   `publish-strip-mp3s` branch removes the MP3 rsync block from
+   `publish.sh` so the leak doesn't restart. aarva.app itself was
+   unaffected throughout — it's Render-served, independent of GH
+   Pages — but the podcast feed served from GH Pages was stuck on
+   whichever older deploy was the last to squeak under the timeout.
+
 ---
 
 ## Deferred — to return to (in priority order)

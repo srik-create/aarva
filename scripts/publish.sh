@@ -39,15 +39,20 @@ cd "$PROJECT_ROOT"
 # Sync output directory into the worktree, preserving the "output/" prefix
 # because the URLs stored in edition_pieces.audio_url and the feed include
 # "output/" — keeping the directory structure aligned avoids 404s.
-mkdir -p "$WORKTREE/output/web" "$WORKTREE/output/audio"
+mkdir -p "$WORKTREE/output/web"
 
 # Copy HTML pages
 rsync -a --delete aarva/output/web/ "$WORKTREE/output/web/"
 
-# Copy audio (MP3s only — WAVs are archival originals, not published)
-rsync -a --delete \
-    --include="*/" --include="*.mp3" --exclude="*" \
-    aarva/output/audio/ "$WORKTREE/output/audio/"
+# NOTE: MP3s are no longer copied to gh-pages. Audio is served from R2
+# (https://audio.aarva.app/output/audio/...), referenced directly by
+# feed.xml's <enclosure url=...> and the HTML pages. The MP3 rsync here
+# was a holdover from when GH Pages hosted audio; by 2026-10 it had
+# accumulated ~5.7 GB / 776 MP3s on the gh-pages tree and tipped the
+# branch over GitHub Pages' 1 GB artifact deployment cap, causing the
+# `pages-build-deployment` workflow to time out (observed 2026-10-02 —
+# see docs/roadmap.md). A one-off cleanup commit removed the historical
+# MP3s from the gh-pages tree; this change prevents them from coming back.
 
 # Copy RSS feed
 cp aarva/output/feed.xml "$WORKTREE/feed.xml"
