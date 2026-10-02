@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Friday, 02 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-02</div>
+      <div class="edition-meta">5 pieces · Friday, 02 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Why doesn&#x27;t a table act like the quantum waves it&#x27;s made of?</p>
+        <h2 class="title">Where Does the Quantum World End and Ours Begin?</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Steven Strogatz and Janna Levin</span>
+        </p>
+        <p class="contextualisation">Quantum mechanics works flawlessly in a lab, yet its strange rules vanish completely in daily life. In an interview published on 17 September 2026, physicist Jonathan Halliwell sits down with Quanta Magazine to trace the exact boundary where a fragile microscopic state turns into a solid object, like a table or the moon. The conversation bypasses the heavy math to ask a stubborn question. Why does the universe hide its strangest mechanics from plain sight, and what happens when a scientist decides to just sit with the mystery?</p>
+        <p class='show-notes'>An overview of how the wave-like behavior of quantum systems transitions into the solid objects of the macroscopic world. The discussion explains the process of decoherence, showing how interactions with the environment disperse fragile quantum states without the need for a conscious observer. It also covers tests of macroscopic realism and the value of accepting multiple perspectives when facing scientific uncertainty.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-02/article_19858.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>52 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/where-does-the-quantum-world-end-and-ours-begin-20260917/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">What happens when the only doctor with the patience to keep looking is a machine?</p>
+        <h2 class="title">Our AI Midwife</h2>
+        <p class="byline">
+          <span class="publication">Astral Codex Ten</span>
+          <span class='sep'>·</span><span>Scott Alexander</span>
+        </p>
+        <p class="contextualisation">After six years of failed fertility treatments, Drew Housman and his wife hit a wall with their doctors. Writing on 2 October 2026, he explains how they turned to a chatbot instead, prompting the software to act like a television doctor. The result is a surprisingly competent diagnostician who catches something the specialists missed. The story pauses on a strange modern tension. Public debate treats artificial intelligence as a looming threat, while regular people are quietly using it to solve the most intimate human problems imaginable.</p>
+        <p class='show-notes'>A firsthand account of using ChatGPT to diagnose a six-year case of unexplained infertility. By prompting the language model to roleplay as a television doctor, a couple bypassed its safety filters and identified a uterine tumor their human specialists had missed. The story contrasts this practical use of the technology with the rising public anxiety surrounding artificial intelligence.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-02/article_22552.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.astralcodexten.com/p/our-ai-midwife' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">What makes your skin smell like a perfect meal to one mosquito, but not another?</p>
+        <h2 class="title">Mosquitoes are picky eaters – we studied 3 common South Florida species to learn why they like some people more than others</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Matthew DeGennaro, Associate Professor of Biological Sciences, Florida International University</span>
+        </p>
+        <p class="contextualisation">A plastic box sits in a Florida lab, dividing a bare human arm from a swarm of hungry mosquitoes. Writing on 4 September 2026, a team of biologists uses that setup to answer a familiar backyard question. Why do some people get eaten alive while others walk away without a scratch? The answer comes down to microscopic skin bacteria and reveals a surprising twist. Different mosquito species have completely different appetites, meaning the universal mosquito magnet might just be a myth.</p>
+        <p class='show-notes'>A study of how three common mosquito species choose which humans to bite, based on lab tests with 119 participants. Researchers collected skin odors and swabbed for bacteria to identify the specific microbes that attract or repel each species. The findings show that different mosquitoes prefer different scents, meaning no single person acts as a universal magnet for all types.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-02/article_17515.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/mosquitoes-are-picky-eaters-we-studied-3-common-south-florida-species-to-learn-why-they-like-some-people-more-than-others-289647' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">What does it cost to notice every single thing that is out of place?</p>
+        <h2 class="title">Mr. Monk And The Unfinished Book</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Sabrina Imbler</span>
+        </p>
+        <p class="contextualisation">Editing a book requires an obsessive attention to detail that can easily tip into madness. Writing for Defector on 2 October 2026, the author finds an unexpected lifeline for the grueling final days of manuscript revision: the comforting predictability of the 2000s television show Monk. The piece circles a surprisingly heavy question for a tribute to a lighthearted procedural. What is the psychological toll of trying to fix every tiny flaw in your own work, and when do you simply walk away?</p>
+        <p class='show-notes'>A reflection on the obsessive work of editing a book, built around a rewatch of the television show Monk. The author compares the detective&#x27;s compulsive attention to detail with the process of revising a manuscript, showing how both require resisting easy but false conclusions. The comparison weighs the mental toll of this extreme focus against the relief of finally accepting an imperfect finish.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-02/article_22718.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/mr-monk-and-the-unfinished-book' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
