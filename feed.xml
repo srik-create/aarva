@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Sun, 04 Oct 2026 19:20:04 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 Oct 2026 23:41:53 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,170 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: fighting mosquito diseases</title>
+      <itunes:title>Crosscut: fighting mosquito diseases</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-10-05.html</link>
+      <description><![CDATA[When a mosquito lands on an arm, the instinct is to swat it. But stopping disease-carrying insects across whole populations reveals a sharp divide in human ambition. A recent report in *The Hindu* follows a project in Kerala, where scientists feed weather data into machine learning models to predict dengue outbreaks. The goal is adaptation, giving local officials time to prepare. Maya Rosen, writing in *Works in Progress*, looks at the same insect and asks why anyone should settle for managing it. She argues for using genetic engineering to wipe out the species completely. Putting these approaches side by side presents a striking choice: learn to outsmart a natural threat, or erase it entirely.<br/><br/><em>Watching scientists in Kerala feed six years of rainfall and temperature data into a computer leaves a distinct impression. The first piece shows immense cleverness, but it operates on a quiet premise: the Aedes mosquito is a permanent fact of life. A health department can build a brilliant early warning system to predict the next dengue outbreak, but people ultimately have to live with the bug.
+
+Turning to Maya Rosen, that exact assumption gets thrown out the window. Rosen looks at the rising number of dengue cases in places like Florida and Puerto Rico and refuses to accept adaptation as the only path. Instead of tracking where mosquitoes will breed, she points to genetic engineering—releasing modified males to ensure the next generation of biting females never survives to adulthood.
+
+Read alongside the forecasting models in Kerala, Rosen’s piece changes the scale of the solution. Both pieces share the same anxiety about warm weather making these diseases harder to contain. But where the first piece treats the insect as a permanent hazard to be managed, Rosen treats its existence as a policy choice. The interesting thing is watching the focus shift from how to safely share a habitat with a deadly pest, to whether to erase it entirely.</em><br/><br/>What lingers after hearing about the clinics in Kerala and the labs editing insect DNA is a basic divide in how humans handle a natural threat. One path uses weather data to track the rain and predict the swarm. The other path seeks to erase the mosquito from the sky entirely. It leaves behind a quiet tension between managing a danger and destroying it. When a tiny insect carries a deadly fever, is it wiser to learn its rhythms and step out of the way, or to rewrite its biology so it never hatches at all?<br/><br/>Sources:<br/><a href="https://www.thehindu.com/news/national/kerala/iav-develops-dengue-early-warning-system-to-forecast-dengue-trends/article71512981.ece">The Hindu: Scientists at IAV, Keralam develop dengue early warning system to forecast trends</a><br/><a href="https://www.worksinprogress.news/p/you-can-just-eradicate-things">Works in Progress: Mosquitoes are a choice</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[When a mosquito lands on an arm, the instinct is to swat it. But stopping disease-carrying insects across whole populations reveals a sharp divide in human ambition. A recent report in *The Hindu* follows a project in Kerala, where scientists feed weather data into machine learning models to predict dengue outbreaks. The goal is adaptation, giving local officials time to prepare. Maya Rosen, writing in *Works in Progress*, looks at the same insect and asks why anyone should settle for managing it. She argues for using genetic engineering to wipe out the species completely. Putting these approaches side by side presents a striking choice: learn to outsmart a natural threat, or erase it entirely.<br/><br/><em>Watching scientists in Kerala feed six years of rainfall and temperature data into a computer leaves a distinct impression. The first piece shows immense cleverness, but it operates on a quiet premise: the Aedes mosquito is a permanent fact of life. A health department can build a brilliant early warning system to predict the next dengue outbreak, but people ultimately have to live with the bug.
+
+Turning to Maya Rosen, that exact assumption gets thrown out the window. Rosen looks at the rising number of dengue cases in places like Florida and Puerto Rico and refuses to accept adaptation as the only path. Instead of tracking where mosquitoes will breed, she points to genetic engineering—releasing modified males to ensure the next generation of biting females never survives to adulthood.
+
+Read alongside the forecasting models in Kerala, Rosen’s piece changes the scale of the solution. Both pieces share the same anxiety about warm weather making these diseases harder to contain. But where the first piece treats the insect as a permanent hazard to be managed, Rosen treats its existence as a policy choice. The interesting thing is watching the focus shift from how to safely share a habitat with a deadly pest, to whether to erase it entirely.</em><br/><br/>What lingers after hearing about the clinics in Kerala and the labs editing insect DNA is a basic divide in how humans handle a natural threat. One path uses weather data to track the rain and predict the swarm. The other path seeks to erase the mosquito from the sky entirely. It leaves behind a quiet tension between managing a danger and destroying it. When a tiny insect carries a deadly fever, is it wiser to learn its rhythms and step out of the way, or to rewrite its biology so it never hatches at all?<br/><br/>Sources:<br/><a href="https://www.thehindu.com/news/national/kerala/iav-develops-dengue-early-warning-system-to-forecast-dengue-trends/article71512981.ece">The Hindu: Scientists at IAV, Keralam develop dengue early warning system to forecast trends</a><br/><a href="https://www.worksinprogress.news/p/you-can-just-eradicate-things">Works in Progress: Mosquitoes are a choice</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When a mosquito lands on an arm, the instinct is to swat it. But stopping disease-carrying insects across whole populations reveals a sharp divide in human ambition. A recent report in *The Hindu* follows a project in Kerala, where scientists feed weather data into machine learning models to predict dengue outbreaks. The goal is adaptation, giving local officials time to prepare. Maya Rosen, writing in *Works in Progress*, looks at the same insect and asks why anyone should settle for managing it. She argues for using genetic engineering to wipe out the species completely. Putting these approaches side by side presents a striking choice: learn to outsmart a natural threat, or erase it entirely.
+
+Watching scientists in Kerala feed six years of rainfall and temperature data into a computer leaves a distinct impression. The first piece shows immense cleverness, but it operates on a quiet premise: the Aedes mosquito is a permanent fact of life. A health department can build a brilliant early warning system to predict the next dengue outbreak, but people ultimately have to live with the bug.
+
+Turning to Maya Rosen, that exact assumption gets thrown out the window. Rosen looks at the rising number of dengue cases in places like Florida and Puerto Rico and refuses to accept adaptation as the only path. Instead of tracking where mosquitoes will breed, she points to genetic engineering—releasing modified males to ensure the next generation of biting females never survives to adulthood.
+
+Read alongside the forecasting models in Kerala, Rosen’s piece changes the scale of the solution. Both pieces share the same anxiety about warm weather making these diseases harder to contain. But where the first piece treats the insect as a permanent hazard to be managed, Rosen treats its existence as a policy choice. The interesting thing is watching the focus shift from how to safely share a habitat with a deadly pest, to whether to erase it entirely.
+
+What lingers after hearing about the clinics in Kerala and the labs editing insect DNA is a basic divide in how humans handle a natural threat. One path uses weather data to track the rain and predict the swarm. The other path seeks to erase the mosquito from the sky entirely. It leaves behind a quiet tension between managing a danger and destroying it. When a tiny insect carries a deadly fever, is it wiser to learn its rhythms and step out of the way, or to rewrite its biology so it never hatches at all?
+
+Sources:
+The Hindu: Scientists at IAV, Keralam develop dengue early warning system to forecast trends
+Works in Progress: Mosquitoes are a choice
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 22:50:03 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-240</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/crosscut_0240.mp3" length="11290221" type="audio/mpeg"/>
+      <itunes:duration>23:31</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · fighting mosquito diseases</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The AI-Assisted Strategic Own Goal in the Kill Chain</title>
+      <itunes:title>The AI-Assisted Strategic Own Goal in the Kill Chain</itunes:title>
+      <link>https://warontherocks.com/cogs-of-war/the-ai-assisted-strategic-own-goal-in-the-kill-chain/</link>
+      <description><![CDATA[<em>If a machine picks a target in seconds, who decides if the strike is actually wise?</em><br/><br/>Writing on 5 October 2026, Dan Summers asks a question military planners are struggling to answer. What happens when artificial intelligence generates bombing targets faster than humans can review them? The problem isn&#x27;t just whether a computer can follow the laws of war. It is whether a machine can weigh the political fallout of a strike, or understand when to hold fire to protect a fragile ceasefire. Automation is speeding up the battlefield, leaving a deeply human problem in its wake: how to keep actual people in control of the decision to take a life.<br/><br/>An analysis of how artificial intelligence is accelerating military targeting and threatening the human oversight that governs democratic warfare. The author outlines how defense ministries can use AI to strengthen human judgment rather than replace it, such as programming algorithms to challenge strike recommendations. Closes with four policy steps to ensure commanders retain final accountability over lethal force.<br/><br/>Read at source: <a href="https://warontherocks.com/cogs-of-war/the-ai-assisted-strategic-own-goal-in-the-kill-chain/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a machine picks a target in seconds, who decides if the strike is actually wise?</em><br/><br/>Writing on 5 October 2026, Dan Summers asks a question military planners are struggling to answer. What happens when artificial intelligence generates bombing targets faster than humans can review them? The problem isn&#x27;t just whether a computer can follow the laws of war. It is whether a machine can weigh the political fallout of a strike, or understand when to hold fire to protect a fragile ceasefire. Automation is speeding up the battlefield, leaving a deeply human problem in its wake: how to keep actual people in control of the decision to take a life.<br/><br/>An analysis of how artificial intelligence is accelerating military targeting and threatening the human oversight that governs democratic warfare. The author outlines how defense ministries can use AI to strengthen human judgment rather than replace it, such as programming algorithms to challenge strike recommendations. Closes with four policy steps to ensure commanders retain final accountability over lethal force.<br/><br/>Read at source: <a href="https://warontherocks.com/cogs-of-war/the-ai-assisted-strategic-own-goal-in-the-kill-chain/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a machine picks a target in seconds, who decides if the strike is actually wise?
+
+Writing on 5 October 2026, Dan Summers asks a question military planners are struggling to answer. What happens when artificial intelligence generates bombing targets faster than humans can review them? The problem isn&#x27;t just whether a computer can follow the laws of war. It is whether a machine can weigh the political fallout of a strike, or understand when to hold fire to protect a fragile ceasefire. Automation is speeding up the battlefield, leaving a deeply human problem in its wake: how to keep actual people in control of the decision to take a life.
+
+An analysis of how artificial intelligence is accelerating military targeting and threatening the human oversight that governs democratic warfare. The author outlines how defense ministries can use AI to strengthen human judgment rather than replace it, such as programming algorithms to challenge strike recommendations. Closes with four policy steps to ensure commanders retain final accountability over lethal force.
+
+Read at source: War on the Rocks
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 19:22:26 +0000</pubDate>
+      <guid isPermaLink="false">aarva-239-23006</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/article_23006.mp3" length="8177709" type="audio/mpeg"/>
+      <itunes:duration>17:02</itunes:duration>
+      <itunes:author>Dan Summers</itunes:author>
+      <itunes:subtitle>War on the Rocks</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Is AI the End of Math As We Know It?</title>
+      <itunes:title>Is AI the End of Math As We Know It?</itunes:title>
+      <link>https://www.quantamagazine.org/is-ai-the-end-of-math-as-we-know-it-20261005/</link>
+      <description><![CDATA[<em>When a machine skips straight to the answer, who is left to understand the math?</em><br/><br/>When artificial intelligence models began spitting out solutions to decades-old conjectures, the public cheered. But inside university classrooms, the mood was closer to grief. Published on 5 October 2026, the piece pauses on a question the tech industry rarely asks: what is mathematics actually for? If the discipline is merely about finding correct answers, the machines have already won. But if math is really about the human struggle to understand how an answer works, an entire academic field must now reinvent itself to survive.<br/><br/>A report on how artificial intelligence is breaking the academic structure of pure mathematics by automating the proof of complex theorems. Because the discipline bases its career incentives on problem-solving, the arrival of machine-generated answers has triggered a professional crisis. Through interviews with researchers and students, the reporting outlines how mathematicians are trying to shift their focus from generating answers to interpreting them.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/is-ai-the-end-of-math-as-we-know-it-20261005/">Quanta Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When a machine skips straight to the answer, who is left to understand the math?</em><br/><br/>When artificial intelligence models began spitting out solutions to decades-old conjectures, the public cheered. But inside university classrooms, the mood was closer to grief. Published on 5 October 2026, the piece pauses on a question the tech industry rarely asks: what is mathematics actually for? If the discipline is merely about finding correct answers, the machines have already won. But if math is really about the human struggle to understand how an answer works, an entire academic field must now reinvent itself to survive.<br/><br/>A report on how artificial intelligence is breaking the academic structure of pure mathematics by automating the proof of complex theorems. Because the discipline bases its career incentives on problem-solving, the arrival of machine-generated answers has triggered a professional crisis. Through interviews with researchers and students, the reporting outlines how mathematicians are trying to shift their focus from generating answers to interpreting them.<br/><br/>Read at source: <a href="https://www.quantamagazine.org/is-ai-the-end-of-math-as-we-know-it-20261005/">Quanta Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When a machine skips straight to the answer, who is left to understand the math?
+
+When artificial intelligence models began spitting out solutions to decades-old conjectures, the public cheered. But inside university classrooms, the mood was closer to grief. Published on 5 October 2026, the piece pauses on a question the tech industry rarely asks: what is mathematics actually for? If the discipline is merely about finding correct answers, the machines have already won. But if math is really about the human struggle to understand how an answer works, an entire academic field must now reinvent itself to survive.
+
+A report on how artificial intelligence is breaking the academic structure of pure mathematics by automating the proof of complex theorems. Because the discipline bases its career incentives on problem-solving, the arrival of machine-generated answers has triggered a professional crisis. Through interviews with researchers and students, the reporting outlines how mathematicians are trying to shift their focus from generating answers to interpreting them.
+
+Read at source: Quanta Magazine
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 19:22:26 +0000</pubDate>
+      <guid isPermaLink="false">aarva-239-23023</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/article_23023.mp3" length="8833389" type="audio/mpeg"/>
+      <itunes:duration>18:24</itunes:duration>
+      <itunes:author>Jordana Cepelewicz</itunes:author>
+      <itunes:subtitle>Quanta Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Why long-brewing physical and mental breakdowns feel so sudden</title>
+      <itunes:title>Why long-brewing physical and mental breakdowns feel so sudden</itunes:title>
+      <link>https://psyche.co/ideas/why-long-brewing-physical-and-mental-breakdowns-feel-so-sudden</link>
+      <description><![CDATA[<em>When a breakdown feels sudden, how long had the body been quietly holding itself together?</em><br/><br/>Collapse almost never happens overnight, a biological reality that anchors this essay published on 1 October 2026. Whether a tumor is growing silently or a stressed student is pushing toward burnout, living systems are remarkably good at hiding their own strain. The piece pauses on an unsettling idea. The daily habits society often praises as extreme discipline or resilience might actually be the early, invisible signs of a body running out of ways to compensate.<br/><br/>An explanation of why physical and mental breakdowns often appear sudden when they are actually the result of long-accumulating strain. Using examples from neuroscience and clinical practice, the author details how living systems absorb damage by redistributing their workloads to maintain outward stability. These hidden adaptations mask the signs of failure in both tumor growth and chronic stress until the system finally crosses a critical threshold.<br/><br/>Read at source: <a href="https://psyche.co/ideas/why-long-brewing-physical-and-mental-breakdowns-feel-so-sudden">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When a breakdown feels sudden, how long had the body been quietly holding itself together?</em><br/><br/>Collapse almost never happens overnight, a biological reality that anchors this essay published on 1 October 2026. Whether a tumor is growing silently or a stressed student is pushing toward burnout, living systems are remarkably good at hiding their own strain. The piece pauses on an unsettling idea. The daily habits society often praises as extreme discipline or resilience might actually be the early, invisible signs of a body running out of ways to compensate.<br/><br/>An explanation of why physical and mental breakdowns often appear sudden when they are actually the result of long-accumulating strain. Using examples from neuroscience and clinical practice, the author details how living systems absorb damage by redistributing their workloads to maintain outward stability. These hidden adaptations mask the signs of failure in both tumor growth and chronic stress until the system finally crosses a critical threshold.<br/><br/>Read at source: <a href="https://psyche.co/ideas/why-long-brewing-physical-and-mental-breakdowns-feel-so-sudden">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When a breakdown feels sudden, how long had the body been quietly holding itself together?
+
+Collapse almost never happens overnight, a biological reality that anchors this essay published on 1 October 2026. Whether a tumor is growing silently or a stressed student is pushing toward burnout, living systems are remarkably good at hiding their own strain. The piece pauses on an unsettling idea. The daily habits society often praises as extreme discipline or resilience might actually be the early, invisible signs of a body running out of ways to compensate.
+
+An explanation of why physical and mental breakdowns often appear sudden when they are actually the result of long-accumulating strain. Using examples from neuroscience and clinical practice, the author details how living systems absorb damage by redistributing their workloads to maintain outward stability. These hidden adaptations mask the signs of failure in both tumor growth and chronic stress until the system finally crosses a critical threshold.
+
+Read at source: Psyche
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 19:22:26 +0000</pubDate>
+      <guid isPermaLink="false">aarva-239-22346</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/article_22346.mp3" length="6550125" type="audio/mpeg"/>
+      <itunes:duration>13:39</itunes:duration>
+      <itunes:author>Sasi S Senga</itunes:author>
+      <itunes:subtitle>Psyche</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Case Against Exceptionalism</title>
+      <itunes:title>The Case Against Exceptionalism</itunes:title>
+      <link>https://defector.com/the-case-against-exceptionalism</link>
+      <description><![CDATA[<em>How much of a life can a family trade away for an Ivy League acceptance letter?</em><br/><br/>Writing on 5 October 2026, the reviewer uses Min Jin Lee’s newest novel to question a brutal survival strategy. The essay looks at the culture of after-school cram academies, where extreme academic pressure often fractures immigrant families. But the most interesting thread covers the act of criticism itself. For years, Korean-American art was so rare that critics felt obligated to praise every new release just to keep the door open. Today, there is finally enough art out there that a writer can simply tell the truth about a book.<br/><br/>A review of Min Jin Lee’s new novel, American Hagwon, focusing on its portrayal of Korean cram schools and the human toll of academic striving. Evaluates the book&#x27;s sprawling narrative structure and its place within Lee’s larger series on immigrant life. The critique also examines how the global boom in Korean media allows readers to judge the book as literature rather than a rare symbol of representation.<br/><br/>Read at source: <a href="https://defector.com/the-case-against-exceptionalism">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How much of a life can a family trade away for an Ivy League acceptance letter?</em><br/><br/>Writing on 5 October 2026, the reviewer uses Min Jin Lee’s newest novel to question a brutal survival strategy. The essay looks at the culture of after-school cram academies, where extreme academic pressure often fractures immigrant families. But the most interesting thread covers the act of criticism itself. For years, Korean-American art was so rare that critics felt obligated to praise every new release just to keep the door open. Today, there is finally enough art out there that a writer can simply tell the truth about a book.<br/><br/>A review of Min Jin Lee’s new novel, American Hagwon, focusing on its portrayal of Korean cram schools and the human toll of academic striving. Evaluates the book&#x27;s sprawling narrative structure and its place within Lee’s larger series on immigrant life. The critique also examines how the global boom in Korean media allows readers to judge the book as literature rather than a rare symbol of representation.<br/><br/>Read at source: <a href="https://defector.com/the-case-against-exceptionalism">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How much of a life can a family trade away for an Ivy League acceptance letter?
+
+Writing on 5 October 2026, the reviewer uses Min Jin Lee’s newest novel to question a brutal survival strategy. The essay looks at the culture of after-school cram academies, where extreme academic pressure often fractures immigrant families. But the most interesting thread covers the act of criticism itself. For years, Korean-American art was so rare that critics felt obligated to praise every new release just to keep the door open. Today, there is finally enough art out there that a writer can simply tell the truth about a book.
+
+A review of Min Jin Lee’s new novel, American Hagwon, focusing on its portrayal of Korean cram schools and the human toll of academic striving. Evaluates the book&#x27;s sprawling narrative structure and its place within Lee’s larger series on immigrant life. The critique also examines how the global boom in Korean media allows readers to judge the book as literature rather than a rare symbol of representation.
+
+Read at source: Defector
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 19:22:26 +0000</pubDate>
+      <guid isPermaLink="false">aarva-239-23194</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/article_23194.mp3" length="6609837" type="audio/mpeg"/>
+      <itunes:duration>13:46</itunes:duration>
+      <itunes:author>Alex Sujong Laughlin</itunes:author>
+      <itunes:subtitle>Defector</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Lessons for the 21st century from a 200-year-old book by ‘Frankenstein’ author Mary Shelley</title>
+      <itunes:title>Lessons for the 21st century from a 200-year-old book by ‘Frankenstein’ author Mary Shelley</itunes:title>
+      <link>https://theconversation.com/lessons-for-the-21st-century-from-a-200-year-old-book-by-frankenstein-author-mary-shelley-291926</link>
+      <description><![CDATA[<em>How did a private diary of grief become a story about the end of the world?</em><br/><br/>Mary Shelley wrote her second science fiction novel after losing her husband and three of her children. Published on 23 September 2026, the essay asks what a two-hundred-year-old story about a global plague reveals about modern crises. The central question is how private grief scales into a warning about human extinction. It wonders how a story ending with a single survivor drifting on a ruined planet still manages to offer a practical model for facing environmental disasters.<br/><br/>An overview of Mary Shelley&#x27;s 1826 novel &quot;The Last Man,&quot; a story of a global plague that helped establish the genre of postapocalyptic fiction. The author outlines the book&#x27;s three-part plot and uses Shelley&#x27;s private diaries to trace the story&#x27;s origins in her personal grief. The analysis shows how a 200-year-old text anticipates modern fears about extreme weather, pandemics, and political failure.<br/><br/>Read at source: <a href="https://theconversation.com/lessons-for-the-21st-century-from-a-200-year-old-book-by-frankenstein-author-mary-shelley-291926">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How did a private diary of grief become a story about the end of the world?</em><br/><br/>Mary Shelley wrote her second science fiction novel after losing her husband and three of her children. Published on 23 September 2026, the essay asks what a two-hundred-year-old story about a global plague reveals about modern crises. The central question is how private grief scales into a warning about human extinction. It wonders how a story ending with a single survivor drifting on a ruined planet still manages to offer a practical model for facing environmental disasters.<br/><br/>An overview of Mary Shelley&#x27;s 1826 novel &quot;The Last Man,&quot; a story of a global plague that helped establish the genre of postapocalyptic fiction. The author outlines the book&#x27;s three-part plot and uses Shelley&#x27;s private diaries to trace the story&#x27;s origins in her personal grief. The analysis shows how a 200-year-old text anticipates modern fears about extreme weather, pandemics, and political failure.<br/><br/>Read at source: <a href="https://theconversation.com/lessons-for-the-21st-century-from-a-200-year-old-book-by-frankenstein-author-mary-shelley-291926">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How did a private diary of grief become a story about the end of the world?
+
+Mary Shelley wrote her second science fiction novel after losing her husband and three of her children. Published on 23 September 2026, the essay asks what a two-hundred-year-old story about a global plague reveals about modern crises. The central question is how private grief scales into a warning about human extinction. It wonders how a story ending with a single survivor drifting on a ruined planet still manages to offer a practical model for facing environmental disasters.
+
+An overview of Mary Shelley&#x27;s 1826 novel &quot;The Last Man,&quot; a story of a global plague that helped establish the genre of postapocalyptic fiction. The author outlines the book&#x27;s three-part plot and uses Shelley&#x27;s private diaries to trace the story&#x27;s origins in her personal grief. The analysis shows how a 200-year-old text anticipates modern fears about extreme weather, pandemics, and political failure.
+
+Read at source: The Conversation
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Mon, 05 Oct 2026 19:22:26 +0000</pubDate>
+      <guid isPermaLink="false">aarva-239-20983</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-05/article_20983.mp3" length="3715053" type="audio/mpeg"/>
+      <itunes:duration>07:44</itunes:duration>
+      <itunes:author>Eileen Hunt, Professor of Political Science, University of Notre Dame</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: instinct and reason</title>
       <itunes:title>Crosscut: instinct and reason</itunes:title>
