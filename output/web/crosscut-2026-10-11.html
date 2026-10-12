@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Sunday, 11 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-11</div>
+      <div class="edition-meta">2 pieces · Crosscut · Sunday, 11 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · viruses and cancer</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-10-11/crosscut_0251.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>16 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Fifty years ago, a scientist trying to keep cells alive in a glass dish stumbled onto a surprise: a virus that could cause leukemia. That accidental discovery changed how medicine views disease. Something interesting emerges when pairing two new essays on this link between viruses and cancer. Writing for STAT News this week, Robert C. Gallo looks back at the trial and error that led to identifying that first cancer-causing human virus. Then, John (Eddie) La Marca brings the science up to the present. He lays out the exact steps a virus takes to mutate a cell, explaining how a simple vaccine can now block that process. Together, they connect a quiet laboratory accident directly to modern prevention.</p>
+        <article class='piece'>
+<p class='hook'>In an essay published just this week, Robert C. Gallo looks back at a laboratory breakthrough from fifty years ago. He wasn&#x27;t trying to find the first cancer-causing human virus. He just wanted to keep human blood cells alive in a culture dish. Listen for the detail about a top expert giving a lecture insisting T cells could never grow in a lab, during the exact week Gallo’s team proved they could.</p>
+<h2 class='title'>Opinion: 50 years ago, my colleagues and I pursued basic research science that became revolutionary</h2>
+<p class='byline'><span class='publication'>STAT News</span><span class='sep'>·</span><span>Robert C. Gallo</span></p>
+<p class='source'><a href='https://www.statnews.com/2026/10/09/robert-gallo-interleukin-2-human-retroviruses-immunotherapy-basic-science/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Robert C. Gallo leaves you staring at a petri dish in the 1970s, watching human T cells divide for the first time. The realization that a virus could trigger leukemia was a total accident, a shock to researchers who thought human retroviruses didn&#x27;t even exist. But turn the page to John (Eddie) La Marca, The Conversation, and that historical surprise becomes a massive, mechanical reality. La Marca looks at the sheer scale of this biological link today, pointing out that over two million new cancer cases a year start with an infection.
+
+What jumps out when you put these two together is the shift from mystery to precision. Gallo describes the messy, unpredictable nature of basic research—stumbling in the dark just to keep cells alive. Read alongside La Marca, that initial stumble opens up a clear, microscopic view of exactly how pathogens hack human cells. La Marca explains the exact mechanisms, like how a virus turns off a cell&#x27;s self-destruct switch or inserts its own DNA. The interesting thing is how Gallo&#x27;s defense of open-ended, unpredictable science ends up building the exact foundation La Marca relies on to argue that a huge percentage of global cancers are entirely preventable.</p>
+        <article class='piece'>
+
+<h2 class='title'>Infections are causing cancer, finds new research</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>John (Eddie) La Marca, The Conversation</span></p>
+<p class='source'><a href='https://scroll.in/article/1096094/infections-are-causing-cancer-finds-new-research?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A strange result in a petri dish decades ago eventually becomes a quick injection in a doctor&#x27;s office today. That shift from a laboratory accident to a life-saving vaccine feels almost miraculous. It takes a specific kind of patience to trace a microscopic invader all the way to a tumor, and then figure out how to block the path entirely. What lingers is the sheer unpredictability of scientific progress. If a random mistake can teach medicine how to stop cancer, what other accidental discoveries are sitting in labs right now, waiting to become tomorrow&#x27;s cures?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Sunday, 11 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-11</div>
+      <div class="edition-meta">5 pieces · Sunday, 11 October 2026</div>
+    </header>
+
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">What happens when an African drumbeat is studied with the tools built for a European symphony?</p>
+        <h2 class="title">The Ghanian scholar who changed how the world hears African music</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Geoff Mapaya, The Conversation</span>
+        </p>
+        <p class="contextualisation">For most of the twentieth century, European music received serious chord analysis, while African music was treated as raw rhythm—something felt rather than thought about. Writing on 10 October 2026, Geoff Mapaya profiles Kofi Agawu, the Ghanaian scholar who broke that double standard. Agawu mastered the rules of Western music theory only to turn them toward the drumming and songs of his native country, proving they carry the same intellectual weight as a classical symphony. The essay pauses on a question that extends far beyond sound: how do you study a tradition without relying on a colonizer&#x27;s tools?</p>
+        <p class='show-notes'>An examination of how Ghanaian scholar Kofi Agawu shifted the study of African music by applying formal theory to traditions previously dismissed as raw rhythm. Traces his arguments across six books, detailing his case that Western chords acted as a colonizing force and his claim that a steady groove unites African musical thought. Concludes by outlining where other scholars push back against his methods.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-11/article_24313.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1096052/the-ghanian-scholar-who-changed-how-the-world-hears-african-music?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">How much of Nina Simone&#x27;s stage persona was actually shaped by a poet?</p>
+        <h2 class="title">Nina Simone, Langston Hughes and their forgotten creative collaboration</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Jason Miller, Assistant Lecturer, North Carolina State University</span>
+        </p>
+        <p class="contextualisation">Nina Simone and Langston Hughes are usually filed in different historical chapters, but an essay published on 1 October 2026 brings their quiet collaboration into the light. Their paths crossed just as Simone was finding her footing in New York. Hughes became a mentor, passing her lyrics and pushing her toward the mystical persona that defined her career. The story leaves a lingering question about art: how much of an icon&#x27;s brilliance comes from solitary genius, and how much is coaxed out by a friend standing quietly in the wings?</p>
+        <p class='show-notes'>An account of the creative partnership between Langston Hughes and Nina Simone, tracing their relationship from a 1949 high school assembly to Hughes&#x27; death in 1967. The poet mentored the young singer and used his cultural influence to advance her career. He also shaped her music directly, providing the lyrics for the song Backlash Blues and the conceptual inspiration for her cover of I Put a Spell on You.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-11/article_22371.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/nina-simone-langston-hughes-and-their-forgotten-creative-collaboration-290878' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">How much boredom does a child actually need before they learn to play alone?</p>
+        <h2 class="title">Did I Ruin My Child’s Imagination By Being Such An Involved Parent?</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Chris Thompson</span>
+        </p>
+        <p class="contextualisation">A four-year-old who refuses to play alone is the starting point for this advice column, published on 7 October 2026. The parents worry their constant involvement has broken the boy&#x27;s imagination, but the response skips the usual lectures about helicopter parenting. Instead, it looks closely at the mechanics of how children actually learn to entertain themselves. The central idea is that true independence rarely arrives in neat, fifteen-minute scheduled breaks while adults finish the dishes. To build a real imagination, a child first has to wade through the uncomfortable, drawn-out stretches of genuine boredom.</p>
+        <p class='show-notes'>Advice for parents whose young children refuse to play alone and demand constant, scripted participation in their games. The author argues that independent play requires extended periods of boredom rather than short breaks. To build this habit, they suggest a daily routine of chores and creative tasks that help a child learn to manage their own free time.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-11/article_23642.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>16 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/did-i-ruin-my-childs-imagination-by-being-such-an-involved-parent' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
