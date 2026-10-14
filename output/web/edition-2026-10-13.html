@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Tuesday, 13 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-13</div>
+      <div class="edition-meta">5 pieces · Tuesday, 13 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Why would a nuclear superpower risk a war over a three-thousand-year-old story?</p>
+        <h2 class="title">How Taiwan Activates Beijing’s Chosen Fear</h2>
+        <p class="byline">
+          <span class="publication">War on the Rocks</span>
+          <span class='sep'>·</span><span>Charles Edward Gehrke</span>
+        </p>
+        <p class="contextualisation">American military planners run countless wargames to figure out how to stop a Chinese attack on Taiwan. In this piece published on 13 October 2026, former wargame designer Charles Edward Gehrke points out a blind spot in those simulations. The models assume Beijing weighs military costs the way Washington would. But Gehrke notes that the Chinese Communist Party views Taiwan through an older historical tradition, where a rival government is proof the ruling regime is failing. If Beijing believes doing nothing guarantees its own collapse, loud American attempts at deterrence might just spark a war.</p>
+        <p class='show-notes'>An analysis of how the Chinese Communist Party views Taiwan through a historical pattern of political division, treating the island&#x27;s separation as a direct threat to its own survival. Drawing on military wargaming, the author argues that American deterrence models miscalculate by ignoring this fear. The proposed solution asks Washington to quietly build Taiwan&#x27;s military capacity while avoiding the public political gestures that force Beijing to escalate.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-13/article_24533.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>29 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://warontherocks.com/how-taiwan-activates-beijings-chosen-fear/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">When does forgiving the men holding you hostage become the only way to free yourself?</p>
+        <h2 class="title">I was kidnapped and held hostage for 977 days. Could I forgive my captors?</h2>
+        <p class="byline">
+          <span class="publication">The Guardian (Long Read)</span>
+          <span class='sep'>·</span><span>Michael Scott Moore</span>
+        </p>
+        <p class="contextualisation">Michael Scott Moore spent nearly three years on a sweat-soaked mattress in Somalia, held hostage by armed pirates. In this piece from 13 October 2026, he writes about what happens after the ransom is paid and the kidnappers finally end up in American courtrooms. The central question is what a person should do with the crushing rage that follows an ordeal like this. Moore separates the pop psychology of Stockholm syndrome from the actual mechanics of mercy, suggesting that choosing to forgive an enemy might be the only reliable way to reclaim a hijacked mind.</p>
+        <p class='show-notes'>An account of surviving 977 days as a hostage to Somali pirates, and the author&#x27;s decision to help the FBI lure his captors to the United States. The narrative tracks the federal trials of three men involved in the kidnapping. It measures the strict sentences of the American justice system against the author&#x27;s own process of forgiveness, defining the difference between Stockholm syndrome and a conscious resolution to abandon vengeance.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-13/article_24640.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>35 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theguardian.com/news/ng-interactive/2026/oct/13/i-was-kidnapped-and-held-hostage-for-977-days-could-i-forgive-my-captors' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">How much of a family&#x27;s history lives just outside the frame of a photograph?</p>
+        <h2 class="title">What is hidden in the photographs we keep of each other?</h2>
+        <p class="byline">
+          <span class="publication">Psyche</span>
+          <span class='sep'>·</span><span>Sawa Kurotani</span>
+        </p>
+        <p class="contextualisation">In this Psyche essay published on 13 October 2026, the writer opens a box of childhood photo albums and notices something strange. Instead of focusing on the smiling faces and holiday milestones, she looks at the shadows. Who is missing from the frame? Why are there no pictures of her parents together? By examining the blank spaces in her family&#x27;s carefully kept records, she uncovers a quiet story about wartime survival and emotional distance. The piece turns a common household object into a tool for understanding the generations that came before.</p>
+        <p class='show-notes'>An anthropological reading of a family&#x27;s photo albums, using the absences in the images to trace the emotional distance in a postwar Japanese household. By noting who is missing from the frame and what moments went unrecorded, the author connects her parents&#x27; wartime trauma to the structure of their middle-class lives. The resulting method for reading family archives shows how personal pictures document both material care and unspoken loss.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-13/article_24524.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://psyche.co/ideas/what-is-hidden-in-the-photographs-we-keep-of-each-other' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">Why does a pop star obsessed with the future still need a crowded room to feel forgiven?</p>
+        <h2 class="title">Grimes’s Secret Psy Opera Pop-Up</h2>
+        <p class="byline">
+          <span class="publication">The Paris Review Daily</span>
+          <span class='sep'>·</span><span>Paul McAdory</span>
+        </p>
+        <p class="contextualisation">Writing on 13 October 2026, Paul McAdory heads to a Brooklyn backyard to catch a surprise DJ set by the pop star Grimes. The musician has spent the last few years alienating her original fanbase through her ties to tech billionaires and a string of chaotic public statements. As she prepares to release her first album in six years, the piece watches her try to pull off a difficult trick. When a beloved artist has thoroughly exhausted her audience, can she win them back just by pressing play?</p>
+        <p class='show-notes'>An account of a surprise Brooklyn DJ set by the musician Grimes, marking her return to public performance ahead of a new double album. The writer observes the crowd&#x27;s mixed feelings about her recent controversies and secures an impromptu backstage interview. In the conversation, Grimes details her new style, her upcoming written manifesto, and her frustrations with tech culture.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-13/article_24702.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>15 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theparisreview.org/blog/2026/10/13/grimes-secret-psy-opera-pop-up/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
