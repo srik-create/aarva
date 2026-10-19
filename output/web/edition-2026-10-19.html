@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Monday, 19 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-19</div>
+      <div class="edition-meta">5 pieces · Monday, 19 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If a machine solves a 160-year-old math problem, does it count before a human understands the proof?</p>
+        <h2 class="title">AI Proved the Quasi-Riemann Hypothesis. What Happens Now?</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Konstantin Kakaes</span>
+        </p>
+        <p class="contextualisation">An artificial intelligence just handed mathematicians the solution to a century-old problem called the quasi-Riemann hypothesis. But as Quanta Magazine reports in this story published on 19 October 2026, the machine did not invent new math to do it. It simply sifted through old, overlooked formulas and spotted connections human experts had entirely missed. The piece asks a quiet but heavy question about the future of discovery. It wonders what happens to scientific progress when a computer can look at existing tools and see answers their creators could not.</p>
+        <p class='show-notes'>A report on OpenAI&#x27;s proof of the quasi-Riemann hypothesis, a problem concerning the distribution of prime numbers. The text outlines the math behind the two proofs and tracks how human number theorists are working to verify the results. It details how the system combined existing but overlooked mathematical tools to reach its conclusion.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-19/article_25621.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/ai-proved-the-quasi-riemann-hypothesis-what-happens-now-20261019/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">If sales only show what&#x27;s on the lot, how do you know what drivers actually want?</p>
+        <h2 class="title">Americans want electric cars – they just can’t find them</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>John Paul Helveston, Associate Professor of Engineering Management and Systems Engineering, George Washington University</span>
+        </p>
+        <p class="contextualisation">When electric vehicle sales dropped alongside soaring gas prices, the auto industry assumed Americans simply didn&#x27;t want battery-powered cars. But in a piece published on 16 October 2026, the data points to a different reality. Buyers are actively searching, only to hit a sudden, policy-driven shortage of inventory. The essay pauses on a basic economic distinction that automakers missed. Sales numbers only measure the cars people managed to drive off the lot, leaving out the invisible demand of drivers who went home empty-handed.</p>
+        <p class='show-notes'>An analysis of electric vehicle sales, using inventory and pricing data to show that declining sales stem from a supply shortage rather than low consumer demand. The author traces this shortage to production cuts automakers made after the end of federal tax credits, and outlines how fuel economy rollbacks and import bans limit the supply of affordable cars.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-19/article_25158.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/americans-want-electric-cars-they-just-cant-find-them-293901' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you unlearn a prejudice against your own skin when your family calls it care?</p>
+        <h2 class="title">‘I wrote a children’s book about an insult I faced. Later, I had the same thought about my daughter’</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Lakshmi Iyer</span>
+        </p>
+        <p class="contextualisation">In a Scroll.in essay published on 17 October 2026, an author catches herself passing down the exact judgment about skin color that haunted her own childhood. The story captures how prejudice operates inside families, often disguised as care or casual observation over breakfast. It asks a difficult question about inherited habits. How do parents and grandparents end up enforcing the very physical standards that caused them pain? The result is a quiet look at generational baggage, and what it actually takes to put it down.</p>
+        <p class='show-notes'>An account of how colorism operates within South Asian families, moving from the author&#x27;s childhood memories of skin-lightening rituals to her experiences raising a brown daughter in the United States. The essay examines how relatives disguise prejudice as care, and explains the author&#x27;s decision to write a children&#x27;s book that gives young readers the vocabulary to name the discrimination they face at home.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-19/article_25431.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1095993/i-wrote-a-childrens-book-about-an-insult-i-faced-later-i-had-the-same-thought-about-my-daughter?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">How close can you get to a fraudster before you stop seeing them clearly?</p>
+        <h2 class="title">Good Art Is Worth Waiting For</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Kelsey McKinney</span>
+        </p>
+        <p class="contextualisation">Nathan Fielder spent the month before Elizabeth Holmes went to prison filming her family at the beach and in their living room. But as an 18 October 2026 essay in Defector reveals, the film eventually abandons the idea of a straightforward documentary to ask a more uncomfortable question about the camera itself. When a director spends months eating and swimming with a subject to get the real story, does the sheer intimacy of the process make clear sight impossible?</p>
+        <p class='show-notes'>A review of Nathan Fielder and Lance Oppenheim’s new documentary, You Can See Everything, which follows Elizabeth Holmes and Billy Evans in the month before her prison sentence. The film splits its timeline, shifting from a close-up profile into a second act two years later where actress Amanda Seyfried watches the footage alongside the subjects. The review examines how the directors use this delayed structure to test the limits of documentary truth and personal bias.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-19/article_25772.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/good-art-is-worth-waiting-for' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you set up a printing press in a city where you barely speak the language?</p>
+        <h2 class="title">This day, that age, and a few memories</h2>
+        <p class="byline">
+          <span class="publication">The Hindu</span>
+          
+        </p>
+        <p class="contextualisation">In September 1976, a massive French printing press arrived in Hyderabad, and a local university student had to be pulled in just to translate for the engineer. Published on 5 September 2026, the story of The Hindu&#x27;s Hyderabad launch skips past dry corporate history to capture the physical friction of bringing new technology to a changing city. It frames a specific moment when a newspaper and a metropolis were maturing together, driven by a handful of young staff members trying to get a machine working in the rain.</p>
+        <p class='show-notes'>An account of the 1976 launch of a major Indian newspaper&#x27;s Hyderabad edition, marking the publication&#x27;s shift to four-color offset printing. Through interviews with the original staff, it details the practical hurdles of setting up the new press, from importing French machinery to overcoming local language barriers. It records the ground-level work of expanding a daily print operation.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-19/article_17567.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>6 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://www.thehindu.com/news/national/telangana/this-day-that-age-and-a-few-memories/article71424105.ece' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
