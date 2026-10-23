@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Friday, 23 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-23</div>
+      <div class="edition-meta">2 pieces · Crosscut · Friday, 23 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · rolling and friction</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-10-23/crosscut_0273.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>28 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Deep in a Southeast Asian forest, a rare snake escapes danger by throwing its body into a continuous, rolling wheel. Writing in Defector, Sabrina Imbler describes this cartwheeling reptile, a creature that essentially reinvented one of humanity&#x27;s oldest tools. But a wheel is useless without the right physical resistance to grip the ground. In a piece published this week in Aeon, Jennifer R Vail traces how human technology advances by learning to harness friction and traction, rather than just trying to eliminate it. Placing a zoologist&#x27;s field notes next to a history of friction reveals an unexpected overlap. It turns out that evolution and human inventors often stumble onto the exact same mechanical tricks to get around.</p>
+        <article class='piece'>
+<p class='hook'>When threatened by a predator, a hedgehog or a pebble toad will just tuck itself into a tight ball and tumble away. But as Sabrina Imbler writes in an essay published earlier this week, the dwarf reed snake of Southeast Asia tries a different trick. It turns its body into a continuous hoop and cartwheels across the ground. Listen for the moment Imbler introduces a biomechanics researcher whose jaw drops the first time he watches the footage.</p>
+<h2 class='title'>Rolling Snakes Reinvent The Wheel</h2>
+<p class='byline'><span class='publication'>Defector</span><span class='sep'>·</span><span>Sabrina Imbler</span></p>
+<p class='source'><a href='https://defector.com/rolling-snakes-reinvent-the-wheel' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading Sabrina Imbler leaves you picturing a small snake throwing itself into a loop and cartwheeling down a hill. It reads like a bizarre biological accident. But read alongside Jennifer R Vail, up next, that rolling reptile suddenly looks like a highly calculated engineering trick. Vail writes about friction. She points out how people spend massive amounts of energy trying to eliminate physical resistance from daily life, smoothing out everything from jet engines to grocery carts. What jumps out when you put a zoologist and a tribologist side by side is how human inventors and wild animals keep stumbling onto the exact same mechanical solutions. Imbler shows a snake minimizing its contact with the dirt to move faster. Vail looks at how people do the exact same thing with wheels and axles. The interesting thing is where Vail takes this shared physical problem. While the snake rolls to escape the ground&#x27;s drag, Vail argues that anyone trying to engineer a frictionless life has misunderstood the physics of movement. She points out that friction isn&#x27;t just a nuisance to be erased. It is the exact force that makes movement possible in the first place.</p>
+        <article class='piece'>
+
+<h2 class='title'>Traction!</h2>
+<p class='byline'><span class='publication'>Aeon</span><span class='sep'>·</span><span>Jennifer R Vail</span></p>
+<p class='source'><a href='https://aeon.co/essays/why-a-world-without-friction-is-a-world-without-progress' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after placing a rolling snake next to an engineer&#x27;s workbench is a strange sense of parallel tracks. A reptile fleeing across a forest floor and a mechanic designing a better tire are ultimately fighting the exact same physical forces. Both have to negotiate with the dirt, turning drag into forward momentum. It leaves a quiet realization that human invention is rarely entirely original. If biology and engineering keep arriving at the exact same tricks to move across a stubborn planet, what other mechanical secrets are still out there, waiting to be noticed?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
