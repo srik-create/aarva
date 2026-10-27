@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Monday, 26 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-26</div>
+      <div class="edition-meta">2 pieces · Crosscut · Monday, 26 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · trusting ai chatbots</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-10-26/crosscut_0277.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>23 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Typing a prompt into a blank chat window leads to wildly different places. Jasmine Mote takes a satirical look at artificial romance, arguing that the awkward reality of texting a high school ex-boyfriend on a Wednesday night offers something a perfectly attentive machine never could. On the purely practical side, Adam Clark Estes points to a much colder risk: the danger of handing over bank passwords and financial decisions to an algorithm. Putting these two pieces together creates an unusual collision. The only real shared tissue is the word chatbot. Yet reading them side by side captures a strange moment, where people are casually trusting the exact same code with both their emotional lives and their money.</p>
+        <article class='piece'>
+<p class='hook'>Jasmine Mote suggests skipping the perfectly agreeable chatbot and tracking down the guy who played Lynyrd Skynyrd in his dad&#x27;s garage. In a satirical piece published last week, Mote argues that the awkward, delayed reality of messaging a high school ex offers a thrill no machine can match. Notice the highly specific details she pulls from the past, like a looping DVD menu playing in the background of a teenage basement memory.</p>
+<h2 class='title'>Why Get Romantic with AI When You Can Message Your High School Ex-Boyfriends at 9:30 p.m. on a Wednesday?</h2>
+<p class='byline'><span class='publication'>McSweeney&#x27;s Internet Tendency</span><span class='sep'>·</span><span>Jasmine Mote</span></p>
+<p class='source'><a href='https://www.mcsweeneys.net/articles/why-get-romantic-with-ai-when-you-can-message-your-high-school-ex-boyfriends-at-9-30-pm-on-a-wednesday' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Jasmine Mote leaves you with a surprisingly strong defense of human friction. A chatbot will reply instantly and politely, but it can never replicate the bizarre thrill of tracking down a guy you dated twenty years ago just to see if he texts back. The appeal of the human ex-boyfriend is exactly that he is flawed, unpredictable, and carrying actual history. Adam Clark Estes, up next, shifts the focus from late-night nostalgia to literal bank accounts. He looks at what happens when people hand their sensitive financial data over to an algorithm. Read alongside Mote, a sharp contrast emerges. Mote rejects chatbots because they are too smooth and lack the messy judgment of a real person. But Estes points out that when it comes to money, that lack of human judgment is exactly the draw. Personal finance is an embarrassing subject for most people. A machine will not judge your credit card debt or your inability to budget. Where Mote wants an unpredictable human on the other side of the screen, Estes shows how a cold, emotionless machine is exactly what millions of stressed Americans actually want to talk to.</p>
+        <article class='piece'>
+
+<h2 class='title'>Should you let a chatbot manage your money?</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Adam Clark Estes</span></p>
+<p class='source'><a href='https://www.vox.com/advice/507505/chatgpt-ai-personal-finance-advice' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>Typing a bank password or sending a late-night text to an ex both carry a distinct sense of risk. What&#x27;s left to sit with is a sudden appreciation for that friction. A machine promises to remove the tension entirely. It offers a perfectly polite conversation or a fast financial fix, completely free of messy consequences. But stripping away the awkwardness also strips away the guardrails. When a computer makes it this easy to hand over the most sensitive parts of life, how does anyone recognize when it&#x27;s time to hold back?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
