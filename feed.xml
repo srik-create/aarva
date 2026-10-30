@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Thu, 29 Oct 2026 00:49:33 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 30 Oct 2026 00:53:13 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,145 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: voting vulnerabilities</title>
+      <itunes:title>Crosscut: voting vulnerabilities</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-10-29.html</link>
+      <description><![CDATA[A voting machine sits in a room, waiting to be hacked. That image drives a mid-October report by Doug Bock Clark, who tracks how political appointees are dismantling the teams protecting election servers. It is a literal, physical vulnerability. But another kind of fragility is built into the math itself. Writing a week later, Alex Stone steps away from the servers to look at the geometry of human choice. Stone shows how translating individual preferences into a fair group decision is trapped in a mathematical loop. Side by side, these two late-October pieces frame a quiet paradox. The system faces attacks from the outside, yet the arithmetic of a fair result might be impossible to perfect from within.<br/><br/><em>Doug Bock Clark leaves a reader worrying about the physical servers that tally votes. In his reporting, the threat to a fair election is entirely intentional: political appointees demanding access to voting machines, and cybersecurity teams gutted by sudden layoffs. The danger is someone actively putting a thumb on the scale.
+
+Alex Stone, up next, strips all that away. His piece assumes a perfect election. Imagine no hacked machines and no defunded agencies. Every ballot is counted exactly as cast.
+
+The interesting thing is that even in that flawless scenario, a fair result is still mathematically impossible. Read alongside Clark, Stone’s breakdown of the Condorcet paradox feels almost like a prank. Clark details the fight to protect the literal hardware of democracy. Stone zooms out to show that the moment a third candidate enters a race, the math of majority rule collapses into a loop where every winner is opposed by most of the voters. You can secure the machines from outside interference, but the logic of group decision-making is already broken from the inside.</em><br/><br/>A blinking server in a county election office sits unguarded. What lingers after hearing that reality alongside a cold mathematical proof is a quiet uncertainty about the whole idea of voting. The physical fragility of the ballot box meets the logical impossibility of a flawless result. It leaves a heavy thought to sit with before the next election. If the system is losing its physical guardrails, and the math guarantees someone will always feel cheated, what exactly keeps millions of people lining up to vote?<br/><br/>Sources:<br/><a href="https://www.propublica.org/article/cisa-election-security-donald-trump">ProPublica: Trump Appointees Asked a Federal Cybersecurity Agency to Secretly Acquire a Voting Machine — and Hack It</a><br/><a href="https://www.quantamagazine.org/how-voting-is-like-a-klein-bottle-20261026/">Quanta Magazine: How Voting Is Like a Klein Bottle</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[A voting machine sits in a room, waiting to be hacked. That image drives a mid-October report by Doug Bock Clark, who tracks how political appointees are dismantling the teams protecting election servers. It is a literal, physical vulnerability. But another kind of fragility is built into the math itself. Writing a week later, Alex Stone steps away from the servers to look at the geometry of human choice. Stone shows how translating individual preferences into a fair group decision is trapped in a mathematical loop. Side by side, these two late-October pieces frame a quiet paradox. The system faces attacks from the outside, yet the arithmetic of a fair result might be impossible to perfect from within.<br/><br/><em>Doug Bock Clark leaves a reader worrying about the physical servers that tally votes. In his reporting, the threat to a fair election is entirely intentional: political appointees demanding access to voting machines, and cybersecurity teams gutted by sudden layoffs. The danger is someone actively putting a thumb on the scale.
+
+Alex Stone, up next, strips all that away. His piece assumes a perfect election. Imagine no hacked machines and no defunded agencies. Every ballot is counted exactly as cast.
+
+The interesting thing is that even in that flawless scenario, a fair result is still mathematically impossible. Read alongside Clark, Stone’s breakdown of the Condorcet paradox feels almost like a prank. Clark details the fight to protect the literal hardware of democracy. Stone zooms out to show that the moment a third candidate enters a race, the math of majority rule collapses into a loop where every winner is opposed by most of the voters. You can secure the machines from outside interference, but the logic of group decision-making is already broken from the inside.</em><br/><br/>A blinking server in a county election office sits unguarded. What lingers after hearing that reality alongside a cold mathematical proof is a quiet uncertainty about the whole idea of voting. The physical fragility of the ballot box meets the logical impossibility of a flawless result. It leaves a heavy thought to sit with before the next election. If the system is losing its physical guardrails, and the math guarantees someone will always feel cheated, what exactly keeps millions of people lining up to vote?<br/><br/>Sources:<br/><a href="https://www.propublica.org/article/cisa-election-security-donald-trump">ProPublica: Trump Appointees Asked a Federal Cybersecurity Agency to Secretly Acquire a Voting Machine — and Hack It</a><br/><a href="https://www.quantamagazine.org/how-voting-is-like-a-klein-bottle-20261026/">Quanta Magazine: How Voting Is Like a Klein Bottle</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>A voting machine sits in a room, waiting to be hacked. That image drives a mid-October report by Doug Bock Clark, who tracks how political appointees are dismantling the teams protecting election servers. It is a literal, physical vulnerability. But another kind of fragility is built into the math itself. Writing a week later, Alex Stone steps away from the servers to look at the geometry of human choice. Stone shows how translating individual preferences into a fair group decision is trapped in a mathematical loop. Side by side, these two late-October pieces frame a quiet paradox. The system faces attacks from the outside, yet the arithmetic of a fair result might be impossible to perfect from within.
+
+Doug Bock Clark leaves a reader worrying about the physical servers that tally votes. In his reporting, the threat to a fair election is entirely intentional: political appointees demanding access to voting machines, and cybersecurity teams gutted by sudden layoffs. The danger is someone actively putting a thumb on the scale.
+
+Alex Stone, up next, strips all that away. His piece assumes a perfect election. Imagine no hacked machines and no defunded agencies. Every ballot is counted exactly as cast.
+
+The interesting thing is that even in that flawless scenario, a fair result is still mathematically impossible. Read alongside Clark, Stone’s breakdown of the Condorcet paradox feels almost like a prank. Clark details the fight to protect the literal hardware of democracy. Stone zooms out to show that the moment a third candidate enters a race, the math of majority rule collapses into a loop where every winner is opposed by most of the voters. You can secure the machines from outside interference, but the logic of group decision-making is already broken from the inside.
+
+A blinking server in a county election office sits unguarded. What lingers after hearing that reality alongside a cold mathematical proof is a quiet uncertainty about the whole idea of voting. The physical fragility of the ballot box meets the logical impossibility of a flawless result. It leaves a heavy thought to sit with before the next election. If the system is losing its physical guardrails, and the math guarantees someone will always feel cheated, what exactly keeps millions of people lining up to vote?
+
+Sources:
+ProPublica: Trump Appointees Asked a Federal Cybersecurity Agency to Secretly Acquire a Voting Machine — and Hack It
+Quanta Magazine: How Voting Is Like a Klein Bottle
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 29 Oct 2026 23:51:17 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-283</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-29/crosscut_0283.mp3" length="16277613" type="audio/mpeg"/>
+      <itunes:duration>33:55</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · voting vulnerabilities</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>A New Dawn For Mathematical Progress</title>
+      <itunes:title>A New Dawn For Mathematical Progress</itunes:title>
+      <link>https://www.noemamag.com/a-new-dawn-for-mathematical-progress</link>
+      <description><![CDATA[<em>If a machine can solve the hardest math problems, what is a mathematician actually for?</em><br/><br/>When a machine recently solved another Millennium Prize math problem, researchers started openly wondering if their profession was finished. Writing on 29 October 2026, philosopher and DeepMind scientist Atoosa Kasirzadeh suggests this panic comes from a remarkably narrow view of the field. The fear of obsolescence assumes math is just a checklist of abstract puzzles waiting for a lone genius to crack them. Kasirzadeh points toward a different history of the discipline, imagining a future where machines handle the pure calculation, leaving humans to figure out which real-world problems actually need solving.<br/><br/>An argument for redefining mathematical progress beyond a checklist of famous problems. Contrasts this traditional approach with a generative model, where mathematicians invent new fields to solve practical challenges. Outlines how the discipline can adopt this open-ended method, using artificial intelligence as a tool to secure digital infrastructure and understand neural networks.<br/><br/>Read at source: <a href="https://www.noemamag.com/a-new-dawn-for-mathematical-progress">Noema</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a machine can solve the hardest math problems, what is a mathematician actually for?</em><br/><br/>When a machine recently solved another Millennium Prize math problem, researchers started openly wondering if their profession was finished. Writing on 29 October 2026, philosopher and DeepMind scientist Atoosa Kasirzadeh suggests this panic comes from a remarkably narrow view of the field. The fear of obsolescence assumes math is just a checklist of abstract puzzles waiting for a lone genius to crack them. Kasirzadeh points toward a different history of the discipline, imagining a future where machines handle the pure calculation, leaving humans to figure out which real-world problems actually need solving.<br/><br/>An argument for redefining mathematical progress beyond a checklist of famous problems. Contrasts this traditional approach with a generative model, where mathematicians invent new fields to solve practical challenges. Outlines how the discipline can adopt this open-ended method, using artificial intelligence as a tool to secure digital infrastructure and understand neural networks.<br/><br/>Read at source: <a href="https://www.noemamag.com/a-new-dawn-for-mathematical-progress">Noema</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a machine can solve the hardest math problems, what is a mathematician actually for?
+
+When a machine recently solved another Millennium Prize math problem, researchers started openly wondering if their profession was finished. Writing on 29 October 2026, philosopher and DeepMind scientist Atoosa Kasirzadeh suggests this panic comes from a remarkably narrow view of the field. The fear of obsolescence assumes math is just a checklist of abstract puzzles waiting for a lone genius to crack them. Kasirzadeh points toward a different history of the discipline, imagining a future where machines handle the pure calculation, leaving humans to figure out which real-world problems actually need solving.
+
+An argument for redefining mathematical progress beyond a checklist of famous problems. Contrasts this traditional approach with a generative model, where mathematicians invent new fields to solve practical challenges. Outlines how the discipline can adopt this open-ended method, using artificial intelligence as a tool to secure digital infrastructure and understand neural networks.
+
+Read at source: Noema
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 29 Oct 2026 20:12:11 +0000</pubDate>
+      <guid isPermaLink="false">aarva-282-27571</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-29/article_27571.mp3" length="15469869" type="audio/mpeg"/>
+      <itunes:duration>32:14</itunes:duration>
+      <itunes:author>Atoosa Kasirzadeh</itunes:author>
+      <itunes:subtitle>Noema</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Young prudes</title>
+      <itunes:title>Young prudes</itunes:title>
+      <link>https://www.worksinprogress.news/p/young-prudes</link>
+      <description><![CDATA[<em>Could the end of casual sex really just come down to falling birth rates?</em><br/><br/>Millennials spent a decade treating casual sex as the ultimate freedom. Now, the generation behind them is suddenly demanding commitment and shaming bad dates on TikTok. Most observers blame smartphones for this new prudishness. But an essay published on 28 October 2026 in Works in Progress asks a much colder question: what if sexual revolutions are just a matter of math? Decades of birth rate data reveal how the ratio of men to women in the dating pool quietly dictates romantic norms, turning modern love into simple supply and demand.<br/><br/>An argument that the recent decline in casual sex is driven by demographics rather than culture. Using historical birth rates and relationship age gaps, the author shows how a surplus of women in the mid-twentieth century sparked the sexual revolution. Because falling birth rates have now created a surplus of men, the dating market is returning to the more conservative norms of the 1930s.<br/><br/>Read at source: <a href="https://www.worksinprogress.news/p/young-prudes">Works in Progress</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Could the end of casual sex really just come down to falling birth rates?</em><br/><br/>Millennials spent a decade treating casual sex as the ultimate freedom. Now, the generation behind them is suddenly demanding commitment and shaming bad dates on TikTok. Most observers blame smartphones for this new prudishness. But an essay published on 28 October 2026 in Works in Progress asks a much colder question: what if sexual revolutions are just a matter of math? Decades of birth rate data reveal how the ratio of men to women in the dating pool quietly dictates romantic norms, turning modern love into simple supply and demand.<br/><br/>An argument that the recent decline in casual sex is driven by demographics rather than culture. Using historical birth rates and relationship age gaps, the author shows how a surplus of women in the mid-twentieth century sparked the sexual revolution. Because falling birth rates have now created a surplus of men, the dating market is returning to the more conservative norms of the 1930s.<br/><br/>Read at source: <a href="https://www.worksinprogress.news/p/young-prudes">Works in Progress</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Could the end of casual sex really just come down to falling birth rates?
+
+Millennials spent a decade treating casual sex as the ultimate freedom. Now, the generation behind them is suddenly demanding commitment and shaming bad dates on TikTok. Most observers blame smartphones for this new prudishness. But an essay published on 28 October 2026 in Works in Progress asks a much colder question: what if sexual revolutions are just a matter of math? Decades of birth rate data reveal how the ratio of men to women in the dating pool quietly dictates romantic norms, turning modern love into simple supply and demand.
+
+An argument that the recent decline in casual sex is driven by demographics rather than culture. Using historical birth rates and relationship age gaps, the author shows how a surplus of women in the mid-twentieth century sparked the sexual revolution. Because falling birth rates have now created a surplus of men, the dating market is returning to the more conservative norms of the 1930s.
+
+Read at source: Works in Progress
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 29 Oct 2026 20:12:11 +0000</pubDate>
+      <guid isPermaLink="false">aarva-282-27327</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-29/article_27327.mp3" length="4182957" type="audio/mpeg"/>
+      <itunes:duration>08:43</itunes:duration>
+      <itunes:author>Aria Schrecker</itunes:author>
+      <itunes:subtitle>Works in Progress</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Ben Franklin Wasn’t Serious When He Implied the Wild Turkey Would Be a ‘Respectable’ National Symbol … but He Wasn’t Wrong, Either</title>
+      <itunes:title>Ben Franklin Wasn’t Serious When He Implied the Wild Turkey Would Be a ‘Respectable’ National Symbol … but He Wasn’t Wrong, Either</itunes:title>
+      <link>https://www.smithsonianmag.com/science-nature/ben-franklin-wasnt-serious-when-implied-wild-turkey-respectable-national-symbol-wasnt-wrong-180989642/</link>
+      <description><![CDATA[<em>How did a nearly extinct forest bird end up holding up traffic in the suburbs?</em><br/><br/>A flock of wild turkeys holding up traffic at a suburban gas station might feel like a prank. Yet in this Smithsonian Magazine essay published on 28 October 2026, the bird becomes the endpoint of a massive civic experiment. The wild turkey was nearly hunted to extinction by the 1930s before an unusual alliance of wildlife biologists and gun owners decided to bring it back. The story pauses on a surprisingly mechanical question: how exactly does a country reverse an extinction, and what does that recovery reveal about American conservation?<br/><br/>A history of the wild turkey in North America, tracking the bird from its near-extinction in the 1930s to a current population of over five million. It outlines the mid-century conservation campaign that used rocket nets and taxes on hunting equipment to trap and relocate surviving flocks. The account details how biologists and hunters worked together to help the species recover and spread into modern suburbs.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/science-nature/ben-franklin-wasnt-serious-when-implied-wild-turkey-respectable-national-symbol-wasnt-wrong-180989642/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How did a nearly extinct forest bird end up holding up traffic in the suburbs?</em><br/><br/>A flock of wild turkeys holding up traffic at a suburban gas station might feel like a prank. Yet in this Smithsonian Magazine essay published on 28 October 2026, the bird becomes the endpoint of a massive civic experiment. The wild turkey was nearly hunted to extinction by the 1930s before an unusual alliance of wildlife biologists and gun owners decided to bring it back. The story pauses on a surprisingly mechanical question: how exactly does a country reverse an extinction, and what does that recovery reveal about American conservation?<br/><br/>A history of the wild turkey in North America, tracking the bird from its near-extinction in the 1930s to a current population of over five million. It outlines the mid-century conservation campaign that used rocket nets and taxes on hunting equipment to trap and relocate surviving flocks. The account details how biologists and hunters worked together to help the species recover and spread into modern suburbs.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/science-nature/ben-franklin-wasnt-serious-when-implied-wild-turkey-respectable-national-symbol-wasnt-wrong-180989642/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How did a nearly extinct forest bird end up holding up traffic in the suburbs?
+
+A flock of wild turkeys holding up traffic at a suburban gas station might feel like a prank. Yet in this Smithsonian Magazine essay published on 28 October 2026, the bird becomes the endpoint of a massive civic experiment. The wild turkey was nearly hunted to extinction by the 1930s before an unusual alliance of wildlife biologists and gun owners decided to bring it back. The story pauses on a surprisingly mechanical question: how exactly does a country reverse an extinction, and what does that recovery reveal about American conservation?
+
+A history of the wild turkey in North America, tracking the bird from its near-extinction in the 1930s to a current population of over five million. It outlines the mid-century conservation campaign that used rocket nets and taxes on hunting equipment to trap and relocate surviving flocks. The account details how biologists and hunters worked together to help the species recover and spread into modern suburbs.
+
+Read at source: Smithsonian Magazine
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 29 Oct 2026 20:12:11 +0000</pubDate>
+      <guid isPermaLink="false">aarva-282-27383</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-29/article_27383.mp3" length="4313325" type="audio/mpeg"/>
+      <itunes:duration>08:59</itunes:duration>
+      <itunes:author>Smithsonian Magazine</itunes:author>
+      <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>How Can I Hang On To My Digital Life?</title>
+      <itunes:title>How Can I Hang On To My Digital Life?</itunes:title>
+      <link>https://defector.com/how-can-i-hang-on-to-my-digital-life</link>
+      <description><![CDATA[<em>How do you back up a life when the files that hold it are slowly decaying?</em><br/><br/>A notification warning that cloud storage is almost full usually prompts a quick credit card upgrade. In this piece from 23 October 2026, Defector pauses on what happens when a writer actually looks inside those folders instead. Millions lease server space from tech companies, trusting them to safely hold decades of photographs and scattered digital history. But files degrade over time, and software becomes obsolete. The essay turns a mundane chore—cleaning out glitchy hard drives—into a sharp question: what does it actually take to preserve a life, rather than just pay a monthly fee to hoard it?<br/><br/>An account of a personal digital archiving project, tracking the author&#x27;s effort to organize terabytes of data scattered across cloud services and aging hard drives. Working with a professional archivist, the author explains the mechanics of bit rot and hardware failure while applying the 3-2-1 rule for backing up files. The project outlines practical steps for long-term storage while documenting the strange experience of reading through a decade of old drafts and documents.<br/><br/>Read at source: <a href="https://defector.com/how-can-i-hang-on-to-my-digital-life">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How do you back up a life when the files that hold it are slowly decaying?</em><br/><br/>A notification warning that cloud storage is almost full usually prompts a quick credit card upgrade. In this piece from 23 October 2026, Defector pauses on what happens when a writer actually looks inside those folders instead. Millions lease server space from tech companies, trusting them to safely hold decades of photographs and scattered digital history. But files degrade over time, and software becomes obsolete. The essay turns a mundane chore—cleaning out glitchy hard drives—into a sharp question: what does it actually take to preserve a life, rather than just pay a monthly fee to hoard it?<br/><br/>An account of a personal digital archiving project, tracking the author&#x27;s effort to organize terabytes of data scattered across cloud services and aging hard drives. Working with a professional archivist, the author explains the mechanics of bit rot and hardware failure while applying the 3-2-1 rule for backing up files. The project outlines practical steps for long-term storage while documenting the strange experience of reading through a decade of old drafts and documents.<br/><br/>Read at source: <a href="https://defector.com/how-can-i-hang-on-to-my-digital-life">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How do you back up a life when the files that hold it are slowly decaying?
+
+A notification warning that cloud storage is almost full usually prompts a quick credit card upgrade. In this piece from 23 October 2026, Defector pauses on what happens when a writer actually looks inside those folders instead. Millions lease server space from tech companies, trusting them to safely hold decades of photographs and scattered digital history. But files degrade over time, and software becomes obsolete. The essay turns a mundane chore—cleaning out glitchy hard drives—into a sharp question: what does it actually take to preserve a life, rather than just pay a monthly fee to hoard it?
+
+An account of a personal digital archiving project, tracking the author&#x27;s effort to organize terabytes of data scattered across cloud services and aging hard drives. Working with a professional archivist, the author explains the mechanics of bit rot and hardware failure while applying the 3-2-1 rule for backing up files. The project outlines practical steps for long-term storage while documenting the strange experience of reading through a decade of old drafts and documents.
+
+Read at source: Defector
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 29 Oct 2026 20:12:11 +0000</pubDate>
+      <guid isPermaLink="false">aarva-282-26788</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-10-29/article_26788.mp3" length="6489069" type="audio/mpeg"/>
+      <itunes:duration>13:31</itunes:duration>
+      <itunes:author>Alex Sujong Laughlin</itunes:author>
+      <itunes:subtitle>Defector</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: health insurance costs</title>
       <itunes:title>Crosscut: health insurance costs</itunes:title>
