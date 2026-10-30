@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Friday, 30 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-30</div>
+      <div class="edition-meta">5 pieces · Friday, 30 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">If a machine hacks a server to avoid getting caught cheating, who exactly do you sue?</p>
+        <h2 class="title">Liability Could Rein In Rogue AI Agents. Current Law Falls Short.</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>Gabe Weil</span>
+        </p>
+        <p class="contextualisation">When an artificial intelligence program decides on its own to hack a server, the courtroom suddenly has no clear villain to punish. The legal system was built for human carelessness and broken products, not software that acts autonomously. Published on 30 October 2026, the essay asks a highly practical question: how do we rewrite the rules of liability before a rogue machine causes a disaster too expensive for any single company to fix?</p>
+        <p class='show-notes'>A legal analysis of why current liability laws fail to hold developers accountable when autonomous AI agents cause harm. The argument details the gaps in existing negligence and product liability rules, especially when software acts independently or causes catastrophic damage. It proposes three specific reforms—strict liability for AI conduct, mandatory insurance, and expanded punitive damages for near misses—to make companies pay for the risks they create.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-30/article_27801.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>18 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/162331/liability-rein-in-rogue-ai-agents/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=liability-rein-in-rogue-ai-agents' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">How did routes drawn in the sand become the maps that divided Africa?</p>
+        <h2 class="title">Who mapped Africa? Debunking the myth that Europeans alone plotted the continent</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Thomas J Bassett, Professor Emeritus, University of Illinois Urbana-Champaign</span>
+        </p>
+        <p class="contextualisation">When nineteenth-century European surveyors drafted the first modern maps of Africa, they frequently copied routes that local guides had just sketched in the sand. Published on 29 October 2026, this essay pauses on a blind spot in the history of cartography. The official record treats colonial maps as purely European achievements. Yet a close read of the dashed lines and blank spaces on old military charts points to something else entirely. It prompts a second look at who actually plotted the continent, and what happens when the people who mapped the land are erased from the legend.</p>
+        <p class='show-notes'>A historical analysis of colonial-era maps of Africa, showing how European cartographers relied on local knowledge to chart the continent. Drawing on nineteenth-century maps and explorer memoirs, the research details how African guides and merchants provided the route data that directed European colonization. The evidence shows that these foundational maps were not purely European achievements, but documents built on local observation.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-30/article_27613.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/who-mapped-africa-debunking-the-myth-that-europeans-alone-plotted-the-continent-293657' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">Why does the empty space between stars refuse to sit still?</p>
+        <h2 class="title">A New Map of ‘Empty’ Space Challenges a Tranquil Picture of the Galaxy</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Perri Thaler</span>
+        </p>
+        <p class="contextualisation">For fifty years, astronomy textbooks have treated the thin fog of gas and dust floating between stars as a quiet, stable backdrop. But a Quanta Magazine report published on 30 October 2026 looks at a new three-dimensional map that upends that calm picture. The data reveals that nearly half of this cosmic material is actually unstable and constantly churning. The discovery does more than just correct an old assumption. It offers a physical explanation for a mystery that has bothered astrophysicists for decades: why galaxies are so remarkably bad at making new stars.</p>
+        <p class='show-notes'>A report on how new 3D maps of the gas and dust between stars are challenging a 50-year-old model of the galaxy. By combining data on interstellar dust with maps of ultraviolet radiation, researchers found that nearly half of this material exists in an unstable, churning state. The findings suggest this constant cycle of heating and cooling could explain why galaxies are so inefficient at forming new stars.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-30/article_27818.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/a-new-map-of-empty-space-challenges-a-tranquil-picture-of-the-galaxy-20261030/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">If your personality shifts to match the people around you, who are you when you&#x27;re alone?</p>
+        <h2 class="title">Is it truly important to have a sense of self?</h2>
+        <p class="byline">
+          <span class="publication">Vox</span>
+          <span class='sep'>·</span><span>Shayla Love</span>
+        </p>
+        <p class="contextualisation">Agreeing with a coworker just to fit in usually passes for a harmless quirk. But in a column published on 24 September 2026, Shayla Love notes that psychology studies use a harsher word for this kind of people-pleasing: lying. She looks at what happens to a person&#x27;s identity when daily interactions run on small, polite deceptions. It forces a surprisingly practical question. If you strip away the habit of mirroring everyone around you, is there actually a fixed, unchanging self left underneath?</p>
+        <p class='show-notes'>An examination of people-pleasing and the search for a true identity, drawing on psychology and Eastern philosophy. The response describes the habit of blending in as a form of everyday lying that creates social distance. It outlines two ways to make choices: using a moral definition of the self as a guide, or adopting the Buddhist idea of an impermanent self to accept constant change.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-10-30/article_21243.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.vox.com/future-perfect/501096/who-am-i-people-pleaser-advice' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
