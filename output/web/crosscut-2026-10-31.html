@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Saturday, 31 October 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-10-31</div>
+      <div class="edition-meta">2 pieces · Crosscut · Saturday, 31 October 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · treating menopause today</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-10-31/crosscut_0287.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>19 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>Pharmacy shelves are suddenly packed with bright bottles promising to fix menopause. A recent article by Jennifer Takhar, The Conversation, observes how a life stage once barely spoken about has become a massive business opportunity for an unregulated wellness industry. But a different conversation is happening inside clinics. An update published today by Laura Ungar shows doctors cutting through the noise of unproven supplements to guide patients back toward regulated hormone treatments. Something interesting emerges when placing these articles side by side. They reveal a clear tug-of-war over a newly visible phase of life—a booming consumer market selling quick fixes on one end, and a medical establishment pulling patients back to proven science on the other.</p>
+        <article class='piece'>
+<p class='hook'>Browse the health aisle today, and you will spot a sudden flood of products targeting a 600-billion-dollar demographic. In an essay published last week, Jennifer Takhar, The Conversation, tracks how menopause went from a quiet medical reality to an aggressive marketing opportunity. Notice how she separates actual prescribed treatments from the new wave of specialized supplements and wellness retreats—a booming market that turns natural aging into a condition you have to buy your way out of.</p>
+<h2 class='title'>From taboo subject, menopause is now a big business opportunity</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Jennifer Takhar, The Conversation</span></p>
+<p class='source'><a href='https://scroll.in/article/1096438/from-taboo-subject-menopause-is-now-a-big-business-opportunity?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Reading Jennifer Takhar feels like watching a modern gold rush. Suddenly, a stage of life that people used to whisper about is a massive market flooded with expensive supplements and wellness retreats. Her article leaves behind a sharp sense of skepticism. The wellness industry is eager to sell relief, but much of what sits on the shelves is completely unproven.
+
+Laura Ungar steps into this exact same cultural shift, but from inside the doctor’s office. Where Takhar watches companies invent a new consumer base, Ungar watches the medical establishment try to pull patients back toward actual science. Her reporting focuses on new guidelines encouraging women to return to regulated hormone therapies—treatments that frightened many people away twenty years ago.
+
+Put the two together, and a quiet tug-of-war emerges over how to treat a newly visible stage of life. Women are finally demanding relief and refusing to suffer in silence. But read side by side, these writers show a patient caught in the middle. On one side is an unregulated industry happy to sell expensive comforts. On the other is a medical community trying to cut through the marketing noise to offer treatments backed by data.</p>
+        <article class='piece'>
+
+<h2 class='title'>There&#x27;s new guidance on menopause symptoms like hot flashes. What women need to know</h2>
+<p class='byline'><span class='publication'>The Independent</span><span class='sep'>·</span><span>Laura Ungar</span></p>
+<p class='source'><a href='https://www.independent.co.uk/news/food-and-drug-administration-menopause-harvard-medical-school-hormones-journalism-b3076802.html' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the image of a crowded drugstore aisle. For decades, menopause was a quiet, private transition. Now, those shelves are packed with expensive, unproven supplements, while doctors in clinics are trying to steer patients back toward standard prescription pads. The silence has finally broken, but the tug-of-war that replaced it is exhausting. The question left to sit with is practical: when a normal physical transition suddenly turns into a billion-dollar market, how does a patient figure out who is actually trying to help, and who is just trying to make a sale?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
