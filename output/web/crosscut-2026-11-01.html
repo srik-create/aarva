@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Sunday, 01 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-01</div>
+      <div class="edition-meta">2 pieces · Crosscut · Sunday, 01 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · india economic reality</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-01/crosscut_0289.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>32 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A stack of government payroll statistics tells one story about India&#x27;s economy, while a rural maize farmer sees something else entirely. There is a persistent gap between what New Delhi announces and what actually happens on the ground. Two recent articles look straight into that space, asking who gets left out of official success stories. In *The Diplomat*, Santosh Mehrotra and Kingshuk Sarkar examine national employment data, showing how formal job numbers easily mask a severe lack of stable work. Then, reporting for *Scroll.in*, Vaishnavi Rathore tracks a massive biofuel push meant to help rural communities. Moving from national spreadsheets to local fields reveals how policies designed to build wealth often just enrich the middlemen standing in the way.</p>
+        <article class='piece'>
+<p class='hook'>When the Indian government points to millions of new retirement fund sign-ups as proof of a booming job market, the numbers look impressive. But writing late last month, Santosh Mehrotra and Kingshuk Sarkar show how those figures mask a lack of stable work. Notice how they distinguish between a genuine new job and an existing informal worker simply getting put on the books. Listen for the specific industries—like garments and brick-making—where employment is quietly shrinking.</p>
+<h2 class='title'>The Indian Government’s Job Statistics Are Misleading</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Santosh Mehrotra and Kingshuk Sarkar</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/10/the-indian-governments-job-statistics-are-misleading/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Santosh Mehrotra and Kingshuk Sarkar leave a lingering image of a government ledger that counts a signature on a retirement form as a brand new job. They expose how official success stories can look completely different depending on who is doing the counting. Vaishnavi Rathore picks up this exact thread next, but she moves the camera away from national payroll statistics and points it at a maize field in Madhya Pradesh. 
+
+Notice what happens when you put the two together. Mehrotra and Sarkar show how New Delhi points to rising fund numbers to claim a booming job market, even as labor-heavy factories actually shed workers. Rathore finds the same disconnect in the government&#x27;s massive ethanol push. Officials claim billions of rupees are flowing back to rural communities. But down in the dirt, farmers like Dharmendra Raghuwanshi are still waiting for crop prices to even hit the government minimum. 
+
+Read alongside each other, the spreadsheets in the first piece and the empty pockets in the second start to look like two symptoms of the same condition. It is one thing to announce an economic boom from a capital city, and entirely another to make it real for the people supposed to be living it.</p>
+        <article class='piece'>
+
+<h2 class='title'>Why India’s ethanol push is not benefitting farmers</h2>
+<p class='byline'><span class='publication'>Scroll.in</span><span class='sep'>·</span><span>Vaishnavi Rathore</span></p>
+<p class='source'><a href='https://scroll.in/article/1096679/why-indias-ethanol-push-is-not-benefitting-farmers?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the sheer distance between a government spreadsheet in New Delhi and a dusty maize field. Official reports project a booming nation. Down on the dirt, the reality is much harder, defined by a lack of steady jobs and policies that reward the well-connected. There is a sharp friction between the statistics a capital chooses to celebrate and the daily survival of the citizens those numbers are supposed to represent. If a country&#x27;s economic miracle is mostly visible from a desk, how do leaders ever learn what is actually broken?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
