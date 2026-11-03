@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 03 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-03</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 03 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · protecting the vote</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-03/crosscut_0293.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>41 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>As Americans head to the polls today, it is easy to fixate on the local officials running the machines and checking the rolls. Writing just yesterday, Peter Elkind watches the lawyers and election workers scrambling to defend existing rules from disruption. But a striking contrast emerges when placing that anxiety next to a dispatch published today by Sarah Waring. In Serbia, the response to a threatened democracy took a very different shape. Instead of trying to shore up a corrupted state, students and workers simply walked away, organizing their own parallel structures of power. Side by side, these accounts ask a sharp question about what happens when democratic systems crack. Do citizens try to patch the old institutions, or build new ones?</p>
+        <article class='piece'>
+<p class='hook'>In the days leading up to the 2026 midterms, the federal government threatened to prosecute local officials who refused to reject certain ballots. Published on election eve, Peter Elkind’s report brings a ground-level view of the legal vulnerabilities facing American election workers. Notice the warning from a recently fired election commissioner. The ultimate danger of this administrative noise, he points out, is that exhausted voters will simply throw their hands up and stay home.</p>
+<h2 class='title'>“Chaos” in the Air: Five Ways Voting Could Be Disrupted on Election Day</h2>
+<p class='byline'><span class='publication'>ProPublica</span><span class='sep'>·</span><span>Peter Elkind</span></p>
+<p class='source'><a href='https://www.propublica.org/article/five-voting-disruptions-midterm-election' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Peter Elkind leaves you watching lawyers and poll workers scramble to patch up a system cracking under pressure. The focus stays entirely inside the existing machinery of American elections. Officials fight court battles and monitors watch the rolls, all trying to hold the line against institutional collapse.
+
+Turn to Sarah Waring’s account from Serbia, and the starting assumption completely shifts. Waring tracks what happens when citizens decide the official structures are already too corrupted to save from the inside. Instead of relying on state institutions, Serbian students and workers built their own parallel civic engine. Notice the sheer physical scale of the alternative infrastructure Waring describes. Eighty thousand volunteers organized their own mobile teams, food delivery networks, and anti-fraud units to bypass the regime&#x27;s falsified voter registers. 
+
+Read back-to-back, the contrast is sharp. The American defenders pour all their energy into protecting the official rules. Waring’s activists assume the rules are rigged, and find their power by organizing entirely outside them.</p>
+        <article class='piece'>
+
+<h2 class='title'>Democracy unfolding</h2>
+<p class='byline'><span class='publication'>Eurozine</span><span class='sep'>·</span><span>Sarah Waring</span></p>
+<p class='source'><a href='https://www.eurozine.com/democracy-unfolding/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=democracy-unfolding' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers after these two accounts is a stark contrast in survival instincts. On one side, lawyers and clerks grip the rulebook tighter, trusting courtrooms to hold the line. On the other, students and workers simply walk away from rigged ballot boxes to build something new in the streets. Both are acts of defense, just fought with completely different tools. When the structure of a government starts to crack, how does a person know whether to stay and patch the foundation, or walk out the door?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
