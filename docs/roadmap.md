@@ -117,6 +117,27 @@ GitHub Pages.
    Pages — but the podcast feed served from GH Pages was stuck on
    whichever older deploy was the last to squeak under the timeout.
 
+6. **`/admin/sync-db` cap bump 200 MB → 1 GB — direct fix on
+   `sync-db-cap-bump`.** 2026-11-09: two consecutive daily runs
+   failed with HTTP 413 "object too large: 210535346 bytes" from
+   the operator's `scripts/sync_db_to_render.sh`. Diagnosis: the
+   gzipped DB payload is now ~210 MB (401 MB raw) and exceeds the
+   `_MAX_PAYLOAD_BYTES = 200 * 1024 * 1024` cap at
+   `aarva/server/routes/admin.py:73`. Cap's purpose is a safety
+   guard against a misconfigured caller, not a real capacity
+   constraint — the streaming decompression at
+   `_fetch_decompress_validate_and_replace` writes 1 MB chunks to
+   a staging file on `/data`, so RAM is bounded regardless of
+   payload size; the limit is disk headroom (`/data` 1 GB, ~600 MB
+   free after both SQLite DBs). Fix: bump to 1 GB; update stale
+   "~30 MB; years of headroom" comment. aarva.app has been stale
+   since 2026-11-07 because the DB sync never landed — gh-pages
+   (RSS + static HTML) kept updating fine since it's an independent
+   path. Separate open question: why is the DB growing this fast
+   (article_scores? embedding BLOBs? article text?) — not blocking,
+   but worth a one-off `du`-style investigation into which tables
+   dominate.
+
 ---
 
 ## Deferred — to return to (in priority order)

@@ -67,10 +67,20 @@ from aarva.services.queries import load_crosscut_episodes, load_listener_episode
 logger = logging.getLogger(__name__)
 
 
-# Hard cap on the R2 object we'll fetch. Sane upper bound to keep a
-# misconfigured caller from wedging us on a multi-gig download. The
-# real DB tarball is currently ~30 MB; 200 MB gives years of headroom.
-_MAX_PAYLOAD_BYTES = 200 * 1024 * 1024
+# Hard cap on the R2 object we'll fetch. Safety guard against a
+# misconfigured caller sending a multi-GB blob — not a real capacity
+# constraint. The streaming fetch at _fetch_decompress_validate_and_replace
+# writes 1 MB chunks straight to a staging file on disk, so a larger
+# payload doesn't pressure RAM; the limit is disk headroom on /data
+# (1 GB total, ~600 MB free after both SQLite DBs at 2026-11-09). The
+# original 200 MB cap was set when the gzipped DB was ~30 MB with the
+# comment "years of headroom"; at 2026-11-09 the DB had grown to
+# 210 MB gzipped (401 MB raw) from accumulated article_scores,
+# embedding BLOBs, and article text — the sync started 413-ing on
+# 2026-11-07. Bumped to 1 GB, which comfortably accommodates the
+# next couple of years of growth while still catching a genuinely
+# misconfigured caller.
+_MAX_PAYLOAD_BYTES = 1024 * 1024 * 1024
 
 
 def _check_token(request: Request) -> None:
