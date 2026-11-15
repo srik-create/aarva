@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Sunday, 15 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-15</div>
+      <div class="edition-meta">4 pieces · Sunday, 15 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">Would a completely empty universe actually be more complicated than one full of planets and people?</p>
+        <h2 class="title">Why anything exists</h2>
+        <p class="byline">
+          <span class="publication">Aeon</span>
+          <span class='sep'>·</span><span>Andrew T Brenner</span>
+        </p>
+        <p class="contextualisation">Building a solar system or a single penguin takes work, while nothingness is free. For centuries, philosophers have assumed that a completely empty universe would be the simplest possible state of affairs. But in this essay published on 12 November 2026, the writer flips that basic assumption. A totally blank reality would require a staggering amount of hidden rules just to stay empty. Putting a physical object in the room might actually be the most efficient way for existence to operate.</p>
+        <p class='show-notes'>An argument against the assumption that an empty universe would be simpler than one with something in it. The author examines facts of logic and math that would remain true even in a total void, showing how these abstract truths create their own complexity. Building on this idea, the essay proposes that a universe with a single explanatory starting point, like a cosmic singularity, is actually the simplest possible state of reality.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-15/article_29918.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>24 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://aeon.co/essays/a-new-answer-to-why-there-is-something-rather-than-nothing' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">Could the future of electric transport be a three-wheeler carrying cabbages down a dirt road?</p>
+        <h2 class="title">Africa is charting a different road to electric mobility with motorbikes and versatile 3-wheelers</h2>
+        <p class="byline">
+          <span class="publication">The Independent</span>
+          <span class='sep'>·</span><span>Farai Mutsaka</span>
+        </p>
+        <p class="contextualisation">The Western vision of the electric vehicle transition assumes sleek passenger cars and massive charging grids. But that picture ignores how most people actually get around. Published on 15 November 2026, The Independent’s reporting shifts the focus to rural dirt paths and local markets. It asks a practical question: how does a continent electrify its roads when the standard blueprint doesn&#x27;t fit? The answer bypasses luxury vehicles entirely, looking instead at the three-wheeled workhorses that actually keep the local economy moving.</p>
+        <p class='show-notes'>A report on how the electric vehicle transition in Africa is bypassing passenger cars in favor of motorcycles and three-wheelers. Interviews with rural farmers and urban taxi drivers show how these smaller, battery-swapping vehicles serve as tools to earn a living rather than personal consumer goods. The reporting outlines the daily cost savings of these machines over gas-powered alternatives, alongside the financing hurdles slowing their spread.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-15/article_30624.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.independent.co.uk/news/south-africa-zimbabwe-harare-transport-kenya-b3085122.html' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">Does watching one man take the fall for a ruined planet let everyone else off the hook?</p>
+        <h2 class="title">The Torment of Individualism</h2>
+        <p class="byline">
+          <span class="publication">The Hedgehog Review</span>
+          <span class='sep'>·</span><span>Heather Penatzer</span>
+        </p>
+        <p class="contextualisation">Tom Cruise trades his usual action-hero swagger for the role of a destructive, drawling oil tycoon in Alejandro Iñárritu’s latest film. Published on 4 November 2026, the review bypasses the movie&#x27;s cinematic tricks to isolate a sharper question about modern consumption. It asks why audiences are so eager to project environmental guilt onto a single corporate villain. People would rather watch a scapegoat suffer than admit a shared appetite for the spoils.</p>
+        <p class='show-notes'>A critical reading of Alejandro Iñárritu’s film Digger, examining how its play-within-a-movie format complicates a standard story about American capitalism. The analysis tracks the film&#x27;s shifting layers of reality to show how it targets both corporate greed and the consumers who demand oil but refuse responsibility for the fallout. It also looks at how Tom Cruise&#x27;s role as a destructive tycoon reverses his long career of playing the ultimate American hero.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-15/article_29410.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://hedgehogreview.com/web-features/thr/posts/the-torment-of-individualism' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you win a revolution when the superpower next door is playing every side?</p>
+        <h2 class="title">Myanmar Needs a China-Critical Policy, Not an Anti-China Policy</h2>
+        <p class="byline">
+          <span class="publication">The Diplomat</span>
+          <span class='sep'>·</span><span>Thurein Naing</span>
+        </p>
+        <p class="contextualisation">Since the military coup, street protests across Myanmar have naturally turned their anger toward Beijing. But a 12 November 2026 piece from The Diplomat asks what happens when that same street-level outrage dictates foreign policy. While the military junta and the democratic resistance fight for physical control of the country, both sides keep stumbling over how to handle their massive northern neighbor. Setting aside the moral arguments, the essay poses a cold, strategic question: if the resistance actually wants to win, can it afford to treat China as an enemy?</p>
+        <p class='show-notes'>An analysis of how Myanmar&#x27;s military junta and its democratic resistance are mismanaging their diplomatic relations with Beijing. Details the junta&#x27;s swings between submission and state-sponsored hostility, alongside the resistance&#x27;s erratic mix of moral outrage and awkward appeals. Outlines a three-part framework for democratic forces to replace emotional anti-Chinese activism with a calculated, China-critical foreign policy.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-15/article_30172.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>14 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://thediplomat.com/2026/11/myanmar-needs-a-china-critical-policy-not-an-anti-china-policy/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
