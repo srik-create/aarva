@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Monday, 16 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-16</div>
+      <div class="edition-meta">4 pieces · Monday, 16 November 2026</div>
+    </header>
+
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">How can sitting perfectly still and watching your breath make you forget you are a person?</p>
+        <h2 class="title">The Dark Side of Mindfulness</h2>
+        <p class="byline">
+          <span class="publication">The Atlantic</span>
+          <span class='sep'>·</span><span>Olga Khazan</span>
+        </p>
+        <p class="contextualisation">Millions of people sit cross-legged on cushions every morning, watching their breath to cure anxiety. But in this piece published on 4 September 2026, The Atlantic pauses on a question the wellness industry prefers to ignore: what happens when meditation actually makes things worse? A prominent psychologist set out to prove the clinical benefits of mindfulness, only to discover that extended silence can trigger severe panic or even psychosis. Her findings challenge the modern habit of treating an intense spiritual discipline like a harmless daily vitamin.</p>
+        <p class='show-notes'>A profile of a clinical psychologist who set out to study the benefits of meditation and instead documented a pattern of severe side effects among people who practice it. The reporting follows her transition from a devoted mindfulness teacher to a researcher cataloging cases of meditation-induced anxiety, depression, and psychosis. It outlines the resistance her findings met from the wellness industry and her work building a support clinic for those harmed by intensive retreats.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-16/article_17616.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>49 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.theatlantic.com/ideas/2026/09/meditation-willoughby-britton-downsides/688474/?utm_source=feed' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">If a company passes the cost of a tariff to its customers, who actually owns the refund?</p>
+        <h2 class="title">Corporations Are Using Trump’s Tariff Refunds on Bonuses Rather Than Reimbursing Consumers</h2>
+        <p class="byline">
+          <span class="publication">ProPublica</span>
+          <span class='sep'>·</span><span>Nick McMillan</span>
+        </p>
+        <p class="contextualisation">When the federal government began issuing billions of dollars in tariff refund checks to American corporations, it left out one major detail: what the companies had to do with the cash. The money is going back to the businesses that originally paid the fees, even though many had already passed those costs down to everyday shoppers. Published on 16 November 2026, ProPublica&#x27;s reporting tracks where the windfall is actually landing. It asks a blunt question: when a government mistake hands a corporation millions of dollars, who gets the payout?</p>
+        <p class='show-notes'>An analysis of corporate financial filings and earnings calls detailing how publicly traded companies are spending their federal tariff refunds. At least nine major firms are using the money to fund executive bonuses rather than reimbursing the consumers who absorbed the initial price hikes. The reporting explains the rules of the government refund process and tracks the pending consumer lawsuits attempting to force corporate payouts.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-16/article_30649.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>13 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://www.propublica.org/article/trump-tariff-refunds-corporate-bonuses' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">Why does a daily pill feel like medicine, while a bowl of beans just feels like lunch?</p>
+        <h2 class="title">Are probiotics necessary? Food expert Krish Ashok asks this question in his new book</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Krish Ashok</span>
+        </p>
+        <p class="contextualisation">Writing on 28 October 2026, Krish Ashok looks at the multi-billion-dollar probiotics industry and asks a surprisingly basic question: what problem is a daily supplement actually trying to solve? The wellness market treats the human gut like a tank that needs topping up with expensive capsules. But Ashok points out that it is an ecosystem that simply needs feeding. The piece strips away the medicalised marketing of modern gut health to show why mundane, everyday foods like dal and curd rice do the job better than a pill.</p>
+        <p class='show-notes'>An examination of the scientific evidence behind commercial probiotic supplements and their generic marketing claims. The text contrasts these manufactured capsules with traditional Indian diets, explaining how ordinary fiber-rich foods and home-fermented staples like dahi and curd rice more effectively feed the gut ecosystem.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-16/article_27470.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>7 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1096098/are-probiotics-necessary-food-expert-krish-ashok-asks-this-question-in-his-new-book?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+
+      <article class="piece">
+        <p class="hook">What happens when you sit still long enough to hear a barnacle?</p>
+        <h2 class="title">‘I heard a barnacle’ – how paying attention to nature’s background noise can reveal animal secrets</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Phil Starks, Associate Professor of Biology, Tufts University</span>
+        </p>
+        <p class="contextualisation">On a rocky beach in Washington, a single barnacle makes a strange popping sound. Published on 6 November 2026, this essay from The Conversation uses that tiny noise to ask a surprisingly difficult question: how do you actually watch an animal? Most people stop looking the moment they know what a creature is called, letting the label replace the experience. The writer outlines a practical method for observing the outdoors, suggesting that finding something new rarely requires a rare species. Usually, it just takes the patience to let the ordinary become interesting.</p>
+        <p class='show-notes'>A guide to observing animal behavior in everyday settings, from rocky shores to backyard gardens. Using examples of barnacles, honeybees, and spiders, the author outlines a four-step method for turning casual sightings into basic science. The steps show how to slow down, notice repetition, and avoid the trap of explaining a discovery too quickly.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-16/article_28950.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>7 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/i-heard-a-barnacle-how-paying-attention-to-natures-background-noise-can-reveal-animal-secrets-290033' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
