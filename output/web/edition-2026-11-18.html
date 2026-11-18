@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Wednesday, 18 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-18</div>
+      <div class="edition-meta">6 pieces · Wednesday, 18 November 2026</div>
+    </header>
+
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">Why are two rival nations racing to build a machine that neither of them can control?</p>
+        <h2 class="title">A Game-Theory Basis for U.S.-China Cooperation on AI Governance (Part I)</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>Craig Martin</span>
+        </p>
+        <p class="contextualisation">Right now, Washington and Beijing are treating the race for artificial intelligence like a winner-takes-all sprint, terrified that slowing down means losing. But an essay published in Just Security on 17 November 2026 pauses to ask a darker question: what happens if winning the race means losing control of the technology entirely? By swapping out one classic game-theory model for another, the authors shift the entire geopolitical standoff. They suggest that when the prize is potentially catastrophic, mutual restraint stops being a naive wish and becomes the only rational move left on the board.</p>
+        <p class='show-notes'>A game-theory analysis of the competition between the United States and China over frontier artificial intelligence. Argues that treating AI development as a winner-take-all prisoner&#x27;s dilemma ignores the shared danger of losing control over advanced models. Proposes reframing the rivalry as a stag hunt, a scenario where verifiable mutual restraint becomes the rational choice for both governments.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-18/article_31021.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>22 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/164387/game-theory-basis-us-china-cooperation-ai/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=game-theory-basis-us-china-cooperation-ai' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook"></p>
+        <h2 class="title">To Many Chinese, Jensen Huang’s Race Was What Led to His Downfall</h2>
+        <p class="byline">
+          <span class="publication">The Diplomat</span>
+          <span class='sep'>·</span><span>Yang Meng</span>
+        </p>
+        <p class="contextualisation">When Nvidia founder Jensen Huang resigned amid a messy scandal, American media read it as a straightforward corporate collapse. But as this piece published on 17 November 2026 points out, Chinese-language commentators saw a warning. The Diplomat captures how a billionaire tech executive became a sudden symbol of vulnerability for the Chinese diaspora. The reaction exposes an intense anxiety running through immigrant communities: how high do you have to climb before you are finally safe from ethnic suspicion?</p>
+        <p class='show-notes'>A report on how Chinese-language media and online communities interpreted the resignation of Nvidia founder Jensen Huang. Tracks how nationalist commentators and overseas Chinese groups framed his downfall as a racially motivated purge by the US establishment, rather than a result of personal misconduct. Documents how this narrative fuels anxieties about ethnic exclusion and accelerates the spread of antisemitic conspiracy theories.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-18/article_31066.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://thediplomat.com/2026/11/to-many-chinese-jensen-huangs-race-was-what-led-to-his-downfall/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">If a living cell is just chemicals inside a bubble, which part had to come first?</p>
+        <h2 class="title">The Case for a Bubble at Life’s Start</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Perri Thaler</span>
+        </p>
+        <p class="contextualisation">A puddle of water sits on the early Earth, gathering stray molecules into tiny spheres. Biologists usually start the story of evolution with genetic code like DNA, but a 10 November 2026 feature from Quanta Magazine circles a biological chicken-and-egg problem. What if the physical container had to come first? Long before complex genetics existed, simple chemical bubbles might have trapped raw ingredients and begun to evolve on their own. The earliest ancestor of all life might have been nothing more than an empty microscopic bag.</p>
+        <p class='show-notes'>An overview of the lipid-first hypothesis, which proposes that life on Earth began with simple chemical bubbles rather than complex genetic molecules. It explains how these early membranes could have trapped molecules in self-repeating loops, allowing them to pass traits to offspring and undergo natural selection. A final section surveys the scientific debate over the theory, including alternative ideas for how early chemistry was contained.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-18/article_29757.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by Vindemiatrix</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/the-case-for-a-bubble-at-lifes-start-20261110/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">How does catching the ball wrong make a wicketkeeper faster than everyone who catches it right?</p>
+        <h2 class="title">‘A Pythagoras behind the stumps’: Mahendra Singh Dhoni retires from the IPL</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Bharat Sundaresan</span>
+        </p>
+        <p class="contextualisation">For years, cricket coaches complained that Mahendra Singh Dhoni ignored the wicketkeeping manual. His hand positions were awkward, and his mechanics looked entirely wrong to anyone trained in the traditional style. Published on 18 November 2026, the excerpt bypasses those old technical complaints to focus on what was actually happening behind the stumps. By pushing his hands forward to catch the ball instead of pulling back to cushion it, Dhoni was not just being stubborn. He was quietly rewriting the physics of the position, trading textbook form for a speed no one else could match.</p>
+        <p class='show-notes'>A mechanical breakdown of Mahendra Singh Dhoni&#x27;s unconventional wicketkeeping technique and the physical traits behind his stumping speed. Drawing on interviews with former players and his childhood coach, the text explains how his self-taught methods contradict standard cricket manuals. It details his hand movements, his method of absorbing force, and his spatial positioning to show how he gains fractions of a second behind the stumps.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-18/article_31120.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://scroll.in/article/1097143/a-pythagoras-behind-the-stumps-mahendra-singh-dhoni-retires-from-the-ipl?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
