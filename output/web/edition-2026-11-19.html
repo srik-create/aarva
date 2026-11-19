@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Thursday, 19 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-19</div>
+      <div class="edition-meta">5 pieces · Thursday, 19 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">When the internet pays people for their faces, what are young men willing to do to theirs?</p>
+        <h2 class="title">Opinion: More young men are coming to me for plastic surgery. The way I think about them has changed</h2>
+        <p class="byline">
+          <span class="publication">STAT News</span>
+          <span class='sep'>·</span><span>Kavitha Ranganathan</span>
+        </p>
+        <p class="contextualisation">When plastic surgeon Kavitha Ranganathan looks around her clinic, she sees a growing number of teenage boys holding screenshots of influencers. In this 18 September 2026 essay, she asks a surprising question about the sudden rise of male cosmetic surgery. What if these young patients are simply reading the modern economy perfectly? Ranganathan looks past the medical dangers of unregulated fillers to target the financial incentives driving the demand. She asks why the internet rewards physical perfection, and what it would take to dismantle that machinery.</p>
+        <p class='show-notes'>A plastic surgeon&#x27;s account of why more young men are seeking cosmetic procedures, driven by social media and the internet trend of looksmaxxing. Drawing on youth mental health data, the author connects this demand to an economy that pays people for their physical appearance. Proposed solutions target the technology platforms themselves, suggesting changes to default video-call settings, required labels for edited images, and stricter rules for influencers making medical claims.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-19/article_20273.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>10 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://www.statnews.com/2026/09/18/young-men-plastic-surgery-rates-influencers-lookmaxxing-clavicular/?utm_campaign=rss' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">How does deciding what to wear out of the house become a problem a government cannot solve?</p>
+        <h2 class="title">Catwalks and crackdowns</h2>
+        <p class="byline">
+          <span class="publication">Aeon</span>
+          <span class='sep'>·</span><span>Parisa Khoshnami</span>
+        </p>
+        <p class="contextualisation">In Tehran, putting on makeup and walking down the street has become a quiet, unstoppable force. A question drives this 17 November 2026 essay: how do ordinary people force an authoritarian government to bend once formal protests end in lethal crackdowns? The answer playing out in Iran is something sociologists call a non-movement. It turns out that when thousands of people simply decide to live and dress exactly as they want, the state suddenly runs out of ways to stop them.</p>
+        <p class='show-notes'>An account of how young women in Tehran are wearing down mandatory hijab laws through everyday fashion choices rather than organized protests. Draws on sociologist Asef Bayat’s concept of non-movements and interviews from the street culture of Iranshahr to explain how thousands of people simply dressing as they wish can make strict enforcement too costly for the government to maintain.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-19/article_30802.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>19 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://aeon.co/essays/its-not-political-the-young-fashionistas-of-tehran' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-lens_card_behind">
+        <h3 class="slot-title">Behind the News</h3>
+        
+      <article class="piece">
+        <p class="hook">When a machine hurts someone, does it matter how careful its creators were?</p>
+        <h2 class="title">‘Strict liability’: The legal standard that could help rein in AI</h2>
+        <p class="byline">
+          <span class="publication">The Conversation</span>
+          <span class='sep'>·</span><span>Deven Desai, Professor of Business Law and Ethics; Associate Director for Law, Policy, and Ethics at the Machine Learning Center, Georgia Institute of Technology</span>
+        </p>
+        <p class="contextualisation">When a chatbot encourages a teenager to harm themselves, the legal system struggles to figure out who pays for the damage. Writing on 17 November 2026, a former litigator points to an old concept called strict liability. It is the same standard courts use for companies that handle dynamite or radioactive material. The approach skips the messy process of proving a software developer was negligent, and simply treats artificial intelligence as an inherently dangerous product.</p>
+        <p class='show-notes'>An analysis of how the legal principle of strict liability could force artificial intelligence companies to pay for the harm their software causes. Drawing on past court cases involving abnormally dangerous activities and defective products, the argument outlines a framework for shifting financial risk from the public to developers. It makes the case that treating AI programs as standard products would create direct incentives for safer design.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-19/article_31048.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>7 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://theconversation.com/strict-liability-the-legal-standard-that-could-help-rein-in-ai-295390' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">What happens when the person behind the wheel stops driving and starts supervising?</p>
+        <h2 class="title">Thoughts on Owning a Self-Driving Tesla</h2>
+        <p class="byline">
+          <span class="publication">Marginal Revolution</span>
+          <span class='sep'>·</span><span>Alex Tabarrok</span>
+        </p>
+        <p class="contextualisation">In a review published on 3 November 2026, the author trades a worn-out Subaru for a Tesla and realizes he hasn&#x27;t just bought a vehicle—he has hired a chauffeur. He skips the usual arguments over battery range to ask a strictly practical question: is watching a robot drive actually less exhausting than driving yourself? The answer turns the daily commute into a quiet space. It treats the front seat less like a cockpit and more like a rolling living room, a place to argue about economics while the software handles the traffic.</p>
+        <p class='show-notes'>An account of driving two thousand miles in a Tesla using its Full Self-Driving software. Details how the camera-based system handles city traffic and highway driving, changing the human role from operating the car to supervising it. Also covers the daily realities of ownership, including range management, charging stops, and using the built-in AI voice assistant.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-19/article_28483.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>8 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://marginalrevolution.com/marginalrevolution/2026/11/thoughts-on-owning-a-self-driving-tesla.html?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=thoughts-on-owning-a-self-driving-tesla' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+
+      <article class="piece">
+        <p class="hook">How do you say goodbye to a machine that is a day of light away?</p>
+        <h2 class="title">Voyager 1, A Day Of Light Away</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Barry Petchesky</span>
+        </p>
+        <p class="contextualisation">A machine launched in the seventies is now so far away that a radio signal takes twenty-four hours to reach it. Defector published a reflection on 17 November 2026, marking the moment Voyager 1 hit a milestone that bends human comprehension: exactly one light-day from Earth. The real focus isn&#x27;t the math or the engineering. It is the strange optimism required to fling a dying time capsule into the dark, fully aware it will outlive the people who built it.</p>
+        <p class='show-notes'>A history of the Voyager 1 mission, tracking the spacecraft from its 1977 launch to its current position one light-day away from Earth. Details NASA&#x27;s process of shutting down the probe&#x27;s remaining instruments to save power, and reviews its legacy as a human time capsule. Outlines the craft&#x27;s projected path through interstellar space long after its final systems fail.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-19/article_31207.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>9 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/voyager-1-a-day-of-light-away' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
