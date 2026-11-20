@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Friday, 20 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-20</div>
+      <div class="edition-meta">2 pieces · Crosscut · Friday, 20 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · tech industry success</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-20/crosscut_0320.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>28 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>A tech empire often starts with someone doing absolutely nothing. Writing this week, Noah Smith looks at the quiet, aimless years of wandering that frequently precede a founder’s massive breakthrough—a period of apparent laziness masking deep ambition. But once that breakthrough scales, the timeline violently accelerates. In a piece published just days later, Adam Clark Estes tracks the fallout of a sudden CEO exit at Nvidia, showing how one corporate shakeup can instantly rattle the broader economy. What emerges is a strange rhythm to Silicon Valley success. The industry relies on slow, invisible incubation, yet it produces companies so massive that a single afternoon of boardroom drama sends shockwaves through retirement accounts everywhere.</p>
+        <article class='piece'>
+<p class='hook'>Before building a billion-dollar company, a founder might spend years crashing on a couch or learning ballet. In an essay published just this week, Noah Smith tracks a strange pattern of aimlessness that often precedes massive breakthroughs. Listen for the story of Sasha Sheng, who quit her corporate job to make her own clothes before co-founding an AI startup valued at seven and a half billion dollars. Wandering might actually be a requirement for invention.</p>
+<h2 class='title'>Bumbition</h2>
+<p class='byline'><span class='publication'>Noahpinion</span><span class='sep'>·</span><span>Noah Smith</span></p>
+<p class='source'><a href='https://www.noahpinion.blog/p/bumbition' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>Noah Smith leaves you with the image of a future billionaire crashing on a girlfriend&#x27;s couch, playing video games and waiting for inspiration to strike. His version of tech innovation happens quietly. It relies on aimless wandering, where a breakthrough feels like a deeply personal discovery. 
+
+Turn the page to Adam Clark Estes, and that romantic image of the eccentric founder suddenly looks like a liability. Estes picks up the story at the exact opposite end of the success curve. Where Smith focuses on the invisible years before a breakthrough, Estes tracks the loud, immediate financial shockwaves when a tech giant stumbles. 
+
+Reading Smith, a founder&#x27;s unpredictable life path feels like a necessary ingredient for building a new AI model. Read alongside Estes, human unpredictability—like Jensen Huang’s sudden scandal and exit from Nvidia—looks like a massive structural vulnerability. Nvidia props up the entire AI economy, meaning one person&#x27;s chaos can threaten the stock market. 
+
+The interesting thing is how Estes views that instability. He suggests that knocking a giant off its perch might actually force the competition the industry desperately needs. Notice what surfaces when you put the two together. The same human unpredictability that builds the AI economy might also be exactly what breaks it apart and forces it to mature.</p>
+        <article class='piece'>
+
+<h2 class='title'>How Nvidia’s chaos trickles down to you</h2>
+<p class='byline'><span class='publication'>Vox</span><span class='sep'>·</span><span>Adam Clark Estes</span></p>
+<p class='source'><a href='https://www.vox.com/technology/511229/nvidia-ai-jensen-huang-401k-bubble' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A tech empire often starts with someone staring at the ceiling, killing time. Years of quiet wandering eventually harden into a product, and then into a market so tightly wound that a single resignation can send billions of dollars into freefall overnight. What lingers is the sheer friction between these two speeds. The slow, invisible incubation of an idea sits right alongside the frantic, fragile economy it creates. If the biggest breakthroughs require years of aimless drifting, what happens when the industry built on those ideas no longer tolerates a single wasted second?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
