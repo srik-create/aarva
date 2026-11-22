@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Sat, 21 Nov 2026 19:13:19 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 22 Nov 2026 20:41:28 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,145 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Crosscut: tech in developing nations</title>
+      <itunes:title>Crosscut: tech in developing nations</itunes:title>
+      <link>https://srik-create.github.io/aarva/web/crosscut-2026-11-22.html</link>
+      <description><![CDATA[There is a sharp contrast between the heavy reality of physical infrastructure and the quiet spread of software. In The Independent, Sibi Arasu documents the slow, dirt-under-the-fingernails work of upgrading India&#x27;s power grid. The country wants 900 gigawatts of clean energy by 2035, but connecting new solar panels means clearing endless roadblocks on the ground. Tyler Cowen looks at technology in the Global South from a very different angle in Marginal Revolution. Reviewing a recent economic paper, Cowen asks how artificial intelligence will eventually cross those same borders. Something interesting emerges when placing these two side by side. One grounds progress in the mud of construction, while the other treats it as code floating across the globe.<br/><br/><em>What jumps out reading Sibi Arasu is the sheer physical weight of the problem. India can manufacture all the solar panels it wants, but without the actual copper wires, batteries, and transmission towers to move that electricity, a 900-gigawatt dream simply stalls. It&#x27;s a story about the heavy, expensive friction of building the future.
+
+Tyler Cowen, up next, looks at the developing world through a completely different lens. Instead of physical grids, he focuses on software. Cowen pushes back against an economic paper warning that artificial intelligence will leave poorer nations behind. Where Arasu details the slow, grinding reality of pouring concrete and stringing wires, Cowen debates a technology that theoretically crosses borders the second it goes online. He argues AI will actually bypass traditional industrial hurdles, instantly boosting things like rainfall prediction and crop management.
+
+Read side by side, the split screen is striking. You have the immense physical drag of upgrading a national power grid right next to the frictionless promise of artificial intelligence. One piece asks how a country physically wires itself for the next decade. The other asks what happens when intelligence becomes a cheap, downloadable resource.</em><br/><br/>A solar panel waiting for a transmission line in India sits heavy in the dirt. A new algorithm, though, can cross an ocean in a keystroke. What lingers after hearing these two stories is the friction between dirt and data. Code promises to leapfrog old problems and spread wealth almost instantly. But servers still need electricity, and electricity still requires moving steel and pouring concrete. If software moves at the speed of light, but the power grids needed to run it take decades to build, who actually gets to participate in the next economy?<br/><br/>Sources:<br/><a href="https://www.independent.co.uk/news/india-brazil-bengaluru-united-nations-donald-trump-b3084891.html">The Independent: India seeks to triple clean energy capacity to 900 gigawatts by 2035, but major hurdles remain</a><br/><a href="https://marginalrevolution.com/marginalrevolution/2026/11/will-ai-growth-reach-the-developing-world.html?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=will-ai-growth-reach-the-developing-world">Marginal Revolution: Will AI Growth Reach the Developing World?</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[There is a sharp contrast between the heavy reality of physical infrastructure and the quiet spread of software. In The Independent, Sibi Arasu documents the slow, dirt-under-the-fingernails work of upgrading India&#x27;s power grid. The country wants 900 gigawatts of clean energy by 2035, but connecting new solar panels means clearing endless roadblocks on the ground. Tyler Cowen looks at technology in the Global South from a very different angle in Marginal Revolution. Reviewing a recent economic paper, Cowen asks how artificial intelligence will eventually cross those same borders. Something interesting emerges when placing these two side by side. One grounds progress in the mud of construction, while the other treats it as code floating across the globe.<br/><br/><em>What jumps out reading Sibi Arasu is the sheer physical weight of the problem. India can manufacture all the solar panels it wants, but without the actual copper wires, batteries, and transmission towers to move that electricity, a 900-gigawatt dream simply stalls. It&#x27;s a story about the heavy, expensive friction of building the future.
+
+Tyler Cowen, up next, looks at the developing world through a completely different lens. Instead of physical grids, he focuses on software. Cowen pushes back against an economic paper warning that artificial intelligence will leave poorer nations behind. Where Arasu details the slow, grinding reality of pouring concrete and stringing wires, Cowen debates a technology that theoretically crosses borders the second it goes online. He argues AI will actually bypass traditional industrial hurdles, instantly boosting things like rainfall prediction and crop management.
+
+Read side by side, the split screen is striking. You have the immense physical drag of upgrading a national power grid right next to the frictionless promise of artificial intelligence. One piece asks how a country physically wires itself for the next decade. The other asks what happens when intelligence becomes a cheap, downloadable resource.</em><br/><br/>A solar panel waiting for a transmission line in India sits heavy in the dirt. A new algorithm, though, can cross an ocean in a keystroke. What lingers after hearing these two stories is the friction between dirt and data. Code promises to leapfrog old problems and spread wealth almost instantly. But servers still need electricity, and electricity still requires moving steel and pouring concrete. If software moves at the speed of light, but the power grids needed to run it take decades to build, who actually gets to participate in the next economy?<br/><br/>Sources:<br/><a href="https://www.independent.co.uk/news/india-brazil-bengaluru-united-nations-donald-trump-b3084891.html">The Independent: India seeks to triple clean energy capacity to 900 gigawatts by 2035, but major hurdles remain</a><br/><a href="https://marginalrevolution.com/marginalrevolution/2026/11/will-ai-growth-reach-the-developing-world.html?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=will-ai-growth-reach-the-developing-world">Marginal Revolution: Will AI Growth Reach the Developing World?</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>There is a sharp contrast between the heavy reality of physical infrastructure and the quiet spread of software. In The Independent, Sibi Arasu documents the slow, dirt-under-the-fingernails work of upgrading India&#x27;s power grid. The country wants 900 gigawatts of clean energy by 2035, but connecting new solar panels means clearing endless roadblocks on the ground. Tyler Cowen looks at technology in the Global South from a very different angle in Marginal Revolution. Reviewing a recent economic paper, Cowen asks how artificial intelligence will eventually cross those same borders. Something interesting emerges when placing these two side by side. One grounds progress in the mud of construction, while the other treats it as code floating across the globe.
+
+What jumps out reading Sibi Arasu is the sheer physical weight of the problem. India can manufacture all the solar panels it wants, but without the actual copper wires, batteries, and transmission towers to move that electricity, a 900-gigawatt dream simply stalls. It&#x27;s a story about the heavy, expensive friction of building the future.
+
+Tyler Cowen, up next, looks at the developing world through a completely different lens. Instead of physical grids, he focuses on software. Cowen pushes back against an economic paper warning that artificial intelligence will leave poorer nations behind. Where Arasu details the slow, grinding reality of pouring concrete and stringing wires, Cowen debates a technology that theoretically crosses borders the second it goes online. He argues AI will actually bypass traditional industrial hurdles, instantly boosting things like rainfall prediction and crop management.
+
+Read side by side, the split screen is striking. You have the immense physical drag of upgrading a national power grid right next to the frictionless promise of artificial intelligence. One piece asks how a country physically wires itself for the next decade. The other asks what happens when intelligence becomes a cheap, downloadable resource.
+
+A solar panel waiting for a transmission line in India sits heavy in the dirt. A new algorithm, though, can cross an ocean in a keystroke. What lingers after hearing these two stories is the friction between dirt and data. Code promises to leapfrog old problems and spread wealth almost instantly. But servers still need electricity, and electricity still requires moving steel and pouring concrete. If software moves at the speed of light, but the power grids needed to run it take decades to build, who actually gets to participate in the next economy?
+
+Sources:
+The Independent: India seeks to triple clean energy capacity to 900 gigawatts by 2035, but major hurdles remain
+Marginal Revolution: Will AI Growth Reach the Developing World?
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 22 Nov 2026 20:04:32 +0000</pubDate>
+      <guid isPermaLink="false">aarva-crosscut-324</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-22/crosscut_0324.mp3" length="5711853" type="audio/mpeg"/>
+      <itunes:duration>11:54</itunes:duration>
+      <itunes:author>Aarva</itunes:author>
+      <itunes:subtitle>Crosscut · tech in developing nations</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Type 1 and Type 2 diabetes therapies show great promise – but treatment is only effective if people can access it</title>
+      <itunes:title>Type 1 and Type 2 diabetes therapies show great promise – but treatment is only effective if people can access it</itunes:title>
+      <link>https://theconversation.com/type-1-and-type-2-diabetes-therapies-show-great-promise-but-treatment-is-only-effective-if-people-can-access-it-296795</link>
+      <description><![CDATA[<em>If a cure for diabetes arrives tomorrow, who actually gets the medicine?</em><br/><br/>Laboratories are currently growing insulin-producing cells that could effectively cure diabetes. Medical science is moving faster than ever, generating new drugs and screening tools for a disease affecting over 800 million people. But an essay published on 19 November 2026 pauses on the hard reality of modern medicine: a treatment only works if a patient can actually get it. The real tension is no longer whether science can beat the disease, but what good a miracle cure does when millions cannot even afford basic insulin.<br/><br/>An overview of emerging treatments for Type 1 and Type 2 diabetes, from cell transplants and onset-delaying drugs to GLP-1 medications. Contrasts these clinical advances with the economic and geographic barriers that block access to care. High costs and supply shortages currently keep both standard insulin and new therapies out of reach for millions of people.<br/><br/>Read at source: <a href="https://theconversation.com/type-1-and-type-2-diabetes-therapies-show-great-promise-but-treatment-is-only-effective-if-people-can-access-it-296795">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a cure for diabetes arrives tomorrow, who actually gets the medicine?</em><br/><br/>Laboratories are currently growing insulin-producing cells that could effectively cure diabetes. Medical science is moving faster than ever, generating new drugs and screening tools for a disease affecting over 800 million people. But an essay published on 19 November 2026 pauses on the hard reality of modern medicine: a treatment only works if a patient can actually get it. The real tension is no longer whether science can beat the disease, but what good a miracle cure does when millions cannot even afford basic insulin.<br/><br/>An overview of emerging treatments for Type 1 and Type 2 diabetes, from cell transplants and onset-delaying drugs to GLP-1 medications. Contrasts these clinical advances with the economic and geographic barriers that block access to care. High costs and supply shortages currently keep both standard insulin and new therapies out of reach for millions of people.<br/><br/>Read at source: <a href="https://theconversation.com/type-1-and-type-2-diabetes-therapies-show-great-promise-but-treatment-is-only-effective-if-people-can-access-it-296795">The Conversation</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a cure for diabetes arrives tomorrow, who actually gets the medicine?
+
+Laboratories are currently growing insulin-producing cells that could effectively cure diabetes. Medical science is moving faster than ever, generating new drugs and screening tools for a disease affecting over 800 million people. But an essay published on 19 November 2026 pauses on the hard reality of modern medicine: a treatment only works if a patient can actually get it. The real tension is no longer whether science can beat the disease, but what good a miracle cure does when millions cannot even afford basic insulin.
+
+An overview of emerging treatments for Type 1 and Type 2 diabetes, from cell transplants and onset-delaying drugs to GLP-1 medications. Contrasts these clinical advances with the economic and geographic barriers that block access to care. High costs and supply shortages currently keep both standard insulin and new therapies out of reach for millions of people.
+
+Read at source: The Conversation
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 22 Nov 2026 18:56:10 +0000</pubDate>
+      <guid isPermaLink="false">aarva-323-31515</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-22/article_31515.mp3" length="4540845" type="audio/mpeg"/>
+      <itunes:duration>09:28</itunes:duration>
+      <itunes:author>Jamie Hartmann-Boyce, Associate Professor of Health Promotion and Policy, UMass Amherst</itunes:author>
+      <itunes:subtitle>The Conversation</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>How a US university became an unlikely home for Carnatic music and dance</title>
+      <itunes:title>How a US university became an unlikely home for Carnatic music and dance</itunes:title>
+      <link>https://scroll.in/magazine/1096700/how-a-us-university-became-an-unlikely-home-for-carnatic-music-and-dance?utm_source=rss&amp;utm_medium=public</link>
+      <description><![CDATA[<em>How did some of India&#x27;s greatest classical artists find a second life in a Connecticut barn?</em><br/><br/>In the 1960s, a family of South Indian musicians, sidelined at home by campaigns against the Devadasi tradition, found an unexpected refuge in a Connecticut barn. Published on 31 October 2026, the story captures how those informal kitchen concerts evolved into a fifty-year tradition at Wesleyan University. The central question is one of cultural collision: how did a small New England college become a global center for Carnatic music, and what happens to a classical art when it takes root far from its origins?<br/><br/>An account of how a liberal arts college in Connecticut became a major center for South Indian classical music and dance. Traces the origins of Wesleyan University&#x27;s Navaratri Festival to the 1960s, when a family of sidelined artists from Chennai arrived on campus. Details how these performers built new teaching methods for American students and established a lasting base for Carnatic arts outside India.<br/><br/>Read at source: <a href="https://scroll.in/magazine/1096700/how-a-us-university-became-an-unlikely-home-for-carnatic-music-and-dance?utm_source=rss&amp;utm_medium=public">Scroll.in</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How did some of India&#x27;s greatest classical artists find a second life in a Connecticut barn?</em><br/><br/>In the 1960s, a family of South Indian musicians, sidelined at home by campaigns against the Devadasi tradition, found an unexpected refuge in a Connecticut barn. Published on 31 October 2026, the story captures how those informal kitchen concerts evolved into a fifty-year tradition at Wesleyan University. The central question is one of cultural collision: how did a small New England college become a global center for Carnatic music, and what happens to a classical art when it takes root far from its origins?<br/><br/>An account of how a liberal arts college in Connecticut became a major center for South Indian classical music and dance. Traces the origins of Wesleyan University&#x27;s Navaratri Festival to the 1960s, when a family of sidelined artists from Chennai arrived on campus. Details how these performers built new teaching methods for American students and established a lasting base for Carnatic arts outside India.<br/><br/>Read at source: <a href="https://scroll.in/magazine/1096700/how-a-us-university-became-an-unlikely-home-for-carnatic-music-and-dance?utm_source=rss&amp;utm_medium=public">Scroll.in</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How did some of India&#x27;s greatest classical artists find a second life in a Connecticut barn?
+
+In the 1960s, a family of South Indian musicians, sidelined at home by campaigns against the Devadasi tradition, found an unexpected refuge in a Connecticut barn. Published on 31 October 2026, the story captures how those informal kitchen concerts evolved into a fifty-year tradition at Wesleyan University. The central question is one of cultural collision: how did a small New England college become a global center for Carnatic music, and what happens to a classical art when it takes root far from its origins?
+
+An account of how a liberal arts college in Connecticut became a major center for South Indian classical music and dance. Traces the origins of Wesleyan University&#x27;s Navaratri Festival to the 1960s, when a family of sidelined artists from Chennai arrived on campus. Details how these performers built new teaching methods for American students and established a lasting base for Carnatic arts outside India.
+
+Read at source: Scroll.in
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 22 Nov 2026 18:56:10 +0000</pubDate>
+      <guid isPermaLink="false">aarva-323-28091</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-22/article_28091.mp3" length="5736429" type="audio/mpeg"/>
+      <itunes:duration>11:57</itunes:duration>
+      <itunes:author>Malini Nair</itunes:author>
+      <itunes:subtitle>Scroll.in</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The softness of metal</title>
+      <itunes:title>The softness of metal</itunes:title>
+      <link>https://psyche.co/turning-points/his-frailty-made-ozzys-final-gig-true-heavy-metal</link>
+      <description><![CDATA[<em>If heavy metal is about strength, why is it such a good place for a failing body?</em><br/><br/>Distortion pedals and screaming guitars usually project an image of indestructible masculinity. But in an essay published on 21 September 2026, the lens turns to what happens when heavy metal&#x27;s aging gods can no longer hide their physical limits. Watching Ozzy Osbourne’s final, physically diminished performance, the writer finds a surprising mirror for everyday human frailty. It asks a quiet question about a loud subculture: what if metal was never actually about rejecting weakness, but about creating a space where broken bodies and chronic pain could finally sit without shame?<br/><br/>A personal essay on heavy metal and physical frailty, framed around Ozzy Osbourne’s final concert. The author connects Osbourne’s seated performance to his own chronic illness and his father’s struggle with Parkinson&#x27;s disease. Drawing on the genre&#x27;s history and his daughter&#x27;s experience at live shows, he argues that metal&#x27;s aggressive exterior hides an acceptance of physical limits.<br/><br/>Read at source: <a href="https://psyche.co/turning-points/his-frailty-made-ozzys-final-gig-true-heavy-metal">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If heavy metal is about strength, why is it such a good place for a failing body?</em><br/><br/>Distortion pedals and screaming guitars usually project an image of indestructible masculinity. But in an essay published on 21 September 2026, the lens turns to what happens when heavy metal&#x27;s aging gods can no longer hide their physical limits. Watching Ozzy Osbourne’s final, physically diminished performance, the writer finds a surprising mirror for everyday human frailty. It asks a quiet question about a loud subculture: what if metal was never actually about rejecting weakness, but about creating a space where broken bodies and chronic pain could finally sit without shame?<br/><br/>A personal essay on heavy metal and physical frailty, framed around Ozzy Osbourne’s final concert. The author connects Osbourne’s seated performance to his own chronic illness and his father’s struggle with Parkinson&#x27;s disease. Drawing on the genre&#x27;s history and his daughter&#x27;s experience at live shows, he argues that metal&#x27;s aggressive exterior hides an acceptance of physical limits.<br/><br/>Read at source: <a href="https://psyche.co/turning-points/his-frailty-made-ozzys-final-gig-true-heavy-metal">Psyche</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If heavy metal is about strength, why is it such a good place for a failing body?
+
+Distortion pedals and screaming guitars usually project an image of indestructible masculinity. But in an essay published on 21 September 2026, the lens turns to what happens when heavy metal&#x27;s aging gods can no longer hide their physical limits. Watching Ozzy Osbourne’s final, physically diminished performance, the writer finds a surprising mirror for everyday human frailty. It asks a quiet question about a loud subculture: what if metal was never actually about rejecting weakness, but about creating a space where broken bodies and chronic pain could finally sit without shame?
+
+A personal essay on heavy metal and physical frailty, framed around Ozzy Osbourne’s final concert. The author connects Osbourne’s seated performance to his own chronic illness and his father’s struggle with Parkinson&#x27;s disease. Drawing on the genre&#x27;s history and his daughter&#x27;s experience at live shows, he argues that metal&#x27;s aggressive exterior hides an acceptance of physical limits.
+
+Read at source: Psyche
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 22 Nov 2026 18:56:10 +0000</pubDate>
+      <guid isPermaLink="false">aarva-323-20498</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-22/article_20498.mp3" length="6528813" type="audio/mpeg"/>
+      <itunes:duration>13:36</itunes:duration>
+      <itunes:author>Keith Kahn-Harris</itunes:author>
+      <itunes:subtitle>Psyche</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Six Ways That People of the Past Used Magic to Protect Their Homes, From Witch Bottles to Mystical Symbols</title>
+      <itunes:title>Six Ways That People of the Past Used Magic to Protect Their Homes, From Witch Bottles to Mystical Symbols</itunes:title>
+      <link>https://www.smithsonianmag.com/history/six-ways-that-people-of-the-past-used-magic-to-protect-their-homes-from-witch-bottles-to-mystical-symbols-180989493/</link>
+      <description><![CDATA[<em>If a lock keeps out a thief, what keeps out a curse?</em><br/><br/>Long before motion sensors and security cameras, home protection relied on a different kind of hardware. Writing on 15 September 2026, historian Thomas Waters details the physical remnants of magical home defense left behind in hearths and garden beds. From buried bottles of hair to stars carved into mortar, these objects functioned as a practical form of psychological armor. They offered a way to manage anxiety in a highly flammable world, showing how humans have always tried to make their private spaces feel secure against forces they cannot control.<br/><br/>A historical survey of the physical objects and architectural features people have used to protect their homes from supernatural threats. It catalogs six methods of domestic defense across different cultures, ranging from witch bottles in early modern Europe to demon tiles in East Asia. These include specific plants, carved symbols, and religious texts that residents relied on to ward off evil and ease everyday anxieties.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/six-ways-that-people-of-the-past-used-magic-to-protect-their-homes-from-witch-bottles-to-mystical-symbols-180989493/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>If a lock keeps out a thief, what keeps out a curse?</em><br/><br/>Long before motion sensors and security cameras, home protection relied on a different kind of hardware. Writing on 15 September 2026, historian Thomas Waters details the physical remnants of magical home defense left behind in hearths and garden beds. From buried bottles of hair to stars carved into mortar, these objects functioned as a practical form of psychological armor. They offered a way to manage anxiety in a highly flammable world, showing how humans have always tried to make their private spaces feel secure against forces they cannot control.<br/><br/>A historical survey of the physical objects and architectural features people have used to protect their homes from supernatural threats. It catalogs six methods of domestic defense across different cultures, ranging from witch bottles in early modern Europe to demon tiles in East Asia. These include specific plants, carved symbols, and religious texts that residents relied on to ward off evil and ease everyday anxieties.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/six-ways-that-people-of-the-past-used-magic-to-protect-their-homes-from-witch-bottles-to-mystical-symbols-180989493/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>If a lock keeps out a thief, what keeps out a curse?
+
+Long before motion sensors and security cameras, home protection relied on a different kind of hardware. Writing on 15 September 2026, historian Thomas Waters details the physical remnants of magical home defense left behind in hearths and garden beds. From buried bottles of hair to stars carved into mortar, these objects functioned as a practical form of psychological armor. They offered a way to manage anxiety in a highly flammable world, showing how humans have always tried to make their private spaces feel secure against forces they cannot control.
+
+A historical survey of the physical objects and architectural features people have used to protect their homes from supernatural threats. It catalogs six methods of domestic defense across different cultures, ranging from witch bottles in early modern Europe to demon tiles in East Asia. These include specific plants, carved symbols, and religious texts that residents relied on to ward off evil and ease everyday anxieties.
+
+Read at source: Smithsonian Magazine
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Sun, 22 Nov 2026 18:56:10 +0000</pubDate>
+      <guid isPermaLink="false">aarva-323-19439</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-22/article_19439.mp3" length="4204077" type="audio/mpeg"/>
+      <itunes:duration>08:45</itunes:duration>
+      <itunes:author>Smithsonian Magazine</itunes:author>
+      <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: the cost of parenting</title>
       <itunes:title>Crosscut: the cost of parenting</itunes:title>

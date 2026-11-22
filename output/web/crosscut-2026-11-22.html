@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Sunday, 22 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-22</div>
+      <div class="edition-meta">2 pieces · Crosscut · Sunday, 22 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · tech in developing nations</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-22/crosscut_0324.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>12 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>There is a sharp contrast between the heavy reality of physical infrastructure and the quiet spread of software. In The Independent, Sibi Arasu documents the slow, dirt-under-the-fingernails work of upgrading India&#x27;s power grid. The country wants 900 gigawatts of clean energy by 2035, but connecting new solar panels means clearing endless roadblocks on the ground. Tyler Cowen looks at technology in the Global South from a very different angle in Marginal Revolution. Reviewing a recent economic paper, Cowen asks how artificial intelligence will eventually cross those same borders. Something interesting emerges when placing these two side by side. One grounds progress in the mud of construction, while the other treats it as code floating across the globe.</p>
+        <article class='piece'>
+<p class='hook'>India wants to install enough solar and wind power to supply a billion homes by 2035. But generating that electricity is only half the problem. In a piece published last week, Sibi Arasu points to physical wires and batteries as the real bottleneck. Notice how Arasu shifts the focus from the raw ambition of building new turbines to the quiet, expensive reality of upgrading the transmission grid so that power actually reaches a light switch.</p>
+<h2 class='title'>India seeks to triple clean energy capacity to 900 gigawatts by 2035, but major hurdles remain</h2>
+<p class='byline'><span class='publication'>The Independent</span><span class='sep'>·</span><span>Sibi Arasu</span></p>
+<p class='source'><a href='https://www.independent.co.uk/news/india-brazil-bengaluru-united-nations-donald-trump-b3084891.html' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>What jumps out reading Sibi Arasu is the sheer physical weight of the problem. India can manufacture all the solar panels it wants, but without the actual copper wires, batteries, and transmission towers to move that electricity, a 900-gigawatt dream simply stalls. It&#x27;s a story about the heavy, expensive friction of building the future.
+
+Tyler Cowen, up next, looks at the developing world through a completely different lens. Instead of physical grids, he focuses on software. Cowen pushes back against an economic paper warning that artificial intelligence will leave poorer nations behind. Where Arasu details the slow, grinding reality of pouring concrete and stringing wires, Cowen debates a technology that theoretically crosses borders the second it goes online. He argues AI will actually bypass traditional industrial hurdles, instantly boosting things like rainfall prediction and crop management.
+
+Read side by side, the split screen is striking. You have the immense physical drag of upgrading a national power grid right next to the frictionless promise of artificial intelligence. One piece asks how a country physically wires itself for the next decade. The other asks what happens when intelligence becomes a cheap, downloadable resource.</p>
+        <article class='piece'>
+
+<h2 class='title'>Will AI Growth Reach the Developing World?</h2>
+<p class='byline'><span class='publication'>Marginal Revolution</span><span class='sep'>·</span><span>Tyler Cowen</span></p>
+<p class='source'><a href='https://marginalrevolution.com/marginalrevolution/2026/11/will-ai-growth-reach-the-developing-world.html?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=will-ai-growth-reach-the-developing-world' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>A solar panel waiting for a transmission line in India sits heavy in the dirt. A new algorithm, though, can cross an ocean in a keystroke. What lingers after hearing these two stories is the friction between dirt and data. Code promises to leapfrog old problems and spread wealth almost instantly. But servers still need electricity, and electricity still requires moving steel and pouring concrete. If software moves at the speed of light, but the power grids needed to run it take decades to build, who actually gets to participate in the next economy?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
