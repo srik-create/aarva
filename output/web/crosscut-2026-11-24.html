@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Tuesday, 24 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-24</div>
+      <div class="edition-meta">2 pieces · Crosscut · Tuesday, 24 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · historic summits</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-24/crosscut_0327.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>43 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>In December 1941, Winston Churchill spent three weeks at the White House with Franklin Roosevelt, hammering out a strategy to win a world war. That visit set the expectation for what a summit should be: a room where history actually turns. A piece from Smithsonian Magazine recounts that encounter as a genuine turning point. But a striking contrast emerges when placing that history next to Anthony Teitler’s analysis in The Diplomat. Looking at modern meetings between the United States and China, Teitler argues these highly staged handshakes are mostly theater. Instead of solving problems, they project a false sense of progress over rivalries that never end. Read together, the pairing captures the distance between world-altering diplomacy and empty spectacle.</p>
+        <article class='piece'>
+<p class='hook'>Published last week in *Smithsonian Magazine*, this historical account starts in a surprisingly vulnerable place: Winston Churchill weeping in bed over sunken battleships and a drowned friend. Just days after Pearl Harbor, the prime minister was terrified Franklin Roosevelt would only fight Japan, leaving Britain to face Germany alone. Notice how the writer captures that exact moment of panic, right before a desperate Christmas summit finally locked in the Allied strategy for the war.</p>
+<h2 class='title'>Winston Churchill Desperately Wanted a Wartime Meeting With FDR. He Got It, and Their Three-Week Christmas Summit Changed the Trajectory of WWII</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/history/winston-churchill-desperately-wanted-wartime-meeting-FDR-got-their-three-week-christmas-summit-changed-trajectory-war-180989842/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>The Smithsonian piece leaves you with a striking image: Winston Churchill twisting in bed, mourning sunken battleships, desperate for a meeting that would actually reshape the globe. That 1941 Christmas summit set a permanent standard for what happens when world leaders cross oceans to talk. Things change. History pivots. 
+
+Read right after that genuine turning point, Anthony Teitler’s analysis of modern diplomacy hits with a much sharper edge. Teitler looks at recent summits between the US and China, and what jumps out is how the expectation created by leaders like Churchill and Roosevelt now gets hijacked. Teitler points out the endless pageantry—the state dinners and repeated declarations of historic breakthroughs. But notice how he contrasts that theater with the reality on the ground. While presidents shake hands for the cameras, the actual disputes over rare earth minerals and trade commitments just keep grinding on, completely unresolved.
+
+Put the two pieces together, and the modern photo ops start to look like a specific kind of illusion. Teitler suggests these meetings are deliberately staged to look like 1941-style turning points, precisely to hide the fact that nothing is actually turning at all.</p>
+        <article class='piece'>
+
+<h2 class='title'>The Never-Ending China-US Story</h2>
+<p class='byline'><span class='publication'>The Diplomat</span><span class='sep'>·</span><span>Anthony Teitler</span></p>
+<p class='source'><a href='https://thediplomat.com/2026/11/the-never-ending-china-us-story/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>What lingers is the sheer distance between a battleship in 1941 and a modern press conference. Churchill and Roosevelt met in the Atlantic to draw up a map for survival. Today, leaders step up to the podium mostly to smile, shaking hands just to freeze a standoff in place. The grand summit has shifted from a site of action to a theater of delay. If the staged handshake no longer signals a real turning point, what actually forces two rival nations to change course?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

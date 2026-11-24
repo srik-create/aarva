@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Tuesday, 24 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-24</div>
+      <div class="edition-meta">4 pieces · Tuesday, 24 November 2026</div>
+    </header>
+
+    
+
+
+      <section class="slot slot-lens_card_humans">
+        <h3 class="slot-title">Humans &amp; Humanity</h3>
+        
+      <article class="piece">
+        <p class="hook">When scientists cut a strand of DNA, what actually stitches the pieces back together?</p>
+        <h2 class="title">The Incredible, Elegant DNA Repair System Makes Gene Editing Work</h2>
+        <p class="byline">
+          <span class="publication">Quanta Magazine</span>
+          <span class='sep'>·</span><span>Annie Melchor</span>
+        </p>
+        <p class="contextualisation">Biology textbooks usually treat DNA like a pristine blueprint locked safely behind glass. But in a piece published on 23 November 2026, Quanta Magazine frames genetic code as a messy, heavily used recipe book. A single cell suffers tens of thousands of microscopic tears every day just from keeping a body alive. The story sets up a quiet realization about modern gene editing. The medical breakthroughs making headlines don&#x27;t actually come from the cutting tools scientists invented. They rely entirely on the ancient repair crews our cells already use to survive.</p>
+        <p class='show-notes'>An explanation of why DNA breaks down during everyday cellular activity, and how the body&#x27;s natural repair systems make modern gene editing possible. Outlines the different types of genetic damage, from single-letter errors to severed strands. Shows how tools like CRISPR do not rewrite the genome directly, but instead make precise cuts that force the cell&#x27;s own repair pathways to stitch in new material.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-24/article_32185.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Gacrux</span>
+        </div>
+    
+        <p class='source'><a href='https://www.quantamagazine.org/the-incredible-elegant-dna-repair-system-makes-gene-editing-work-20261123/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-curiosity">
+        <h3 class="slot-title">For Your Curiosity</h3>
+        
+      <article class="piece">
+        <p class="hook">Why is it easier to pause a country&#x27;s debt than to return its stolen land?</p>
+        <h2 class="title">The imperialism of progressive economics</h2>
+        <p class="byline">
+          <span class="publication">Africa Is a Country</span>
+          <span class='sep'>·</span><span>Keston K. Perry</span>
+        </p>
+        <p class="contextualisation">When a climate disaster strikes a developing nation, international consultants usually arrive right behind the aid workers. In an essay published on 23 November 2026, the magazine Africa Is a Country asks what happens when well-meaning economists bring ready-made solutions to postcolonial states. Proposals like universal basic income or debt restructuring sound helpful on paper, but they often leave old power structures completely intact. The piece poses a sharp question about who actually gets to define justice after centuries of extraction, and whether modern progressive policy might just be an older kind of empire wearing a nicer suit.</p>
+        <p class='show-notes'>A critique of how progressive economists from wealthy nations impose universal policies, like basic income or climate finance, on the Global South. Draws on examples from Caribbean debt relief and African economic planning to show how technical fixes bypass historical demands for reparations and the return of stolen land. Argues for an alternative approach that returns economic decision-making power to local communities.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-24/article_32206.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>12 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://africasacountry.com/2026/11/the-imperialism-of-progressive-economics' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">If a political memoir reads like a paperback romance, is the love any less real?</p>
+        <h2 class="title">‘Belonging’: Sonia and Rajiv Gandhi’s love story has all the makings of a great romance novel</h2>
+        <p class="byline">
+          <span class="publication">Scroll.in</span>
+          <span class='sep'>·</span><span>Trisha Das</span>
+        </p>
+        <p class="contextualisation">People usually read political memoirs looking for historical secrets or score-settling. In this piece published on 21 November 2026, romance novelist Trisha Das approaches Sonia Gandhi’s memoir looking for the people inside it. She sets aside the political machinery to focus on the marriage at the center of the book. Das finds a story that hits every familiar beat of a paperback romance, from the foggy Cambridge meet-cute to the overbearing mother-in-law. The essay asks what happens when the private love story of a highly public figure is finally read on its own terms.</p>
+        <p class='show-notes'>A reading of Sonia Gandhi’s memoir, Belonging, that treats the book strictly as a romance novel. It follows Sonia and Rajiv Gandhi&#x27;s relationship from their early days in Cambridge to the strict rules of a political family and the daily reality of their marriage. By separating public history from personal narrative, the text examines how the memoir builds a love story that ends with Rajiv&#x27;s assassination.</p>
+        <div class='audio-missing'>Audio not available</div>
+        <p class='source'><a href='https://scroll.in/article/1097186/belonging-sonia-and-rajiv-gandhis-love-story-has-all-the-makings-of-a-great-romance-novel?utm_source=rss&amp;utm_medium=public' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
