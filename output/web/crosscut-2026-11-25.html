@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Crosscut · Wednesday, 25 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-25</div>
+      <div class="edition-meta">2 pieces · Crosscut · Wednesday, 25 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-crosscut">
+        <h3 class="slot-title">Crosscut · healthcare on the margins</h3>
+        
+      <audio controls preload="metadata" class="audio">
+        <source src="https://srik-create.github.io/aarva/output/audio/2026-11-25/crosscut_0329.mp3" type="audio/mpeg" />
+        Your browser doesn't support the audio element.
+      </audio>
+      <div class="audio-meta">
+        <span>20 min</span>
+        <span class='sep'>·</span><span>narrated by Sulafat/Charon/Vindemiatrix</span>
+      </div>
+    
+        <p class='contextualisation'>When a new vaccine makes headlines, cameras usually focus on the laboratory. But a blind spot appears when attention shifts toward the margins, where medicine actually meets the public. A recent piece from Smithsonian Magazine examines centuries of medical breakthroughs, pointing out how marginalized patients are consistently left waiting at the end of the line. Turning to the Ebola crisis in the Democratic Republic of Congo, Sarah Elizabeth Scales asks a different question. She argues that local health workers risking their lives to deliver treatments in conflict zones are owed physical protection, not just praise. Together, these perspectives ask who is really forgotten when a medical miracle finally leaves the lab.</p>
+        <article class='piece'>
+<p class='hook'>A pair of cracked leather clogs worn by a New York nurse during the Covid-19 pandemic sits near the syringe Jonas Salk used to test his polio vaccine. Published last week in *Smithsonian Magazine*, this piece looks at a new museum exhibition to track centuries of medical history. Listen for how the writer contrasts the physical objects of life-saving progress with the persistent reality that these breakthroughs consistently bypass marginalized patients.</p>
+<h2 class='title'>From Penicillin to the Polio Vaccine, a New Exhibition Reveals How Far We’ve Come With Lifesaving Medical Innovations—and How Much Further We Have to Go</h2>
+<p class='byline'><span class='publication'>Smithsonian Magazine</span></p>
+<p class='source'><a href='https://www.smithsonianmag.com/smithsonian-institution/from-penicillin-to-the-polio-vaccine-a-new-exhibition-reveals-how-far-weve-come-with-lifesaving-medical-innovations-and-how-much-further-we-have-to-go-180989892/' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='hook'>The Smithsonian piece leaves you staring at a pair of cracked, unpolished clogs worn by a nurse in Queens. It makes a quiet point: behind every polished Nobel Prize medal, there is a physical toll, and a history of people living on the margins who never see the benefits of those discoveries. Turning to Sarah Elizabeth Scales, you find that exact physical toll happening right now during an Ebola outbreak in the Democratic Republic of Congo. Where the first piece asks who gets access to life-saving medicine, Scales asks what happens when that medicine does not exist yet. Notice how the focus shifts from the marginalized patient to the local health worker. Scales points out that society expects these workers to risk their lives—relying on a medical code written in 1847—while treating their physical protection as an afterthought. Read alongside the museum exhibit, Scales’s argument shifts the frame. The cracked shoes in the Smithsonian stop looking like a simple symbol of heroism. Instead, they become evidence of a system that expects local workers to absorb the deadliest risks of a crisis, long before the vaccines ever arrive.</p>
+        <article class='piece'>
+
+<h2 class='title'>The DRC’s Ebola crisis revives an old ethical question: What do health workers owe patients?</h2>
+<p class='byline'><span class='publication'>The Conversation</span><span class='sep'>·</span><span>Sarah Elizabeth Scales, Assistant Professor of Epidemiology, University of Nebraska Medical Center</span></p>
+<p class='source'><a href='https://theconversation.com/the-drcs-ebola-crisis-revives-an-old-ethical-question-what-do-health-workers-owe-patients-296998' target='_blank' rel='noopener'>Read at source →</a></p>
+</article>
+        <p class='contextualisation'>The distance between a quiet laboratory and a makeshift clinic is vast. A new vaccine might look like a triumph on paper, but healing only happens when a pill actually reaches a hand. Right now, the people standing in that gap are left entirely exposed. Applause cannot stop a bullet for a volunteer carrying supplies through rubble, and a medical patent cannot save a patient pushed to the margins. If the final mile of healthcare is always the most dangerous, what will it take to protect the people forced to walk it?</p>
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>
