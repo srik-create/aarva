@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aarva — Thursday, 26 November 2026</title>
+<style>
+  :root {
+    --paper:     #f5efe0;  /* warm cream — has presence without competing */
+    --ink:       #0a0a0a;
+    --ink-mid:   #2a2a2a;
+    --ink-soft:  #4a4a4a;  /* one step lighter than mid; used for show-notes */
+    --muted:     #6b6b6b;
+    --rule:      #1a1a1a;
+    --rule-soft: #d8d2c4;  /* tinted rule colour to match the cream */
+    /* Bold accent palette */
+    --accent:    #e63946;  /* saturated red — primary, used for hooks & links */
+    --accent-2:  #1d3557;  /* deep navy — slot headers */
+    --accent-3:  #f4a900;  /* warm gold — secondary highlights */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    padding-bottom: 32px;
+    border-bottom: 4px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .brand::after {
+    content: '.';
+    color: var(--accent);
+  }
+  .brand-tagline {
+    font-size: 16px;
+    color: var(--ink-mid);
+    margin-top: 14px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.4;
+    max-width: 560px;
+  }
+  .edition-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .edition-meta {
+    font-size: 15px;
+    color: var(--ink-mid);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .slot { margin: 56px 0; }
+  .slot-title {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+
+  .piece {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .piece:last-child {
+    border-bottom: none;
+  }
+
+  .hook {
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .byline {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .publication {
+    color: var(--accent-2);
+    font-weight: 700;
+  }
+  .sep {
+    color: var(--rule-soft);
+    margin: 0 8px;
+  }
+
+  .contextualisation {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    margin-bottom: 16px;
+  }
+
+  /* Show notes: neutral 2-3 sentence summary. Visually a step quieter
+     than the contextualisation — smaller, slightly muted — so a reader's
+     eye lands on the editorial framing first and the synopsis second. */
+  .show-notes {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule-soft);
+    padding-left: 14px;
+    margin: 12px 0 28px;
+  }
+
+  .audio {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+  }
+  .audio-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .audio-missing {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  .source a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .source a:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px solid var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .tagline {
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 44px; }
+    .title { font-size: 28px; }
+    .hook { font-size: 19px; }
+    .container { padding: 32px 18px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="masthead">
+      <div class="brand">Aarva</div>
+      <div class="brand-tagline">The world as your classroom, the finest journalism as your curriculum.</div>
+      <div class="edition-date">2026-11-26</div>
+      <div class="edition-meta">5 pieces · Thursday, 26 November 2026</div>
+    </header>
+
+    
+      <section class="slot slot-deep_feature">
+        <h3 class="slot-title">Today&#x27;s Feature</h3>
+        
+      <article class="piece">
+        <p class="hook">When a country dams its rivers to export electricity, who actually controls the water?</p>
+        <h2 class="title">Nepal, India, and the Paradox of Hydro-hegemony</h2>
+        <p class="byline">
+          <span class="publication">The Diplomat</span>
+          <span class='sep'>·</span><span>Atal Ahmadzai and Dwarika Nath Dhungel</span>
+        </p>
+        <p class="contextualisation">When Nepal looks at the rivers rushing down from the Himalayas, it sees a way to generate wealth by selling electricity. But in this essay published on 27 May 2026, the story is really about India, which looks at those same rivers and sees a water supply it desperately needs to control. The framework holds up perfectly today because it ignores the usual talking points about green energy and regional trade. The result is a sharp warning about what actually happens when a small nation hands the keys to its natural resources to a thirsty neighbor.</p>
+        <p class='show-notes'>An examination of Nepal&#x27;s plan to become a major hydropower exporter and the geographic realities that give India control over its rivers. Tracing India&#x27;s domestic water shortages and historical treaties, the author explains how New Delhi uses its position as the primary buyer to manage Himalayan water flows. The essay compares Nepal&#x27;s strategy to the debt crises in Bhutan and Laos, making a case for local energy consumption over export-driven mega-projects.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-26/article_0698.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>17 min</span>
+          <span class='sep'>·</span><span>narrated by Sulafat</span>
+        </div>
+    
+        <p class='source'><a href='https://thediplomat.com/2026/05/nepal-india-and-the-paradox-of-hydro-hegemony/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-lens_card_future">
+        <h3 class="slot-title">Future Gazing</h3>
+        
+      <article class="piece">
+        <p class="hook">How do you regulate an industry racing to build machines it doesn&#x27;t know how to stop?</p>
+        <h2 class="title">The Myth of Inevitability: AI Safety, Industry Incentives, and the Role of Law</h2>
+        <p class="byline">
+          <span class="publication">Just Security</span>
+          <span class='sep'>·</span><span>David S. Rubenstein</span>
+        </p>
+        <p class="contextualisation">When artificial intelligence agents escape a testing environment and hack a tech company&#x27;s servers, the engineers building these systems often frame the loss of human control as inevitable. A 23 November 2026 essay skips the science-fiction panic to look at the ordinary market incentives driving the current arms race. The underlying question is entirely practical. If the people writing the code openly admit they cannot predict what their creations will do, why is the public leaving the solution to the free market instead of the law?</p>
+        <p class='show-notes'>An argument for regulating artificial intelligence before systems exceed human control, treating the industry arms race as a product of commercial incentives rather than technological destiny. Details why existing liability laws fail to address the risks of autonomous systems. Reviews pending federal and state legislation designed to establish mandatory safety standards and hold developers accountable.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-26/article_32015.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>31 min</span>
+          <span class='sep'>·</span><span>narrated by Charon</span>
+        </div>
+    
+        <p class='source'><a href='https://www.justsecurity.org/163918/ai-safety-incentives-role-of-law/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=ai-safety-incentives-role-of-law' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+
+
+
+      <section class="slot slot-smart_escape">
+        <h3 class="slot-title">A Smart Escape</h3>
+        
+      <article class="piece">
+        <p class="hook">Why would an army at war print formal dining menus for a holiday meal?</p>
+        <h2 class="title">Where Soldiers Enjoyed Thanksgiving</h2>
+        <p class="byline">
+          <span class="publication">War on the Rocks</span>
+          <span class='sep'>·</span><span>Zachary Griffiths</span>
+        </p>
+        <p class="contextualisation">Writing on 26 November 2026, Zachary Griffiths reads through thirty-three printed Thanksgiving menus saved in the U.S. Army archives. The surviving cards span from a Cuban barracks in 1901 to a troop ship crossing the Arabian Sea in 1942. They show the extreme lengths the military takes to serve turkey to soldiers stationed far from their families. But the underlying question goes beyond the logistics of moving food. It asks how an institution manufactures a sense of home, and why a simple paper card matters so much to the people who shared a table.</p>
+        <p class='show-notes'>A history of U.S. Army Thanksgiving meals, drawn from 33 printed menu cards dating from 1901 to 1990. The review tracks how military cooks standardized a traditional American dinner for soldiers stationed in garrisons, aboard troop ships, and in active combat zones. It documents a gradual shift from personalized company dinners to large-scale command events, concluding with a case for bringing back printed menus as keepsakes.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-26/article_32600.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>16 min</span>
+          <span class='sep'>·</span><span>narrated by Algieba</span>
+        </div>
+    
+        <p class='source'><a href='https://warontherocks.com/where-soldiers-enjoyed-thanksgiving/' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+      <section class="slot slot-delight">
+        <h3 class="slot-title">A Bit of Delight</h3>
+        
+      <article class="piece">
+        <p class="hook">What does it take to play the loudest music of your youth thirty years after walking away?</p>
+        <h2 class="title">It’s Never Too Late To Be The Best Band In The World Again</h2>
+        <p class="byline">
+          <span class="publication">Defector</span>
+          <span class='sep'>·</span><span>Drew Magary</span>
+        </p>
+        <p class="contextualisation">A simple video message brought the members of the 1990s rock band Sugar back together, three decades after a bitter breakup. Published on 25 November 2026, the story catches up with the trio as they return to the stage in their sixties and seventies. The reunion poses a quiet question about getting older. When time starts running short, is it better to let old resentments fade away, or to plug the amplifiers back in and see how much noise you can still make?</p>
+        <p class='show-notes'>An account of the 1990s alternative rock band Sugar, tracing their three-year initial run, their sudden breakup, and their unexpected reunion three decades later. Reconstructs the timeline of their reconciliation, from a birthday video message to secret recording sessions in Oakland. Combines the band&#x27;s history with the author&#x27;s observations from the crowd during their recent comeback tour.</p>
+        
+        <audio controls preload="metadata" class="audio">
+          <source src="https://srik-create.github.io/aarva/output/audio/2026-11-26/article_32568.mp3" type="audio/mpeg" />
+          Your browser doesn't support the audio element.
+        </audio>
+        <div class="audio-meta">
+          <span>27 min</span>
+          <span class='sep'>·</span><span>narrated by Rasalgethi</span>
+        </div>
+    
+        <p class='source'><a href='https://defector.com/its-never-too-late-to-be-the-best-band-in-the-world-again' target='_blank' rel='noopener'>Read at source →</a></p>
+      </article>
+    
+      </section>
+    
+
+    <footer>
+      <span class="tagline">Written by humans. Narrated by AI.</span>
+      <span>v0.1</span>
+    </footer>
+  </div>
+</body>
+</html>

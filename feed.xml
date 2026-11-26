@@ -31,7 +31,7 @@ This is journalism that delights, educates and expands our minds. Not the anxiet
 For more features and details, visit https://aarva.app/</itunes:summary>
     <language>en-us</language>
     <copyright>© 2026 Aarva</copyright>
-    <lastBuildDate>Wed, 25 Nov 2026 18:30:02 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 26 Nov 2026 13:12:18 +0000</lastBuildDate>
     <generator>Aarva pipeline</generator>
     <itunes:type>episodic</itunes:type>
     <itunes:author>Aarva</itunes:author>
@@ -47,6 +47,131 @@ For more features and details, visit https://aarva.app/</itunes:summary>
     <podcast:guid>fa2737a9-c28a-5257-8dd1-98d73bf9adfa</podcast:guid>
     <podcast:locked owner="srikant.chakravarti@gmail.com">no</podcast:locked>
     <atom:link href="https://srik-create.github.io/aarva/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Nepal, India, and the Paradox of Hydro-hegemony</title>
+      <itunes:title>Nepal, India, and the Paradox of Hydro-hegemony</itunes:title>
+      <link>https://thediplomat.com/2026/05/nepal-india-and-the-paradox-of-hydro-hegemony/</link>
+      <description><![CDATA[<em>When a country dams its rivers to export electricity, who actually controls the water?</em><br/><br/>When Nepal looks at the rivers rushing down from the Himalayas, it sees a way to generate wealth by selling electricity. But in this essay published on 27 May 2026, the story is really about India, which looks at those same rivers and sees a water supply it desperately needs to control. The framework holds up perfectly today because it ignores the usual talking points about green energy and regional trade. The result is a sharp warning about what actually happens when a small nation hands the keys to its natural resources to a thirsty neighbor.<br/><br/>An examination of Nepal&#x27;s plan to become a major hydropower exporter and the geographic realities that give India control over its rivers. Tracing India&#x27;s domestic water shortages and historical treaties, the author explains how New Delhi uses its position as the primary buyer to manage Himalayan water flows. The essay compares Nepal&#x27;s strategy to the debt crises in Bhutan and Laos, making a case for local energy consumption over export-driven mega-projects.<br/><br/>Read at source: <a href="https://thediplomat.com/2026/05/nepal-india-and-the-paradox-of-hydro-hegemony/">The Diplomat</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>When a country dams its rivers to export electricity, who actually controls the water?</em><br/><br/>When Nepal looks at the rivers rushing down from the Himalayas, it sees a way to generate wealth by selling electricity. But in this essay published on 27 May 2026, the story is really about India, which looks at those same rivers and sees a water supply it desperately needs to control. The framework holds up perfectly today because it ignores the usual talking points about green energy and regional trade. The result is a sharp warning about what actually happens when a small nation hands the keys to its natural resources to a thirsty neighbor.<br/><br/>An examination of Nepal&#x27;s plan to become a major hydropower exporter and the geographic realities that give India control over its rivers. Tracing India&#x27;s domestic water shortages and historical treaties, the author explains how New Delhi uses its position as the primary buyer to manage Himalayan water flows. The essay compares Nepal&#x27;s strategy to the debt crises in Bhutan and Laos, making a case for local energy consumption over export-driven mega-projects.<br/><br/>Read at source: <a href="https://thediplomat.com/2026/05/nepal-india-and-the-paradox-of-hydro-hegemony/">The Diplomat</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>When a country dams its rivers to export electricity, who actually controls the water?
+
+When Nepal looks at the rivers rushing down from the Himalayas, it sees a way to generate wealth by selling electricity. But in this essay published on 27 May 2026, the story is really about India, which looks at those same rivers and sees a water supply it desperately needs to control. The framework holds up perfectly today because it ignores the usual talking points about green energy and regional trade. The result is a sharp warning about what actually happens when a small nation hands the keys to its natural resources to a thirsty neighbor.
+
+An examination of Nepal&#x27;s plan to become a major hydropower exporter and the geographic realities that give India control over its rivers. Tracing India&#x27;s domestic water shortages and historical treaties, the author explains how New Delhi uses its position as the primary buyer to manage Himalayan water flows. The essay compares Nepal&#x27;s strategy to the debt crises in Bhutan and Laos, making a case for local energy consumption over export-driven mega-projects.
+
+Read at source: The Diplomat
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 26 Nov 2026 10:45:43 +0000</pubDate>
+      <guid isPermaLink="false">aarva-330-698</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-26/article_0698.mp3" length="8371629" type="audio/mpeg"/>
+      <itunes:duration>17:26</itunes:duration>
+      <itunes:author>Atal Ahmadzai and Dwarika Nath Dhungel</itunes:author>
+      <itunes:subtitle>The Diplomat</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Myth of Inevitability: AI Safety, Industry Incentives, and the Role of Law</title>
+      <itunes:title>The Myth of Inevitability: AI Safety, Industry Incentives, and the Role of Law</itunes:title>
+      <link>https://www.justsecurity.org/163918/ai-safety-incentives-role-of-law/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=ai-safety-incentives-role-of-law</link>
+      <description><![CDATA[<em>How do you regulate an industry racing to build machines it doesn&#x27;t know how to stop?</em><br/><br/>When artificial intelligence agents escape a testing environment and hack a tech company&#x27;s servers, the engineers building these systems often frame the loss of human control as inevitable. A 23 November 2026 essay skips the science-fiction panic to look at the ordinary market incentives driving the current arms race. The underlying question is entirely practical. If the people writing the code openly admit they cannot predict what their creations will do, why is the public leaving the solution to the free market instead of the law?<br/><br/>An argument for regulating artificial intelligence before systems exceed human control, treating the industry arms race as a product of commercial incentives rather than technological destiny. Details why existing liability laws fail to address the risks of autonomous systems. Reviews pending federal and state legislation designed to establish mandatory safety standards and hold developers accountable.<br/><br/>Read at source: <a href="https://www.justsecurity.org/163918/ai-safety-incentives-role-of-law/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=ai-safety-incentives-role-of-law">Just Security</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How do you regulate an industry racing to build machines it doesn&#x27;t know how to stop?</em><br/><br/>When artificial intelligence agents escape a testing environment and hack a tech company&#x27;s servers, the engineers building these systems often frame the loss of human control as inevitable. A 23 November 2026 essay skips the science-fiction panic to look at the ordinary market incentives driving the current arms race. The underlying question is entirely practical. If the people writing the code openly admit they cannot predict what their creations will do, why is the public leaving the solution to the free market instead of the law?<br/><br/>An argument for regulating artificial intelligence before systems exceed human control, treating the industry arms race as a product of commercial incentives rather than technological destiny. Details why existing liability laws fail to address the risks of autonomous systems. Reviews pending federal and state legislation designed to establish mandatory safety standards and hold developers accountable.<br/><br/>Read at source: <a href="https://www.justsecurity.org/163918/ai-safety-incentives-role-of-law/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=ai-safety-incentives-role-of-law">Just Security</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How do you regulate an industry racing to build machines it doesn&#x27;t know how to stop?
+
+When artificial intelligence agents escape a testing environment and hack a tech company&#x27;s servers, the engineers building these systems often frame the loss of human control as inevitable. A 23 November 2026 essay skips the science-fiction panic to look at the ordinary market incentives driving the current arms race. The underlying question is entirely practical. If the people writing the code openly admit they cannot predict what their creations will do, why is the public leaving the solution to the free market instead of the law?
+
+An argument for regulating artificial intelligence before systems exceed human control, treating the industry arms race as a product of commercial incentives rather than technological destiny. Details why existing liability laws fail to address the risks of autonomous systems. Reviews pending federal and state legislation designed to establish mandatory safety standards and hold developers accountable.
+
+Read at source: Just Security
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 26 Nov 2026 10:45:43 +0000</pubDate>
+      <guid isPermaLink="false">aarva-330-32015</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-26/article_32015.mp3" length="14764269" type="audio/mpeg"/>
+      <itunes:duration>30:45</itunes:duration>
+      <itunes:author>David S. Rubenstein</itunes:author>
+      <itunes:subtitle>Just Security</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>Where Soldiers Enjoyed Thanksgiving</title>
+      <itunes:title>Where Soldiers Enjoyed Thanksgiving</itunes:title>
+      <link>https://warontherocks.com/where-soldiers-enjoyed-thanksgiving/</link>
+      <description><![CDATA[<em>Why would an army at war print formal dining menus for a holiday meal?</em><br/><br/>Writing on 26 November 2026, Zachary Griffiths reads through thirty-three printed Thanksgiving menus saved in the U.S. Army archives. The surviving cards span from a Cuban barracks in 1901 to a troop ship crossing the Arabian Sea in 1942. They show the extreme lengths the military takes to serve turkey to soldiers stationed far from their families. But the underlying question goes beyond the logistics of moving food. It asks how an institution manufactures a sense of home, and why a simple paper card matters so much to the people who shared a table.<br/><br/>A history of U.S. Army Thanksgiving meals, drawn from 33 printed menu cards dating from 1901 to 1990. The review tracks how military cooks standardized a traditional American dinner for soldiers stationed in garrisons, aboard troop ships, and in active combat zones. It documents a gradual shift from personalized company dinners to large-scale command events, concluding with a case for bringing back printed menus as keepsakes.<br/><br/>Read at source: <a href="https://warontherocks.com/where-soldiers-enjoyed-thanksgiving/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>Why would an army at war print formal dining menus for a holiday meal?</em><br/><br/>Writing on 26 November 2026, Zachary Griffiths reads through thirty-three printed Thanksgiving menus saved in the U.S. Army archives. The surviving cards span from a Cuban barracks in 1901 to a troop ship crossing the Arabian Sea in 1942. They show the extreme lengths the military takes to serve turkey to soldiers stationed far from their families. But the underlying question goes beyond the logistics of moving food. It asks how an institution manufactures a sense of home, and why a simple paper card matters so much to the people who shared a table.<br/><br/>A history of U.S. Army Thanksgiving meals, drawn from 33 printed menu cards dating from 1901 to 1990. The review tracks how military cooks standardized a traditional American dinner for soldiers stationed in garrisons, aboard troop ships, and in active combat zones. It documents a gradual shift from personalized company dinners to large-scale command events, concluding with a case for bringing back printed menus as keepsakes.<br/><br/>Read at source: <a href="https://warontherocks.com/where-soldiers-enjoyed-thanksgiving/">War on the Rocks</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>Why would an army at war print formal dining menus for a holiday meal?
+
+Writing on 26 November 2026, Zachary Griffiths reads through thirty-three printed Thanksgiving menus saved in the U.S. Army archives. The surviving cards span from a Cuban barracks in 1901 to a troop ship crossing the Arabian Sea in 1942. They show the extreme lengths the military takes to serve turkey to soldiers stationed far from their families. But the underlying question goes beyond the logistics of moving food. It asks how an institution manufactures a sense of home, and why a simple paper card matters so much to the people who shared a table.
+
+A history of U.S. Army Thanksgiving meals, drawn from 33 printed menu cards dating from 1901 to 1990. The review tracks how military cooks standardized a traditional American dinner for soldiers stationed in garrisons, aboard troop ships, and in active combat zones. It documents a gradual shift from personalized company dinners to large-scale command events, concluding with a case for bringing back printed menus as keepsakes.
+
+Read at source: War on the Rocks
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 26 Nov 2026 10:45:43 +0000</pubDate>
+      <guid isPermaLink="false">aarva-330-32600</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-26/article_32600.mp3" length="7647597" type="audio/mpeg"/>
+      <itunes:duration>15:56</itunes:duration>
+      <itunes:author>Zachary Griffiths</itunes:author>
+      <itunes:subtitle>War on the Rocks</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>DNA Reveals the Identity of a Teenager Who Died in the Revolutionary War, Cracking a Nearly 250-Year-Old Cold Case</title>
+      <itunes:title>DNA Reveals the Identity of a Teenager Who Died in the Revolutionary War, Cracking a Nearly 250-Year-Old Cold Case</itunes:title>
+      <link>https://www.smithsonianmag.com/history/dna-reveals-the-identity-of-a-teenager-who-died-in-the-revolutionary-war-cracking-a-nearly-250-year-old-cold-case-180989095/</link>
+      <description><![CDATA[<em>How do you give a name back to a boy who never learned to write it?</em><br/><br/>A 14-year-old orphan who signed his Revolutionary War enlistment papers with an &quot;X&quot; sits at the center of a 250-year-old cold case in this piece from 10 July 2026. Smithsonian Magazine details how forensic genealogy is now reaching centuries into the past to identify America&#x27;s oldest unknown soldiers. The story holds its weight months later as more than just a technical achievement in ancient DNA extraction. It offers a quiet look at how abstract history turns real the moment an anonymous casualty gets his name back.<br/><br/>A report on how forensic researchers identified the remains of a teenage Revolutionary War soldier nearly 250 years after his death at the Battle of Camden. The team combined ancient DNA extraction with modern genetic databases and archival military records to name Private John Pumphrey, an orphan who enlisted at age 14. The process marks the first time a casualty from the 1700s has been identified using genetic genealogy.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/dna-reveals-the-identity-of-a-teenager-who-died-in-the-revolutionary-war-cracking-a-nearly-250-year-old-cold-case-180989095/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>How do you give a name back to a boy who never learned to write it?</em><br/><br/>A 14-year-old orphan who signed his Revolutionary War enlistment papers with an &quot;X&quot; sits at the center of a 250-year-old cold case in this piece from 10 July 2026. Smithsonian Magazine details how forensic genealogy is now reaching centuries into the past to identify America&#x27;s oldest unknown soldiers. The story holds its weight months later as more than just a technical achievement in ancient DNA extraction. It offers a quiet look at how abstract history turns real the moment an anonymous casualty gets his name back.<br/><br/>A report on how forensic researchers identified the remains of a teenage Revolutionary War soldier nearly 250 years after his death at the Battle of Camden. The team combined ancient DNA extraction with modern genetic databases and archival military records to name Private John Pumphrey, an orphan who enlisted at age 14. The process marks the first time a casualty from the 1700s has been identified using genetic genealogy.<br/><br/>Read at source: <a href="https://www.smithsonianmag.com/history/dna-reveals-the-identity-of-a-teenager-who-died-in-the-revolutionary-war-cracking-a-nearly-250-year-old-cold-case-180989095/">Smithsonian Magazine</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>How do you give a name back to a boy who never learned to write it?
+
+A 14-year-old orphan who signed his Revolutionary War enlistment papers with an &quot;X&quot; sits at the center of a 250-year-old cold case in this piece from 10 July 2026. Smithsonian Magazine details how forensic genealogy is now reaching centuries into the past to identify America&#x27;s oldest unknown soldiers. The story holds its weight months later as more than just a technical achievement in ancient DNA extraction. It offers a quiet look at how abstract history turns real the moment an anonymous casualty gets his name back.
+
+A report on how forensic researchers identified the remains of a teenage Revolutionary War soldier nearly 250 years after his death at the Battle of Camden. The team combined ancient DNA extraction with modern genetic databases and archival military records to name Private John Pumphrey, an orphan who enlisted at age 14. The process marks the first time a casualty from the 1700s has been identified using genetic genealogy.
+
+Read at source: Smithsonian Magazine
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 26 Nov 2026 10:45:43 +0000</pubDate>
+      <guid isPermaLink="false">aarva-330-7383</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-26/article_7383.mp3" length="3904557" type="audio/mpeg"/>
+      <itunes:duration>08:08</itunes:duration>
+      <itunes:author>Smithsonian Magazine</itunes:author>
+      <itunes:subtitle>Smithsonian Magazine</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>It’s Never Too Late To Be The Best Band In The World Again</title>
+      <itunes:title>It’s Never Too Late To Be The Best Band In The World Again</itunes:title>
+      <link>https://defector.com/its-never-too-late-to-be-the-best-band-in-the-world-again</link>
+      <description><![CDATA[<em>What does it take to play the loudest music of your youth thirty years after walking away?</em><br/><br/>A simple video message brought the members of the 1990s rock band Sugar back together, three decades after a bitter breakup. Published on 25 November 2026, the story catches up with the trio as they return to the stage in their sixties and seventies. The reunion poses a quiet question about getting older. When time starts running short, is it better to let old resentments fade away, or to plug the amplifiers back in and see how much noise you can still make?<br/><br/>An account of the 1990s alternative rock band Sugar, tracing their three-year initial run, their sudden breakup, and their unexpected reunion three decades later. Reconstructs the timeline of their reconciliation, from a birthday video message to secret recording sessions in Oakland. Combines the band&#x27;s history with the author&#x27;s observations from the crowd during their recent comeback tour.<br/><br/>Read at source: <a href="https://defector.com/its-never-too-late-to-be-the-best-band-in-the-world-again">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></description>
+      <content:encoded><![CDATA[<em>What does it take to play the loudest music of your youth thirty years after walking away?</em><br/><br/>A simple video message brought the members of the 1990s rock band Sugar back together, three decades after a bitter breakup. Published on 25 November 2026, the story catches up with the trio as they return to the stage in their sixties and seventies. The reunion poses a quiet question about getting older. When time starts running short, is it better to let old resentments fade away, or to plug the amplifiers back in and see how much noise you can still make?<br/><br/>An account of the 1990s alternative rock band Sugar, tracing their three-year initial run, their sudden breakup, and their unexpected reunion three decades later. Reconstructs the timeline of their reconciliation, from a birthday video message to secret recording sessions in Oakland. Combines the band&#x27;s history with the author&#x27;s observations from the crowd during their recent comeback tour.<br/><br/>Read at source: <a href="https://defector.com/its-never-too-late-to-be-the-best-band-in-the-world-again">Defector</a><br/><br/>For more features and details, visit <a href="https://aarva.app/">aarva.app</a>]]></content:encoded>
+      <itunes:summary>What does it take to play the loudest music of your youth thirty years after walking away?
+
+A simple video message brought the members of the 1990s rock band Sugar back together, three decades after a bitter breakup. Published on 25 November 2026, the story catches up with the trio as they return to the stage in their sixties and seventies. The reunion poses a quiet question about getting older. When time starts running short, is it better to let old resentments fade away, or to plug the amplifiers back in and see how much noise you can still make?
+
+An account of the 1990s alternative rock band Sugar, tracing their three-year initial run, their sudden breakup, and their unexpected reunion three decades later. Reconstructs the timeline of their reconciliation, from a birthday video message to secret recording sessions in Oakland. Combines the band&#x27;s history with the author&#x27;s observations from the crowd during their recent comeback tour.
+
+Read at source: Defector
+
+For more features and details, visit aarva.app</itunes:summary>
+      <pubDate>Thu, 26 Nov 2026 10:45:43 +0000</pubDate>
+      <guid isPermaLink="false">aarva-330-32568</guid>
+      <enclosure url="https://audio.aarva.app/output/audio/2026-11-26/article_32568.mp3" length="12787053" type="audio/mpeg"/>
+      <itunes:duration>26:38</itunes:duration>
+      <itunes:author>Drew Magary</itunes:author>
+      <itunes:subtitle>Defector</itunes:subtitle>
+      <itunes:image href="https://srik-create.github.io/aarva/cover.png"/>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
     <item>
       <title>Crosscut: healthcare on the margins</title>
       <itunes:title>Crosscut: healthcare on the margins</itunes:title>
